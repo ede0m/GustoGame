@@ -42,6 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\Sprite.cs" />
     <Compile Include="AnimatedSprite\Tower.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="CalculateTextureBoundingBox.cs" />
     <Compile Include="GameGusto.cs" />
     <Compile Include="Models\IShip.cs" />
+    <Compile Include="Models\Sail.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

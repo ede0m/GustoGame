@@ -16,15 +16,18 @@ namespace Gusto.Models
         public int millisecondsPerFrame; // turning speed
         public float baseMovementSpeed;
         public int health;
-        public int shipWindWindowAdd; // used to see if the ship can catch wind
-        public int shipWindWindowSub; // ...
+        public int sailUnits;
         int shipWindWindowMax;
         int shipWindWindowMin;
         int sailPositionInRespectToShip;
 
+        public Sail shipSail { get; set; }
+
         public Ship(Texture2D texture, Texture2D boundingBoxFrame, int rows, int columns, Vector2 startingLoc, float scale, string bbKey) 
             : base(texture, boundingBoxFrame, rows, columns, startingLoc, scale, bbKey){}
 
+
+        // Ship collision handler
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
             if (collidedWith.boundingBoxKey.Equals("tower"))
@@ -43,8 +46,8 @@ namespace Gusto.Models
             int xdir = Math.Sign(ShipDirectionVectorValues[currRowFrame].Item1);
             int ydir = Math.Sign(ShipDirectionVectorValues[currRowFrame].Item2);
             // construct ship window
-            shipWindWindowMax = windDirection + shipWindWindowAdd;
-            shipWindWindowMin = windDirection - shipWindWindowSub;
+            shipWindWindowMax = windDirection + shipSail.windWindowAdd;
+            shipWindWindowMin = windDirection - shipSail.windWindowSub;
             sailPositionInRespectToShip = currRowFrame;
             BoundShipWindow();
 

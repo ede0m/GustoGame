@@ -14,12 +14,14 @@ namespace Gusto.AnimatedSprite
 
         public BaseShip(Texture2D texture, Texture2D bbF, int rows, int columns, Vector2 location, float scale, string bbKey) : base(texture, bbF, rows, columns, location, scale, bbKey)
         {
+            shipSail = new BaseSail();
+            // TODO: align the saile on the 
+
             timeSinceLastFrame = 0;
-            millisecondsPerFrame = 300;
+            millisecondsPerFrame = 300; // turn speed
             baseMovementSpeed = 0.3f;
+            sailUnits = 1;
             health = 100;
-            shipWindWindowAdd = 1; // todo -- sail model??
-            shipWindWindowSub = 1;
             MapModelMovementVectorValues();
         }
 
@@ -53,7 +55,7 @@ namespace Gusto.AnimatedSprite
                 Tuple<float, float> movementValues = ShipDirectionVectorValues[currRowFrame];
                 location.X += movementValues.Item1;
                 location.Y += movementValues.Item2;
-                SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, 2.0f, 0, 2);
+                SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, 2.0f, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
                 Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
         }
