@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
+using Gusto.Models;
 
 namespace Gusto.AnimatedSprite
 {
@@ -13,7 +14,7 @@ namespace Gusto.AnimatedSprite
         private int millisecondsPerFrame;
         Random randomGeneration;
 
-        public Tower(Texture2D texture, Texture2D bbF, int rows, int columns, Vector2 location, float scale, string bbKey) : base(texture, bbF, rows, columns, location, scale, bbKey)
+        public Tower(Vector2 location, Asset asset) : base(location, asset)
         {
             randomGeneration = new Random();
             currRowFrame = 0;
@@ -43,7 +44,7 @@ namespace Gusto.AnimatedSprite
             // Only stop movement when colliding at the bottom of the tower
             int movePastTowerThresholdBehind =  this.GetBoundingBox().Bottom - 40;
             int movePastTowerThresholdInfront =  this.GetBoundingBox().Bottom + 40;
-            if (collidedWith.boundingBoxKey.Equals("ship") && (overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
+            if (collidedWith.bbKey.Equals("ship") && (overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
             {
                 Trace.WriteLine("Collision at base of tower");
                 collidedWith.moving = false;

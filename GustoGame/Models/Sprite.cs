@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gusto.Models;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Gusto.AnimatedSprite
@@ -17,19 +18,19 @@ namespace Gusto.AnimatedSprite
         public int currRowFrame;
         public int currColumnFrame;
 
-        public string boundingBoxKey { get; set; }
+        public string bbKey { get; set; }
         public bool moving { get; set; }
 
-        public Sprite(Texture2D texture, Texture2D boundingBoxFrame, int rows, int columns, Vector2 startingLoc, float scale, string bbKey)
+        public Sprite(Vector2 startingLoc, Asset asset)
         {
-            _texture = texture;
-            spriteScale = scale;
+            _texture = asset.Texture;
+            spriteScale = asset.Scale;
             location = startingLoc;
-            nRows = rows;
-            nColumns = columns;
+            nRows = asset.Rows;
+            nColumns = asset.Columns;
             currRowFrame = 0;
             currColumnFrame = 0;
-            boundingBoxKey = bbKey;
+            bbKey = asset.BBKey;
             moving = true;
 
             int width = _texture.Width / nColumns;
@@ -38,22 +39,22 @@ namespace Gusto.AnimatedSprite
 
             if (bbKey != null)
             {
-                boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures["ship"][currColumnFrame.ToString() + currRowFrame.ToString()];
+                boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
                 boundingBoxRect.X = ((int)location.X + ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2) - ((boundingBoxRect.Right - boundingBoxRect.Left) / 2);
                 boundingBoxRect.Y = ((int)location.Y + ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2) - ((boundingBoxRect.Bottom - boundingBoxRect.Top) / 2);
             }
 
             // For DEBUG highlighting bounding box
-            if (boundingBoxFrame != null)
+            if (asset.BBTexture != null)
             {
                 // generate a bounding box around the sprite at the current location
-                int bbW = boundingBoxFrame.Width;
-                int bbH = boundingBoxFrame.Height;
+                int bbW = asset.BBTexture.Width;
+                int bbH = asset.BBTexture.Height;
                 Color[] data = new Color[bbW * bbH];
                 for (int i = 0; i < data.Length; i++)
                     data[i] = Color.Orange;
-                boundingBoxFrame.SetData(data);
-                boundingBox = boundingBoxFrame;
+                asset.BBTexture.SetData(data);
+                boundingBox = asset.BBTexture;
             }
         }
 
@@ -84,9 +85,9 @@ namespace Gusto.AnimatedSprite
 
 
             // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
-            if (boundingBoxKey != null)
+            if (bbKey != null)
             {
-                boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[boundingBoxKey][currColumnFrame.ToString() + currRowFrame.ToString()];
+                boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
                 boundingBoxRect.X = ((int)location.X + ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2) - ((boundingBoxRect.Right - boundingBoxRect.Left) / 2);
                 boundingBoxRect.Y = ((int)location.Y + ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2) - ((boundingBoxRect.Bottom - boundingBoxRect.Top) / 2);
             }

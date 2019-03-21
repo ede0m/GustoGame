@@ -44,12 +44,14 @@
   <ItemGroup>
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
-    <Compile Include="AnimatedSprite\Sprite.cs" />
+    <Compile Include="Models\Sprite.cs" />
     <Compile Include="AnimatedSprite\Tower.cs" />
     <Compile Include="AnimatedSprite\WindArrows.cs" />
+    <Compile Include="AssetFinder.cs" />
     <Compile Include="BoundingBoxTextures.cs" />
     <Compile Include="CalculateTextureBoundingBox.cs" />
     <Compile Include="GameGusto.cs" />
+    <Compile Include="Models\Asset.cs" />
     <Compile Include="Models\IShip.cs" />
     <Compile Include="Models\Sail.cs" />
     <Compile Include="Models\Ship.cs" />
@@ -115,8 +117,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
-    <None Include="Content\bin\DesktopGL\ball.xnb" />
-    <None Include="Content\bin\DesktopGL\Content\ball.xnb" />
     <None Include="Content\bin\DesktopGL\Content\NextShipSpriteSheetFINAL.xnb" />
     <None Include="Content\bin\DesktopGL\Content\NextShipSpriteSheetRevised.xnb" />
     <None Include="Content\bin\DesktopGL\Content\tower.xnb" />
@@ -127,10 +127,8 @@
     <None Include="Content\bin\DesktopGL\WindArrows.xnb" />
     <None Include="Content\obj\DesktopGL\.mgcontent" />
     <None Include="Content\obj\DesktopGL\.mgstats" />
-    <None Include="Content\obj\DesktopGL\ball.mgcontent" />
     <None Include="Content\obj\DesktopGL\Content\.mgcontent" />
     <None Include="Content\obj\DesktopGL\Content\.mgstats" />
-    <None Include="Content\obj\DesktopGL\Content\ball.mgcontent" />
     <None Include="Content\obj\DesktopGL\Content\NextShipSpriteSheetFINAL.mgcontent" />
     <None Include="Content\obj\DesktopGL\Content\NextShipSpriteSheetRevised.mgcontent" />
     <None Include="Content\obj\DesktopGL\Content\tower.mgcontent" />
@@ -141,7 +139,6 @@
     <None Include="Content\obj\DesktopGL\WindArrows.mgcontent" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\ball.png" />
     <Content Include="Content\NextShipSpriteSheetFINAL.png" />
     <Content Include="Content\NextShipSpriteSheetRevised.png" />
     <Content Include="Content\tower.png" />

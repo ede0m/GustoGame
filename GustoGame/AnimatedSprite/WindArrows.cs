@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using Gusto.Models;
 
 namespace Gusto.AnimatedSprite
 {
@@ -12,7 +13,7 @@ namespace Gusto.AnimatedSprite
         private int millisecondsPerFrame;
         Random randomGeneration;
 
-        public WindArrows(Texture2D texture, Texture2D bbF, int rows, int columns, Vector2 location, float scale, string bbKey) : base(texture, bbF, rows, columns, location, scale, bbKey)
+        public WindArrows(Vector2 location, Asset asset) : base(location, asset)
         {
             randomGeneration = new Random();
             timeSinceLastFrame = 0;
@@ -45,19 +46,6 @@ namespace Gusto.AnimatedSprite
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
             throw new NotImplementedException();
-        }
-
-        private void BoundFrames()
-        {
-            if (currRowFrame < 0)
-                currRowFrame = nRows - 1;
-            else if (currRowFrame == nRows)
-                currRowFrame = 0;
-
-            if (currColumnFrame == nColumns)
-                currColumnFrame = 0;
-            else if (currColumnFrame < 0)
-                currColumnFrame = nColumns - 1;
         }
 
         private void RandomWind()
