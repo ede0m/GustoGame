@@ -68,7 +68,7 @@ namespace Gusto.Models
                 location.X += movementValues.Item1;
                 location.Y += movementValues.Item2;
                 SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
+                //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
         }
 
@@ -90,15 +90,14 @@ namespace Gusto.Models
             BoundShipWindow();
 
             int addedWindWindow = windDirection;
-            //sailPositionInRespectToShip = currRowFrame;
             // sail in wind direction bonus (expands ShipWindWindow)
-            if (currColumnFrame == sailRColumn)  // sail is right
+            if (shipSail.currColumnFrame == sailRColumn)  // sail is right
             {
                 sailPositionInRespectToShip--;
                 addedWindWindow = shipWindWindowMax;
                 shipWindWindowMax++;
             }
-            else if (currColumnFrame == sailLColumn) // sail is left
+            else if (shipSail.currColumnFrame == sailLColumn) // sail is left
             {
                 sailPositionInRespectToShip++;
                 addedWindWindow = shipWindWindowMin;
@@ -127,7 +126,6 @@ namespace Gusto.Models
             // set the sail location here (equal to ship location plus the offset on the texture to hit the mount)
             int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
             int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
-
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
         }
