@@ -29,10 +29,7 @@ namespace Gusto.Models
 
         public Sail shipSail { get; set; }
 
-        public Ship() 
-        {
-        }
-
+        public Ship() {}
 
         // Ship collision handler
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -113,7 +110,7 @@ namespace Gusto.Models
             if (currRowFrame == shipWindWindowMin || currRowFrame == shipWindWindowMax || currRowFrame == addedWindWindow || currRowFrame == windDirection)
             {
 
-                Trace.WriteLine("CATCHING WIND\n ship pos: " + currRowFrame.ToString() + "\n Max: " + shipWindWindowMax.ToString() + " windDir: " + windDirection.ToString() + " Min: " + shipWindWindowMin.ToString());
+                Trace.WriteLine("\nCATCHING WIND\n ship pos: " + currRowFrame.ToString() + "\n Max: " + shipWindWindowMax.ToString() + " windDir: " + windDirection.ToString() + " Min: " + shipWindWindowMin.ToString() + "\n");
                 location.Y += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus * windSpeed;
                 location.X += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus * windSpeed;
                 if (sailDirectlyInWind)

@@ -30,7 +30,7 @@ namespace Gusto
         
         public GameGusto()
         {
-            GameOptions.ShowBoundingBox = false;
+            GameOptions.ShowBoundingBox = true;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1400;
             graphics.PreferredBackBufferHeight = 1200;
@@ -108,39 +108,6 @@ namespace Gusto
                 }
             }
         }
-
-        /*public Tuple<int, int> GetSailMountCords(Texture2D texture, int rows, int cols, string key)
-        {
-            Color[,] Colors = TextureUtility.TextureTo2DArray(texture);
-
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols; c++)
-                {
-                    // target frame on the texture
-                    int width = texture.Width / cols;
-                    int height = texture.Height / rows;
-                    int X = width * c;
-                    int Y = height * r;
-   
-                    for (int a = X; a < X + width; a++)
-                    {
-                        for (int b = Y; b < Y + height; b++)
-                        {
-                            //If we find a the red sail mount color
-                                if (Colors[a, b].R == 255 && Colors[a, b].G == 45 && Colors[a, b].B == 0 && Colors[a, b].A == 255)
-                            {
-                                if (!SailMountTextureCoordinates.SailMountCords.ContainsKey(key))
-                                    SailMountTextureCoordinates.SailMountCords.Add(key, new Dictionary<int, Tuple<int, int>>());
-                                if (!SailMountTextureCoordinates.SailMountCords[key].ContainsKey(r))
-                                    SailMountTextureCoordinates.SailMountCords[key][r] = new Tuple<int, int>(a-X, b-Y);
-                            }
-                        }
-                    }
-                }
-            }
-            return null;
-        }*/
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload

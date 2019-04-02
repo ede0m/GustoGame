@@ -23,9 +23,9 @@ namespace Gusto.Bounds
                             },
                             {1, new Dictionary<int, Tuple<int, int>>
                                 {
-                                    { 0, new Tuple<int, int>(-23, -50)},
-                                    { 1, new Tuple<int, int>(-28, -58)},
-                                    { 2, new Tuple<int, int>(-32, -41)}
+                                    { 0, new Tuple<int, int>(-23, -100)},
+                                    { 1, new Tuple<int, int>(-29, -110)},
+                                    { 2, new Tuple<int, int>(-32, -92)}
                                 }
                             },
                             {2, new Dictionary<int, Tuple<int, int>>
@@ -65,9 +65,9 @@ namespace Gusto.Bounds
                             },
                             {7, new Dictionary<int, Tuple<int, int>>
                                 {
-                                    { 0, new Tuple<int, int>(32, -42)},
-                                    { 1, new Tuple<int, int>(30, -60)},
-                                    { 2, new Tuple<int, int>(26, -55)}
+                                    { 0, new Tuple<int, int>(32, -90)},
+                                    { 1, new Tuple<int, int>(29, -110)},
+                                    { 2, new Tuple<int, int>(25, -100)}
                                 }
                             },
 

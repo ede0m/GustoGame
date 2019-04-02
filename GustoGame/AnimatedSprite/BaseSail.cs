@@ -27,10 +27,9 @@ namespace Gusto.AnimatedSprite
 
             Texture2D textureBaseSail = content.Load<Texture2D>("DecomposedBaseSail");
             Texture2D textureBaseSailBB = null;
-            Asset baseSailAsset = new Asset(textureBaseSail, textureBaseSailBB, 3, 8, 0.6f, "baseSail");
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseSailBB = new Texture2D(graphics, textureBaseSail.Width, textureBaseSail.Height);
-
+            Asset baseSailAsset = new Asset(textureBaseSail, textureBaseSailBB, 3, 8, 0.6f, "baseSail");
             SetSpriteAsset(baseSailAsset, location);
         }
 
