@@ -26,7 +26,6 @@ namespace Gusto.Models
 
         public Sail()
         {
-            MapModelMovementVectorValues();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -74,7 +73,7 @@ namespace Gusto.Models
 
 
         // map ship direction sprite frames (ROWS) to base movement values
-        private void MapModelMovementVectorValues()
+        public void MapModelMovementVectorValues()
         {
             float sin45deg = (float)(1 / Math.Sqrt(2));
 

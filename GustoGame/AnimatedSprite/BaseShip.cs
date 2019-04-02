@@ -22,6 +22,7 @@ namespace Gusto.AnimatedSprite
             sailUnits = 1;
             health = 100;
 
+            MapModelMovementVectorValues();
 
             Texture2D textureBaseShip = content.Load<Texture2D>("BaseShip");
             Texture2D textureBaseShipBB = null;

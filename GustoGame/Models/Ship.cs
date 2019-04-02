@@ -29,7 +29,7 @@ namespace Gusto.Models
 
         public Ship() 
         {
-            MapModelMovementVectorValues();
+
         }
 
 
@@ -72,6 +72,7 @@ namespace Gusto.Models
                 // map frame to vector movement
                 Tuple<float, float> movementValues = ShipDirectionVectorValues[currRowFrame];
                 location.X += movementValues.Item1;
+                Trace.WriteLine(movementValues.Item1);
                 location.Y += movementValues.Item2;
                 SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, 2.0f, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
                 Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
@@ -144,7 +145,7 @@ namespace Gusto.Models
         }
 
         // map ship direction sprite frames (ROWS) to base movement values
-        private void MapModelMovementVectorValues()
+        public void MapModelMovementVectorValues()
         {
             float sin45deg = (float)(1 / Math.Sqrt(2));
 
