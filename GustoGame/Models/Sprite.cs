@@ -8,7 +8,7 @@ namespace Gusto.AnimatedSprite
     {
         protected Texture2D _texture;
         protected Texture2D boundingBox;
-        private Rectangle targetRectangle;
+        public Rectangle targetRectangle;
         private Rectangle boundingBoxRect;
         public float spriteScale;
 

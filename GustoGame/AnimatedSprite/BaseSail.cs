@@ -25,9 +25,7 @@ namespace Gusto.AnimatedSprite
             windWindowAdd = 1;
             windWindowSub = 1;
 
-            MapModelMovementVectorValues();
-
-            Texture2D textureBaseSail = content.Load<Texture2D>("BaseSail");
+            Texture2D textureBaseSail = content.Load<Texture2D>("DecomposedBaseSail");
             Texture2D textureBaseSailBB = null;
             Asset baseSailAsset = new Asset(textureBaseSail, textureBaseSailBB, 3, 8, 0.6f, "baseSail");
             if (Gusto.GameOptions.ShowBoundingBox)

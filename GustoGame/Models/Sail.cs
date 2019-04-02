@@ -50,7 +50,7 @@ namespace Gusto.Models
                     else if (kstate.IsKeyDown(Keys.Right))
                         currColumnFrame--;
                 }
-                else
+                else 
                 {
                     // ship direction
                     if (kstate.IsKeyDown(Keys.Left))
@@ -61,32 +61,6 @@ namespace Gusto.Models
                 BoundFrames();
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
-            if (moving)
-            {
-                // map frame to vector movement
-                Tuple<float, float> movementValues = ShipDirectionVectorValues[currRowFrame];
-                location.X += movementValues.Item1;
-                location.Y += movementValues.Item2;
-                Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
-            }
-        }
-
-
-        // map ship direction sprite frames (ROWS) to base movement values
-        public void MapModelMovementVectorValues()
-        {
-            float sin45deg = (float)(1 / Math.Sqrt(2));
-
-            ShipDirectionVectorValues = new Dictionary<int, Tuple<float, float>>();
-            // map ship direction sprite frames (ROWS) to base movement values
-            ShipDirectionVectorValues[0] = new Tuple<float, float>(0, -sailSpeed);
-            ShipDirectionVectorValues[1] = new Tuple<float, float>(-(sailSpeed * sin45deg), -sailSpeed * sin45deg); // NW so -25x and +25y
-            ShipDirectionVectorValues[2] = new Tuple<float, float>(-(sailSpeed), 0); // W so -50x and 0y
-            ShipDirectionVectorValues[3] = new Tuple<float, float>(-sailSpeed * sin45deg, sailSpeed * sin45deg); // ...
-            ShipDirectionVectorValues[4] = new Tuple<float, float>(0, (sailSpeed));
-            ShipDirectionVectorValues[5] = new Tuple<float, float>(sailSpeed * sin45deg, sailSpeed * sin45deg);
-            ShipDirectionVectorValues[6] = new Tuple<float, float>(sailSpeed, 0);
-            ShipDirectionVectorValues[7] = new Tuple<float, float>(sailSpeed * sin45deg, -sailSpeed * sin45deg);
         }
 
     }

@@ -1,12 +1,14 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Bounds;
 using Gusto.Models;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Gusto
 {
@@ -56,22 +58,27 @@ namespace Gusto
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // generate texture bounding boxes game content
+            // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
+            GetSailMountCords(textureBaseShip, 8, 1, "baseShip");
             //textureBaseShip.Dispose();
-            Texture2D textureBaseSail = Content.Load<Texture2D>("BaseSail");
+            Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
+            GetSailMountCords(textureBaseSail, 8, 3, "baseSail");
             //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
             //textureTower.Dispose();
 
+
+
             // create models and initally place them
             baseShip = new BaseShip(new Vector2(1000, 800), Content, GraphicsDevice);
             tower = new Tower(new Vector2(600, 300), Content, GraphicsDevice);
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
-
+            
+            
             // fill draw order list
             DrawOrder = new List<Sprite>();
             DrawOrder.Add(baseShip);
@@ -100,6 +107,38 @@ namespace Gusto
                     BoundingBoxTextures.DynamicBoundingBoxTextures[key].Add(i.ToString() + j.ToString(), bb);
                 }
             }
+        }
+
+        public Tuple<int, int> GetSailMountCords(Texture2D texture, int rows, int cols, string key)
+        {
+            Color[,] Colors = TextureUtility.TextureTo2DArray(texture);
+
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    // target frame on the texture
+                    int width = texture.Width / cols;
+                    int height = texture.Height / rows;
+                    int X = width * c;
+                    int Y = height * r;
+   
+                    for (int a = X; a < X + width; a++)
+                    {
+                        for (int b = Y; b < Y + height; b++)
+                        {
+                            //If we find a the red sail mount color
+                                if (Colors[a, b].R == 255 && Colors[a, b].G == 45 && Colors[a, b].B == 0 && Colors[a, b].A == 255)
+                            {
+                                if (!SailMountTextureCoordinates.SailMountCords.ContainsKey(key))
+                                    SailMountTextureCoordinates.SailMountCords.Add(key, new Dictionary<int, Tuple<int, int>>());
+                                SailMountTextureCoordinates.SailMountCords[key][r] = new Tuple<int, int>(a-X, b-Y);
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -179,6 +218,14 @@ namespace Gusto
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
             {
+                // Draw a ships sail before a ship
+                if(sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship) sprite;
+                    sprite.Draw(spriteBatch);
+                    ship.shipSail.Draw(spriteBatch);
+                    continue;
+                }
                 sprite.Draw(spriteBatch);
             }
             base.Draw(gameTime);

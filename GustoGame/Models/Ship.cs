@@ -1,4 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Bounds;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -29,7 +31,6 @@ namespace Gusto.Models
 
         public Ship() 
         {
-
         }
 
 
@@ -49,14 +50,7 @@ namespace Gusto.Models
             if (timeSinceLastFrame > millisecondsPerFrame)
             {
                 // sail direction
-                if (kstate.IsKeyDown(Keys.LeftShift))
-                {
-                    if (kstate.IsKeyDown(Keys.Left))
-                        currColumnFrame++;
-                    else if (kstate.IsKeyDown(Keys.Right))
-                        currColumnFrame--;
-                }
-                else
+                if (!kstate.IsKeyDown(Keys.LeftShift))
                 {
                     // ship direction
                     if (kstate.IsKeyDown(Keys.Left))
@@ -72,9 +66,8 @@ namespace Gusto.Models
                 // map frame to vector movement
                 Tuple<float, float> movementValues = ShipDirectionVectorValues[currRowFrame];
                 location.X += movementValues.Item1;
-                Trace.WriteLine(movementValues.Item1);
                 location.Y += movementValues.Item2;
-                SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, 2.0f, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
+                SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
                 Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
         }
@@ -91,7 +84,9 @@ namespace Gusto.Models
             // construct ship window
             shipWindWindowMax = windDirection + shipSail.windWindowAdd;
             shipWindWindowMin = windDirection - shipSail.windWindowSub;
-            sailPositionInRespectToShip = currRowFrame;
+
+            sailPositionInRespectToShip = shipSail.currRowFrame; // TODO: this (row) needs to draw from sail sprite data
+
             BoundShipWindow();
 
             int addedWindWindow = windDirection;
@@ -128,6 +123,10 @@ namespace Gusto.Models
                     location.X += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus;
                 }
             }
+
+            // set the sail location here (equal to ship location plus the offset on the texture to hit the mount)
+            shipSail.location.X = location.X - SailMountTextureCoordinates.SailMountCords[shipSail.bbKey][shipSail.currRowFrame].Item1;// - SailMountTextureCoordinates.SailMountCords[bbKey][currRowFrame].Item1;
+            shipSail.location.Y = location.Y - SailMountTextureCoordinates.SailMountCords[shipSail.bbKey][shipSail.currRowFrame].Item2;// - SailMountTextureCoordinates.SailMountCords[bbKey][currRowFrame].Item2;
         }
         
         // handles cycling the shipWindWindow and sail position against ship direction
@@ -160,6 +159,5 @@ namespace Gusto.Models
             ShipDirectionVectorValues[6] = new Tuple<float, float>(baseMovementSpeed, 0);
             ShipDirectionVectorValues[7] = new Tuple<float, float>(baseMovementSpeed * sin45deg, -baseMovementSpeed * sin45deg);
         }
-
     }
 }
