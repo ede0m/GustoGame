@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
+using Gusto.Models;
+using Microsoft.Xna.Framework.Content;
 
 namespace Gusto.AnimatedSprite
 {
@@ -13,13 +15,21 @@ namespace Gusto.AnimatedSprite
         private int millisecondsPerFrame;
         Random randomGeneration;
 
-        public Tower(Texture2D texture, Texture2D bbF, int rows, int columns, Vector2 location, float scale, string bbKey) : base(texture, bbF, rows, columns, location, scale, bbKey)
+        public Tower(Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             randomGeneration = new Random();
             currRowFrame = 0;
             currColumnFrame = 0;
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 10000;
+
+            Texture2D textureTower = content.Load<Texture2D>("tower");
+            Texture2D textureTowerBB = null;
+            if (Gusto.GameOptions.ShowBoundingBox)
+                textureTowerBB = new Texture2D(graphics, textureTower.Width, textureTower.Height);
+            Asset towerAsset = new Asset(textureTower, textureTowerBB, 1, 1, 0.5f, "tower");
+
+            SetSpriteAsset(towerAsset, location);
         }
 
         // logic to find correct frame of sprite from user input
@@ -43,7 +53,7 @@ namespace Gusto.AnimatedSprite
             // Only stop movement when colliding at the bottom of the tower
             int movePastTowerThresholdBehind =  this.GetBoundingBox().Bottom - 40;
             int movePastTowerThresholdInfront =  this.GetBoundingBox().Bottom + 40;
-            if (collidedWith.boundingBoxKey.Equals("ship") && (overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
+            if (collidedWith.bbKey.Equals("baseShip") && (overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
             {
                 Trace.WriteLine("Collision at base of tower");
                 collidedWith.moving = false;

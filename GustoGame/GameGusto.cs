@@ -1,9 +1,14 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Bounds;
+using Gusto.Models;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Gusto
 {
@@ -13,15 +18,10 @@ namespace Gusto
     public class GameGusto : Game
     {
 
-        public bool showBoundingBox;
-
-        private BaseShip ship;
-        private WindArrows windArrows;
-        private Tower tower;
-
-        Texture2D textureShip;
-        Texture2D textureWindArrows;
-        Texture2D textureTower;
+        // TEMPORARY -- expose the "players and enemies". 
+        BaseShip baseShip;
+        Tower tower;
+        WindArrows windArrows;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
         GraphicsDeviceManager graphics;
@@ -30,10 +30,10 @@ namespace Gusto
         
         public GameGusto()
         {
-            showBoundingBox = false;
+            GameOptions.ShowBoundingBox = true;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1400;
-            graphics.PreferredBackBufferHeight = 1000;
+            graphics.PreferredBackBufferHeight = 1200;
             Content.RootDirectory = "Content";
         }
 
@@ -58,32 +58,31 @@ namespace Gusto
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Loads game content and starting position.
-            textureShip = Content.Load<Texture2D>("NextShipSpriteSheetRevised");
-            LoadDynamicBoundingBoxPerFrame(8, 3, textureShip, "ship", 0.6f);
-            Texture2D textureShipBB = null;
-
-            textureTower = Content.Load<Texture2D>("tower");
+            // PREPROCESSING
+            Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
+            LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
+            //GetSailMountCords(textureBaseShip, 8, 1, "baseShip");
+            //textureBaseShip.Dispose();
+            Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
+            LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
+            //GetSailMountCords(textureBaseSail, 8, 3, "baseSail");
+            //textureBaseSail.Dispose();
+            Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
-            Texture2D textureTowerBB = null;
+            //textureTower.Dispose();
 
-            textureWindArrows = Content.Load<Texture2D>("WindArrows");
 
-            // debug options
-            if (showBoundingBox)
-            {
-                textureShipBB = new Texture2D(GraphicsDevice, textureShip.Width, textureShip.Height);
-                textureTowerBB = new Texture2D(GraphicsDevice, textureTower.Width, textureTower.Height);
-            }
 
-            // create sprite models
-            ship = new BaseShip(textureShip, textureShipBB, 8, 3, new Vector2(1000, 800), 0.6f, "ship");
-            tower = new Tower(textureTower, textureTowerBB, 1, 1, new Vector2(600, 300), 0.5f, "tower");
-            windArrows = new WindArrows(textureWindArrows, null, 8, 2, new Vector2(1250, 0), 1.0f, null);
-
+            // create models and initally place them
+            baseShip = new BaseShip(new Vector2(1000, 800), Content, GraphicsDevice);
+            tower = new Tower(new Vector2(600, 300), Content, GraphicsDevice);
+            windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
+            
+            
             // fill draw order list
             DrawOrder = new List<Sprite>();
-            DrawOrder.Add(ship);
+            DrawOrder.Add(baseShip);
+            // TODO figure out how to get a ships sail in the draw order
             DrawOrder.Add(tower);
         }
 
@@ -162,8 +161,10 @@ namespace Gusto
             windArrows.Update(kstate, gameTime);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
-            // Ship
-            ship.Update(kstate, gameTime, windDirection, windSpeed);
+            // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
+            baseShip.Update(kstate, gameTime, windDirection, windSpeed);
+            baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+
             // Tower
             tower.Update(kstate, gameTime);
 
@@ -185,6 +186,14 @@ namespace Gusto
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
             {
+                // Draw a ships sail before a ship
+                if(sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship) sprite;
+                    sprite.Draw(spriteBatch);
+                    ship.shipSail.Draw(spriteBatch);
+                    continue;
+                }
                 sprite.Draw(spriteBatch);
             }
             base.Draw(gameTime);
