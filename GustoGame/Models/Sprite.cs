@@ -21,7 +21,9 @@ namespace Gusto.AnimatedSprite
         public string bbKey { get; set; }
         public bool moving { get; set; }
 
-        public Sprite(Vector2 startingLoc, Asset asset)
+        public Sprite(){}
+
+        public void SetSpriteAsset(Asset asset, Vector2 startingLoc)
         {
             _texture = asset.Texture;
             spriteScale = asset.Scale;

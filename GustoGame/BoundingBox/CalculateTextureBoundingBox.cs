@@ -1,10 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
-namespace Gusto
+namespace Gusto.Bounds
 {
-    public static class CalculateTextureBoundingBox
+    public class CalculateTextureBoundingBox
     {
+
+
         //Get smallest rectangle from Texture, cased on color
         public static Rectangle GetSmallestRectangleFromTexture(Texture2D Texture, float scale)
         {

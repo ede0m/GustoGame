@@ -44,12 +44,12 @@
   <ItemGroup>
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
+    <Compile Include="GameOptions.cs" />
     <Compile Include="Models\Sprite.cs" />
     <Compile Include="AnimatedSprite\Tower.cs" />
     <Compile Include="AnimatedSprite\WindArrows.cs" />
-    <Compile Include="AssetFinder.cs" />
-    <Compile Include="BoundingBoxTextures.cs" />
-    <Compile Include="CalculateTextureBoundingBox.cs" />
+    <Compile Include="BoundingBox\BoundingBoxTextures.cs" />
+    <Compile Include="BoundingBox\CalculateTextureBoundingBox.cs" />
     <Compile Include="GameGusto.cs" />
     <Compile Include="Models\Asset.cs" />
     <Compile Include="Models\IShip.cs" />
@@ -57,7 +57,7 @@
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuadTreeCollision.cs" />
+    <Compile Include="BoundingBox\QuadTreeCollision.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

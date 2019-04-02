@@ -1,6 +1,8 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Bounds;
 using Gusto.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -13,14 +15,11 @@ namespace Gusto
     /// </summary>
     public class GameGusto : Game
     {
+
         // TEMPORARY -- expose the "players and enemies". 
         BaseShip baseShip;
         Tower tower;
         WindArrows windArrows;
-
-
-
-        public bool showBoundingBox;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
         GraphicsDeviceManager graphics;
@@ -29,7 +28,7 @@ namespace Gusto
         
         public GameGusto()
         {
-            showBoundingBox = false;
+            GameOptions.ShowBoundingBox = false;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1400;
             graphics.PreferredBackBufferHeight = 1000;
@@ -57,48 +56,21 @@ namespace Gusto
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Loads game content and starting position.
-
+            // generate texture bounding boxes game content
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            Texture2D textureBaseShipBB = null;
-
+            //textureBaseShip.Dispose();
             Texture2D textureBaseSail = Content.Load<Texture2D>("BaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
-            Texture2D textureBaseSailBB = null;
-
+            //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
-            Texture2D textureTowerBB = null;
-
-            // OLD TEXTURES
-            /*textureShip = Content.Load<Texture2D>("NextShipSpriteSheetRevised");
-            LoadDynamicBoundingBoxPerFrame(8, 3, textureShip, "ship", 0.6f);
-            Texture2D textureShipBB = null;*/
-
-            Texture2D textureWindArrows = Content.Load<Texture2D>("WindArrows");
-
-            // debug options
-            if (showBoundingBox)
-            {
-                textureBaseShipBB = new Texture2D(GraphicsDevice, textureBaseShip.Width, textureBaseShip.Height);
-                textureBaseSailBB = new Texture2D(GraphicsDevice, textureBaseSail.Width, textureBaseSail.Height);
-                textureTowerBB = new Texture2D(GraphicsDevice, textureTower.Width, textureTower.Height);
-            }
-
-            // create texture assets
-            Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip");
-            Asset baseSailAsset = new Asset(textureBaseSail, textureBaseSailBB, 3, 8, 0.6f, "baseSail");
-            Asset towerAsset = new Asset(textureTower, textureTowerBB, 1, 1, 0.5f, "tower");
-            Asset windArrowsAsset = new Asset(textureWindArrows, null, 2, 8, 1.0f, null);
-            AssetFinder.Ships.Add("baseShip", baseShipAsset);
-            AssetFinder.Sails.Add("baseSail", baseSailAsset);
-            AssetFinder.Towers.Add("tower", towerAsset);
+            //textureTower.Dispose();
 
             // create models and initally place them
-            baseShip = new BaseShip(new Vector2(1000, 800), baseShipAsset);
-            tower = new Tower(new Vector2(600, 300), towerAsset);
-            windArrows = new WindArrows(new Vector2(1250, 0), windArrowsAsset);
+            baseShip = new BaseShip(new Vector2(1000, 800), Content, GraphicsDevice);
+            tower = new Tower(new Vector2(600, 300), Content, GraphicsDevice);
+            windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
 
             // fill draw order list
             DrawOrder = new List<Sprite>();

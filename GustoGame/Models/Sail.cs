@@ -24,8 +24,7 @@ namespace Gusto.Models
         public int sailIsLeftColumn { get; set; }
         public int sailIsRightColumn { get; set; }
 
-        public Sail(Vector2 startingLoc, Asset asset)
-            : base(startingLoc, asset)
+        public Sail()
         {
             MapModelMovementVectorValues();
         }

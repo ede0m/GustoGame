@@ -27,10 +27,8 @@ namespace Gusto.Models
 
         public Sail shipSail { get; set; }
 
-        public Ship(Vector2 startingLoc, Asset asset) 
-            : base(startingLoc, asset)
+        public Ship() 
         {
-
             MapModelMovementVectorValues();
         }
 
