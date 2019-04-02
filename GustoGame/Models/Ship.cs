@@ -125,8 +125,11 @@ namespace Gusto.Models
             }
 
             // set the sail location here (equal to ship location plus the offset on the texture to hit the mount)
-            shipSail.location.X = location.X - SailMountTextureCoordinates.SailMountCords[shipSail.bbKey][shipSail.currRowFrame].Item1;// - SailMountTextureCoordinates.SailMountCords[bbKey][currRowFrame].Item1;
-            shipSail.location.Y = location.Y - SailMountTextureCoordinates.SailMountCords[shipSail.bbKey][shipSail.currRowFrame].Item2;// - SailMountTextureCoordinates.SailMountCords[bbKey][currRowFrame].Item2;
+            int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
+            int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
+
+            shipSail.location.X = location.X + sailMountX;
+            shipSail.location.Y = location.Y + sailMountY;
         }
         
         // handles cycling the shipWindWindow and sail position against ship direction
@@ -159,5 +162,6 @@ namespace Gusto.Models
             ShipDirectionVectorValues[6] = new Tuple<float, float>(baseMovementSpeed, 0);
             ShipDirectionVectorValues[7] = new Tuple<float, float>(baseMovementSpeed * sin45deg, -baseMovementSpeed * sin45deg);
         }
+
     }
 }

@@ -33,7 +33,7 @@ namespace Gusto
             GameOptions.ShowBoundingBox = false;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1400;
-            graphics.PreferredBackBufferHeight = 1000;
+            graphics.PreferredBackBufferHeight = 1200;
             Content.RootDirectory = "Content";
         }
 
@@ -61,11 +61,11 @@ namespace Gusto
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            GetSailMountCords(textureBaseShip, 8, 1, "baseShip");
+            //GetSailMountCords(textureBaseShip, 8, 1, "baseShip");
             //textureBaseShip.Dispose();
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
-            GetSailMountCords(textureBaseSail, 8, 3, "baseSail");
+            //GetSailMountCords(textureBaseSail, 8, 3, "baseSail");
             //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
@@ -109,7 +109,7 @@ namespace Gusto
             }
         }
 
-        public Tuple<int, int> GetSailMountCords(Texture2D texture, int rows, int cols, string key)
+        /*public Tuple<int, int> GetSailMountCords(Texture2D texture, int rows, int cols, string key)
         {
             Color[,] Colors = TextureUtility.TextureTo2DArray(texture);
 
@@ -132,14 +132,15 @@ namespace Gusto
                             {
                                 if (!SailMountTextureCoordinates.SailMountCords.ContainsKey(key))
                                     SailMountTextureCoordinates.SailMountCords.Add(key, new Dictionary<int, Tuple<int, int>>());
-                                SailMountTextureCoordinates.SailMountCords[key][r] = new Tuple<int, int>(a-X, b-Y);
+                                if (!SailMountTextureCoordinates.SailMountCords[key].ContainsKey(r))
+                                    SailMountTextureCoordinates.SailMountCords[key][r] = new Tuple<int, int>(a-X, b-Y);
                             }
                         }
                     }
                 }
             }
             return null;
-        }
+        }*/
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
