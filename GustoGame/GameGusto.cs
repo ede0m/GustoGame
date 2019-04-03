@@ -30,7 +30,6 @@ namespace Gusto
         
         public GameGusto()
         {
-            GameOptions.ShowBoundingBox = true;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1400;
             graphics.PreferredBackBufferHeight = 1200;
@@ -61,15 +60,15 @@ namespace Gusto
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            //GetSailMountCords(textureBaseShip, 8, 1, "baseShip");
             //textureBaseShip.Dispose();
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
-            //GetSailMountCords(textureBaseSail, 8, 3, "baseSail");
             //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
             //textureTower.Dispose();
+            Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
+            LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
 
 
 
@@ -82,7 +81,6 @@ namespace Gusto
             // fill draw order list
             DrawOrder = new List<Sprite>();
             DrawOrder.Add(baseShip);
-            // TODO figure out how to get a ships sail in the draw order
             DrawOrder.Add(tower);
         }
 
@@ -129,10 +127,82 @@ namespace Gusto
                 Exit();
             var kstate = Keyboard.GetState();
 
+            QuadTreeCollision(DrawOrder);
+            // Wind
+            windArrows.Update(kstate, gameTime);
+            int windDirection = windArrows.getWindDirection();
+            int windSpeed = windArrows.getWindSpeed();
+            // Tower
+            tower.Update(kstate, gameTime);
+            // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
+            baseShip.Update(kstate, gameTime, windDirection, windSpeed);
+            baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+
+            base.Update(gameTime);
+        }
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            // draw sprites that don't move
+            windArrows.Draw(spriteBatch);
+
+            // sort sprites by y cord asc and draw
+            DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+            foreach (var sprite in DrawOrder)
+            {
+                //Trace.WriteLine(sprite.GetType());
+                
+                // Draw a ships sail before a ship
+                if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship) sprite;
+                    sprite.Draw(spriteBatch);
+                    ship.shipSail.Draw(spriteBatch);
+                    continue;
+                } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.Tower))
+                {
+                    Tower tower = (Tower) sprite;
+                    sprite.Draw(spriteBatch);
+                    // draw any shots this tower has in motion
+                    foreach (var shot in tower.Shots)
+                        shot.Draw(spriteBatch);
+                    continue;
+                }
+                sprite.Draw(spriteBatch);
+            }
+            base.Draw(gameTime);
+        }
+
+        private void QuadTreeCollision(List<Sprite> DrawOrder)
+        {
             // quadtree collision handling
             quad.Clear();
             foreach (var sprite in DrawOrder) // TODO: could use just a list of colliadable objects here (e.g. dont use wind arrows)
+            {
+                if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship)sprite;
+                    quad.Insert(sprite);
+                    quad.Insert(ship);
+                    continue;
+                }
+                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.Tower))
+                {
+                    Tower tower = (Tower)sprite;
+                    quad.Insert(tower);
+                    foreach (var shot in tower.Shots)
+                        quad.Insert(shot);
+                    continue;
+                }
                 quad.Insert(sprite);
+            }
+
             List<Sprite> collidable = new List<Sprite>();
             foreach (var spriteA in DrawOrder)
             {
@@ -156,47 +226,6 @@ namespace Gusto
                     }
                 }
             }
-
-            // Wind
-            windArrows.Update(kstate, gameTime);
-            int windDirection = windArrows.getWindDirection();
-            int windSpeed = windArrows.getWindSpeed();
-            // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
-            baseShip.Update(kstate, gameTime, windDirection, windSpeed);
-            baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
-
-            // Tower
-            tower.Update(kstate, gameTime);
-
-            base.Update(gameTime);
-        }
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // draw sprites that don't move
-            windArrows.Draw(spriteBatch);
-
-            // sort sprites by y cord asc and draw
-            DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
-            foreach (var sprite in DrawOrder)
-            {
-                // Draw a ships sail before a ship
-                if(sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
-                {
-                    Ship ship = (Ship) sprite;
-                    sprite.Draw(spriteBatch);
-                    ship.shipSail.Draw(spriteBatch);
-                    continue;
-                }
-                sprite.Draw(spriteBatch);
-            }
-            base.Draw(gameTime);
         }
     }
 }

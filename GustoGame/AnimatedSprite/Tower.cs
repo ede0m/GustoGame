@@ -5,23 +5,38 @@ using System;
 using System.Diagnostics;
 using Gusto.Models;
 using Microsoft.Xna.Framework.Content;
+using System.Collections.Generic;
 
 namespace Gusto.AnimatedSprite
 {
     public class Tower : Sprite
     {
+        private ContentManager _content;
+        private GraphicsDevice _graphics;
+
         private Vector2 Location;
-        private int timeSinceLastFrame;
-        private int millisecondsPerFrame;
+        private int timeSinceLastShot;
+        private int timeSinceLastExpClean;
+        private int millisecondsNewShot;
+        private int millisecondsExplosionLasts;
         Random randomGeneration;
+
+        public List<CannonBall> Shots;
 
         public Tower(Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
+            _content = content;
+            _graphics = graphics;
+
             randomGeneration = new Random();
             currRowFrame = 0;
             currColumnFrame = 0;
-            timeSinceLastFrame = 0;
-            millisecondsPerFrame = 10000;
+            timeSinceLastShot = 0;
+            timeSinceLastExpClean = 0;
+            millisecondsNewShot = 1000;
+            millisecondsExplosionLasts = 1000;
+
+            Shots = new List<CannonBall>();
 
             Texture2D textureTower = content.Load<Texture2D>("tower");
             Texture2D textureTowerBB = null;
@@ -32,13 +47,31 @@ namespace Gusto.AnimatedSprite
             SetSpriteAsset(towerAsset, location);
         }
 
-        // logic to find correct frame of sprite from user input
-        public void Update(KeyboardState kstate, GameTime gameTime) // keeping kstate in here for possible powerup to change wind directrion
+        public void Update(KeyboardState kstate, GameTime gameTime)
         {
-            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastFrame > millisecondsPerFrame)
+            timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+            timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
+
+            foreach (var shot in Shots)
+                shot.Update(kstate, gameTime);
+
+            if (timeSinceLastExpClean > millisecondsExplosionLasts)
             {
-                timeSinceLastFrame -= millisecondsPerFrame;
+                // remove exploded shots
+                for (int i = 0; i < Shots.Count; i++)
+                {
+                    if (Shots[i].exploded)
+                        Shots.RemoveAt(i);
+                }
+                timeSinceLastExpClean -= millisecondsNewShot;
+            }
+
+            if (timeSinceLastShot > millisecondsNewShot)
+            {
+                BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
+                Shots.Add(cannonShot);
+                cannonShot.moving = true;
+                timeSinceLastShot -= millisecondsNewShot;
             }
         }
 
