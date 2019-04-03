@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Gusto.Models;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
+using Gusto.Bounding;
 
 namespace Gusto.AnimatedSprite
 {
@@ -69,8 +70,10 @@ namespace Gusto.AnimatedSprite
             if (timeSinceLastShot > millisecondsNewShot)
             {
                 BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
-                Shots.Add(cannonShot);
+                Tuple<int, int> shotDirection = BoundingBoxLocations.BoundingBoxLocationMap["baseShip"]; // TODO REMOVE HARDCODE AND SCAN BY TOWER RANGE
+                cannonShot.SetFireAtDirection(shotDirection);
                 cannonShot.moving = true;
+                Shots.Add(cannonShot);
                 timeSinceLastShot -= millisecondsNewShot;
             }
         }
@@ -90,9 +93,6 @@ namespace Gusto.AnimatedSprite
             {
                 Trace.WriteLine("Collision at base of tower");
                 collidedWith.moving = false;
-            } else
-            {
-                Trace.WriteLine("Collision but passing");
             }
         }
     }

@@ -4,6 +4,7 @@ using Gusto.AnimatedSprite;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Gusto.Models
 {
@@ -13,6 +14,8 @@ namespace Gusto.Models
         public int millisecondsPerFrame; // turning speed
         public float baseMovementSpeed;
         public bool exploded;
+        public int shotDirX;
+        public int shotDirY;
 
         public CannonBall(){}
 
@@ -38,11 +41,17 @@ namespace Gusto.Models
             {
                 if (moving)
                 {
-                    location.X += 100;
-                    location.Y += 100;
+                    location.X += shotDirX;
+                    location.Y += shotDirY;
                 }
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
+        }
+
+        public void SetFireAtDirection(Tuple<int,int> fireAtDirection)
+        {
+            shotDirX = (fireAtDirection.Item1 - GetBoundingBox().X) / 10;
+            shotDirY = (fireAtDirection.Item2 - GetBoundingBox().Y) / 10;
         }
 
     }

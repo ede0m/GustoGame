@@ -1,4 +1,5 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
 using Gusto.Utility;
@@ -204,8 +205,10 @@ namespace Gusto
             }
 
             List<Sprite> collidable = new List<Sprite>();
+            BoundingBoxLocations.BoundingBoxLocationMap.Clear();
             foreach (var spriteA in DrawOrder)
             {
+                BoundingBoxLocations.BoundingBoxLocationMap.Add(spriteA.bbKey, new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 Rectangle bbA = spriteA.GetBoundingBox();
                 quad.Retrieve(collidable, spriteA); //adds objects to collidable list if it is in quadrent of this sprite
                 foreach (var spriteB in collidable)

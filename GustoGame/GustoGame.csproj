@@ -45,6 +45,7 @@
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
+    <Compile Include="Bounding\BoundingBoxLocations.cs" />
     <Compile Include="Bounding\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Models\CannonBall.cs" />
