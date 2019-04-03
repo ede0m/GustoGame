@@ -14,8 +14,8 @@ namespace Gusto.Models
         public int millisecondsPerFrame; // turning speed
         public float baseMovementSpeed;
         public bool exploded;
-        public int shotDirX;
-        public int shotDirY;
+        public float shotDirX;
+        public float shotDirY;
 
         public CannonBall(){}
 
@@ -27,7 +27,6 @@ namespace Gusto.Models
             } else
             {
                 currColumnFrame++; // explosion
-                moving = false;
                 exploded = true;
                 BoundFrames();
             }
@@ -48,11 +47,16 @@ namespace Gusto.Models
             }
         }
 
-        public void SetFireAtDirection(Tuple<int,int> fireAtDirection)
+        public void SetFireAtDirection(Tuple<int,int> fireAtDirection, int propulsion)
         {
-            shotDirX = (fireAtDirection.Item1 - GetBoundingBox().X) / 10;
-            shotDirY = (fireAtDirection.Item2 - GetBoundingBox().Y) / 10;
+            float vMag = VectorMagnitude(GetBoundingBox().X, fireAtDirection.Item1, GetBoundingBox().Y, fireAtDirection.Item2);
+            shotDirX = (fireAtDirection.Item1 - GetBoundingBox().X) / vMag  * propulsion;
+            shotDirY = (fireAtDirection.Item2 - GetBoundingBox().Y) /vMag * propulsion;
         }
 
+        private float VectorMagnitude(float x2, float x1, float y2, float y1)
+        {
+            return (float) Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+        }
     }
 }

@@ -34,8 +34,8 @@ namespace Gusto.AnimatedSprite
             currColumnFrame = 0;
             timeSinceLastShot = 0;
             timeSinceLastExpClean = 0;
-            millisecondsNewShot = 1000;
-            millisecondsExplosionLasts = 1000;
+            millisecondsNewShot = 2000;
+            millisecondsExplosionLasts = 400;
 
             Shots = new List<CannonBall>();
 
@@ -64,24 +64,29 @@ namespace Gusto.AnimatedSprite
                     if (Shots[i].exploded)
                         Shots.RemoveAt(i);
                 }
-                timeSinceLastExpClean -= millisecondsNewShot;
+                timeSinceLastExpClean -= millisecondsExplosionLasts;
             }
 
             if (timeSinceLastShot > millisecondsNewShot)
             {
                 BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
                 Tuple<int, int> shotDirection = BoundingBoxLocations.BoundingBoxLocationMap["baseShip"]; // TODO REMOVE HARDCODE AND SCAN BY TOWER RANGE
-                cannonShot.SetFireAtDirection(shotDirection);
+                cannonShot.SetFireAtDirection(shotDirection, RandomShotSpeed());
                 cannonShot.moving = true;
                 Shots.Add(cannonShot);
                 timeSinceLastShot -= millisecondsNewShot;
             }
         }
 
-        private void RandomShot()
+        private int RandomShot()
         {
             int randomDirection = randomGeneration.Next(-100, 200);
+            return 0;
+        }
 
+        private int RandomShotSpeed()
+        {
+            return randomGeneration.Next(20, 30);
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
