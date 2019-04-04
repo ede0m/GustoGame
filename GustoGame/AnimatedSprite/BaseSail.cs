@@ -18,7 +18,6 @@ namespace Gusto.AnimatedSprite
         public BaseSail(Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             timeSinceLastFrame = 0;
-            millisecondsPerFrame = 300; // turn speed
             sailIsLeftColumn = 2;
             sailIsRightColumn = 0;
             sailSpeed = 1.5f;

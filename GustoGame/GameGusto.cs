@@ -21,7 +21,7 @@ namespace Gusto
 
         // TEMPORARY -- expose the "players and enemies". 
         BaseShip baseShip;
-        Tower tower;
+        BaseTower tower;
         WindArrows windArrows;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
@@ -79,7 +79,7 @@ namespace Gusto
 
             // create models and initally place them
             baseShip = new BaseShip(new Vector2(1000, 800), Content, GraphicsDevice);
-            tower = new Tower(new Vector2(600, 300), Content, GraphicsDevice);
+            tower = new BaseTower(new Vector2(600, 300), Content, GraphicsDevice);
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
             
             
@@ -173,7 +173,7 @@ namespace Gusto
                     sprite.Draw(spriteBatch);
                     ship.shipSail.Draw(spriteBatch);
                     continue;
-                } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.Tower))
+                } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower) sprite;
                     sprite.Draw(spriteBatch);
@@ -200,7 +200,7 @@ namespace Gusto
                     quad.Insert(ship.shipSail);
                     continue;
                 }
-                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.Tower))
+                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower)sprite;
                     quad.Insert(tower);

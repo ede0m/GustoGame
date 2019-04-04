@@ -20,9 +20,9 @@ namespace Gusto.Bounding
                 // a ship doesn't collide with its own sail
                 if (ship.shipSail == b)
                     return false;
-            } else if (a.GetType() == typeof(Gusto.AnimatedSprite.Tower))
+            } else if (a.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
             {
-                Tower tower = (Tower)a;
+                BaseTower tower = (BaseTower)a;
                 // a tower doesn't collide with its own shots (iterate backwards because newest (closest) shots will be appended on the end)
                 for (int i = tower.Shots.Count()-1; i >= 0; i--)
                 {
