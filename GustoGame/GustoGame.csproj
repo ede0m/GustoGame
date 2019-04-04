@@ -42,12 +42,16 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
+    <Compile Include="Bounding\BoundingBoxLocations.cs" />
+    <Compile Include="Bounding\CollisionGameLogic.cs" />
     <Compile Include="Bounding\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
+    <Compile Include="Models\CannonBall.cs" />
     <Compile Include="Models\Sprite.cs" />
-    <Compile Include="AnimatedSprite\Tower.cs" />
+    <Compile Include="AnimatedSprite\BaseTower.cs" />
     <Compile Include="AnimatedSprite\WindArrows.cs" />
     <Compile Include="Bounding\BoundingBoxTextures.cs" />
     <Compile Include="Bounding\CalculateTextureBoundingBox.cs" />
@@ -56,6 +60,7 @@
     <Compile Include="Models\IShip.cs" />
     <Compile Include="Models\Sail.cs" />
     <Compile Include="Models\Ship.cs" />
+    <Compile Include="Models\Tower.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Bounding\QuadTreeCollision.cs" />

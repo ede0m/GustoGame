@@ -20,6 +20,7 @@ namespace Gusto.AnimatedSprite
 
         public string bbKey { get; set; }
         public bool moving { get; set; }
+        public bool colliding { get; set; }
 
         public Sprite(){}
 

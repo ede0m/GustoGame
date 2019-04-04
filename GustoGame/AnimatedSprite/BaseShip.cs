@@ -16,7 +16,7 @@ namespace Gusto.AnimatedSprite
         public BaseShip(Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             timeSinceLastFrame = 0;
-            millisecondsPerFrame = 300; // turn speed
+            millisecondsPerFrame = 500; // turn speed
             baseMovementSpeed = 0.2f;
             sailUnits = 1;
             health = 100;
@@ -30,6 +30,7 @@ namespace Gusto.AnimatedSprite
             Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip");
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(location, content, graphics);
+            shipSail.millisecondsPerFrame = 500; // match turn speed for sail
             SetSpriteAsset(baseShipAsset, location);
         }
     }

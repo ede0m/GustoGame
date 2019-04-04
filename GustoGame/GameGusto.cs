@@ -1,4 +1,5 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
 using Gusto.Utility;
@@ -20,21 +21,24 @@ namespace Gusto
 
         // TEMPORARY -- expose the "players and enemies". 
         BaseShip baseShip;
-        Tower tower;
+        BaseTower tower;
         WindArrows windArrows;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
+        List<Sprite> Collidable;
         SpriteBatch spriteBatch;
         
         public GameGusto()
         {
-            GameOptions.ShowBoundingBox = true;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1400;
             graphics.PreferredBackBufferHeight = 1200;
             Content.RootDirectory = "Content";
+
+            DrawOrder = new List<Sprite>();
+            Collidable = new List<Sprite>();
         }
 
         /// <summary>
@@ -61,29 +65,31 @@ namespace Gusto
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            //GetSailMountCords(textureBaseShip, 8, 1, "baseShip");
             //textureBaseShip.Dispose();
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
-            //GetSailMountCords(textureBaseSail, 8, 3, "baseSail");
             //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
             //textureTower.Dispose();
+            Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
+            LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
 
 
 
             // create models and initally place them
             baseShip = new BaseShip(new Vector2(1000, 800), Content, GraphicsDevice);
-            tower = new Tower(new Vector2(600, 300), Content, GraphicsDevice);
+            tower = new BaseTower(new Vector2(600, 300), Content, GraphicsDevice);
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
             
             
             // fill draw order list
-            DrawOrder = new List<Sprite>();
             DrawOrder.Add(baseShip);
-            // TODO figure out how to get a ships sail in the draw order
             DrawOrder.Add(tower);
+            // fill collidable list
+            Collidable.Add(baseShip);
+            Collidable.Add(tower);
+
         }
 
         // creates dynamic bounding boxes for each sprite frame
@@ -129,44 +135,16 @@ namespace Gusto
                 Exit();
             var kstate = Keyboard.GetState();
 
-            // quadtree collision handling
-            quad.Clear();
-            foreach (var sprite in DrawOrder) // TODO: could use just a list of colliadable objects here (e.g. dont use wind arrows)
-                quad.Insert(sprite);
-            List<Sprite> collidable = new List<Sprite>();
-            foreach (var spriteA in DrawOrder)
-            {
-                Rectangle bbA = spriteA.GetBoundingBox();
-                quad.Retrieve(collidable, spriteA); //adds objects to collidable list if it is in quadrent of this sprite
-                foreach (var spriteB in collidable)
-                {
-                    if (spriteB == spriteA)
-                        continue;
-
-                    // Reset any collision values on the sprites that need to be
-                    spriteA.moving = true;
-                    spriteB.moving = true;
-
-                    Rectangle bbB = spriteB.GetBoundingBox();
-                    if (bbA.Intersects(bbB))
-                    {
-                        Rectangle overlap = Rectangle.Intersect(bbA, bbB);
-                        spriteA.HandleCollision(spriteB, overlap);
-                        spriteB.HandleCollision(spriteA, overlap);
-                    }
-                }
-            }
-
+            QuadTreeCollision(DrawOrder);
             // Wind
             windArrows.Update(kstate, gameTime);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
+            // Tower
+            tower.Update(kstate, gameTime);
             // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
             baseShip.Update(kstate, gameTime, windDirection, windSpeed);
             baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
-
-            // Tower
-            tower.Update(kstate, gameTime);
 
             base.Update(gameTime);
         }
@@ -186,17 +164,81 @@ namespace Gusto
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
             {
+                //Trace.WriteLine(sprite.GetType());
+                
                 // Draw a ships sail before a ship
-                if(sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
                     sprite.Draw(spriteBatch);
                     ship.shipSail.Draw(spriteBatch);
                     continue;
+                } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                {
+                    Tower tower = (Tower) sprite;
+                    sprite.Draw(spriteBatch);
+                    // draw any shots this tower has in motion
+                    foreach (var shot in tower.Shots)
+                        shot.Draw(spriteBatch);
+                    continue;
                 }
                 sprite.Draw(spriteBatch);
             }
             base.Draw(gameTime);
+        }
+
+        private void QuadTreeCollision(List<Sprite> DrawOrder)
+        {
+            // quadtree collision handling
+            quad.Clear();
+            foreach (var sprite in Collidable)
+            {
+                if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship)sprite;
+                    quad.Insert(sprite);
+                    quad.Insert(ship.shipSail);
+                    continue;
+                }
+                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                {
+                    Tower tower = (Tower)sprite;
+                    quad.Insert(tower);
+                    foreach (var shot in tower.Shots)
+                        quad.Insert(shot);
+                    continue;
+                }
+                quad.Insert(sprite);
+            }
+
+            List<Sprite> collidable = new List<Sprite>();
+            BoundingBoxLocations.BoundingBoxLocationMap.Clear();
+            foreach (var spriteA in Collidable)
+            {
+                BoundingBoxLocations.BoundingBoxLocationMap.Add(spriteA.bbKey, new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                Rectangle bbA = spriteA.GetBoundingBox();
+                collidable.Clear();
+                quad.Retrieve(collidable, spriteA); //adds objects to collidable list if it is in quadrent of this sprite
+                foreach (var spriteB in collidable)
+                {
+                    if (spriteB == spriteA)
+                        continue;
+
+                    // Reset any collision values on the sprites that need to be
+                    spriteA.colliding = false;
+                    spriteB.colliding = false;
+
+                    Rectangle bbB = spriteB.GetBoundingBox();
+                    if (bbA.Intersects(bbB) && CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
+                    {
+                        spriteA.colliding = true;
+                        spriteB.colliding = true;
+                        Rectangle overlap = Rectangle.Intersect(bbA, bbB);
+                        spriteA.HandleCollision(spriteB, overlap);
+                        spriteB.HandleCollision(spriteA, overlap);
+                    }
+                }
+            }
         }
     }
 }
