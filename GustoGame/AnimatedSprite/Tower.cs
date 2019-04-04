@@ -20,6 +20,7 @@ namespace Gusto.AnimatedSprite
         private int timeSinceLastExpClean;
         private int millisecondsNewShot;
         private int millisecondsExplosionLasts;
+        private int maxShotsMoving;
         Random randomGeneration;
 
         public List<CannonBall> Shots;
@@ -36,6 +37,7 @@ namespace Gusto.AnimatedSprite
             timeSinceLastExpClean = 0;
             millisecondsNewShot = 2000;
             millisecondsExplosionLasts = 400;
+            maxShotsMoving = 5;
 
             Shots = new List<CannonBall>();
 
@@ -61,13 +63,13 @@ namespace Gusto.AnimatedSprite
                 // remove exploded shots
                 for (int i = 0; i < Shots.Count; i++)
                 {
-                    if (Shots[i].exploded)
+                    if (Shots[i].exploded || Shots[i].outOfRange)
                         Shots.RemoveAt(i);
                 }
                 timeSinceLastExpClean -= millisecondsExplosionLasts;
             }
 
-            if (timeSinceLastShot > millisecondsNewShot)
+            if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving)
             {
                 BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
                 Tuple<int, int> shotDirection = BoundingBoxLocations.BoundingBoxLocationMap["baseShip"]; // TODO REMOVE HARDCODE AND SCAN BY TOWER RANGE
@@ -86,7 +88,7 @@ namespace Gusto.AnimatedSprite
 
         private int RandomShotSpeed()
         {
-            return randomGeneration.Next(20, 30);
+            return randomGeneration.Next(10, 25);
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -94,10 +96,16 @@ namespace Gusto.AnimatedSprite
             // Only stop movement when colliding at the bottom of the tower
             int movePastTowerThresholdBehind =  this.GetBoundingBox().Bottom - 40;
             int movePastTowerThresholdInfront =  this.GetBoundingBox().Bottom + 40;
-            if (collidedWith.bbKey.Equals("baseShip") && (overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
+            if (collidedWith.bbKey.Equals("baseShip"))
             {
-                Trace.WriteLine("Collision at base of tower");
-                collidedWith.moving = false;
+                if ((overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
+                {
+                    Trace.WriteLine("Collision at base of tower");
+                    collidedWith.colliding = true;
+                } else
+                {
+                    collidedWith.colliding = false;
+                }
             }
         }
     }

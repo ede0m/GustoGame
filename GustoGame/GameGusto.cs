@@ -27,6 +27,7 @@ namespace Gusto
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
+        List<Sprite> Collidable;
         SpriteBatch spriteBatch;
         
         public GameGusto()
@@ -35,6 +36,9 @@ namespace Gusto
             graphics.PreferredBackBufferWidth = 1400;
             graphics.PreferredBackBufferHeight = 1200;
             Content.RootDirectory = "Content";
+
+            DrawOrder = new List<Sprite>();
+            Collidable = new List<Sprite>();
         }
 
         /// <summary>
@@ -80,9 +84,12 @@ namespace Gusto
             
             
             // fill draw order list
-            DrawOrder = new List<Sprite>();
             DrawOrder.Add(baseShip);
             DrawOrder.Add(tower);
+            // fill collidable list
+            Collidable.Add(baseShip);
+            Collidable.Add(tower);
+
         }
 
         // creates dynamic bounding boxes for each sprite frame
@@ -184,13 +191,13 @@ namespace Gusto
         {
             // quadtree collision handling
             quad.Clear();
-            foreach (var sprite in DrawOrder) // TODO: could use just a list of colliadable objects here (e.g. dont use wind arrows)
+            foreach (var sprite in Collidable)
             {
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship)sprite;
                     quad.Insert(sprite);
-                    quad.Insert(ship);
+                    quad.Insert(ship.shipSail);
                     continue;
                 }
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.Tower))
@@ -206,10 +213,11 @@ namespace Gusto
 
             List<Sprite> collidable = new List<Sprite>();
             BoundingBoxLocations.BoundingBoxLocationMap.Clear();
-            foreach (var spriteA in DrawOrder)
+            foreach (var spriteA in Collidable)
             {
                 BoundingBoxLocations.BoundingBoxLocationMap.Add(spriteA.bbKey, new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 Rectangle bbA = spriteA.GetBoundingBox();
+                collidable.Clear();
                 quad.Retrieve(collidable, spriteA); //adds objects to collidable list if it is in quadrent of this sprite
                 foreach (var spriteB in collidable)
                 {
@@ -217,12 +225,14 @@ namespace Gusto
                         continue;
 
                     // Reset any collision values on the sprites that need to be
-                    spriteA.moving = true;
-                    spriteB.moving = true;
+                    spriteA.colliding = false;
+                    spriteB.colliding = false;
 
                     Rectangle bbB = spriteB.GetBoundingBox();
-                    if (bbA.Intersects(bbB))
+                    if (bbA.Intersects(bbB) && CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
                     {
+                        spriteA.colliding = true;
+                        spriteB.colliding = true;
                         Rectangle overlap = Rectangle.Intersect(bbA, bbB);
                         spriteA.HandleCollision(spriteB, overlap);
                         spriteB.HandleCollision(spriteA, overlap);
