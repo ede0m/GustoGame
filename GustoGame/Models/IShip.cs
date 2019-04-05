@@ -8,7 +8,7 @@ namespace Gusto.Models
 {
     public interface IShip
     {
-        void SetSailBonusMovement(Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues,
+        Tuple<float, float> SetSailBonusMovement(Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues,
             int windDirection, int windSpeed, float sailSpeedBonus, int sailRColumn, int sailLColumn);
 
     }

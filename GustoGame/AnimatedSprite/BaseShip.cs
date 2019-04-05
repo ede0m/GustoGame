@@ -20,9 +20,10 @@ namespace Gusto.AnimatedSprite
             timeSinceLastExpClean = 0;
             millisecondsExplosionLasts = 400;
             timeSinceLastShot = 0;
-            millisecondsNewShot = 0;
+            millisecondsNewShot = 2000;
             baseMovementSpeed = 0.2f;
-            sailUnits = 1;
+            nSails = 1;
+            nCannons = 1;
             health = 100;
 
             MapModelMovementVectorValues();
@@ -34,6 +35,7 @@ namespace Gusto.AnimatedSprite
             Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip");
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(location, content, graphics);
+            Cannons.Add(new BaseCannon(location, content, graphics));
             shipSail.millisecondsPerFrame = 500; // match turn speed for sail
             SetSpriteAsset(baseShipAsset, location);
         }

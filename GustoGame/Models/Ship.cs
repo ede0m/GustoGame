@@ -33,7 +33,8 @@ namespace Gusto.Models
 
         public float baseMovementSpeed;
         public int health;
-        public int sailUnits;
+        public int nSails;
+        public int nCannons;
         public bool aiming;
         int shipWindWindowMax;
         int shipWindWindowMin;
@@ -42,12 +43,14 @@ namespace Gusto.Models
         Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
+        public List<Cannon> Cannons { get; set; }
         public List<CannonBall> Shots;
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
             aimLine = new Rectangle();
             Shots = new List<CannonBall>();
+            Cannons = new List<Cannon>();
             teamType = type;
             _content = content;
             _graphics = graphics;
@@ -81,7 +84,7 @@ namespace Gusto.Models
             {
                 timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
                 aiming = true;
-                startAimLine = GetBoundingBox().Location.ToVector2();
+                startAimLine = Cannons[0].GetBoundingBox().Location.ToVector2(); // TODO - Remove hard code and draw line for all cannons
                 endAimLine.X = Mouse.GetState().X;
                 endAimLine.Y = Mouse.GetState().Y;
             } else { aiming = false; }
@@ -125,28 +128,39 @@ namespace Gusto.Models
             {
                 // map frame to vector movement
                 Tuple<float, float> movementValues = ShipDirectionVectorValues[currRowFrame];
-                location.X += movementValues.Item1;
-                location.Y += movementValues.Item2;
-                SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
+                Tuple<float, float> bonus = SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
+                location.X += movementValues.Item1 + bonus.Item1;
+                location.Y += movementValues.Item2 + bonus.Item2;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
+
+                foreach (var cannon in Cannons)
+                {
+                    cannon.Update(kstate, gameTime, movementValues);
+                    cannon.location.X = location.X;
+                    cannon.location.Y = location.Y; 
+;                }
+                // set the sail location here (equal to ship location plus the offset on the texture to hit the mount)
+                int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
+                int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
+                shipSail.location.X = location.X + sailMountX;
+                shipSail.location.Y = location.Y + sailMountY;
             }
         }
 
         /* Adds movement values to X Y location vector based on sail position with wind. 
          * Logic works because the ship direction sprite frames and wind direction sprite frames are aligned.*/
-        public void SetSailBonusMovement(Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues, 
+        public Tuple<float, float> SetSailBonusMovement(Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues, 
              int windDirection, int windSpeed, float sailSpeedBonus, int sailRColumn, int sailLColumn)
         {
             bool sailDirectlyInWind = false;
-            // get ship direction (sign of the X Y cords)
-            int xdir = Math.Sign(ShipDirectionVectorValues[currRowFrame].Item1);
-            int ydir = Math.Sign(ShipDirectionVectorValues[currRowFrame].Item2);
+            float xBonus = 0f;
+            float yBonus = 0f;
+
             // construct ship window
             shipWindWindowMax = windDirection + shipSail.windWindowAdd;
             shipWindWindowMin = windDirection - shipSail.windWindowSub;
 
-            sailPositionInRespectToShip = shipSail.currRowFrame; // TODO: this (row) needs to draw from sail sprite data
-
+            sailPositionInRespectToShip = shipSail.currRowFrame;
             BoundShipWindow();
 
             int addedWindWindow = windDirection;
@@ -174,20 +188,15 @@ namespace Gusto.Models
             {
 
                 Trace.WriteLine("\nCATCHING WIND\n ship pos: " + currRowFrame.ToString() + "\n Max: " + shipWindWindowMax.ToString() + " windDir: " + windDirection.ToString() + " Min: " + shipWindWindowMin.ToString() + "\n");
-                location.Y += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus * windSpeed;
-                location.X += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus * windSpeed;
+                yBonus += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus * windSpeed;
+                xBonus += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus * windSpeed;
                 if (sailDirectlyInWind)
                 {
-                    location.Y += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus;
-                    location.X += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus;
+                    yBonus += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus;
+                    xBonus += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus;
                 }
             }
-
-            // set the sail location here (equal to ship location plus the offset on the texture to hit the mount)
-            int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
-            int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
-            shipSail.location.X = location.X + sailMountX;
-            shipSail.location.Y = location.Y + sailMountY;
+            return new Tuple<float, float>(xBonus, yBonus);
         }
 
         public void DrawAimLine(SpriteBatch sb)

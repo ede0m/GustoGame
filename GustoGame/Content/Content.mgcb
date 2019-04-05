@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:../../../../GameSprites/BaseShip.png;BaseShip.png
 
+#begin BaseCannon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BaseCannon.png
+
 #begin BaseSail.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -42,6 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\BaseCannon.cs" />
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Mappings\AttackMapping.cs" />
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
+    <Compile Include="Models\Cannon.cs" />
     <Compile Include="Models\Weapon\CannonBall.cs" />
     <Compile Include="Models\Sprite.cs" />
     <Compile Include="AnimatedSprite\BaseTower.cs" />

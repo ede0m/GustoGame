@@ -74,7 +74,9 @@ namespace Gusto
             //textureTower.Dispose();
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
-
+            //
+            Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
+            LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
 
 
             // create Team models and initally place them
@@ -174,6 +176,8 @@ namespace Gusto
                     Ship ship = (Ship) sprite;
                     sprite.Draw(spriteBatch);
                     ship.shipSail.Draw(spriteBatch);
+                    foreach (var cannon in ship.Cannons)
+                        cannon.Draw(spriteBatch);
                     foreach (var shot in ship.Shots)
                         shot.Draw(spriteBatch);
                     if (ship.aiming)
@@ -206,6 +210,8 @@ namespace Gusto
                     Ship ship = (Ship)sprite;
                     quad.Insert(sprite);
                     quad.Insert(ship.shipSail);
+                    foreach (var shot in ship.Shots)
+                        quad.Insert(shot);
                     BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<int, int>(sprite.GetBoundingBox().X, sprite.GetBoundingBox().Y));
                     continue;
                 }
