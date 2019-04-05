@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Gusto.AnimatedSprite;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,10 @@ namespace Gusto.Bounding
 {
     public class BoundingBoxLocations
     {
-        public static Dictionary<string, Tuple<int, int>> BoundingBoxLocationMap = new Dictionary<string, Tuple<int, int>>();
+        public static Dictionary<TeamType, List<Tuple<int,int>>> BoundingBoxLocationMap = new Dictionary<TeamType, List<Tuple<int, int>>>()
+        {
+            {TeamType.Player, new List<Tuple<int,int>>() },
+            {TeamType.A, new List<Tuple<int, int>>() }
+        };
     }
 }

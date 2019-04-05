@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto
+namespace Gusto.AnimatedSprite
 {
-    public class GameOptions
+    public enum TeamType
     {
-        public static bool ShowBoundingBox = true;
+        Player,
+        A,
+        B,
+        C
     }
 }

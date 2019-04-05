@@ -7,13 +7,12 @@ using Gusto.Models;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using Gusto.Bounding;
-using Gusto.Models;
 
 namespace Gusto.AnimatedSprite
 {
     public class BaseTower : Tower
     {
-        public BaseTower(Vector2 location, ContentManager content, GraphicsDevice graphics) : base(content, graphics)
+        public BaseTower(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
 
             timeSinceLastShot = 0;
@@ -21,6 +20,7 @@ namespace Gusto.AnimatedSprite
             millisecondsNewShot = 2000;
             millisecondsExplosionLasts = 400;
             maxShotsMoving = 5;
+            range = 300f;
 
             Texture2D textureTower = content.Load<Texture2D>("tower");
             Texture2D textureTowerBB = null;

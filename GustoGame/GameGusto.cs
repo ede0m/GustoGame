@@ -77,9 +77,11 @@ namespace Gusto
 
 
 
-            // create models and initally place them
-            baseShip = new BaseShip(new Vector2(1000, 800), Content, GraphicsDevice);
-            tower = new BaseTower(new Vector2(600, 300), Content, GraphicsDevice);
+            // create Team models and initally place them
+            baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 800), Content, GraphicsDevice);
+            tower = new BaseTower(TeamType.A, new Vector2(600, 300), Content, GraphicsDevice);
+
+            // static 
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
             
             
@@ -189,6 +191,8 @@ namespace Gusto
 
         private void QuadTreeCollision(List<Sprite> DrawOrder)
         {
+            foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
+                BoundingBoxLocations.BoundingBoxLocationMap[team].Clear();
             // quadtree collision handling
             quad.Clear();
             foreach (var sprite in Collidable)
@@ -198,24 +202,24 @@ namespace Gusto
                     Ship ship = (Ship)sprite;
                     quad.Insert(sprite);
                     quad.Insert(ship.shipSail);
+                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<int, int>(sprite.GetBoundingBox().X, sprite.GetBoundingBox().Y));
                     continue;
                 }
-                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Tower))
                 {
                     Tower tower = (Tower)sprite;
                     quad.Insert(tower);
                     foreach (var shot in tower.Shots)
                         quad.Insert(shot);
+                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(sprite.GetBoundingBox().X, sprite.GetBoundingBox().Y));
                     continue;
                 }
                 quad.Insert(sprite);
             }
 
             List<Sprite> collidable = new List<Sprite>();
-            BoundingBoxLocations.BoundingBoxLocationMap.Clear();
             foreach (var spriteA in Collidable)
             {
-                BoundingBoxLocations.BoundingBoxLocationMap.Add(spriteA.bbKey, new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 Rectangle bbA = spriteA.GetBoundingBox();
                 collidable.Clear();
                 quad.Retrieve(collidable, spriteA); //adds objects to collidable list if it is in quadrent of this sprite

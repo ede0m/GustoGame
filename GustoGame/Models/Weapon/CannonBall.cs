@@ -1,6 +1,6 @@
 ﻿
 using global::Gusto.AnimatedSprite;
-using Gusto.AnimatedSprite;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -74,16 +74,11 @@ namespace Gusto.Models
 
         public void SetFireAtDirection(Tuple<int,int> fireAtDirection, int shotSpeed, int aimOffset)
         {
-            vectorMagnitude = VectorMagnitude(GetBoundingBox().X, fireAtDirection.Item1, GetBoundingBox().Y, fireAtDirection.Item2);
+            vectorMagnitude = PhysicsUtility.VectorMagnitude(GetBoundingBox().X, fireAtDirection.Item1, GetBoundingBox().Y, fireAtDirection.Item2);
             shotLenX = Math.Max(fireAtDirection.Item1, GetBoundingBox().X) - Math.Min(fireAtDirection.Item1, GetBoundingBox().X);
             shotLenY = Math.Max(fireAtDirection.Item2, GetBoundingBox().Y) - Math.Min(fireAtDirection.Item2, GetBoundingBox().Y);
             shotDirX = (fireAtDirection.Item1 - GetBoundingBox().X + aimOffset) / vectorMagnitude  * shotSpeed;
             shotDirY = (fireAtDirection.Item2 - GetBoundingBox().Y + aimOffset) /vectorMagnitude * shotSpeed;
-        }
-
-        private float VectorMagnitude(float x2, float x1, float y2, float y1)
-        {
-            return (float) Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
         }
     }
 }

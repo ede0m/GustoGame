@@ -1,15 +1,12 @@
 ﻿using Gusto.AnimatedSprite;
-using Gusto.Bounds;
-using Gusto.Utility;
+using Gusto.Mappings;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
@@ -27,9 +24,13 @@ namespace Gusto.Models
         int shipWindWindowMin;
         int sailPositionInRespectToShip;
 
+        public TeamType teamType;
         public Sail shipSail { get; set; }
 
-        public Ship() {}
+        public Ship(TeamType type, ContentManager content, GraphicsDevice graphics)
+        {
+            teamType = type;
+        }
 
         // Ship collision handler
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)

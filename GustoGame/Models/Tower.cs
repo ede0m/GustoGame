@@ -1,6 +1,8 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Bounding;
+using Gusto.Mappings;
 using Gusto.Models;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,15 +26,18 @@ namespace Gusto.Models
         public int millisecondsNewShot;
         public int millisecondsExplosionLasts;
         public int maxShotsMoving;
+        public float range;
             
         Random randomGeneration;
+        public TeamType teamType;
         public List<CannonBall> Shots;
 
-        public Tower(ContentManager content, GraphicsDevice graphics)
+        public Tower(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
             _content = content;
             _graphics = graphics;
 
+            teamType = type;
             Shots = new List<CannonBall>();
             randomGeneration = new Random();
         }
@@ -75,21 +80,38 @@ namespace Gusto.Models
                 timeSinceLastExpClean -= millisecondsExplosionLasts;
             }
 
-            if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving)
+            if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving )
             {
-                BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
-                Tuple<int, int> shotDirection = BoundingBoxLocations.BoundingBoxLocationMap["baseShip"]; // TODO REMOVE HARDCODE AND SCAN BY TOWER RANGE
-                cannonShot.SetFireAtDirection(shotDirection, RandomShotSpeed(), RandomAimOffset());
-                cannonShot.moving = true;
-                Shots.Add(cannonShot);
+                Tuple<int, int> shotDirection = ChooseTarget();
+                if (shotDirection != null)
+                {
+                    BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
+                    cannonShot.SetFireAtDirection(shotDirection, RandomShotSpeed(), RandomAimOffset());
+                    cannonShot.moving = true;
+                    Shots.Add(cannonShot);
+                }
                 timeSinceLastShot -= millisecondsNewShot;
             }
         }
 
+        private Tuple<int, int> ChooseTarget()
+        {
+            foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
+            {
+                if (AttackMapping.AttackMappings[teamType][otherTeam])
+                {
+                    Tuple<int, int> shotCords = BoundingBoxLocations.BoundingBoxLocationMap[otherTeam][0];// TODO REMOVE HARDCODED random target (pick team member with lowest health)
+                    float vmag = PhysicsUtility.VectorMagnitude(shotCords.Item1, GetBoundingBox().X, shotCords.Item2, GetBoundingBox().Y);
+                    if (vmag <= range)
+                        return shotCords;
+                }
+            }
+            return null;
+        }
+
         private int RandomAimOffset()
         {
-            return randomGeneration.Next(-120, 120
-                );
+            return randomGeneration.Next(-120, 120);
         }
 
         private int RandomShotSpeed()
