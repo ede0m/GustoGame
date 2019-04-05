@@ -1,5 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Mappings;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,22 +15,43 @@ namespace Gusto.Models
     {
         private Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues; // maps ship frames to vector movement values (Tuple x,y)
 
-        public int timeSinceLastFrame;
-        public int millisecondsPerFrame; // turning speed
+        private ContentManager _content;
+        private GraphicsDevice _graphics;
+
+        Rectangle aimLine;
+        Vector2 startAimLine;
+        Vector2 endAimLine;
+
+        public int timeSinceLastShot;
+        public int timeSinceLastExpClean;
+        public int millisecondsNewShot;
+        public int millisecondsExplosionLasts;
+        public int maxShotsMoving;
+        public float range;
+        public int timeSinceLastTurn;
+        public int millisecondsPerTurn; // turning speed
 
         public float baseMovementSpeed;
         public int health;
         public int sailUnits;
+        public bool aiming;
         int shipWindWindowMax;
         int shipWindWindowMin;
         int sailPositionInRespectToShip;
 
+        Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
+        public List<CannonBall> Shots;
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
+            aimLine = new Rectangle();
+            Shots = new List<CannonBall>();
             teamType = type;
+            _content = content;
+            _graphics = graphics;
+            rand = new Random();
         }
 
         // Ship collision handler
@@ -44,25 +66,60 @@ namespace Gusto.Models
         // logic to find correct frame of sprite from user input and update movement values
         public void Update(KeyboardState kstate, GameTime gameTime, int windDir, int windSp)
         {
+            timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
+            timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
+
+            foreach (var shot in Shots)
+                shot.Update(kstate, gameTime);
+
             if (colliding)
                 moving = false;
             else
                 moving = true;
 
-            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastFrame > millisecondsPerFrame)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+                aiming = true;
+                startAimLine = GetBoundingBox().Location.ToVector2();
+                endAimLine.X = Mouse.GetState().X;
+                endAimLine.Y = Mouse.GetState().Y;
+            } else { aiming = false; }
+
+            if (timeSinceLastExpClean > millisecondsExplosionLasts)
+            {
+                // remove exploded shots
+                for (int i = 0; i < Shots.Count; i++)
+                {
+                    if (Shots[i].exploded || Shots[i].outOfRange)
+                        Shots.RemoveAt(i);
+                }
+                timeSinceLastExpClean = 0;
+            }
+
+            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
+            {
+                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
+                BaseCannonBall cannonShot = new BaseCannonBall(startAimLine, _content, _graphics);
+                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), RandomEvents.RandomAimOffset(this.rand));
+                cannonShot.moving = true;
+                Shots.Add(cannonShot);
+                timeSinceLastShot = 0;
+            }
+
+            if (timeSinceLastTurn > millisecondsPerTurn)
             {
                 // sail direction
                 if (!kstate.IsKeyDown(Keys.LeftShift))
                 {
                     // ship direction
-                    if (kstate.IsKeyDown(Keys.Left))
+                    if (kstate.IsKeyDown(Keys.A))
                         currRowFrame++;
-                    else if (kstate.IsKeyDown(Keys.Right))
+                    else if (kstate.IsKeyDown(Keys.D))
                         currRowFrame--;
                 }
                 BoundFrames();
-                timeSinceLastFrame -= millisecondsPerFrame;
+                timeSinceLastTurn -= millisecondsPerTurn;
             }
             if (moving)
             {
@@ -131,6 +188,18 @@ namespace Gusto.Models
             int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
+        }
+
+        public void DrawAimLine(SpriteBatch sb)
+        {
+            Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
+            aimLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
+            Vector2 edge = endAimLine - startAimLine;
+            float angle = (float)Math.Atan2(edge.Y, edge.X);
+            var line = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edge.Length(), 2);
+            sb.Begin();
+            sb.Draw(aimLineTexture, line, null, Color.DarkSeaGreen, angle, new Vector2(0, 0), SpriteEffects.None, 0);
+            sb.End();
         }
         
         // handles cycling the shipWindWindow and sail position against ship direction

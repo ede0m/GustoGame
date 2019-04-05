@@ -174,6 +174,10 @@ namespace Gusto
                     Ship ship = (Ship) sprite;
                     sprite.Draw(spriteBatch);
                     ship.shipSail.Draw(spriteBatch);
+                    foreach (var shot in ship.Shots)
+                        shot.Draw(spriteBatch);
+                    if (ship.aiming)
+                        ship.DrawAimLine(spriteBatch);
                     continue;
                 } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {

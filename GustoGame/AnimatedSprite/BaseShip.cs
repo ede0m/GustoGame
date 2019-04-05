@@ -15,8 +15,12 @@ namespace Gusto.AnimatedSprite
     {
         public BaseShip(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base (team, content, graphics)
         {
-            timeSinceLastFrame = 0;
-            millisecondsPerFrame = 500; // turn speed
+            timeSinceLastTurn = 0;
+            millisecondsPerTurn = 500; // turn speed
+            timeSinceLastExpClean = 0;
+            millisecondsExplosionLasts = 400;
+            timeSinceLastShot = 0;
+            millisecondsNewShot = 0;
             baseMovementSpeed = 0.2f;
             sailUnits = 1;
             health = 100;
