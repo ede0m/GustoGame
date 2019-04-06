@@ -21,12 +21,12 @@ namespace Gusto.AnimatedSprite
             millisecondsExplosionLasts = 400;
             timeSinceLastShot = 0;
             millisecondsNewShot = 2000;
-            baseMovementSpeed = 0.2f;
+            movementSpeed = 0.2f;
             nSails = 1;
             nCannons = 1;
             health = 100;
 
-            MapModelMovementVectorValues();
+            //MapModelMovementVectorValues();
 
             Texture2D textureBaseShip = content.Load<Texture2D>("BaseShip");
             Texture2D textureBaseShipBB = null;
@@ -35,7 +35,6 @@ namespace Gusto.AnimatedSprite
             Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip");
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(location, content, graphics);
-            Cannons.Add(new BaseCannon(location, content, graphics));
             shipSail.millisecondsPerFrame = 500; // match turn speed for sail
             SetSpriteAsset(baseShipAsset, location);
         }

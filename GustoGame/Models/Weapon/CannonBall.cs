@@ -27,7 +27,6 @@ namespace Gusto.Models
 
         public CannonBall(Vector2 firedFrom)
         {
-            firedFromLoc = firedFrom;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)

@@ -13,12 +13,10 @@ namespace Gusto.Models
 {
     public class Ship : Sprite, IShip
     {
-        private Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues; // maps ship frames to vector movement values (Tuple x,y)
-
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        Rectangle aimLine;
+        Vector2 edge;
         Vector2 startAimLine;
         Vector2 endAimLine;
 
@@ -31,7 +29,7 @@ namespace Gusto.Models
         public int timeSinceLastTurn;
         public int millisecondsPerTurn; // turning speed
 
-        public float baseMovementSpeed;
+        public float movementSpeed;
         public int health;
         public int nSails;
         public int nCannons;
@@ -43,14 +41,11 @@ namespace Gusto.Models
         Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
-        public List<Cannon> Cannons { get; set; }
         public List<CannonBall> Shots;
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
-            aimLine = new Rectangle();
             Shots = new List<CannonBall>();
-            Cannons = new List<Cannon>();
             teamType = type;
             _content = content;
             _graphics = graphics;
@@ -74,21 +69,6 @@ namespace Gusto.Models
 
             foreach (var shot in Shots)
                 shot.Update(kstate, gameTime);
-
-            if (colliding)
-                moving = false;
-            else
-                moving = true;
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-                aiming = true;
-                startAimLine = Cannons[0].GetBoundingBox().Location.ToVector2(); // TODO - Remove hard code and draw line for all cannons
-                endAimLine.X = Mouse.GetState().X;
-                endAimLine.Y = Mouse.GetState().Y;
-            } else { aiming = false; }
-
             if (timeSinceLastExpClean > millisecondsExplosionLasts)
             {
                 // remove exploded shots
@@ -100,15 +80,10 @@ namespace Gusto.Models
                 timeSinceLastExpClean = 0;
             }
 
-            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
-            {
-                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
-                BaseCannonBall cannonShot = new BaseCannonBall(startAimLine, _content, _graphics);
-                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), RandomEvents.RandomAimOffset(this.rand));
-                cannonShot.moving = true;
-                Shots.Add(cannonShot);
-                timeSinceLastShot = 0;
-            }
+            if (colliding)
+                moving = false;
+            else
+                moving = true;
 
             if (timeSinceLastTurn > millisecondsPerTurn)
             {
@@ -120,30 +95,50 @@ namespace Gusto.Models
                         currRowFrame++;
                     else if (kstate.IsKeyDown(Keys.D))
                         currRowFrame--;
+                    BoundFrames();
                 }
-                BoundFrames();
+
                 timeSinceLastTurn -= millisecondsPerTurn;
             }
             if (moving)
             {
                 // map frame to vector movement
-                Tuple<float, float> movementValues = ShipDirectionVectorValues[currRowFrame];
-                Tuple<float, float> bonus = SetSailBonusMovement(ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                location.X += movementValues.Item1 + bonus.Item1;
-                location.Y += movementValues.Item2 + bonus.Item2;
+                Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
+                location.X += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1;
+                location.Y += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
-
-                foreach (var cannon in Cannons)
-                {
-                    cannon.Update(kstate, gameTime, movementValues);
-                    cannon.location.X = location.X;
-                    cannon.location.Y = location.Y; 
-;                }
-                // set the sail location here (equal to ship location plus the offset on the texture to hit the mount)
+                
+                // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
                 int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
                 int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
                 shipSail.location.X = location.X + sailMountX;
                 shipSail.location.Y = location.Y + sailMountY;
+            }
+
+            // aiming
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+                aiming = true;
+                startAimLine = GetBoundingBox().Center.ToVector2();
+                endAimLine.X = Mouse.GetState().X;
+                endAimLine.Y = Mouse.GetState().Y;
+            }
+            else { aiming = false; }
+
+            // shooting
+            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
+            {
+                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
+                BaseCannonBall cannonShot = new BaseCannonBall(startAimLine, _content, _graphics);
+                int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
+                int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
+                cannonShot.location.X -= cannonBallTextureCenterOffsetX;
+                cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
+                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), RandomEvents.RandomAimOffset(this.rand));
+                cannonShot.moving = true;
+                Shots.Add(cannonShot);
+                timeSinceLastShot = 0;
             }
         }
 
@@ -203,8 +198,13 @@ namespace Gusto.Models
         {
             Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
             aimLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
-            Vector2 edge = endAimLine - startAimLine;
+
+            //Vector2 perpendicularLinePlus = new Vector2(startAimLine.X + ShipDirectionVectorValues[currRowFrame].Item1, startAimLine.Y + ShipDirectionVectorValues[currRowFrame].Item2);
+            //Vector2 perpendicularLineMinus = new Vector2(startAimLine.X - ShipDirectionVectorValues[currRowFrame].Item1, startAimLine.Y - ShipDirectionVectorValues[currRowFrame].Item2);
+            edge = endAimLine - startAimLine;
+            float radiansToDegrees = 180f / (float)Math.PI;
             float angle = (float)Math.Atan2(edge.Y, edge.X);
+            float angleInDeg = angle * radiansToDegrees;
             var line = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edge.Length(), 2);
             sb.Begin();
             sb.Draw(aimLineTexture, line, null, Color.DarkSeaGreen, angle, new Vector2(0, 0), SpriteEffects.None, 0);
@@ -224,23 +224,5 @@ namespace Gusto.Models
             else if (sailPositionInRespectToShip == nRows)
                 sailPositionInRespectToShip = 0;
         }
-
-        // map ship direction sprite frames (ROWS) to base movement values
-        public void MapModelMovementVectorValues()
-        {
-            float sin45deg = (float)(1 / Math.Sqrt(2));
-
-            ShipDirectionVectorValues = new Dictionary<int, Tuple<float, float>>();
-            // map ship direction sprite frames (ROWS) to base movement values
-            ShipDirectionVectorValues[0] = new Tuple<float, float>(0, -baseMovementSpeed);
-            ShipDirectionVectorValues[1] = new Tuple<float, float>(-(baseMovementSpeed * sin45deg), -baseMovementSpeed * sin45deg); // NW so -25x and +25y
-            ShipDirectionVectorValues[2] = new Tuple<float, float>(-(baseMovementSpeed), 0); // W so -50x and 0y
-            ShipDirectionVectorValues[3] = new Tuple<float, float>(-baseMovementSpeed * sin45deg, baseMovementSpeed * sin45deg); // ...
-            ShipDirectionVectorValues[4] = new Tuple<float, float>(0, (baseMovementSpeed));
-            ShipDirectionVectorValues[5] = new Tuple<float, float>(baseMovementSpeed * sin45deg, baseMovementSpeed * sin45deg);
-            ShipDirectionVectorValues[6] = new Tuple<float, float>(baseMovementSpeed, 0);
-            ShipDirectionVectorValues[7] = new Tuple<float, float>(baseMovementSpeed * sin45deg, -baseMovementSpeed * sin45deg);
-        }
-
     }
 }

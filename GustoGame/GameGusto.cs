@@ -176,8 +176,6 @@ namespace Gusto
                     Ship ship = (Ship) sprite;
                     sprite.Draw(spriteBatch);
                     ship.shipSail.Draw(spriteBatch);
-                    foreach (var cannon in ship.Cannons)
-                        cannon.Draw(spriteBatch);
                     foreach (var shot in ship.Shots)
                         shot.Draw(spriteBatch);
                     if (ship.aiming)
