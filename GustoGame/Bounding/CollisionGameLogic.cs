@@ -20,6 +20,12 @@ namespace Gusto.Bounding
                 // a ship doesn't collide with its own sail
                 if (ship.shipSail == b)
                     return false;
+                // a ship doesn't collid with its own shots
+                for (int i = ship.Shots.Count() - 1; i >= 0; i--) // TODO could remove these o(n) operations by saying if sprite b is not = this sprites team
+                {
+                    if (ship.Shots[i] == b)
+                        return false;
+                }
             } else if (a.GetType().BaseType == typeof(Gusto.Models.Tower))
             {
                 BaseTower tower = (BaseTower)a;

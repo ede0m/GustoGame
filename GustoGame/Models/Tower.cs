@@ -1,7 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Mappings;
-using Gusto.Models;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -10,9 +9,6 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
@@ -28,7 +24,7 @@ namespace Gusto.Models
         public int maxShotsMoving;
         public float range;
             
-        Random randomGeneration;
+        Random rand;
         public TeamType teamType;
         public List<CannonBall> Shots;
 
@@ -39,7 +35,7 @@ namespace Gusto.Models
 
             teamType = type;
             Shots = new List<CannonBall>();
-            randomGeneration = new Random();
+            rand = new Random();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -77,46 +73,21 @@ namespace Gusto.Models
                     if (Shots[i].exploded || Shots[i].outOfRange)
                         Shots.RemoveAt(i);
                 }
-                timeSinceLastExpClean -= millisecondsExplosionLasts;
+                timeSinceLastExpClean = 0;
             }
 
             if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving )
             {
-                Tuple<int, int> shotDirection = ChooseTarget();
+                Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
                 if (shotDirection != null)
                 {
                     BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
-                    cannonShot.SetFireAtDirection(shotDirection, RandomShotSpeed(), RandomAimOffset());
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), RandomEvents.RandomAimOffset(rand));
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                 }
-                timeSinceLastShot -= millisecondsNewShot;
+                timeSinceLastShot = 0;
             }
-        }
-
-        private Tuple<int, int> ChooseTarget()
-        {
-            foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
-            {
-                if (AttackMapping.AttackMappings[teamType][otherTeam])
-                {
-                    Tuple<int, int> shotCords = BoundingBoxLocations.BoundingBoxLocationMap[otherTeam][0];// TODO REMOVE HARDCODED random target (pick team member with lowest health)
-                    float vmag = PhysicsUtility.VectorMagnitude(shotCords.Item1, GetBoundingBox().X, shotCords.Item2, GetBoundingBox().Y);
-                    if (vmag <= range)
-                        return shotCords;
-                }
-            }
-            return null;
-        }
-
-        private int RandomAimOffset()
-        {
-            return randomGeneration.Next(-120, 120);
-        }
-
-        private int RandomShotSpeed()
-        {
-            return randomGeneration.Next(10, 25);
         }
     }
 }

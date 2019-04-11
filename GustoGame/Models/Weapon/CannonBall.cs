@@ -27,25 +27,13 @@ namespace Gusto.Models
 
         public CannonBall(Vector2 firedFrom)
         {
-            firedFromLoc = firedFrom;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.bbKey.Equals("tower"))
-            {
-
-            } else if (collidedWith.bbKey.Equals("baseSail"))
-            {
-                Trace.WriteLine("COLLIDED WITH SAIL");
-            }
-
-            else
-            {
-                currColumnFrame++; // explosion
-                exploded = true;
-                BoundFrames();
-            }
+            currColumnFrame++; // explosion
+            exploded = true;
+            BoundFrames();
         }
 
         // logic to find correct frame of sprite from user input and update movement values

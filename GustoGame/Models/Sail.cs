@@ -45,17 +45,17 @@ namespace Gusto.Models
                 // sail direction
                 if (kstate.IsKeyDown(Keys.LeftShift))
                 {
-                    if (kstate.IsKeyDown(Keys.Left))
+                    if (kstate.IsKeyDown(Keys.A))
                         currColumnFrame++;
-                    else if (kstate.IsKeyDown(Keys.Right))
+                    else if (kstate.IsKeyDown(Keys.D))
                         currColumnFrame--;
                 }
                 else 
                 {
                     // ship direction
-                    if (kstate.IsKeyDown(Keys.Left))
+                    if (kstate.IsKeyDown(Keys.A))
                         currRowFrame++;
-                    else if (kstate.IsKeyDown(Keys.Right))
+                    else if (kstate.IsKeyDown(Keys.D))
                         currRowFrame--;
                 }
                 BoundFrames();

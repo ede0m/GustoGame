@@ -21,7 +21,9 @@ namespace Gusto
 
         // TEMPORARY -- expose the "players and enemies". 
         BaseShip baseShip;
+        BaseShip baseShipAI;
         BaseTower tower;
+
         WindArrows windArrows;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
@@ -74,12 +76,15 @@ namespace Gusto
             //textureTower.Dispose();
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
-
+            //
+            Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
+            LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
 
 
             // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 800), Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 50), Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(600, 300), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(800, 300), Content, GraphicsDevice);
 
             // static 
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
@@ -87,6 +92,7 @@ namespace Gusto
             
             // fill draw order list
             DrawOrder.Add(baseShip);
+            DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
             // fill collidable list
             Collidable.Add(baseShip);
@@ -144,9 +150,13 @@ namespace Gusto
             int windSpeed = windArrows.getWindSpeed();
             // Tower
             tower.Update(kstate, gameTime);
+            // ship AI
+            baseShipAI.Update(kstate, gameTime, windDirection, windSpeed);
+            //baseShipAI.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+
             // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
             baseShip.Update(kstate, gameTime, windDirection, windSpeed);
-            baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+            //baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
 
             base.Update(gameTime);
         }
@@ -174,6 +184,10 @@ namespace Gusto
                     Ship ship = (Ship) sprite;
                     sprite.Draw(spriteBatch);
                     ship.shipSail.Draw(spriteBatch);
+                    foreach (var shot in ship.Shots)
+                        shot.Draw(spriteBatch);
+                    if (ship.aiming)
+                        ship.DrawAimLine(spriteBatch);
                     continue;
                 } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
@@ -202,6 +216,8 @@ namespace Gusto
                     Ship ship = (Ship)sprite;
                     quad.Insert(sprite);
                     quad.Insert(ship.shipSail);
+                    foreach (var shot in ship.Shots)
+                        quad.Insert(shot);
                     BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<int, int>(sprite.GetBoundingBox().X, sprite.GetBoundingBox().Y));
                     continue;
                 }

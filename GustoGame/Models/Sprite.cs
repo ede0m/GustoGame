@@ -119,6 +119,11 @@ namespace Gusto.AnimatedSprite
             return _texture.Height;
         }
 
+        public Vector2 GetTextureCenter()
+        {
+            return _texture.Bounds.Center.ToVector2();
+        }
+
         public double GetWidth()
         {
             return _texture.Width;

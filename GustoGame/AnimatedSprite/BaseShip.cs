@@ -15,14 +15,20 @@ namespace Gusto.AnimatedSprite
     {
         public BaseShip(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base (team, content, graphics)
         {
-            timeSinceLastFrame = 0;
-            millisecondsPerFrame = 500; // turn speed
-            baseMovementSpeed = 0.2f;
-            sailUnits = 1;
+            timeSinceLastTurn = 0;
+            millisecondsPerTurn = 500; // turn speed
+            timeSinceLastExpClean = 0;
+            millisecondsExplosionLasts = 400;
+            timeSinceLastShot = 0;
+            millisecondsNewShot = 2000;
+            movementSpeed = 0.2f;
+            nSails = 1;
+            nCannons = 1;
             health = 100;
+            range = 1000f;
 
-            MapModelMovementVectorValues();
 
+            //MapModelMovementVectorValues();
             Texture2D textureBaseShip = content.Load<Texture2D>("BaseShip");
             Texture2D textureBaseShipBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
