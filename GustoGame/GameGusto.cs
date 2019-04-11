@@ -21,7 +21,9 @@ namespace Gusto
 
         // TEMPORARY -- expose the "players and enemies". 
         BaseShip baseShip;
+        BaseShip baseShipAI;
         BaseTower tower;
+
         WindArrows windArrows;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
@@ -80,8 +82,9 @@ namespace Gusto
 
 
             // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 800), Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 50), Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(600, 300), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(800, 300), Content, GraphicsDevice);
 
             // static 
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
@@ -89,6 +92,7 @@ namespace Gusto
             
             // fill draw order list
             DrawOrder.Add(baseShip);
+            DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
             // fill collidable list
             Collidable.Add(baseShip);
@@ -146,9 +150,13 @@ namespace Gusto
             int windSpeed = windArrows.getWindSpeed();
             // Tower
             tower.Update(kstate, gameTime);
+            // ship AI
+            baseShipAI.Update(kstate, gameTime, windDirection, windSpeed);
+            //baseShipAI.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+
             // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
             baseShip.Update(kstate, gameTime, windDirection, windSpeed);
-            baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+            //baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
 
             base.Update(gameTime);
         }

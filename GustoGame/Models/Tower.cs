@@ -78,7 +78,7 @@ namespace Gusto.Models
 
             if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving )
             {
-                Tuple<int, int> shotDirection = ChooseTarget();
+                Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
                 if (shotDirection != null)
                 {
                     BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
@@ -88,21 +88,6 @@ namespace Gusto.Models
                 }
                 timeSinceLastShot = 0;
             }
-        }
-
-        private Tuple<int, int> ChooseTarget()
-        {
-            foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
-            {
-                if (AttackMapping.AttackMappings[teamType][otherTeam])
-                {
-                    Tuple<int, int> shotCords = BoundingBoxLocations.BoundingBoxLocationMap[otherTeam][0];// TODO REMOVE HARDCODED random target (pick team member with lowest health)
-                    float vmag = PhysicsUtility.VectorMagnitude(shotCords.Item1, GetBoundingBox().X, shotCords.Item2, GetBoundingBox().Y);
-                    if (vmag <= range)
-                        return shotCords;
-                }
-            }
-            return null;
         }
     }
 }

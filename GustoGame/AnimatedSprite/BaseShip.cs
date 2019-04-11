@@ -25,9 +25,10 @@ namespace Gusto.AnimatedSprite
             nSails = 1;
             nCannons = 1;
             health = 100;
+            range = 1000f;
+
 
             //MapModelMovementVectorValues();
-
             Texture2D textureBaseShip = content.Load<Texture2D>("BaseShip");
             Texture2D textureBaseShipBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

@@ -64,81 +64,143 @@ namespace Gusto.Models
         // logic to find correct frame of sprite from user input and update movement values
         public void Update(KeyboardState kstate, GameTime gameTime, int windDir, int windSp)
         {
-            timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
-            timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
-
-            foreach (var shot in Shots)
-                shot.Update(kstate, gameTime);
-            if (timeSinceLastExpClean > millisecondsExplosionLasts)
+            // TODO atleast refactor to separate method for AI
+            if (teamType != TeamType.Player)
             {
-                // remove exploded shots
-                for (int i = 0; i < Shots.Count; i++)
-                {
-                    if (Shots[i].exploded || Shots[i].outOfRange)
-                        Shots.RemoveAt(i);
-                }
-                timeSinceLastExpClean = 0;
-            }
+                Tuple<int, int> target = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
+                if (target == null)
+                    return;
 
-            if (colliding)
-                moving = false;
+                float slope = (target.Item2 - location.Y) / (target.Item1 - location.X);
+
+                if (slope > 0)
+                {
+                    if (slope < 2.5 && slope > 0.4)
+                    {
+                        if ((target.Item1 - location.X) > 0)
+                            currRowFrame = 5; // upper right
+                        else
+                            currRowFrame = 1; // lower left
+                    }
+                    else if (slope < 0.4 && slope > 0)
+                    {
+                        if ((target.Item1 - location.X) > 0)
+                            currRowFrame = 6; // right
+                        else
+                            currRowFrame = 2; // left
+                    }
+                    else if (slope > 2.5)
+                    {
+                        if ((target.Item2 - location.Y) > 0)
+                            currRowFrame = 4; // down
+                        else
+                            currRowFrame = 0; // up
+                    }
+                }
+                else
+                {
+                    if (slope > -2.5 && slope < -0.4)
+                    {
+                        if ((target.Item1 - location.X) > 0)
+                            currRowFrame = 7; // lower right
+                        else
+                            currRowFrame = 3; // upper left
+                    }
+                    else if (slope > -0.4 && slope < 0)
+                    {
+                        if ((target.Item1 - location.X) > 0)
+                            currRowFrame = 6; // right
+                        else
+                            currRowFrame = 2; // left
+                    }
+                    else if (slope < -2.5)
+                    {
+                        if ((target.Item2 - location.Y) > 0)
+                            currRowFrame = 4; // down
+                        else
+                            currRowFrame = 0; // up
+                    }
+                }
+            }
             else
-                moving = true;
-
-            if (timeSinceLastTurn > millisecondsPerTurn)
             {
-                // sail direction
-                if (!kstate.IsKeyDown(Keys.LeftShift))
+                timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
+                timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
+
+                foreach (var shot in Shots)
+                    shot.Update(kstate, gameTime);
+                if (timeSinceLastExpClean > millisecondsExplosionLasts)
                 {
-                    // ship direction
-                    if (kstate.IsKeyDown(Keys.A))
-                        currRowFrame++;
-                    else if (kstate.IsKeyDown(Keys.D))
-                        currRowFrame--;
-                    BoundFrames();
+                    // remove exploded shots
+                    for (int i = 0; i < Shots.Count; i++)
+                    {
+                        if (Shots[i].exploded || Shots[i].outOfRange)
+                            Shots.RemoveAt(i);
+                    }
+                    timeSinceLastExpClean = 0;
                 }
 
-                timeSinceLastTurn -= millisecondsPerTurn;
-            }
-            if (moving)
-            {
-                // map frame to vector movement
-                Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                location.X += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1;
-                location.Y += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2;
-                //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
-                
-                // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
-                int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
-                int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
-                shipSail.location.X = location.X + sailMountX;
-                shipSail.location.Y = location.Y + sailMountY;
-            }
+                if (colliding)
+                    moving = false;
+                else
+                    moving = true;
 
-            // aiming
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-                aiming = true;
-                startAimLine = GetBoundingBox().Center.ToVector2();
-                endAimLine.X = Mouse.GetState().X;
-                endAimLine.Y = Mouse.GetState().Y;
-            }
-            else { aiming = false; }
+                if (timeSinceLastTurn > millisecondsPerTurn)
+                {
+                    // sail direction
+                    if (!kstate.IsKeyDown(Keys.LeftShift))
+                    {
+                        // ship direction
+                        if (kstate.IsKeyDown(Keys.A))
+                            currRowFrame++;
+                        else if (kstate.IsKeyDown(Keys.D))
+                            currRowFrame--;
+                        BoundFrames();
+                    }
 
-            // shooting
-            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
-            {
-                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
-                BaseCannonBall cannonShot = new BaseCannonBall(startAimLine, _content, _graphics);
-                int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
-                int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
-                cannonShot.location.X -= cannonBallTextureCenterOffsetX;
-                cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
-                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), RandomEvents.RandomAimOffset(this.rand));
-                cannonShot.moving = true;
-                Shots.Add(cannonShot);
-                timeSinceLastShot = 0;
+                    timeSinceLastTurn -= millisecondsPerTurn;
+                }
+                if (moving)
+                {
+                    // map frame to vector movement
+                    Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
+                    location.X += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1;
+                    location.Y += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2;
+                    //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
+
+                    // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
+                    int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
+                    int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
+                    shipSail.location.X = location.X + sailMountX;
+                    shipSail.location.Y = location.Y + sailMountY;
+                }
+                shipSail.Update(kstate, gameTime, windDir, windSp);
+
+                // aiming
+                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                {
+                    timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+                    aiming = true;
+                    startAimLine = GetBoundingBox().Center.ToVector2();
+                    endAimLine.X = Mouse.GetState().X;
+                    endAimLine.Y = Mouse.GetState().Y;
+                }
+                else { aiming = false; }
+
+                // shooting
+                if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
+                {
+                    Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
+                    BaseCannonBall cannonShot = new BaseCannonBall(startAimLine, _content, _graphics);
+                    int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
+                    int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
+                    cannonShot.location.X -= cannonBallTextureCenterOffsetX;
+                    cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), RandomEvents.RandomAimOffset(this.rand));
+                    cannonShot.moving = true;
+                    Shots.Add(cannonShot);
+                    timeSinceLastShot = 0;
+                }
             }
         }
 
