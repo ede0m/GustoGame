@@ -17,6 +17,7 @@ namespace Gusto.Models
 
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
+        public TeamType teamType;
 
         public float sailSpeed { get; set; }
         public int windWindowAdd { get; set; } // used for shipWindWindow bounds
@@ -24,8 +25,9 @@ namespace Gusto.Models
         public int sailIsLeftColumn { get; set; }
         public int sailIsRightColumn { get; set; }
 
-        public Sail()
+        public Sail(TeamType type)
         {
+            teamType = type;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -40,26 +42,33 @@ namespace Gusto.Models
         public void Update(KeyboardState kstate, GameTime gameTime, int windDir, int windSp)
         {
             timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastFrame > millisecondsPerFrame)
+
+            if (teamType != TeamType.Player)
             {
-                // sail direction
-                if (kstate.IsKeyDown(Keys.LeftShift))
+
+            } else
+            {
+                if (timeSinceLastFrame > millisecondsPerFrame)
                 {
-                    if (kstate.IsKeyDown(Keys.A))
-                        currColumnFrame++;
-                    else if (kstate.IsKeyDown(Keys.D))
-                        currColumnFrame--;
+                    // sail direction
+                    if (kstate.IsKeyDown(Keys.LeftShift))
+                    {
+                        if (kstate.IsKeyDown(Keys.A))
+                            currColumnFrame++;
+                        else if (kstate.IsKeyDown(Keys.D))
+                            currColumnFrame--;
+                    }
+                    else
+                    {
+                        // ship direction
+                        if (kstate.IsKeyDown(Keys.A))
+                            currRowFrame++;
+                        else if (kstate.IsKeyDown(Keys.D))
+                            currRowFrame--;
+                    }
+                    BoundFrames();
+                    timeSinceLastFrame -= millisecondsPerFrame;
                 }
-                else 
-                {
-                    // ship direction
-                    if (kstate.IsKeyDown(Keys.A))
-                        currRowFrame++;
-                    else if (kstate.IsKeyDown(Keys.D))
-                        currRowFrame--;
-                }
-                BoundFrames();
-                timeSinceLastFrame -= millisecondsPerFrame;
             }
         }
 

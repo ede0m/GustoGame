@@ -15,7 +15,7 @@ namespace Gusto.AnimatedSprite
     public class BaseSail : Sail
     {
 
-        public BaseSail(Vector2 location, ContentManager content, GraphicsDevice graphics)
+        public BaseSail(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team)
         {
             timeSinceLastFrame = 0;
             sailIsLeftColumn = 2;

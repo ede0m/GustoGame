@@ -84,7 +84,7 @@ namespace Gusto
             // create Team models and initally place them
             baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 50), Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(600, 300), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(800, 300), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(800, 800), Content, GraphicsDevice);
 
             // static 
             windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
