@@ -25,8 +25,8 @@ namespace Gusto.AnimatedSprite
             nSails = 1;
             health = 100;
             shotRange = 700f;
-            stopRange = 200f;
-            attackRange = 700f;
+            stopRange = 100f;
+            attackRange = 400f;
 
 
             //MapModelMovementVectorValues();

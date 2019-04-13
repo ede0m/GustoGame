@@ -37,7 +37,6 @@ namespace Gusto.Models
         public bool aiming;
         int shipWindWindowMax;
         int shipWindWindowMin;
-        int sailPositionInRespectToShip;
 
         Random rand;
         public TeamType teamType;
@@ -171,14 +170,16 @@ namespace Gusto.Models
         {
             Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
             if (target == null)
+            {
+                moving = false;
                 return;
+            }
 
             var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
-            // move towards target once in range, stop if too close
-            if (distanceToTarget < attackRange && distanceToTarget >= stopRange)
-                moving = true;
-            else
+            if (distanceToTarget <= stopRange)
                 moving = false;
+            else
+                moving = true;
 
             currRowFrame = AIUtility.SetAIShipDirection(target, location);
             shipSail.currRowFrame = currRowFrame;
@@ -189,7 +190,7 @@ namespace Gusto.Models
         public Tuple<float, float> SetSailBonusMovement(Dictionary<int, Tuple<float, float>> ShipDirectionVectorValues, 
              int windDirection, int windSpeed, float sailSpeedBonus, int sailRColumn, int sailLColumn)
         {
-            bool sailDirectlyInWind = false;
+            shipSail.sailDirectlyInWind = false;
             float xBonus = 0f;
             float yBonus = 0f;
 
@@ -197,28 +198,30 @@ namespace Gusto.Models
             shipWindWindowMax = windDirection + shipSail.windWindowAdd;
             shipWindWindowMin = windDirection - shipSail.windWindowSub;
 
-            sailPositionInRespectToShip = shipSail.currRowFrame;
+            shipSail.sailPositionInRespectToShip = shipSail.currRowFrame;
             BoundShipWindow();
 
             int addedWindWindow = windDirection;
             // sail in wind direction bonus (expands ShipWindWindow)
             if (shipSail.currColumnFrame == sailRColumn)  // sail is right
             {
-                sailPositionInRespectToShip--;
+                shipSail.sailPositionInRespectToShip--;
                 addedWindWindow = shipWindWindowMax;
                 shipWindWindowMax++;
             }
             else if (shipSail.currColumnFrame == sailLColumn) // sail is left
             {
-                sailPositionInRespectToShip++;
+                shipSail.sailPositionInRespectToShip++;
                 addedWindWindow = shipWindWindowMin;
                 shipWindWindowMin--;
             }
             BoundShipWindow();
 
             // bonus for sailing directly into wind
-            if (sailPositionInRespectToShip == windDirection)
-                sailDirectlyInWind = true;
+            if (shipSail.sailPositionInRespectToShip == windDirection)
+                shipSail.sailDirectlyInWind = true;
+
+            shipSail.SetWindWindow(shipWindWindowMin, shipWindWindowMax, addedWindWindow);
 
             // is the ship able to catch wind?
             if (currRowFrame == shipWindWindowMin || currRowFrame == shipWindWindowMax || currRowFrame == addedWindWindow || currRowFrame == windDirection)
@@ -227,7 +230,7 @@ namespace Gusto.Models
                 Trace.WriteLine("\nCATCHING WIND\n ship pos: " + currRowFrame.ToString() + "\n Max: " + shipWindWindowMax.ToString() + " windDir: " + windDirection.ToString() + " Min: " + shipWindWindowMin.ToString() + "\n");
                 yBonus += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus * windSpeed;
                 xBonus += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus * windSpeed;
-                if (sailDirectlyInWind)
+                if (shipSail.sailDirectlyInWind)
                 {
                     yBonus += ShipDirectionVectorValues[currRowFrame].Item2 * sailSpeedBonus;
                     xBonus += ShipDirectionVectorValues[currRowFrame].Item1 * sailSpeedBonus;
@@ -261,10 +264,10 @@ namespace Gusto.Models
             if (shipWindWindowMin == -1)
                 shipWindWindowMin = nRows - 1;
 
-            if (sailPositionInRespectToShip == -1)
-                sailPositionInRespectToShip = nRows - 1;
-            else if (sailPositionInRespectToShip == nRows)
-                sailPositionInRespectToShip = 0;
+            if (shipSail.sailPositionInRespectToShip == -1)
+                shipSail.sailPositionInRespectToShip = nRows - 1;
+            else if (shipSail.sailPositionInRespectToShip == nRows)
+                shipSail.sailPositionInRespectToShip = 0;
         }
     }
 }
