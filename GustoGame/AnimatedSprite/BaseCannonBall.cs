@@ -12,7 +12,7 @@ namespace Gusto.AnimatedSprite
 {
     public class BaseCannonBall : CannonBall
     {
-        public BaseCannonBall(Vector2 location, ContentManager content, GraphicsDevice graphics) : base (location)
+        public BaseCannonBall(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base (location, team)
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;

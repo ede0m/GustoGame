@@ -1,5 +1,6 @@
 ﻿
 using global::Gusto.AnimatedSprite;
+using Gusto.Models.Weapon;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,7 +10,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models
 {
-    public class CannonBall : Sprite
+    public class CannonBall : Sprite, IWeapon
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
@@ -24,9 +25,11 @@ namespace Gusto.Models
         int shotLenX;
         int shotLenY;
         public Vector2 firedFromLoc;
+        public TeamType teamType;
 
-        public CannonBall(Vector2 firedFrom)
+        public CannonBall(Vector2 firedFrom, TeamType type)
         {
+            teamType = type;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -54,7 +57,7 @@ namespace Gusto.Models
                     distanceTraveledX += Math.Abs(shotDirX);
                     distanceTraveledY += Math.Abs(shotDirY);
                 }
-                if (distanceTraveledX > (shotLenX * 1.3) || distanceTraveledY > (shotLenY * 1.3))
+                if (distanceTraveledX > (shotLenX * 1.5) || distanceTraveledY > (shotLenY * 1.5))
                     outOfRange = true;
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
