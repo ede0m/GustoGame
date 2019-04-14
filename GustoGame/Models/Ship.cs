@@ -1,5 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Mappings;
+using Gusto.Models.Weapon;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -55,14 +56,9 @@ namespace Gusto.Models
         // Ship collision handler
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Ship))
+            if (collidedWith is IWeapon)
             {
-                //collidedWith.colliding = true;
-            }
-
-            if (collidedWith.bbKey.Equals("tower"))
-            {
-
+                colliding = false;
             }
         }
 
@@ -74,7 +70,7 @@ namespace Gusto.Models
 
             // AI logic
             if (teamType != TeamType.Player)
-                AIUpdate();
+                AIUpdate(gameTime);
             // player logic
             else
                 PlayerUpdate(kstate, gameTime);
@@ -177,30 +173,55 @@ namespace Gusto.Models
             }
         }
 
-        private void AIUpdate()
+        private void AIUpdate(GameTime gameTime)
         {
-            Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+            // AI ship direction and movement
+            if (timeSinceLastTurn > millisecondsPerTurn)
+            {
+                Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+                if (target == null)
+                {
+                    moving = false;
+                    shipSail.moving = false;
+                    return;
+                }
+                var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
+                if (distanceToTarget <= stopRange)
+                {
+                    moving = false;
+                    shipSail.moving = false;
+                }
+                else
+                {
+                    moving = true;
+                    shipSail.moving = true;
+                }
 
-            if (target == null)
-            {
-                moving = false;
-                shipSail.moving = false;
-                return;
-            }
-            var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
-            if (distanceToTarget <= stopRange)
-            {
-                moving = false;
-                shipSail.moving = false;
-            }
-            else
-            {
-                moving = true;
-                shipSail.moving = true;
+                currRowFrame = AIUtility.SetAIShipDirection(target, location);
+                shipSail.currRowFrame = currRowFrame;
+
+                timeSinceLastTurn -= millisecondsPerTurn;
             }
 
-            currRowFrame = AIUtility.SetAIShipDirection(target, location);
-            shipSail.currRowFrame = currRowFrame;
+            // AI Ship Shooting
+            timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastShot > millisecondsNewShot)
+            {
+                Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+                if (shotDirection != null)
+                {
+                    Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, shipCenter, _content, _graphics);
+                    int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
+                    int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
+                    cannonShot.location.X -= cannonBallTextureCenterOffsetX;
+                    cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), RandomEvents.RandomAimOffset(rand));
+                    cannonShot.moving = true;
+                    Shots.Add(cannonShot);
+                }
+                timeSinceLastShot = 0;
+            }
         }
 
         /* Adds movement values to X Y location vector based on sail position with wind. 

@@ -24,7 +24,13 @@ namespace Gusto.AnimatedSprite
             windWindowAdd = 1;
             windWindowSub = 1;
 
-            Texture2D textureBaseSail = content.Load<Texture2D>("DecomposedBaseSail");
+            string spriteSheetName = null;
+            if (team == TeamType.A)
+                spriteSheetName = "BaseSailA";
+            else if (team == TeamType.Player)
+                spriteSheetName = "BaseSailPlayer";
+
+            Texture2D textureBaseSail = content.Load<Texture2D>(spriteSheetName);
             Texture2D textureBaseSailBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseSailBB = new Texture2D(graphics, textureBaseSail.Width, textureBaseSail.Height);
