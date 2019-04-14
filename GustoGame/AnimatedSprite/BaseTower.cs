@@ -19,7 +19,7 @@ namespace Gusto.AnimatedSprite
             timeSinceLastExpClean = 0;
             millisecondsNewShot = 2000;
             millisecondsExplosionLasts = 400;
-            maxShotsMoving = 5;
+            maxShotsMoving = 4;
             range = 600f;
 
             Texture2D textureTower = content.Load<Texture2D>("tower");

@@ -96,6 +96,7 @@ namespace Gusto
             DrawOrder.Add(tower);
             // fill collidable list
             Collidable.Add(baseShip);
+            Collidable.Add(baseShipAI);
             Collidable.Add(tower);
 
         }
@@ -207,6 +208,7 @@ namespace Gusto
         {
             foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
                 BoundingBoxLocations.BoundingBoxLocationMap[team].Clear();
+            
             // quadtree collision handling
             quad.Clear();
             foreach (var sprite in Collidable)
@@ -239,14 +241,16 @@ namespace Gusto
                 Rectangle bbA = spriteA.GetBoundingBox();
                 collidable.Clear();
                 quad.Retrieve(collidable, spriteA); //adds objects to collidable list if it is in quadrent of this sprite
+
+                spriteA.colliding = false;
                 foreach (var spriteB in collidable)
                 {
                     if (spriteB == spriteA)
                         continue;
 
                     // Reset any collision values on the sprites that need to be
-                    spriteA.colliding = false;
-                    spriteB.colliding = false;
+
+                    //spriteB.colliding = false;
 
                     Rectangle bbB = spriteB.GetBoundingBox();
                     if (bbA.Intersects(bbB) && CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))

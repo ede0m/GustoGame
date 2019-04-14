@@ -64,6 +64,8 @@ namespace Gusto.Models
 
         private void AIUpdate(int windDir)
         {
+
+            // AI sail movement .. needs work lolz
             int sailRangeMin = currRowFrame + 1;
             int sailRangeMax = currRowFrame - 1;
             if (sailRangeMin > nRows - 1)
@@ -73,7 +75,7 @@ namespace Gusto.Models
             if (currRowFrame == windWindowMin || currRowFrame == windWindowMax || currRowFrame == addedWindWindow || currRowFrame == windDir)
             {
                 // can we adjust sail to get direct wind?
-                if ((sailRangeMin == windDir || sailRangeMax == windDir) && !sailDirectlyInWind)
+                if ((sailRangeMin == windDir || sailRangeMax == windDir || currRowFrame == windDir) && !sailDirectlyInWind && moving)
                 {
                     if (currColumnFrame == nColumns - 1)
                     {
@@ -86,7 +88,7 @@ namespace Gusto.Models
             else
             {
                 // can sail be moved into wind window?
-                if (sailRangeMax == windWindowMax || sailRangeMin == windWindowMax || sailRangeMax == windWindowMin || sailRangeMin == windWindowMin)
+                if ((sailRangeMax == windWindowMax || sailRangeMin == windWindowMax || sailRangeMax == windWindowMin || sailRangeMin == windWindowMin) && moving)
                 {
                     if (currColumnFrame == nColumns - 1)
                     {

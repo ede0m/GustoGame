@@ -17,26 +17,27 @@ namespace Gusto.Bounding
             if (a.GetType().BaseType == typeof(Gusto.Models.Ship))
             {
                 Ship ship = (Ship)a;
-                // a ship doesn't collide with its own sail
-                if (ship.shipSail == b)
+                // a ship doesn't collide with its any ship's sails
+                if (b.GetType().BaseType == typeof(Gusto.Models.Sail))
                     return false;
-                // a ship doesn't collid with its own shots
-                for (int i = ship.Shots.Count() - 1; i >= 0; i--) // TODO could remove these o(n) operations by saying if sprite b is not = this sprites team
-                {
-                    if (ship.Shots[i] == b)
+                // ship doesn't collide with its own cannon balls
+                if (b.GetType().BaseType == typeof(Gusto.Models.CannonBall)) {
+                    CannonBall ball = (CannonBall)b;
+                    if (ball.teamType == ship.teamType)
                         return false;
                 }
-            } else if (a.GetType().BaseType == typeof(Gusto.Models.Tower))
+            }
+
+            else if (a.GetType().BaseType == typeof(Gusto.Models.Tower))
             {
                 BaseTower tower = (BaseTower)a;
-                // a tower doesn't collide with its own shots (iterate backwards because newest (closest) shots will be appended on the end)
-                for (int i = tower.Shots.Count()-1; i >= 0; i--)
+                // a tower doesn't collide with its own shots
+                if (b.GetType().BaseType == typeof(Gusto.Models.CannonBall))
                 {
-                    if (tower.Shots[i] == b)
+                    CannonBall ball = (CannonBall)b;
+                    if (ball.teamType == tower.teamType)
                         return false;
                 }
-
-
             }
             return true;
         }

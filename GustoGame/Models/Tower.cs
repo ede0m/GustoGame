@@ -81,7 +81,7 @@ namespace Gusto.Models
                 Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
                 if (shotDirection != null)
                 {
-                    BaseCannonBall cannonShot = new BaseCannonBall(location, _content, _graphics);
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, location, _content, _graphics);
                     cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), RandomEvents.RandomAimOffset(rand));
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);

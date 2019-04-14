@@ -24,9 +24,11 @@ namespace Gusto.Models
         int shotLenX;
         int shotLenY;
         public Vector2 firedFromLoc;
+        public TeamType teamType;
 
-        public CannonBall(Vector2 firedFrom)
+        public CannonBall(Vector2 firedFrom, TeamType type)
         {
+            teamType = type;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)

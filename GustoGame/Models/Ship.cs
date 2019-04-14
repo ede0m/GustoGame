@@ -55,6 +55,11 @@ namespace Gusto.Models
         // Ship collision handler
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
+            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Ship))
+            {
+                //collidedWith.colliding = true;
+            }
+
             if (collidedWith.bbKey.Equals("tower"))
             {
 
@@ -149,7 +154,7 @@ namespace Gusto.Models
             if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
             {
                 Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
-                BaseCannonBall cannonShot = new BaseCannonBall(startAimLine, _content, _graphics);
+                BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
                 int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
                 int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
                 cannonShot.location.X -= cannonBallTextureCenterOffsetX;
@@ -161,25 +166,38 @@ namespace Gusto.Models
             }
 
             if (colliding)
+            {
                 moving = false;
+                shipSail.moving = false;
+            }
             else
+            {
                 moving = true;
+                shipSail.moving = true;
+            }
         }
 
         private void AIUpdate()
         {
             Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+
             if (target == null)
             {
                 moving = false;
+                shipSail.moving = false;
                 return;
             }
-
             var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
             if (distanceToTarget <= stopRange)
+            {
                 moving = false;
+                shipSail.moving = false;
+            }
             else
+            {
                 moving = true;
+                shipSail.moving = true;
+            }
 
             currRowFrame = AIUtility.SetAIShipDirection(target, location);
             shipSail.currRowFrame = currRowFrame;
