@@ -9,5 +9,7 @@ namespace Gusto
     public class GameOptions
     {
         public static bool ShowBoundingBox = true;
+        public static int PrefferedBackBufferWidth = 1800;
+        public static int PrefferedBackBufferHeight = 1000;
     }
 }

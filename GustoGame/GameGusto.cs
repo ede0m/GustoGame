@@ -38,8 +38,8 @@ namespace Gusto
         public GameGusto()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1800;
-            graphics.PreferredBackBufferHeight = 1000;
+            graphics.PreferredBackBufferWidth = GameOptions.PrefferedBackBufferWidth;
+            graphics.PreferredBackBufferHeight = GameOptions.PrefferedBackBufferHeight;
             Content.RootDirectory = "Content";
 
             DrawOrder = new List<Sprite>();
@@ -90,7 +90,7 @@ namespace Gusto
             // create Team models and initally place them
             baseShip = new BaseShip(TeamType.Player, screenCenter, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(200, 300), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(200, 200), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(200, 100), Content, GraphicsDevice);
 
             // static 
             windArrows = new WindArrows(new Vector2(1700, 50), Content, GraphicsDevice);

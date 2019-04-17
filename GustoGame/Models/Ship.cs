@@ -131,20 +131,21 @@ namespace Gusto.Models
                 aiming = true;
                 startAimLine = GetBoundingBox().Center.ToVector2();
 
-                Vector2 mousePos = new Vector2(Mouse.GetState().X  , Mouse.GetState().Y );
+                Vector2 mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                Vector2 clickPos = mousePos - new Vector2(GameOptions.PrefferedBackBufferWidth/2, GameOptions.PrefferedBackBufferHeight/2)+ camera.Position;
 
-                var lineDistance = PhysicsUtility.VectorMagnitude(mousePos.X, startAimLine.X, mousePos.Y, startAimLine.Y);
+                var lineDistance = PhysicsUtility.VectorMagnitude(clickPos.X, startAimLine.X, clickPos.Y, startAimLine.Y);
                 if (lineDistance > shotRange)
                 {
                     float disRatio = shotRange / lineDistance;
-                    Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * mousePos.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * mousePos.Y)));
+                    Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * clickPos.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * clickPos.Y)));
                     endAimLine.X = maxPos.X;
                     endAimLine.Y = maxPos.Y;
                 }
                 else
                 {
-                    endAimLine.X = mousePos.X;
-                    endAimLine.Y = mousePos.Y;
+                    endAimLine.X = clickPos.X;
+                    endAimLine.Y = clickPos.Y;
                 }
             }
             else { aiming = false; }
