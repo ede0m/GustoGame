@@ -8,6 +8,6 @@ namespace Gusto
 {
     public class GameOptions
     {
-        public static bool ShowBoundingBox = false;
+        public static bool ShowBoundingBox = true;
     }
 }

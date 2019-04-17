@@ -1,4 +1,5 @@
-﻿using Gusto.AnimatedSprite;
+﻿using Comora;
+using Gusto.AnimatedSprite;
 using Gusto.Mappings;
 using Gusto.Models.Weapon;
 using Gusto.Utility;
@@ -63,7 +64,7 @@ namespace Gusto.Models
         }
 
         // logic to find correct frame of sprite from user input and update movement values
-        public void Update(KeyboardState kstate, GameTime gameTime, int windDir, int windSp)
+        public void Update(KeyboardState kstate, GameTime gameTime, int windDir, int windSp, Camera camera)
         {
             timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
@@ -73,7 +74,7 @@ namespace Gusto.Models
                 AIUpdate(gameTime);
             // player logic
             else
-                PlayerUpdate(kstate, gameTime);
+                PlayerUpdate(kstate, gameTime, camera);
             
             // clean shots
             foreach (var shot in Shots)
@@ -105,7 +106,7 @@ namespace Gusto.Models
             shipSail.Update(kstate, gameTime, windDir, windSp);
         }
 
-        private void PlayerUpdate(KeyboardState kstate, GameTime gameTime)
+        private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             if (timeSinceLastTurn > millisecondsPerTurn)
             {
@@ -129,7 +130,9 @@ namespace Gusto.Models
                 timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
                 aiming = true;
                 startAimLine = GetBoundingBox().Center.ToVector2();
-                Vector2 mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+
+                Vector2 mousePos = new Vector2(Mouse.GetState().X  , Mouse.GetState().Y );
+
                 var lineDistance = PhysicsUtility.VectorMagnitude(mousePos.X, startAimLine.X, mousePos.Y, startAimLine.Y);
                 if (lineDistance > shotRange)
                 {
@@ -278,7 +281,7 @@ namespace Gusto.Models
             return new Tuple<float, float>(xBonus, yBonus);
         }
 
-        public void DrawAimLine(SpriteBatch sb)
+        public void DrawAimLine(SpriteBatch sb, Camera camera)
         {
             Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
             aimLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
@@ -290,7 +293,7 @@ namespace Gusto.Models
             float angle = (float)Math.Atan2(edge.Y, edge.X);
             float angleInDeg = angle * radiansToDegrees;
             var line = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edge.Length(), 2);
-            sb.Begin();
+            sb.Begin(camera);
             sb.Draw(aimLineTexture, line, null, Color.DarkSeaGreen, angle, new Vector2(0, 0), SpriteEffects.None, 0);
             sb.End();
         }

@@ -74,6 +74,9 @@
     <Compile Include="Utility\TextureUtility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Comora, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Comora.0.5.0\lib\portable-net45+win8+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Comora.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
@@ -151,6 +154,7 @@
     <None Include="Content\obj\DesktopGL\NextShipSpriteSheetRevised.mgcontent" />
     <None Include="Content\obj\DesktopGL\tower.mgcontent" />
     <None Include="Content\obj\DesktopGL\WindArrows.mgcontent" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\NextShipSpriteSheetFINAL.png" />
