@@ -164,11 +164,11 @@ namespace Gusto.Models
             {
                 Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
                 BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
-                int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
-                int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
-                cannonShot.location.X -= cannonBallTextureCenterOffsetX;
-                cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
-                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), RandomEvents.RandomAimOffset(this.rand));
+                //int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
+                //int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
+                //cannonShot.location.X -= cannonBallTextureCenterOffsetX;
+                //cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
+                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
                 cannonShot.moving = true;
                 Shots.Add(cannonShot);
                 timeSinceLastShot = 0;
