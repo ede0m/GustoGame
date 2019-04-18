@@ -142,20 +142,17 @@ namespace Gusto.Models
 
                 var lineDistanceFull = PhysicsUtility.VectorMagnitude(clickPos.X, startAimLine.X, clickPos.Y, startAimLine.Y);
                 var lineDistanceReload = PhysicsUtility.VectorMagnitude(reloadSpot.X, startAimLine.X, reloadSpot.Y, startAimLine.Y);
-                
+
+                float disRatio = shotRange / lineDistanceFull;
+                Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * clickPos.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * clickPos.Y)));
+
                 // restrict aiming by shotRange
                 if (lineDistanceFull > shotRange)
-                {
-                    float disRatio = shotRange / lineDistanceFull;
-                    Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * clickPos.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * clickPos.Y)));
                     endAimLineFull = maxPos;
-                }
                 else
-                {
                     endAimLineFull = clickPos;
-                }
 
-                if (lineDistanceReload > lineDistanceFull)
+                if (lineDistanceReload > lineDistanceFull || lineDistanceReload > shotRange)
                     endAimLineReload = endAimLineFull;
                 else
                     endAimLineReload = reloadSpot;
