@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using Gusto.Models;
 using Microsoft.Xna.Framework.Content;
+using Comora;
 
 namespace Gusto.AnimatedSprite
 {
@@ -38,6 +39,7 @@ namespace Gusto.AnimatedSprite
         // logic to find correct frame of sprite from user input
         public void Update(KeyboardState kstate, GameTime gameTime) // keeping kstate in here for possible powerup to change wind directrion
         {
+
             timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
             if (timeSinceLastFrame > millisecondsPerFrame)
             {

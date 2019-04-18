@@ -1,4 +1,5 @@
-﻿using Gusto.AnimatedSprite;
+﻿using Comora;
+using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
@@ -30,13 +31,15 @@ namespace Gusto
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
-        SpriteBatch spriteBatch;
+        SpriteBatch spriteBatchView;
+        SpriteBatch spriteBatchStatic;
+        Camera camera;
         
         public GameGusto()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1400;
-            graphics.PreferredBackBufferHeight = 1200;
+            graphics.PreferredBackBufferWidth = GameOptions.PrefferedBackBufferWidth;
+            graphics.PreferredBackBufferHeight = GameOptions.PrefferedBackBufferHeight;
             Content.RootDirectory = "Content";
 
             DrawOrder = new List<Sprite>();
@@ -51,7 +54,7 @@ namespace Gusto
         /// </summary>
         protected override void Initialize()
         {
-
+            this.camera = new Camera(GraphicsDevice);
             base.Initialize();
         }
 
@@ -62,7 +65,8 @@ namespace Gusto
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatchView = new SpriteBatch(GraphicsDevice);
+            spriteBatchStatic = new SpriteBatch(GraphicsDevice);
 
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
@@ -81,13 +85,15 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
 
 
+            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+
             // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, new Vector2(1000, 500), Content, GraphicsDevice);
-            tower = new BaseTower(TeamType.A, new Vector2(600, 300), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(800, 800), Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, screenCenter, Content, GraphicsDevice);
+            tower = new BaseTower(TeamType.A, new Vector2(200, 300), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(200, 100), Content, GraphicsDevice);
 
             // static 
-            windArrows = new WindArrows(new Vector2(1250, 0), Content, GraphicsDevice);
+            windArrows = new WindArrows(new Vector2(1700, 50), Content, GraphicsDevice);
             
             
             // fill draw order list
@@ -140,6 +146,9 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            // camera follows player
+            this.camera.Position = baseShip.location;
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             var kstate = Keyboard.GetState();
@@ -152,13 +161,14 @@ namespace Gusto
             // Tower
             tower.Update(kstate, gameTime);
             // ship AI
-            baseShipAI.Update(kstate, gameTime, windDirection, windSpeed);
+            baseShipAI.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
             //baseShipAI.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
 
             // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
-            baseShip.Update(kstate, gameTime, windDirection, windSpeed);
+            baseShip.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
             //baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
 
+            this.camera.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -171,35 +181,33 @@ namespace Gusto
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // draw sprites that don't move
-            windArrows.Draw(spriteBatch);
+            windArrows.Draw(spriteBatchStatic, null);
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
-            {
-                //Trace.WriteLine(sprite.GetType());
-                
+            {                
                 // Draw a ships sail before a ship
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
-                    sprite.Draw(spriteBatch);
-                    ship.shipSail.Draw(spriteBatch);
+                    sprite.Draw(spriteBatchView, this.camera);
+                    ship.shipSail.Draw(spriteBatchView, this.camera);
                     foreach (var shot in ship.Shots)
-                        shot.Draw(spriteBatch);
+                        shot.Draw(spriteBatchView, this.camera);
                     if (ship.aiming)
-                        ship.DrawAimLine(spriteBatch);
+                        ship.DrawAimLine(spriteBatchView, this.camera);
                     continue;
                 } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower) sprite;
-                    sprite.Draw(spriteBatch);
+                    sprite.Draw(spriteBatchView, this.camera);
                     // draw any shots this tower has in motion
                     foreach (var shot in tower.Shots)
-                        shot.Draw(spriteBatch);
+                        shot.Draw(spriteBatchView, this.camera);
                     continue;
                 }
-                sprite.Draw(spriteBatch);
+                sprite.Draw(spriteBatchView, this.camera);
             }
             base.Draw(gameTime);
         }
