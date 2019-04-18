@@ -18,16 +18,19 @@ namespace Gusto.Models
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        Vector2 edge;
-        Vector2 startAimLine;
-        Vector2 endAimLine;
-
-        public int timeSinceLastShot;
+        public float timeSinceLastShot;
         public int timeSinceLastExpClean;
-        public int millisecondsNewShot;
+        public float millisecondsNewShot;
         public int millisecondsExplosionLasts;
         public int timeSinceLastTurn;
         public int millisecondsPerTurn; // turning speed
+
+        // aim line stuff
+        Vector2 edgeFull;
+        Vector2 edgeReload;
+        Vector2 startAimLine;
+        Vector2 endAimLineFull;
+        Vector2 endAimLineReload;
 
         public float shotRange;
         public float attackRange;
@@ -128,32 +131,41 @@ namespace Gusto.Models
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+                float percentReloaded = timeSinceLastShot / millisecondsNewShot;
+
                 aiming = true;
                 startAimLine = GetBoundingBox().Center.ToVector2();
 
                 Vector2 mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 Vector2 clickPos = mousePos - new Vector2(GameOptions.PrefferedBackBufferWidth/2, GameOptions.PrefferedBackBufferHeight/2)+ camera.Position;
+                Vector2 reloadSpot = new Vector2(((1 - percentReloaded) * startAimLine.X + (percentReloaded * clickPos.X)), ((1 - percentReloaded) * startAimLine.Y + (percentReloaded * clickPos.Y)));
 
-                var lineDistance = PhysicsUtility.VectorMagnitude(clickPos.X, startAimLine.X, clickPos.Y, startAimLine.Y);
-                if (lineDistance > shotRange)
+                var lineDistanceFull = PhysicsUtility.VectorMagnitude(clickPos.X, startAimLine.X, clickPos.Y, startAimLine.Y);
+                var lineDistanceReload = PhysicsUtility.VectorMagnitude(reloadSpot.X, startAimLine.X, reloadSpot.Y, startAimLine.Y);
+                
+                // restrict aiming by shotRange
+                if (lineDistanceFull > shotRange)
                 {
-                    float disRatio = shotRange / lineDistance;
+                    float disRatio = shotRange / lineDistanceFull;
                     Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * clickPos.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * clickPos.Y)));
-                    endAimLine.X = maxPos.X;
-                    endAimLine.Y = maxPos.Y;
+                    endAimLineFull = maxPos;
                 }
                 else
                 {
-                    endAimLine.X = clickPos.X;
-                    endAimLine.Y = clickPos.Y;
+                    endAimLineFull = clickPos;
                 }
+
+                if (lineDistanceReload > lineDistanceFull)
+                    endAimLineReload = endAimLineFull;
+                else
+                    endAimLineReload = reloadSpot;
             }
             else { aiming = false; }
 
             // shooting
             if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
             {
-                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLine.X, (int)endAimLine.Y);
+                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
                 BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
                 int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
                 int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
@@ -285,17 +297,25 @@ namespace Gusto.Models
         public void DrawAimLine(SpriteBatch sb, Camera camera)
         {
             Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
-            aimLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
+            Texture2D reloadLineTexture = new Texture2D(_graphics, 1, 1);
+            aimLineTexture.SetData<Color>(new Color[] { Color.IndianRed });
+            reloadLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
 
             //Vector2 perpendicularLinePlus = new Vector2(startAimLine.X + ShipDirectionVectorValues[currRowFrame].Item1, startAimLine.Y + ShipDirectionVectorValues[currRowFrame].Item2);
             //Vector2 perpendicularLineMinus = new Vector2(startAimLine.X - ShipDirectionVectorValues[currRowFrame].Item1, startAimLine.Y - ShipDirectionVectorValues[currRowFrame].Item2);
-            edge = endAimLine - startAimLine;
-            float radiansToDegrees = 180f / (float)Math.PI;
-            float angle = (float)Math.Atan2(edge.Y, edge.X);
-            float angleInDeg = angle * radiansToDegrees;
-            var line = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edge.Length(), 2);
+            edgeFull = endAimLineFull - startAimLine;
+            edgeReload =  endAimLineReload - startAimLine;
+            //float radiansToDegrees = 180f / (float)Math.PI;
+            float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
+            float angleReload = (float)Math.Atan2(edgeReload.Y, edgeReload.X);
+            //float angleInDeg = angleFull * radiansToDegrees;
+
+            var lineFull = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeFull.Length(), 4);
+            var lineReload = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeReload.Length(), 4);
+
             sb.Begin(camera);
-            sb.Draw(aimLineTexture, line, null, Color.DarkSeaGreen, angle, new Vector2(0, 0), SpriteEffects.None, 0);
+            sb.Draw(aimLineTexture, lineFull, null, Color.IndianRed, angleFull, new Vector2(0, 0), SpriteEffects.None, 0);
+            sb.Draw(reloadLineTexture, lineReload, null, Color.DarkSeaGreen, angleReload, new Vector2(0, 0), SpriteEffects.None, 0);
             sb.End();
         }
         
