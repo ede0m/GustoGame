@@ -25,7 +25,9 @@ namespace Gusto
         BaseShip baseShipAI;
         BaseTower tower;
 
+        // static
         WindArrows windArrows;
+        Texture2D anchorIcon;
 
         QuadTreeCollision quad = new QuadTreeCollision(0, new Rectangle(0, 0, 1400, 1000));
         GraphicsDeviceManager graphics;
@@ -94,6 +96,7 @@ namespace Gusto
 
             // static 
             windArrows = new WindArrows(new Vector2(1700, 50), Content, GraphicsDevice);
+            anchorIcon = Content.Load<Texture2D>("anchor-shape");
             
             
             // fill draw order list
@@ -191,7 +194,8 @@ namespace Gusto
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
-                    sprite.Draw(spriteBatchView, this.camera);
+                    ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1620, 40), anchorIcon);
+                    ship.Draw(spriteBatchView, this.camera);
                     ship.shipSail.Draw(spriteBatchView, this.camera);
                     foreach (var shot in ship.Shots)
                         shot.Draw(spriteBatchView, this.camera);

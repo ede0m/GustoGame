@@ -19,10 +19,12 @@ namespace Gusto.Models
         private GraphicsDevice _graphics;
 
         public float timeSinceLastShot;
+        public float timeSinceStartAnchor;
         public int timeSinceLastExpClean;
-        public float millisecondsNewShot;
-        public int millisecondsExplosionLasts;
         public int timeSinceLastTurn;
+        public float millisecondsNewShot;
+        public float millisecondsToAnchor;
+        public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
 
         // aim line stuff
@@ -32,14 +34,19 @@ namespace Gusto.Models
         Vector2 endAimLineFull;
         Vector2 endAimLineReload;
 
+        private Texture2D meterFull;
+        private Texture2D meterProg;
+
         public float shotRange;
         public float attackRange;
         public float stopRange;
         public float movementSpeed;
+        public float percentNotAnchored;
         public int health;
         public int maxShotsMoving;
         public int nSails;
         public bool aiming;
+        public bool anchored;
         int shipWindWindowMax;
         int shipWindWindowMin;
 
@@ -55,6 +62,11 @@ namespace Gusto.Models
             _content = content;
             _graphics = graphics;
             rand = new Random();
+
+            // anchor feat init
+            percentNotAnchored = 1;
+            meterFull = new Texture2D(_graphics, 1, 1);
+            meterProg = new Texture2D(_graphics, 1, 1);
         }
 
         // Ship collision handler
@@ -97,8 +109,8 @@ namespace Gusto.Models
             {
                 // map frame to vector movement
                 Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                location.X += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1;
-                location.Y += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2;
+                location.X += (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored;
+                location.Y += (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
@@ -111,9 +123,9 @@ namespace Gusto.Models
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+            // turning
             if (timeSinceLastTurn > millisecondsPerTurn)
             {
-                // sail direction
                 if (!kstate.IsKeyDown(Keys.LeftShift))
                 {
                     // ship direction
@@ -123,9 +135,43 @@ namespace Gusto.Models
                         currRowFrame--;
                     BoundFrames();
                 }
-
                 timeSinceLastTurn -= millisecondsPerTurn;
             }
+
+            // anchoring toggle
+            if (kstate.IsKeyDown(Keys.S))
+            {
+                if (anchored)
+                {
+                    percentNotAnchored = (timeSinceStartAnchor / millisecondsToAnchor);
+                    timeSinceStartAnchor += gameTime.ElapsedGameTime.Milliseconds;
+                    if (percentNotAnchored >= 1)
+                    {
+                        anchored = false;
+                        timeSinceStartAnchor = 0;
+                    }
+                }
+                else
+                {
+                    percentNotAnchored = 1 - (timeSinceStartAnchor / millisecondsToAnchor);
+                    timeSinceStartAnchor += gameTime.ElapsedGameTime.Milliseconds;
+                    if (timeSinceStartAnchor >= millisecondsToAnchor)
+                    {
+                        anchored = true;
+                        timeSinceStartAnchor = 0;
+                        percentNotAnchored = 0;
+                    }
+                }
+            }
+            else if ((percentNotAnchored <= 1))
+            {
+                if (anchored)
+                    percentNotAnchored = 0;
+                else
+                    percentNotAnchored = 1;
+                timeSinceStartAnchor = 0;
+            }
+
 
             // aiming
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
@@ -164,17 +210,13 @@ namespace Gusto.Models
             {
                 Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
                 BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
-                //int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
-                //int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
-                //cannonShot.location.X -= cannonBallTextureCenterOffsetX;
-                //cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
                 cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
                 cannonShot.moving = true;
                 Shots.Add(cannonShot);
                 timeSinceLastShot = 0;
             }
 
-            if (colliding)
+            if (colliding || anchored)
             {
                 moving = false;
                 shipSail.moving = false;
@@ -298,14 +340,10 @@ namespace Gusto.Models
             aimLineTexture.SetData<Color>(new Color[] { Color.IndianRed });
             reloadLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
 
-            //Vector2 perpendicularLinePlus = new Vector2(startAimLine.X + ShipDirectionVectorValues[currRowFrame].Item1, startAimLine.Y + ShipDirectionVectorValues[currRowFrame].Item2);
-            //Vector2 perpendicularLineMinus = new Vector2(startAimLine.X - ShipDirectionVectorValues[currRowFrame].Item1, startAimLine.Y - ShipDirectionVectorValues[currRowFrame].Item2);
             edgeFull = endAimLineFull - startAimLine;
             edgeReload =  endAimLineReload - startAimLine;
-            //float radiansToDegrees = 180f / (float)Math.PI;
             float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
             float angleReload = (float)Math.Atan2(edgeReload.Y, edgeReload.X);
-            //float angleInDeg = angleFull * radiansToDegrees;
 
             var lineFull = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeFull.Length(), 4);
             var lineReload = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeReload.Length(), 4);
@@ -314,6 +352,23 @@ namespace Gusto.Models
             sb.Draw(aimLineTexture, lineFull, null, Color.IndianRed, angleFull, new Vector2(0, 0), SpriteEffects.None, 0);
             sb.Draw(reloadLineTexture, lineReload, null, Color.DarkSeaGreen, angleReload, new Vector2(0, 0), SpriteEffects.None, 0);
             sb.End();
+        }
+
+        public void DrawAnchorMeter(SpriteBatch sb, Vector2 pos, Texture2D anchorIcon)
+        {
+            if (teamType == TeamType.Player)
+            {
+                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
+                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
+                float progress = (1f - percentNotAnchored) * 40f;
+                Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
+                Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
+                sb.Begin();
+                sb.Draw(meterFull, full, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(meterProg, prog, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(anchorIcon, full, null, Color.AliceBlue, 0, Vector2.Zero, SpriteEffects.None, 0);
+                sb.End();
+            }
         }
         
         // handles cycling the shipWindWindow and sail position against ship direction

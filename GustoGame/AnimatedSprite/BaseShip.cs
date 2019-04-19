@@ -17,6 +17,8 @@ namespace Gusto.AnimatedSprite
         {
             timeSinceLastTurn = 0;
             millisecondsPerTurn = 500; // turn speed
+            timeSinceStartAnchor = 0;
+            millisecondsToAnchor = 1000;
             timeSinceLastExpClean = 0;
             millisecondsExplosionLasts = 400;
             timeSinceLastShot = 0;
