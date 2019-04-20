@@ -95,7 +95,7 @@ namespace Gusto
             baseShipAI = new BaseShip(TeamType.A, new Vector2(200, 100), Content, GraphicsDevice);
 
             // static 
-            windArrows = new WindArrows(new Vector2(1700, 50), Content, GraphicsDevice);
+            windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
             
             
@@ -156,7 +156,7 @@ namespace Gusto
                 Exit();
             var kstate = Keyboard.GetState();
 
-            QuadTreeCollision(DrawOrder);
+            QuadTreeCollision(DrawOrder, gameTime);
             // Wind
             windArrows.Update(kstate, gameTime);
             int windDirection = windArrows.getWindDirection();
@@ -194,7 +194,7 @@ namespace Gusto
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
-                    ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1620, 40), anchorIcon);
+                    ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
                     ship.Draw(spriteBatchView, this.camera);
                     ship.shipSail.Draw(spriteBatchView, this.camera);
                     foreach (var shot in ship.Shots)
@@ -205,6 +205,7 @@ namespace Gusto
                 } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower) sprite;
+                    tower.DrawHealthBar(spriteBatchView, this.camera);
                     sprite.Draw(spriteBatchView, this.camera);
                     // draw any shots this tower has in motion
                     foreach (var shot in tower.Shots)
@@ -216,7 +217,7 @@ namespace Gusto
             base.Draw(gameTime);
         }
 
-        private void QuadTreeCollision(List<Sprite> DrawOrder)
+        private void QuadTreeCollision(List<Sprite> DrawOrder, GameTime gameTime)
         {
             foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
                 BoundingBoxLocations.BoundingBoxLocationMap[team].Clear();

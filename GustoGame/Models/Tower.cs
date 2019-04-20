@@ -1,4 +1,5 @@
-﻿using Gusto.AnimatedSprite;
+﻿using Comora;
+using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Mappings;
 using Gusto.Utility;
@@ -19,10 +20,15 @@ namespace Gusto.Models
 
         public int timeSinceLastShot;
         public int timeSinceLastExpClean;
+        public int timeShowingHealthBar;
         public int millisecondsNewShot;
         public int millisecondsExplosionLasts;
+        public int millisecondsToShowHealthBar;
         public int maxShotsMoving;
         public float range;
+        public float health;
+        public float fullHealth;
+        private bool showHealthBar;
             
         Random rand;
         public TeamType teamType;
@@ -36,6 +42,9 @@ namespace Gusto.Models
             teamType = type;
             Shots = new List<CannonBall>();
             rand = new Random();
+
+            millisecondsToShowHealthBar = 6000;
+            timeShowingHealthBar = 0;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -47,6 +56,7 @@ namespace Gusto.Models
             {
                 if ((overlap.Bottom > movePastTowerThresholdBehind && collidedWith.GetBoundingBox().Bottom <= movePastTowerThresholdInfront))
                 {
+                    showHealthBar = true;
                     Trace.WriteLine("Collision at base of tower");
                     collidedWith.colliding = true;
                 }
@@ -54,6 +64,13 @@ namespace Gusto.Models
                 {
                     collidedWith.colliding = false;
                 }
+            } 
+            else if (collidedWith.bbKey.Equals("baseCannonBall"))
+            {
+                showHealthBar = true;
+                CannonBall ball = (CannonBall)collidedWith;
+                if (!ball.exploded)
+                    health -= 5;
             }
         }
 
@@ -61,6 +78,14 @@ namespace Gusto.Models
         {
             timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
+
+            if (showHealthBar)
+                timeShowingHealthBar += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeShowingHealthBar > millisecondsToShowHealthBar)
+            {
+                showHealthBar = false;
+                timeShowingHealthBar = 0;
+            }
 
             foreach (var shot in Shots)
                 shot.Update(kstate, gameTime);
@@ -87,6 +112,24 @@ namespace Gusto.Models
                     Shots.Add(cannonShot);
                 }
                 timeSinceLastShot = 0;
+            }
+        }
+
+        public void DrawHealthBar(SpriteBatch sb, Camera camera)
+        {
+            if (showHealthBar)
+            {
+                Texture2D meterAlive = new Texture2D(_graphics, 1, 1);
+                Texture2D meterDead = new Texture2D(_graphics, 1, 1);
+                meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
+                meterDead.SetData<Color>(new Color[] { Color.IndianRed });
+                float healthLeft = (1f - (1f - (health / fullHealth))) * 60f;
+                Rectangle dead = new Rectangle((int)GetBoundingBox().Center.X - 30, (int)GetBoundingBox().Center.Y - 150, 60, 7);
+                Rectangle alive = new Rectangle((int)GetBoundingBox().Center.X - 30, (int)GetBoundingBox().Center.Y - 150, (int)healthLeft, 7);
+                sb.Begin(camera);
+                sb.Draw(meterDead, dead, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(meterAlive, alive, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.End();
             }
         }
     }
