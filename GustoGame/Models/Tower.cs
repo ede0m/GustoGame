@@ -101,7 +101,7 @@ namespace Gusto.Models
                 timeSinceLastExpClean = 0;
             }
 
-            if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving )
+            if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving && health > 0)
             {
                 Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
                 if (shotDirection != null)

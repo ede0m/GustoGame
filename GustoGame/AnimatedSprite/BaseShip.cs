@@ -25,7 +25,8 @@ namespace Gusto.AnimatedSprite
             millisecondsNewShot = 2000;
             movementSpeed = 0.2f;
             nSails = 1;
-            health = 100;
+            fullHealth = 40;
+            health = fullHealth;
             shotRange = 700f;
             stopRange = 260f;
             attackRange = 400f;

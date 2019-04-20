@@ -195,6 +195,7 @@ namespace Gusto
                 {
                     Ship ship = (Ship) sprite;
                     ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
+                    ship.DrawHealthBar(spriteBatchView, camera);
                     ship.Draw(spriteBatchView, this.camera);
                     ship.shipSail.Draw(spriteBatchView, this.camera);
                     foreach (var shot in ship.Shots)

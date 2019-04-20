@@ -22,10 +22,12 @@ namespace Gusto.Models
         public float timeSinceStartAnchor;
         public int timeSinceLastExpClean;
         public int timeSinceLastTurn;
+        public int timeShowingHealthBar;
         public float millisecondsNewShot;
         public float millisecondsToAnchor;
         public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
+        public int millisecondsToShowHealthBar;
 
         // aim line stuff
         Vector2 edgeFull;
@@ -42,13 +44,15 @@ namespace Gusto.Models
         public float stopRange;
         public float movementSpeed;
         public float percentNotAnchored;
-        public int health;
         public int maxShotsMoving;
         public int nSails;
         public bool aiming;
         public bool anchored;
         int shipWindWindowMax;
         int shipWindWindowMin;
+        public float health;
+        public float fullHealth;
+        private bool showHealthBar;
 
         Random rand;
         public TeamType teamType;
@@ -67,14 +71,25 @@ namespace Gusto.Models
             percentNotAnchored = 1;
             meterFull = new Texture2D(_graphics, 1, 1);
             meterProg = new Texture2D(_graphics, 1, 1);
+
+            millisecondsToShowHealthBar = 6000;
+            timeShowingHealthBar = 0;
         }
 
         // Ship collision handler
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith is IWeapon)
+            if (collidedWith is IWeapon) // weapons don't stop ship movement - its own weapons have already been filtered out
             {
                 colliding = false;
+            }
+
+            if (collidedWith.bbKey.Equals("baseCannonBall"))
+            {
+                showHealthBar = true;
+                CannonBall ball = (CannonBall)collidedWith;
+                if (!ball.exploded)
+                    health -= 5;
             }
         }
 
@@ -83,6 +98,14 @@ namespace Gusto.Models
         {
             timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
+
+            if (showHealthBar)
+                timeShowingHealthBar += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeShowingHealthBar > millisecondsToShowHealthBar)
+            {
+                showHealthBar = false;
+                timeShowingHealthBar = 0;
+            }
 
             // AI logic
             if (teamType != TeamType.Player)
@@ -216,7 +239,7 @@ namespace Gusto.Models
                 timeSinceLastShot = 0;
             }
 
-            if (colliding || anchored)
+            if (colliding || anchored || health <= 0)
             {
                 moving = false;
                 shipSail.moving = false;
@@ -241,7 +264,7 @@ namespace Gusto.Models
                     return;
                 }
                 var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
-                if (distanceToTarget <= stopRange)
+                if (distanceToTarget <= stopRange || health <= 0)
                 {
                     moving = false;
                     shipSail.moving = false;
@@ -260,7 +283,7 @@ namespace Gusto.Models
 
             // AI Ship Shooting
             timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastShot > millisecondsNewShot)
+            if (timeSinceLastShot > millisecondsNewShot && health > 0)
             {
                 Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
                 if (shotDirection != null)
@@ -370,7 +393,26 @@ namespace Gusto.Models
                 sb.End();
             }
         }
-        
+
+
+        public void DrawHealthBar(SpriteBatch sb, Camera camera)
+        {
+            if (showHealthBar)
+            {
+                Texture2D meterAlive = new Texture2D(_graphics, 1, 1);
+                Texture2D meterDead = new Texture2D(_graphics, 1, 1);
+                meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
+                meterDead.SetData<Color>(new Color[] { Color.IndianRed });
+                float healthLeft = (1f - (1f - (health / fullHealth))) * 60f;
+                Rectangle dead = new Rectangle((int)shipSail.GetBoundingBox().Center.X - 30, (int)shipSail.GetBoundingBox().Center.Y - 130, 60, 7);
+                Rectangle alive = new Rectangle((int)shipSail.GetBoundingBox().Center.X - 30, (int)shipSail.GetBoundingBox().Center.Y - 130, (int)healthLeft, 7);
+                sb.Begin(camera);
+                sb.Draw(meterDead, dead, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(meterAlive, alive, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.End();
+            }
+        }
+
         // handles cycling the shipWindWindow and sail position against ship direction
         private void BoundShipWindow()
         {
