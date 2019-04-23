@@ -145,6 +145,11 @@ namespace Gusto.AnimatedSprite
             return boundingBoxRect;
         }
 
+        public Sprite GetBase()
+        {
+            return (Sprite)this;
+        }
+
         public abstract void HandleCollision(Sprite collidedWith, Rectangle overlap);
     }
 }

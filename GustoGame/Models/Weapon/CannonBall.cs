@@ -1,5 +1,6 @@
 ﻿
 using global::Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Models.Weapon;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -61,6 +62,8 @@ namespace Gusto.Models
                     outOfRange = true;
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
+
+            SpatialBounding.SetQuad(GetBase());
         }
 
         public void SetFireAtDirection(Tuple<int,int> fireAtDirection, int shotSpeed, int aimOffset)
