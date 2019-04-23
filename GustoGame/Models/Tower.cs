@@ -113,6 +113,8 @@ namespace Gusto.Models
                 }
                 timeSinceLastShot = 0;
             }
+
+            SpatialBounding.SetQuad(GetBase());
         }
 
         public void DrawHealthBar(SpriteBatch sb, Camera camera)

@@ -48,6 +48,7 @@
     <Compile Include="AnimatedSprite\TeamType.cs" />
     <Compile Include="Bounding\BoundingBoxLocations.cs" />
     <Compile Include="Bounding\CollisionGameLogic.cs" />
+    <Compile Include="Bounding\SpatialBounding.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
@@ -67,7 +68,6 @@
     <Compile Include="Models\Weapon\IWeapon.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Bounding\QuadTreeCollision.cs" />
     <Compile Include="Utility\AIUtility.cs" />
     <Compile Include="Utility\PhysicsUtility.cs" />
     <Compile Include="Utility\RandomEvents.cs" />

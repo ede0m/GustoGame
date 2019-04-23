@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Mappings;
 using Gusto.Models.Weapon;
 using Gusto.Utility;
@@ -142,6 +143,8 @@ namespace Gusto.Models
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
             shipSail.Update(kstate, gameTime, windDir, windSp);
+
+            SpatialBounding.SetQuad(GetBase());
         }
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
