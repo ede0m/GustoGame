@@ -3,7 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
-using Gusto.Utility;
+using Gusto.GameMap;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,10 +25,13 @@ namespace Gusto
         BaseShip baseShipAI;
         BaseTower tower;
 
+
+        GameMapProcedural map;
+
         // static
         WindArrows windArrows;
         Texture2D anchorIcon;
-
+ 
         SpatialBounding collision;
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
@@ -57,6 +60,7 @@ namespace Gusto
             Collidable = new List<Sprite>();
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
+            map = new GameMapProcedural(this.camera);
             base.Initialize();
         }
 
@@ -85,7 +89,9 @@ namespace Gusto
             //
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
-
+            // 
+            Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
+            LoadDynamicBoundingBoxPerFrame(8, 1, textureOcean1, "oceanTile", 1.0f);
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
@@ -97,8 +103,10 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
-            
-            
+
+            // Game Map
+            map.SetGameMap(Content, GraphicsDevice);
+
             // fill draw order list
             DrawOrder.Add(baseShip);
             DrawOrder.Add(baseShipAI);
@@ -190,6 +198,9 @@ namespace Gusto
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // draw map
+            map.DrawMap(spriteBatchView);
+
             // draw sprites that don't move
             windArrows.Draw(spriteBatchStatic, null);
 
@@ -203,12 +214,21 @@ namespace Gusto
                     Ship ship = (Ship) sprite;
                     ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
                     ship.DrawHealthBar(spriteBatchView, camera);
-                    ship.Draw(spriteBatchView, this.camera);
-                    ship.shipSail.Draw(spriteBatchView, this.camera);
-                    foreach (var shot in ship.Shots)
-                        shot.Draw(spriteBatchView, this.camera);
-                    if (ship.aiming)
-                        ship.DrawAimLine(spriteBatchView, this.camera);
+
+                    if (ship.sinking)
+                    {
+                        ship.DrawSinking(spriteBatchView, this.camera);
+                        ship.shipSail.DrawSinking(spriteBatchView, this.camera);
+                    }
+                    else
+                    {
+                        ship.Draw(spriteBatchView, this.camera);
+                        ship.shipSail.Draw(spriteBatchView, this.camera);
+                        foreach (var shot in ship.Shots)
+                            shot.Draw(spriteBatchView, this.camera);
+                        if (ship.aiming)
+                            ship.DrawAimLine(spriteBatchView, this.camera);
+                    }
                     continue;
                 } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {

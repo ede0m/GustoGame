@@ -1,4 +1,5 @@
-﻿using Gusto.AnimatedSprite;
+﻿using Comora;
+using Gusto.AnimatedSprite;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,6 +20,7 @@ namespace Gusto.Models
         public TeamType teamType;
 
         public float sailSpeed { get; set; }
+        public float sinkingTransparency { get; set; }
         public int windWindowAdd { get; set; } // used for shipWindWindow bounds
         public int windWindowSub { get; set; } // ...
         public int sailIsLeftColumn { get; set; }
@@ -60,6 +62,16 @@ namespace Gusto.Models
             }
             lastWindDir = windDir;
             lastRowFrame = currRowFrame;
+        }
+
+        public void DrawSinking(SpriteBatch sb, Camera camera)
+        {
+            targetRectangle.X = (_texture.Width / nColumns) * currColumnFrame;
+            targetRectangle.Y = (_texture.Height / nRows) * currRowFrame;
+            sb.Begin(camera);
+            sb.Draw(_texture, location, targetRectangle, Color.White * sinkingTransparency, 0f,
+                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            sb.End();
         }
 
         private void AIUpdate(int windDir)

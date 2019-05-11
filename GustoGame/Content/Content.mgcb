@@ -133,6 +133,18 @@
 /processorParam:TextureFormat=Color
 /build:NextShipSpriteSheetRevised.png
 
+#begin Ocean1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Ocean1.png
+
 #begin tower.png
 /importer:TextureImporter
 /processor:TextureProcessor
