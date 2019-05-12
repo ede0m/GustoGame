@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace Gusto
 {
@@ -25,8 +27,8 @@ namespace Gusto
         BaseShip baseShipAI;
         BaseTower tower;
 
-
-        GameMapProcedural map;
+        TileGameMap map;
+        JObject mapData;
 
         // static
         WindArrows windArrows;
@@ -60,7 +62,7 @@ namespace Gusto
             Collidable = new List<Sprite>();
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
-            map = new GameMapProcedural(this.camera);
+            map = new TileGameMap(this.camera);
             base.Initialize();
         }
 
@@ -70,6 +72,9 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
+            mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
+            map.LoadMapData(mapData);
+
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatchView = new SpriteBatch(GraphicsDevice);
             spriteBatchStatic = new SpriteBatch(GraphicsDevice);
@@ -92,6 +97,8 @@ namespace Gusto
             // 
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureOcean1, "oceanTile", 1.0f);
+            Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
+            LoadDynamicBoundingBoxPerFrame(8, 1, textureLand1, "landTile", 1.0f);
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
