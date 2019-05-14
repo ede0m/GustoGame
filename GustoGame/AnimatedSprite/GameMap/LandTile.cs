@@ -14,7 +14,7 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class LandTile : TilePiece
     {
-        public LandTile(Vector2 location, ContentManager content, GraphicsDevice graphics)
+        public LandTile(Vector2 location, ContentManager content, GraphicsDevice graphics, string key)
         {
 
             //MapModelMovementVectorValues();

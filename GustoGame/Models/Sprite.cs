@@ -22,6 +22,7 @@ namespace Gusto.AnimatedSprite
         public string bbKey { get; set; }
         public bool moving { get; set; }
         public bool colliding { get; set; }
+        public bool remove;
 
         public Sprite(){}
 
@@ -36,6 +37,7 @@ namespace Gusto.AnimatedSprite
             currColumnFrame = 0;
             bbKey = asset.BBKey;
             moving = true;
+            remove = false;
 
             int width = _texture.Width / nColumns;
             int height = _texture.Height / nRows;

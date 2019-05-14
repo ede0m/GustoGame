@@ -13,11 +13,15 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class OceanTile : TilePiece
     {
-        public OceanTile(Vector2 location, ContentManager content, GraphicsDevice graphics)
+        public OceanTile(Vector2 location, ContentManager content, GraphicsDevice graphics, string key)
         {
+            Texture2D textureOceanTile = null;
 
-            //MapModelMovementVectorValues();
-            Texture2D textureOceanTile = content.Load<Texture2D>("Ocean1");
+            if (key.Equals("o1"))
+                textureOceanTile = content.Load<Texture2D>("Ocean1");
+            else if (key.Equals("o2"))
+                textureOceanTile = content.Load<Texture2D>("Ocean2");
+
             Asset oceanTileAsset = new Asset(textureOceanTile, null, 1, 1, 1.0f, "oceanTile");
             SetSpriteAsset(oceanTileAsset, location);
         }

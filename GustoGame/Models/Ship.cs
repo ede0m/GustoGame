@@ -159,6 +159,8 @@ namespace Gusto.Models
                 timeSinceStartSinking += gameTime.ElapsedGameTime.Milliseconds;
                 sinkingTransparency = 1 - (timeSinceStartSinking / millisecondToSink);
                 shipSail.sinkingTransparency = sinkingTransparency;
+                if(sinkingTransparency <= 0)
+                    remove = true;
             }
         }
 

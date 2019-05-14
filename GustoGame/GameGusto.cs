@@ -38,6 +38,7 @@ namespace Gusto
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
+        List<Sprite> UpdateOrder;
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
@@ -60,6 +61,7 @@ namespace Gusto
         {
             DrawOrder = new List<Sprite>();
             Collidable = new List<Sprite>();
+            UpdateOrder = new List<Sprite>();
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
             map = new TileGameMap(this.camera);
@@ -118,6 +120,12 @@ namespace Gusto
             DrawOrder.Add(baseShip);
             DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
+
+            // fill update order list
+            UpdateOrder.Add(baseShip);
+            UpdateOrder.Add(baseShipAI);
+            UpdateOrder.Add(tower);
+
             // fill collidable list
             Collidable.Add(baseShip);
             SpatialBounding.SetQuad(baseShip.GetBase());
@@ -167,6 +175,8 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            List<Sprite> toRemove = new List<Sprite>();
+            
             // camera follows player
             this.camera.Position = baseShip.location;
 
@@ -174,21 +184,48 @@ namespace Gusto
                 Exit();
             var kstate = Keyboard.GetState();
 
-            //QuadTreeCollision(DrawOrder, gameTime);
 
             // Wind
             windArrows.Update(kstate, gameTime);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
+            
+            foreach (var sp in UpdateOrder)
+            {
+                if (sp.remove)
+                {
+                    DrawOrder.Remove(sp);
+                    Collidable.Remove(sp);
+                    toRemove.Add(sp);
+                }
+
+                if (sp.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship)sp;
+                    ship.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
+                } else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                {
+                    Tower ship = (Tower)sp;
+                    tower.Update(kstate, gameTime);
+                }
+            }
+
+            foreach (var r in toRemove)
+                UpdateOrder.Remove(r);
+
             // Tower
-            tower.Update(kstate, gameTime);
+            //tower.Update(kstate, gameTime);
             // ship AI
-            baseShipAI.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
+            //if (baseShipAI.remove)
+            //    DrawOrder.Remove((Sprite)baseShipAI);
+            //else
+            //   baseShipAI.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
             //baseShipAI.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
 
             // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
-            baseShip.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
+            //baseShip.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
             //baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+
 
             collision.Update(this.camera.Position);
             SpatialCollision();
@@ -214,7 +251,7 @@ namespace Gusto
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
-            {                
+            {
                 // Draw a ships sail before a ship
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {

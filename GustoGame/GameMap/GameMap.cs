@@ -25,8 +25,8 @@ namespace Gusto.GameMap
         private List<TilePiece> map;
         private JObject _mapData;
 
-        const int tileHeight = 64;
-        const int tileWidth = 64;
+        const int tileHeight = 32;
+        const int tileWidth = 32;
         Vector2 startMapPoint;
 
         public TileGameMap(Camera camera)
@@ -54,10 +54,13 @@ namespace Gusto.GameMap
                     switch(_mapData[index.ToString()].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(worldLoc, content, graphics);
+                            tile = new OceanTile(worldLoc, content, graphics, "o1");
+                            break;
+                        case "o2":
+                            tile = new OceanTile(worldLoc, content, graphics, "o2");
                             break;
                         case "l1":
-                            tile = new LandTile(worldLoc, content, graphics);
+                            tile = new LandTile(worldLoc, content, graphics, "l1");
                             break;
                     }
 
