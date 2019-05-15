@@ -19,10 +19,16 @@ namespace Gusto.Utility
             {
                 if (AttackMapping.AttackMappings[teamType][otherTeam])
                 {
-                    Tuple<int, int> shotCords = BoundingBoxLocations.BoundingBoxLocationMap[otherTeam][0]; // TODO REMOVE HARDCODED random target (pick team member with lowest health)
-                    float vmag = PhysicsUtility.VectorMagnitude(shotCords.Item1, bb.X, shotCords.Item2, bb.Y);
-                    if (vmag <= range)
-                        return shotCords;
+                    Tuple<int, int> shotCords;
+                    if (BoundingBoxLocations.BoundingBoxLocationMap[otherTeam].Any())
+                    {
+                        shotCords = BoundingBoxLocations.BoundingBoxLocationMap[otherTeam][0]; // TODO REMOVE HARDCODED random target (pick team member with lowest health)
+                        float vmag = PhysicsUtility.VectorMagnitude(shotCords.Item1, bb.X, shotCords.Item2, bb.Y);
+                        if (vmag <= range)
+                            return shotCords;
+                    }
+                    else
+                        return null;
                 }
             }
             return null;

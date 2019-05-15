@@ -1,4 +1,5 @@
-﻿using Comora;
+﻿using System;
+using Comora;
 using Gusto.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -62,6 +63,11 @@ namespace Gusto.AnimatedSprite
                 asset.BBTexture.SetData(data);
                 boundingBox = asset.BBTexture;
             }
+        }
+
+        public void SetTileDesignColumn(int c)
+        {
+            currColumnFrame = c;
         }
 
         // handles cycling the frames at sprite sheet end and beginning

@@ -89,6 +89,11 @@ namespace Gusto.Models
                 colliding = false;
             }
 
+            if (collidedWith.bbKey.Equals("landTile"))
+            {
+                Trace.WriteLine("LAND AHOY!@");
+            }
+
             if (collidedWith.bbKey.Equals("baseCannonBall"))
             {
                 showHealthBar = true;

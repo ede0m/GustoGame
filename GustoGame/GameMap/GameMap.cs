@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Gusto.Utility;
+using Gusto.AnimatedSprite;
 
 namespace Gusto.GameMap
 {
@@ -22,12 +24,15 @@ namespace Gusto.GameMap
         private int _cols;
         private int _rows;
 
-        private List<TilePiece> map;
+        private List<Sprite> map;
+        private List<Sprite> collidablePieces;
         private JObject _mapData;
 
         const int tileHeight = 32;
         const int tileWidth = 32;
         Vector2 startMapPoint;
+
+        Random rand;
 
         public TileGameMap(Camera camera)
         {
@@ -39,7 +44,9 @@ namespace Gusto.GameMap
             startMapPoint = new Vector2(0 - (_width/2), 0 - (_height/2));
 
             _cam = camera;
-            map = new List<TilePiece>();
+            map = new List<Sprite>();
+            collidablePieces = new List<Sprite>();
+            rand = new Random();
         }
 
         public void SetGameMap(ContentManager content, GraphicsDevice graphics)
@@ -50,7 +57,8 @@ namespace Gusto.GameMap
             {
                 for (int j = 0; j < _cols; j++)
                 {
-                    TilePiece tile = null;
+                    Sprite tile = null;
+
                     switch(_mapData[index.ToString()].ToString())
                     {
                         case "o1":
@@ -64,6 +72,7 @@ namespace Gusto.GameMap
                             break;
                     }
 
+                    tile.SetTileDesignColumn(RandomEvents.RandomTilePiece(tile.nColumns, rand));
                     worldLoc.X += tileWidth;
                     map.Add(tile);
                     index++;
@@ -78,17 +87,26 @@ namespace Gusto.GameMap
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
+            collidablePieces.Clear();
             foreach (var tile in map)
             {
                 var loc = tile.location;
                 if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
+                {
+                    collidablePieces.Add(tile);
                     tile.Draw(sb, _cam);
+                }
             }
         }
 
         public void LoadMapData(JObject data)
         {
             _mapData = data;
+        }
+
+        public List<Sprite> GetCollidableTiles()
+        {
+            return collidablePieces;
         }
     }
 }

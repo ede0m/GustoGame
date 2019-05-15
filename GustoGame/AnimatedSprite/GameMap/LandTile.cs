@@ -19,7 +19,7 @@ namespace Gusto.AnimatedSprite.GameMap
 
             //MapModelMovementVectorValues();
             Texture2D textureOceanTile = content.Load<Texture2D>("Land1");
-            Asset oceanTileAsset = new Asset(textureOceanTile, null, 1, 1, 1.0f, "landTile");
+            Asset oceanTileAsset = new Asset(textureOceanTile, null, 4, 1, 1.0f, "landTile");
             SetSpriteAsset(oceanTileAsset, location);
         }
 

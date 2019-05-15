@@ -98,9 +98,9 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
             // 
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
-            LoadDynamicBoundingBoxPerFrame(8, 1, textureOcean1, "oceanTile", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(1, 4, textureOcean1, "oceanTile", 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
-            LoadDynamicBoundingBoxPerFrame(8, 1, textureLand1, "landTile", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(1, 4, textureLand1, "landTile", 1.0f);
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
@@ -185,11 +185,12 @@ namespace Gusto
             var kstate = Keyboard.GetState();
 
 
-            // Wind
+            // static update (Wind)
             windArrows.Update(kstate, gameTime);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
             
+            // main update for all non static objects
             foreach (var sp in UpdateOrder)
             {
                 if (sp.remove)
@@ -210,23 +211,25 @@ namespace Gusto
                 }
             }
 
+
+            // clear any "dead" objects from updating
             foreach (var r in toRemove)
                 UpdateOrder.Remove(r);
+            
+            // reset collidable with "alive" objects and map pieces that are in view 
+            Collidable.Clear();
+            foreach (var sp in UpdateOrder)
+            {
+                Collidable.Add(sp);
+                SpatialBounding.SetQuad(sp.GetBase());
+            }
+            /*foreach (var tile in map.GetCollidableTiles())
+            {
+                Collidable.Add(tile);
+                SpatialBounding.SetQuad(tile.GetBase());
+            }*/
 
-            // Tower
-            //tower.Update(kstate, gameTime);
-            // ship AI
-            //if (baseShipAI.remove)
-            //    DrawOrder.Remove((Sprite)baseShipAI);
-            //else
-            //   baseShipAI.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-            //baseShipAI.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
-
-            // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
-            //baseShip.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-            //baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
-
-
+            // handle collision
             collision.Update(this.camera.Position);
             SpatialCollision();
 
@@ -307,11 +310,11 @@ namespace Gusto
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
                 Rectangle bbA = spriteA.GetBoundingBox();
-                List<string> quadKeys = collision.GetQuadKey(bbA);
-                List<Sprite> possible = new List<Sprite>();
+                HashSet<string> quadKeys = collision.GetQuadKey(bbA);
+                HashSet<Sprite> possible = new HashSet<Sprite>();
                 foreach (var key in quadKeys)
                 {
-                    possible.AddRange(collision.GetSpatialBoundingMap()[key]);
+                    possible.UnionWith(collision.GetSpatialBoundingMap()[key]);
                 }
                 
                 foreach (var spriteB in possible)

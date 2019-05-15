@@ -19,5 +19,10 @@ namespace Gusto.Utility
             return randomGeneration.Next(10, 25);
         }
 
+        public static int RandomTilePiece(int nPieces, Random randomGeneration)
+        {
+            return randomGeneration.Next(0, nPieces);
+        }
+
     }
 }

@@ -22,8 +22,8 @@ namespace Gusto.Bounding
         private static Rectangle q1;
         private static Rectangle q2;
         private static Rectangle q3;
-        public static Dictionary<string, List<Sprite>> spatialBoundingMap;
-        private static Dictionary<Rectangle, List<string>> bbQuadMap { get; set; }
+        public static Dictionary<string, HashSet<Sprite>> spatialBoundingMap;
+        private static Dictionary<Rectangle, HashSet<string>> bbQuadMap { get; set; }
         private Dictionary<string, Rectangle> quadNameMap;
 
 
@@ -40,21 +40,21 @@ namespace Gusto.Bounding
             q2 = new Rectangle((int)overLay.X, (int)overLay.Y + horizontalMid, verticalMid, horizontalMid);
             q3 = new Rectangle((int)overLay.X + verticalMid, (int)overLay.Y + horizontalMid, verticalMid, horizontalMid);
 
-            bbQuadMap = new Dictionary<Rectangle, List<string>>();
-            spatialBoundingMap = new Dictionary<string, List<Sprite>>();
+            bbQuadMap = new Dictionary<Rectangle, HashSet<string>>();
+            spatialBoundingMap = new Dictionary<string, HashSet<Sprite>>();
             quadNameMap = new Dictionary<string, Rectangle>();
 
-            spatialBoundingMap.Add("q0", new List<Sprite>());
-            spatialBoundingMap.Add("q1", new List<Sprite>());
-            spatialBoundingMap.Add("q2", new List<Sprite>());
-            spatialBoundingMap.Add("q3", new List<Sprite>());
+            spatialBoundingMap.Add("q0", new HashSet<Sprite>());
+            spatialBoundingMap.Add("q1", new HashSet<Sprite>());
+            spatialBoundingMap.Add("q2", new HashSet<Sprite>());
+            spatialBoundingMap.Add("q3", new HashSet<Sprite>());
         }
 
         public static void SetQuad(Sprite sp)
         {
             var bb = sp.GetBoundingBox();
             if (!bbQuadMap.ContainsKey(bb))
-                bbQuadMap[bb] = new List<string>();
+                bbQuadMap[bb] = new HashSet<string>();
 
             if (bb.Intersects(q0))
             {
@@ -93,23 +93,23 @@ namespace Gusto.Bounding
         {
             spatialBoundingMap.Clear();
             bbQuadMap.Clear();
-            spatialBoundingMap.Add("q0", new List<Sprite>());
-            spatialBoundingMap.Add("q1", new List<Sprite>());
-            spatialBoundingMap.Add("q2", new List<Sprite>());
-            spatialBoundingMap.Add("q3", new List<Sprite>());
+            spatialBoundingMap.Add("q0", new HashSet<Sprite>());
+            spatialBoundingMap.Add("q1", new HashSet<Sprite>());
+            spatialBoundingMap.Add("q2", new HashSet<Sprite>());
+            spatialBoundingMap.Add("q3", new HashSet<Sprite>());
         }
 
-        public List<string> GetQuadKey(Rectangle spriteBB)
+        public HashSet<string> GetQuadKey(Rectangle spriteBB)
         {
             return bbQuadMap[spriteBB];
         }
 
-        public Dictionary<string, List<Sprite>> GetSpatialBoundingMap()
+        public Dictionary<string, HashSet<Sprite>> GetSpatialBoundingMap()
         {
             return spatialBoundingMap;
         }
 
-        public Dictionary<Rectangle, List<string>> GetBBQuadMap()
+        public Dictionary<Rectangle, HashSet<string>> GetBBQuadMap()
         {
             return bbQuadMap;
         }
