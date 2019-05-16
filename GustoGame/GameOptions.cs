@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gusto
+﻿namespace Gusto
 {
     public class GameOptions
     {
         public static bool ShowBoundingBox = true;
-        public static int PrefferedBackBufferWidth = 1800;
-        public static int PrefferedBackBufferHeight = 1000;
+        public static int PrefferedBackBufferWidth = 1856;
+        public static int PrefferedBackBufferHeight = 1024;
+        public static int GameMapWidthMult = 10;
+        public static int GameMapHeightMult = 10;
     }
 }

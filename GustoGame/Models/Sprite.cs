@@ -1,4 +1,5 @@
-﻿using Comora;
+﻿using System;
+using Comora;
 using Gusto.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,6 +23,7 @@ namespace Gusto.AnimatedSprite
         public string bbKey { get; set; }
         public bool moving { get; set; }
         public bool colliding { get; set; }
+        public bool remove;
 
         public Sprite(){}
 
@@ -36,6 +38,7 @@ namespace Gusto.AnimatedSprite
             currColumnFrame = 0;
             bbKey = asset.BBKey;
             moving = true;
+            remove = false;
 
             int width = _texture.Width / nColumns;
             int height = _texture.Height / nRows;
@@ -60,6 +63,11 @@ namespace Gusto.AnimatedSprite
                 asset.BBTexture.SetData(data);
                 boundingBox = asset.BBTexture;
             }
+        }
+
+        public void SetTileDesignColumn(int c)
+        {
+            currColumnFrame = c;
         }
 
         // handles cycling the frames at sprite sheet end and beginning

@@ -3,7 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
-using Gusto.Utility;
+using Gusto.GameMap;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace Gusto
 {
@@ -25,14 +27,18 @@ namespace Gusto
         BaseShip baseShipAI;
         BaseTower tower;
 
+        TileGameMap map;
+        JObject mapData;
+
         // static
         WindArrows windArrows;
         Texture2D anchorIcon;
-
+ 
         SpatialBounding collision;
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
+        List<Sprite> UpdateOrder;
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
@@ -55,8 +61,10 @@ namespace Gusto
         {
             DrawOrder = new List<Sprite>();
             Collidable = new List<Sprite>();
+            UpdateOrder = new List<Sprite>();
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
+            map = new TileGameMap(this.camera);
             base.Initialize();
         }
 
@@ -66,6 +74,9 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
+            mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
+            map.LoadMapData(mapData);
+
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatchView = new SpriteBatch(GraphicsDevice);
             spriteBatchStatic = new SpriteBatch(GraphicsDevice);
@@ -85,7 +96,11 @@ namespace Gusto
             //
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
-
+            // 
+            Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
+            LoadDynamicBoundingBoxPerFrame(1, 4, textureOcean1, "oceanTile", 1.0f);
+            Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
+            LoadDynamicBoundingBoxPerFrame(1, 4, textureLand1, "landTile", 1.0f);
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
@@ -97,12 +112,20 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
-            
-            
+
+            // Game Map
+            map.SetGameMap(Content, GraphicsDevice);
+
             // fill draw order list
             DrawOrder.Add(baseShip);
             DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
+
+            // fill update order list
+            UpdateOrder.Add(baseShip);
+            UpdateOrder.Add(baseShipAI);
+            UpdateOrder.Add(tower);
+
             // fill collidable list
             Collidable.Add(baseShip);
             SpatialBounding.SetQuad(baseShip.GetBase());
@@ -152,6 +175,8 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            List<Sprite> toRemove = new List<Sprite>();
+            
             // camera follows player
             this.camera.Position = baseShip.location;
 
@@ -159,22 +184,51 @@ namespace Gusto
                 Exit();
             var kstate = Keyboard.GetState();
 
-            //QuadTreeCollision(DrawOrder, gameTime);
 
-            // Wind
+            // static update (Wind)
             windArrows.Update(kstate, gameTime);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
-            // Tower
-            tower.Update(kstate, gameTime);
-            // ship AI
-            baseShipAI.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-            //baseShipAI.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+            
+            // main update for all non static objects
+            foreach (var sp in UpdateOrder)
+            {
+                if (sp.remove)
+                {
+                    DrawOrder.Remove(sp);
+                    Collidable.Remove(sp);
+                    toRemove.Add(sp);
+                }
 
-            // Ship & Sail TEMPORARY -- hardcode one baseShip and baseSail to update
-            baseShip.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-            //baseShip.shipSail.Update(kstate, gameTime, windDirection, windSpeed);
+                if (sp.GetType().BaseType == typeof(Gusto.Models.Ship))
+                {
+                    Ship ship = (Ship)sp;
+                    ship.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
+                } else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                {
+                    Tower ship = (Tower)sp;
+                    tower.Update(kstate, gameTime);
+                }
+            }
 
+
+            // clear any "dead" objects from updating
+            foreach (var r in toRemove)
+                UpdateOrder.Remove(r);
+            
+            // reset collidable with "alive" objects and map pieces that are in view 
+            Collidable.Clear();
+            foreach (var sp in UpdateOrder)
+            {
+                Collidable.Add(sp);
+                SpatialBounding.SetQuad(sp.GetBase());
+            }
+
+            // set any visible collidable map pieces for collision
+            foreach (var tile in map.GetCollidableTiles())
+                SpatialBounding.SetQuad(tile.GetBase());
+
+            // handle collision
             collision.Update(this.camera.Position);
             SpatialCollision();
 
@@ -190,25 +244,37 @@ namespace Gusto
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // draw map
+            map.DrawMap(spriteBatchView);
+
             // draw sprites that don't move
             windArrows.Draw(spriteBatchStatic, null);
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
-            {                
+            {
                 // Draw a ships sail before a ship
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
                     ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
                     ship.DrawHealthBar(spriteBatchView, camera);
-                    ship.Draw(spriteBatchView, this.camera);
-                    ship.shipSail.Draw(spriteBatchView, this.camera);
-                    foreach (var shot in ship.Shots)
-                        shot.Draw(spriteBatchView, this.camera);
-                    if (ship.aiming)
-                        ship.DrawAimLine(spriteBatchView, this.camera);
+
+                    if (ship.sinking)
+                    {
+                        ship.DrawSinking(spriteBatchView, this.camera);
+                        ship.shipSail.DrawSinking(spriteBatchView, this.camera);
+                    }
+                    else
+                    {
+                        ship.Draw(spriteBatchView, this.camera);
+                        ship.shipSail.Draw(spriteBatchView, this.camera);
+                        foreach (var shot in ship.Shots)
+                            shot.Draw(spriteBatchView, this.camera);
+                        if (ship.aiming)
+                            ship.DrawAimLine(spriteBatchView, this.camera);
+                    }
                     continue;
                 } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
@@ -242,14 +308,13 @@ namespace Gusto
                     Tower tower = (Tower)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
+
                 Rectangle bbA = spriteA.GetBoundingBox();
-                List<string> quadKeys = collision.GetQuadKey(bbA);
-                List<Sprite> possible = new List<Sprite>();
+                HashSet<string> quadKeys = collision.GetQuadKey(bbA);
+                HashSet<Sprite> possible = new HashSet<Sprite>();
                 foreach (var key in quadKeys)
-                {
-                    possible.AddRange(collision.GetSpatialBoundingMap()[key]);
-                }
-                
+                    possible.UnionWith(collision.GetSpatialBoundingMap()[key]);
+
                 foreach (var spriteB in possible)
                 {
                     if (spriteB == spriteA)

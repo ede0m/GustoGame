@@ -21,11 +21,13 @@ namespace Gusto.Models
 
         public float timeSinceLastShot;
         public float timeSinceStartAnchor;
+        public float timeSinceStartSinking;
         public int timeSinceLastExpClean;
         public int timeSinceLastTurn;
         public int timeShowingHealthBar;
         public float millisecondsNewShot;
         public float millisecondsToAnchor;
+        public float millisecondToSink;
         public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
         public int millisecondsToShowHealthBar;
@@ -45,8 +47,11 @@ namespace Gusto.Models
         public float stopRange;
         public float movementSpeed;
         public float percentNotAnchored;
+        public float sinkingTransparency;
         public int maxShotsMoving;
         public int nSails;
+        public bool hittingLand;
+        public bool sinking;
         public bool aiming;
         public bool anchored;
         int shipWindWindowMax;
@@ -81,9 +86,7 @@ namespace Gusto.Models
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
             if (collidedWith is IWeapon) // weapons don't stop ship movement - its own weapons have already been filtered out
-            {
                 colliding = false;
-            }
 
             if (collidedWith.bbKey.Equals("baseCannonBall"))
             {
@@ -91,6 +94,19 @@ namespace Gusto.Models
                 CannonBall ball = (CannonBall)collidedWith;
                 if (!ball.exploded)
                     health -= 5;
+                return;
+            }
+
+            if (collidedWith.bbKey.Equals("landTile"))
+            {
+                colliding = false;
+                if (!anchored)
+                {
+                    showHealthBar = true;
+                    health -= 1;
+                }
+                anchored = true;
+                return;
             }
         }
 
@@ -143,8 +159,21 @@ namespace Gusto.Models
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
             shipSail.Update(kstate, gameTime, windDir, windSp);
-
             SpatialBounding.SetQuad(GetBase());
+
+            // sinking
+            if (health <= 0)
+            {
+                sinking = true;
+                currRowFrame = 2;
+                shipSail.currRowFrame = 2;
+
+                timeSinceStartSinking += gameTime.ElapsedGameTime.Milliseconds;
+                sinkingTransparency = 1 - (timeSinceStartSinking / millisecondToSink);
+                shipSail.sinkingTransparency = sinkingTransparency;
+                if(sinkingTransparency <= 0)
+                    remove = true;
+            }
         }
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
@@ -397,6 +426,15 @@ namespace Gusto.Models
             }
         }
 
+        public void DrawSinking(SpriteBatch sb, Camera camera)
+        {
+            targetRectangle.X = (_texture.Width / nColumns) * currColumnFrame;
+            targetRectangle.Y = (_texture.Height / nRows) * currRowFrame;
+            sb.Begin(camera);
+            sb.Draw(_texture, location, targetRectangle, Color.White * sinkingTransparency, 0f,
+                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height/ nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            sb.End();
+        }
 
         public void DrawHealthBar(SpriteBatch sb, Camera camera)
         {

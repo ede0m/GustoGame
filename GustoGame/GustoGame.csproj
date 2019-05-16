@@ -45,14 +45,19 @@
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
+    <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
+    <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
     <Compile Include="AnimatedSprite\TeamType.cs" />
     <Compile Include="Bounding\BoundingBoxLocations.cs" />
     <Compile Include="Bounding\CollisionGameLogic.cs" />
     <Compile Include="Bounding\SpatialBounding.cs" />
+    <Compile Include="GameMap\GameMap.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
+    <Compile Include="Models\IObject.cs" />
+    <Compile Include="Models\TilePiece.cs" />
     <Compile Include="Models\Weapon\CannonBall.cs" />
     <Compile Include="Models\Sprite.cs" />
     <Compile Include="AnimatedSprite\BaseTower.cs" />
@@ -79,6 +84,9 @@
     </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
