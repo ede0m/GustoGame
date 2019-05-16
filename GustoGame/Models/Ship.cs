@@ -50,6 +50,7 @@ namespace Gusto.Models
         public float sinkingTransparency;
         public int maxShotsMoving;
         public int nSails;
+        public bool hittingLand;
         public bool sinking;
         public bool aiming;
         public bool anchored;
@@ -85,14 +86,7 @@ namespace Gusto.Models
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
             if (collidedWith is IWeapon) // weapons don't stop ship movement - its own weapons have already been filtered out
-            {
                 colliding = false;
-            }
-
-            if (collidedWith.bbKey.Equals("landTile"))
-            {
-                Trace.WriteLine("LAND AHOY!@");
-            }
 
             if (collidedWith.bbKey.Equals("baseCannonBall"))
             {
@@ -100,6 +94,19 @@ namespace Gusto.Models
                 CannonBall ball = (CannonBall)collidedWith;
                 if (!ball.exploded)
                     health -= 5;
+                return;
+            }
+
+            if (collidedWith.bbKey.Equals("landTile"))
+            {
+                colliding = false;
+                if (!anchored)
+                {
+                    showHealthBar = true;
+                    health -= 1;
+                }
+                anchored = true;
+                return;
             }
         }
 

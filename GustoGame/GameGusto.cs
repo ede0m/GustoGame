@@ -223,11 +223,10 @@ namespace Gusto
                 Collidable.Add(sp);
                 SpatialBounding.SetQuad(sp.GetBase());
             }
-            /*foreach (var tile in map.GetCollidableTiles())
-            {
-                Collidable.Add(tile);
+
+            // set any visible collidable map pieces for collision
+            foreach (var tile in map.GetCollidableTiles())
                 SpatialBounding.SetQuad(tile.GetBase());
-            }*/
 
             // handle collision
             collision.Update(this.camera.Position);
@@ -309,14 +308,13 @@ namespace Gusto
                     Tower tower = (Tower)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
+
                 Rectangle bbA = spriteA.GetBoundingBox();
                 HashSet<string> quadKeys = collision.GetQuadKey(bbA);
                 HashSet<Sprite> possible = new HashSet<Sprite>();
                 foreach (var key in quadKeys)
-                {
                     possible.UnionWith(collision.GetSpatialBoundingMap()[key]);
-                }
-                
+
                 foreach (var spriteB in possible)
                 {
                     if (spriteB == spriteA)

@@ -93,7 +93,8 @@ namespace Gusto.GameMap
                 var loc = tile.location;
                 if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
                 {
-                    collidablePieces.Add(tile);
+                    if (tile.bbKey.Equals("landTile"))
+                        collidablePieces.Add(tile);
                     tile.Draw(sb, _cam);
                 }
             }
