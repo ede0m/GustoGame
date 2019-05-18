@@ -71,7 +71,7 @@ namespace Gusto.AnimatedSprite
         }
 
         // handles cycling the frames at sprite sheet end and beginning
-        public void BoundFrames()
+        public Tuple<int, int> BoundFrames(int currRowFrame, int currColFrame)
         {
             if (currRowFrame < 0)
                 currRowFrame = nRows - 1;
@@ -82,6 +82,8 @@ namespace Gusto.AnimatedSprite
                 currColumnFrame = nColumns - 1;
             else if (currColumnFrame < 0)
                 currColumnFrame = 0;
+
+            return new Tuple<int, int>(currRowFrame, currColumnFrame);
         }
 
         public void Draw(SpriteBatch spriteBatch, Camera camera)

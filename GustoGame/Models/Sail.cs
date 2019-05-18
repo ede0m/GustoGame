@@ -111,7 +111,9 @@ namespace Gusto.Models
                 }
 
             }
-            BoundFrames();
+            Tuple<int, int> frames = BoundFrames(currRowFrame, currColumnFrame);
+            currColumnFrame = frames.Item2;
+            currRowFrame = frames.Item1;
         }
 
         private void PlayerUpdate(KeyboardState kstate)
@@ -132,7 +134,9 @@ namespace Gusto.Models
                 else if (kstate.IsKeyDown(Keys.D))
                     currRowFrame--;
             }
-            BoundFrames();
+            Tuple<int, int> frames = BoundFrames(currRowFrame, currColumnFrame);
+            currColumnFrame = frames.Item2;
+            currRowFrame = frames.Item1;
         }
 
         public void SetWindWindow(int shipWindWindowMin, int shipWindWindowMax, int addedShipWindWindow)

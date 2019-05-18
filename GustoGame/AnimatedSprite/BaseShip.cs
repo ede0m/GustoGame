@@ -22,7 +22,7 @@ namespace Gusto.AnimatedSprite
             timeSinceLastExpClean = 0;
             millisecondsExplosionLasts = 400;
             timeSinceLastShot = 0;
-            millisecondsNewShot = 20;
+            millisecondsNewShot = 2000;
             movementSpeed = 0.2f;
             timeSinceStartSinking = 0;
             millisecondToSink = 10000;

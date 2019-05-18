@@ -44,7 +44,9 @@ namespace Gusto.AnimatedSprite
             if (timeSinceLastFrame > millisecondsPerFrame)
             {
                 RandomWind();
-                BoundFrames();
+                Tuple<int, int> frames = BoundFrames(currRowFrame, currColumnFrame);
+                currColumnFrame = frames.Item2;
+                currRowFrame = frames.Item1;
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
         }
