@@ -15,5 +15,7 @@ namespace Gusto.Bounding
             {TeamType.Player, new List<Tuple<int,int>>() },
             {TeamType.A, new List<Tuple<int, int>>() }
         };
+
+        public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>();
     }
 }

@@ -13,6 +13,7 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using Gusto.Utility;
 using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 
 namespace Gusto.GameMap
 {
@@ -87,14 +88,16 @@ namespace Gusto.GameMap
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
-            collidablePieces.Clear();
+            BoundingBoxLocations.LandTileLocationList.Clear();
+            //collidablePieces.Clear();
             foreach (var tile in map)
             {
                 var loc = tile.location;
                 if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
                 {
                     if (tile.bbKey.Equals("landTile"))
-                        collidablePieces.Add(tile);
+                        BoundingBoxLocations.LandTileLocationList.Add(tile);
+                        //collidablePieces.Add(tile);
                     tile.Draw(sb, _cam);
                 }
             }

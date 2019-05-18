@@ -37,7 +37,8 @@ namespace Gusto.Models
         {
             currColumnFrame++; // explosion
             exploded = true;
-            BoundFrames();
+            Tuple<int, int> frames = BoundFrames(currRowFrame, currColumnFrame);
+            currColumnFrame = frames.Item2;
         }
 
         // logic to find correct frame of sprite from user input and update movement values

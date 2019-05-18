@@ -1,6 +1,7 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
+using Gusto.GameMap;
 using Gusto.Mappings;
 using Gusto.Models.Weapon;
 using Gusto.Utility;
@@ -11,6 +12,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Gusto.Models
 {
@@ -178,6 +180,7 @@ namespace Gusto.Models
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+            health = 40;
             // turning
             if (timeSinceLastTurn > millisecondsPerTurn)
             {
@@ -188,7 +191,9 @@ namespace Gusto.Models
                         currRowFrame++;
                     else if (kstate.IsKeyDown(Keys.D))
                         currRowFrame--;
-                    BoundFrames();
+                    Tuple<int, int> frames = BoundFrames(currRowFrame, currColumnFrame);
+                    currRowFrame = frames.Item1;
+                    currColumnFrame = frames.Item2;
                 }
                 timeSinceLastTurn -= millisecondsPerTurn;
             }
@@ -307,9 +312,72 @@ namespace Gusto.Models
                     shipSail.moving = true;
                 }
 
-                currRowFrame = AIUtility.SetAIShipDirection(target, location);
-                shipSail.currRowFrame = currRowFrame;
+                // TODO: need some sort of timer to unachor ai ship when it is stuck.
+                //if (anchored)
+                //moving = false;
 
+
+
+                // collision avoidance take 2
+                bool probesCollides = false;
+                int lineOfSightDistance = 2000;
+                Vector2 shipCenterPoint = GetBoundingBox().Center.ToVector2();
+                int crf = currRowFrame;
+                Dictionary<int, float> nonCollidingLOSMap = new Dictionary<int, float>(); // rowFrame and los distance to target
+                for (int i = 0; i < nRows; i++)
+                {
+                    Tuple<int, int> LosFrames = BoundFrames(crf, currColumnFrame);
+                    crf = LosFrames.Item1;
+                    Vector2 pointOfSight = new Vector2(shipCenterPoint.X + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item1 * lineOfSightDistance,
+                        shipCenterPoint.Y + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item2 * lineOfSightDistance);
+                    
+                    foreach (var land in BoundingBoxLocations.LandTileLocationList)
+                    {
+                        int padding = GetBoundingBox().Width / 2; // padd the tile pieces with half of the ships width
+                        Rectangle bbPadded = new Rectangle(land.GetBoundingBox().X, land.GetBoundingBox().Y, land.GetBoundingBox().Width + padding, land.GetBoundingBox().Height + padding);
+
+                        if (AIUtility.LineIntersectsRect(shipCenterPoint, pointOfSight, bbPadded))
+                        {
+                            nonCollidingLOSMap.Remove(crf);
+                            probesCollides = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (!nonCollidingLOSMap.ContainsKey(crf))
+                                nonCollidingLOSMap.Add(crf, PhysicsUtility.VectorMagnitude(target.Item1, pointOfSight.X, target.Item2, pointOfSight.Y));
+                        }   
+                    }
+                    crf++;
+                }
+
+                if (!probesCollides)
+                    currRowFrame = AIUtility.SetAIShipDirection(target, location);
+                else
+                {
+                    if (nonCollidingLOSMap.Keys.Count == 0)
+                    {
+                        // all of our lines of sight collide... TODO
+                    }
+                    else
+                    {
+                        // go towards min nonCollidable path to target
+                        int bestRowFrame = 0;
+                        float minDistance = float.MaxValue;
+                        foreach (var los in nonCollidingLOSMap.Keys)
+                        {
+                            if (nonCollidingLOSMap[los] < minDistance)
+                            {
+                                minDistance = nonCollidingLOSMap[los];
+                                bestRowFrame = los;
+                            }
+                        }
+                        currRowFrame = bestRowFrame;
+                    }
+                }
+                // end collision avoidance
+
+                shipSail.currRowFrame = currRowFrame;
                 timeSinceLastTurn -= millisecondsPerTurn;
             }
 

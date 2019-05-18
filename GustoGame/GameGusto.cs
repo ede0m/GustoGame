@@ -105,9 +105,9 @@ namespace Gusto
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
             // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, screenCenter, Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(200, 300), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), Content, GraphicsDevice);
 
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
@@ -225,7 +225,7 @@ namespace Gusto
             }
 
             // set any visible collidable map pieces for collision
-            foreach (var tile in map.GetCollidableTiles())
+            foreach (var tile in BoundingBoxLocations.LandTileLocationList)
                 SpatialBounding.SetQuad(tile.GetBase());
 
             // handle collision
