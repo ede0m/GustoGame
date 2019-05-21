@@ -110,6 +110,12 @@ namespace Gusto.Models
                 anchored = true;
                 return;
             }
+
+            if (collidedWith is IShip)
+            {
+                colliding = false;
+                anchored = true;
+            }
         }
 
         // logic to find correct frame of sprite from user input and update movement values

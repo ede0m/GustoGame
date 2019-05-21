@@ -276,7 +276,9 @@ namespace Gusto
                             ship.DrawAimLine(spriteBatchView, this.camera);
                     }
                     continue;
-                } else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                }
+
+                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower) sprite;
                     tower.DrawHealthBar(spriteBatchView, this.camera);
