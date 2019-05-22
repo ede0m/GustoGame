@@ -183,7 +183,7 @@ namespace Gusto
             List<Sprite> toRemove = new List<Sprite>();
             
             // camera follows player
-            this.camera.Position = baseShip.location;
+            this.camera.Position = piratePlayer.location;
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -284,6 +284,16 @@ namespace Gusto
                         if (ship.aiming)
                             ship.DrawAimLine(spriteBatchView, this.camera);
                     }
+                    continue;
+                }
+
+                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
+                {
+                    PlayerPirate pirate = (PlayerPirate)sprite;
+                    if (pirate.swimming)
+                        pirate.DrawSwimming(spriteBatchView, this.camera);
+                    else
+                        pirate.Draw(spriteBatchView, this.camera);
                     continue;
                 }
 

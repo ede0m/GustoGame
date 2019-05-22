@@ -99,6 +99,24 @@ namespace Gusto.AnimatedSprite
 
 
             // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
+            SetBoundingBox();
+
+            if (camera == null)
+                spriteBatch.Begin();
+            else
+                spriteBatch.Begin(camera);
+            // TEST STUFF for trying to draw bounding box around sprite
+            if (boundingBox != null)
+                spriteBatch.Draw(boundingBox, boundingBoxRect.Location.ToVector2(), boundingBoxRect, Color.Orange, 0f,
+                    Vector2.Zero, 1.0f, SpriteEffects.None, 0f); // scaling is already done in constructor
+            // 
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f, 
+                new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.End();
+        }
+
+        public void SetBoundingBox()
+        {
             if (bbKey != null)
             {
                 // texture is drawn to orgin, so we must offset our bounding boxes by this manually
@@ -109,20 +127,6 @@ namespace Gusto.AnimatedSprite
                 boundingBoxRect.X = (((int)location.X + ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2) - ((boundingBoxRect.Right - boundingBoxRect.Left) / 2)) - orginXOffset;
                 boundingBoxRect.Y = (((int)location.Y + ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2) - ((boundingBoxRect.Bottom - boundingBoxRect.Top) / 2)) - orginYOffset;
             }
-
-            if (camera == null)
-                spriteBatch.Begin();
-            else
-                spriteBatch.Begin(camera);
-            // TEST STUFF for trying to draw bounding box around sprite
-
-            if (boundingBox != null)
-                spriteBatch.Draw(boundingBox, boundingBoxRect.Location.ToVector2(), boundingBoxRect, Color.Orange, 0f,
-                    Vector2.Zero, 1.0f, SpriteEffects.None, 0f); // scaling is already done in constructor
-            // 
-            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f, 
-                new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
-            spriteBatch.End();
         }
 
         public float GetYPosition()

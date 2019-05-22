@@ -20,21 +20,26 @@ namespace Gusto.Models
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
+        public bool swimming;
 
         public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
-
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            return;
+            if (collidedWith.bbKey.Equals("landTile"))
+            {
+                colliding = false;
+                swimming = false;
+            }
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             timeSinceLastTurnFrame += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastWalkFrame += gameTime.ElapsedGameTime.Milliseconds;
+            swimming = true;
 
             if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
             {
@@ -92,6 +97,27 @@ namespace Gusto.Models
             {
                 currColumnFrame = 0;
             }
+        }
+
+        public void DrawSwimming(SpriteBatch sb, Camera camera)
+        {
+            Rectangle tRect = new Rectangle(targetRectangle.X, targetRectangle.Y, targetRectangle.Width, targetRectangle.Height);
+            tRect.X = (_texture.Width / nColumns) * currColumnFrame;
+            tRect.Y = (_texture.Height / nRows) * currRowFrame;
+
+            // cut the bottom half of the targetRectangle off to hide the "under water" portion of the body
+            tRect.Height = (_texture.Height / nRows) / 2;
+
+            targetRectangle.X = (_texture.Width / nColumns) * currColumnFrame;
+            targetRectangle.Y = (_texture.Height / nRows) * currRowFrame;
+            targetRectangle.Width = (_texture.Width / nColumns);
+            targetRectangle.Height = tRect.Height;
+
+            SetBoundingBox();
+            sb.Begin(camera);
+            sb.Draw(_texture, location, tRect, Color.White , 0f,
+                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            sb.End();
         }
     }
 }
