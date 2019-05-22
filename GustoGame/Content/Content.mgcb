@@ -109,6 +109,13 @@
 /processorParam:TextureFormat=Color
 /build:DecomposedBaseSail.png
 
+#begin helperFont.spritefont
+/importer:FontDescriptionImporter
+/processor:LocalizedFontProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:helperFont.spritefont
+
 #begin Land1.png
 /importer:TextureImporter
 /processor:TextureProcessor

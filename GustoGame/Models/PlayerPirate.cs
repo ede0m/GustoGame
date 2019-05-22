@@ -21,9 +21,15 @@ namespace Gusto.Models
         public float millisecondsPerWalkFrame;
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
+        public bool nearShip;
+
+        ContentManager _content;
+        GraphicsDevice _graphics;
 
         public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
+            _content = content;
+            _graphics = graphics;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -33,12 +39,23 @@ namespace Gusto.Models
                 colliding = false;
                 swimming = false;
             }
+            else if (collidedWith is IShip)
+            {
+                nearShip = true;
+            }
+
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             timeSinceLastTurnFrame += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastWalkFrame += gameTime.ElapsedGameTime.Milliseconds;
+
+            if (colliding)
+                moving = false;
+
+            colliding = false;
+            nearShip = false;
             swimming = true;
 
             if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
@@ -117,6 +134,14 @@ namespace Gusto.Models
             sb.Begin(camera);
             sb.Draw(_texture, location, tRect, Color.White , 0f,
                 new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            sb.End();
+        }
+
+        public void DrawEnterShip(SpriteBatch sb, Camera camera)
+        {
+            SpriteFont font = _content.Load<SpriteFont>("helperFont");
+            sb.Begin(camera);
+            sb.DrawString(font, "e", new Vector2(GetBoundingBox().X, GetBoundingBox().Y - 50), Color.Black);
             sb.End();
         }
     }

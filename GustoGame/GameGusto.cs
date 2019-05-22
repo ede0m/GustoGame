@@ -290,6 +290,9 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
+                    if (pirate.nearShip)
+                        pirate.DrawEnterShip(spriteBatchView, this.camera);
+
                     if (pirate.swimming)
                         pirate.DrawSwimming(spriteBatchView, this.camera);
                     else
