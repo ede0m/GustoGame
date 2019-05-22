@@ -26,6 +26,7 @@ namespace Gusto
         BaseShip baseShip;
         BaseShip baseShipAI;
         BaseTower tower;
+        PiratePlayer piratePlayer;
 
         TileGameMap map;
         JObject mapData;
@@ -84,19 +85,18 @@ namespace Gusto
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            //textureBaseShip.Dispose();
+            Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1");
+            LoadDynamicBoundingBoxPerFrame(4, 8, texturePlayerPirate, "playerPirate", 0.6f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
-            //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
-            //textureTower.Dispose();
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
-            //
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
-            // 
+            
+            // Tile Pieces
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(1, 4, textureOcean1, "oceanTile", 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
@@ -106,6 +106,7 @@ namespace Gusto
 
             // create Team models and initally place them
             baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, new Vector2(300, -300), Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), Content, GraphicsDevice);
 
@@ -118,17 +119,21 @@ namespace Gusto
 
             // fill draw order list
             DrawOrder.Add(baseShip);
+            DrawOrder.Add(piratePlayer);
             DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
 
             // fill update order list
             UpdateOrder.Add(baseShip);
+            UpdateOrder.Add(piratePlayer);
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
 
             // fill collidable list
             Collidable.Add(baseShip);
             SpatialBounding.SetQuad(baseShip.GetBase());
+            Collidable.Add(piratePlayer);
+            SpatialBounding.SetQuad(piratePlayer);
             Collidable.Add(baseShipAI);
             SpatialBounding.SetQuad(baseShipAI.GetBase());
             Collidable.Add(tower);
@@ -208,6 +213,10 @@ namespace Gusto
                 {
                     Tower ship = (Tower)sp;
                     tower.Update(kstate, gameTime);
+                } else if (sp.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
+                {
+                    PlayerPirate pirate = (PlayerPirate)sp;
+                    pirate.Update(kstate, gameTime, this.camera);
                 }
             }
 

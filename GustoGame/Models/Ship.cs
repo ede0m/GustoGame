@@ -52,15 +52,16 @@ namespace Gusto.Models
         public float sinkingTransparency;
         public int maxShotsMoving;
         public int nSails;
-        public bool hittingLand;
-        public bool sinking;
-        public bool aiming;
-        public bool anchored;
         int shipWindWindowMax;
         int shipWindWindowMin;
         public float health;
         public float fullHealth;
         private bool showHealthBar;
+        public bool hittingLand;
+        public bool sinking;
+        public bool aiming;
+        public bool anchored;
+        public bool playerAboard;
 
         Random rand;
         public TeamType teamType;
@@ -188,7 +189,7 @@ namespace Gusto.Models
         {
             health = 40;
             // turning
-            if (timeSinceLastTurn > millisecondsPerTurn)
+            if (timeSinceLastTurn > millisecondsPerTurn && playerAboard)
             {
                 if (!kstate.IsKeyDown(Keys.LeftShift))
                 {
@@ -205,7 +206,7 @@ namespace Gusto.Models
             }
 
             // anchoring toggle
-            if (kstate.IsKeyDown(Keys.S))
+            if (kstate.IsKeyDown(Keys.S) && playerAboard)
             {
                 if (anchored)
                 {
@@ -229,7 +230,7 @@ namespace Gusto.Models
                     }
                 }
             }
-            else if ((percentNotAnchored <= 1))
+            else if ((percentNotAnchored <= 1) && playerAboard)
             {
                 if (anchored)
                     percentNotAnchored = 0;
@@ -240,7 +241,7 @@ namespace Gusto.Models
 
 
             // aiming
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && playerAboard)
             {
                 timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
                 float percentReloaded = timeSinceLastShot / millisecondsNewShot;
@@ -272,7 +273,7 @@ namespace Gusto.Models
             else { aiming = false; }
 
             // shooting
-            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
+            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot && playerAboard)
             {
                 Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
                 BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
@@ -282,7 +283,7 @@ namespace Gusto.Models
                 timeSinceLastShot = 0;
             }
 
-            if (colliding || anchored || health <= 0)
+            if (colliding || anchored || !playerAboard ||health <= 0)
             {
                 moving = false;
                 shipSail.moving = false;
