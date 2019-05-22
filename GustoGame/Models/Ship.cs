@@ -112,6 +112,12 @@ namespace Gusto.Models
                 return;
             }
 
+            if (collidedWith.bbKey.Equals("playerPirate"))
+            {
+                colliding = false;
+                return;
+            }
+
             if (collidedWith is IShip)
             {
                 colliding = false;
@@ -283,7 +289,7 @@ namespace Gusto.Models
                 timeSinceLastShot = 0;
             }
 
-            if (colliding || anchored || !playerAboard ||health <= 0)
+            if (colliding || anchored || !playerAboard || health <= 0)
             {
                 moving = false;
                 shipSail.moving = false;

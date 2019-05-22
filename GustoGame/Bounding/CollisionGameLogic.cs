@@ -28,6 +28,18 @@ namespace Gusto.Bounding
                 }
             }
 
+            else if (a.GetType().BaseType == typeof(Gusto.Models.PlayerPirate))
+            {
+                PlayerPirate pirate = (PlayerPirate)a;
+                // a player doesn't collide with its own shots
+                if (b.GetType().BaseType == typeof(Gusto.Models.CannonBall))
+                {
+                    CannonBall ball = (CannonBall)b;
+                    if (ball.teamType == pirate.teamType)
+                        return false;
+                }
+            }
+
             else if (a.GetType().BaseType == typeof(Gusto.Models.Tower))
             {
                 BaseTower tower = (BaseTower)a;

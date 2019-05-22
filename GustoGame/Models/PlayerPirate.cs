@@ -22,12 +22,16 @@ namespace Gusto.Models
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
         public bool nearShip;
+        public bool onShip;
+        public Ship playerOnShip;
+        public TeamType teamType;
 
         ContentManager _content;
         GraphicsDevice _graphics;
 
         public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
+            teamType = type;
             _content = content;
             _graphics = graphics;
         }
@@ -41,7 +45,11 @@ namespace Gusto.Models
             }
             else if (collidedWith is IShip)
             {
-                nearShip = true;
+                if (!onShip)
+                {
+                    nearShip = true;
+                    playerOnShip = (Ship)collidedWith;
+                }
             }
 
         }
@@ -55,48 +63,69 @@ namespace Gusto.Models
                 moving = false;
 
             colliding = false;
-            nearShip = false;
             swimming = true;
 
             if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
             {
-                moving = true;
-                // player direction
-                if (kstate.IsKeyDown(Keys.W))
+                if (!onShip)
                 {
-                    currRowFrame = 3;
-                    directionalFrame = 0;
-                    if (kstate.IsKeyDown(Keys.A))
-                        directionalFrame = 1;
+                    moving = true;
+                    // player direction
+                    if (kstate.IsKeyDown(Keys.W))
+                    {
+                        currRowFrame = 3;
+                        directionalFrame = 0;
+                        if (kstate.IsKeyDown(Keys.A))
+                            directionalFrame = 1;
+                        else if (kstate.IsKeyDown(Keys.D))
+                            directionalFrame = 7;
+                    }
+                    else if (kstate.IsKeyDown(Keys.S))
+                    {
+                        currRowFrame = 0;
+                        directionalFrame = 4;
+                        if (kstate.IsKeyDown(Keys.A))
+                            directionalFrame = 3;
+                        else if (kstate.IsKeyDown(Keys.D))
+                            directionalFrame = 5;
+                    }
+                    else if (kstate.IsKeyDown(Keys.A))
+                    {
+                        currRowFrame = 2;
+                        directionalFrame = 2;
+                    }
                     else if (kstate.IsKeyDown(Keys.D))
-                        directionalFrame = 7;
-                } else if (kstate.IsKeyDown(Keys.S))
-                {
-                    currRowFrame = 0;
-                    directionalFrame = 4;
-                    if (kstate.IsKeyDown(Keys.A))
-                        directionalFrame = 3;
-                    else if (kstate.IsKeyDown(Keys.D))
-                        directionalFrame = 5;
-                }
-                else if (kstate.IsKeyDown(Keys.A))
-                {
-                    currRowFrame = 2;
-                    directionalFrame = 2;
-                }
-                else if (kstate.IsKeyDown(Keys.D))
-                {
-                    currRowFrame = 1;
-                    directionalFrame = 6;
-                }
-                else
+                    {
+                        currRowFrame = 1;
+                        directionalFrame = 6;
+                    }
+                    else
+                    {
+                        moving = false;
+                    }
+                } else
                 {
                     moving = false;
                 }
+
                 timeSinceLastTurnFrame -= millisecondsPerTurnFrame;
             }
 
-            if (moving)
+            if (nearShip && kstate.IsKeyDown(Keys.E))
+            {
+                location = playerOnShip.GetBoundingBox().Center.ToVector2();
+                onShip = true;
+                playerOnShip.playerAboard = true;
+                playerOnShip.shipSail.playerAboard = true;
+            }
+            nearShip = false;
+
+            if (onShip)
+            {
+                location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X;
+                location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
+            }
+            else if (moving)
             {
                 // walking animation
                 if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
@@ -142,6 +171,21 @@ namespace Gusto.Models
             SpriteFont font = _content.Load<SpriteFont>("helperFont");
             sb.Begin(camera);
             sb.DrawString(font, "e", new Vector2(GetBoundingBox().X, GetBoundingBox().Y - 50), Color.Black);
+            sb.End();
+        }
+
+        public void DrawOnShip(SpriteBatch sb, Camera camera)
+        {
+
+            targetRectangle.X = (_texture.Width / nColumns) * currColumnFrame;
+            targetRectangle.Y = (_texture.Height / nRows) * currRowFrame;
+            targetRectangle.Width = (_texture.Width / nColumns);
+            targetRectangle.Height = (_texture.Height / nRows);
+
+            SetBoundingBox();
+            sb.Begin(camera);
+            sb.Draw(_texture, location, targetRectangle, Color.White * 0.0f, 0f,
+                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
             sb.End();
         }
     }

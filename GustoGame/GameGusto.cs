@@ -181,9 +181,12 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
             List<Sprite> toRemove = new List<Sprite>();
-            
+
             // camera follows player
-            this.camera.Position = piratePlayer.location;
+            if (!piratePlayer.onShip)
+                this.camera.Position = piratePlayer.location;
+            else
+                this.camera.Position = piratePlayer.playerOnShip.location;
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -292,10 +295,12 @@ namespace Gusto
                     PlayerPirate pirate = (PlayerPirate)sprite;
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
+                    else if (pirate.onShip)
+                        pirate.DrawOnShip(spriteBatchView, this.camera);
 
-                    if (pirate.swimming)
+                    if (pirate.swimming && !pirate.onShip)
                         pirate.DrawSwimming(spriteBatchView, this.camera);
-                    else
+                    else if (!pirate.onShip)
                         pirate.Draw(spriteBatchView, this.camera);
                     continue;
                 }
