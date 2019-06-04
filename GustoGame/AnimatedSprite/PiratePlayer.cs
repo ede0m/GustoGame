@@ -25,8 +25,9 @@ namespace Gusto.AnimatedSprite
             Texture2D texturePlayerPirateBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 texturePlayerPirateBB = new Texture2D(graphics, texturePlayerPirate.Width, texturePlayerPirate.Height);
-            Asset playerPirateAsset = new Asset(texturePlayerPirate, texturePlayerPirateBB, 8, 4, 0.6f, "playerPirate");
+            Asset playerPirateAsset = new Asset(texturePlayerPirate, texturePlayerPirateBB, 8, 4, 1.0f, "playerPirate");
             SetSpriteAsset(playerPirateAsset, location);
         }
     }
+
 }

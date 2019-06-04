@@ -17,6 +17,7 @@ namespace Gusto.Models
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
+        public float timeSinceExitShipStart;
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
@@ -111,12 +112,31 @@ namespace Gusto.Models
                 timeSinceLastTurnFrame -= millisecondsPerTurnFrame;
             }
 
-            if (nearShip && kstate.IsKeyDown(Keys.E))
+            // hop on ship
+            if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && timeSinceExitShipStart < 2000)
             {
                 location = playerOnShip.GetBoundingBox().Center.ToVector2();
                 onShip = true;
                 playerOnShip.playerAboard = true;
                 playerOnShip.shipSail.playerAboard = true;
+            }
+            // exit ship
+            else if (kstate.IsKeyDown(Keys.X) && onShip)
+            {
+                timeSinceExitShipStart += gameTime.ElapsedGameTime.Milliseconds;
+                if (timeSinceExitShipStart > 2000)
+                {
+                    onShip = false;
+                    playerOnShip.playerAboard = false;
+                    playerOnShip.shipSail.playerAboard = false;
+                    location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X - 70;
+                    location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
+                    playerOnShip = null;
+                }
+            }
+            else
+            {
+                timeSinceExitShipStart = 0;
             }
             nearShip = false;
 
@@ -136,10 +156,11 @@ namespace Gusto.Models
                     timeSinceLastWalkFrame = 0;
                 }
 
-                // actual movement
+                // actual "regular" movement
                 location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1);
                 location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2);
-            } else
+            }
+            else
             {
                 currColumnFrame = 0;
             }
@@ -170,7 +191,7 @@ namespace Gusto.Models
         {
             SpriteFont font = _content.Load<SpriteFont>("helperFont");
             sb.Begin(camera);
-            sb.DrawString(font, "e", new Vector2(GetBoundingBox().X, GetBoundingBox().Y - 50), Color.Black);
+            sb.DrawString(font, "x", new Vector2(GetBoundingBox().X, GetBoundingBox().Y - 50), Color.Black);
             sb.End();
         }
 
