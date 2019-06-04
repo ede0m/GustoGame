@@ -17,14 +17,18 @@ namespace Gusto.Models
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
+        public float timeSinceSwordSwing;
         public float timeSinceExitShipStart;
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
+        public float millisecondsCombatSwing;
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
         public bool nearShip;
         public bool onShip;
+        public bool inCombat;
         public Ship playerOnShip;
+        public Sword playerSword;
         public TeamType teamType;
 
         ContentManager _content;
@@ -104,12 +108,40 @@ namespace Gusto.Models
                     {
                         moving = false;
                     }
+                    playerSword.currRowFrame = currRowFrame;
                 } else
                 {
                     moving = false;
                 }
 
                 timeSinceLastTurnFrame -= millisecondsPerTurnFrame;
+            }
+
+            // combat 
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                inCombat = true;
+                currColumnFrame = 8;
+                playerSword.currColumnFrame = 0;
+                playerSword.location = location;
+            }
+            else if (inCombat)
+            {
+                if (timeSinceSwordSwing > millisecondsCombatSwing)
+                {
+
+                    currColumnFrame++;
+                    playerSword.location = location;
+                    playerSword.Update(kstate, gameTime, currRowFrame);
+                    if (currColumnFrame == nColumns)
+                    {
+                        inCombat = false;
+                        currColumnFrame = 0;
+                        playerSword.currColumnFrame = 0;
+                    }
+                    timeSinceSwordSwing = 0;
+                }
+                timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
             }
 
             // hop on ship
@@ -145,13 +177,13 @@ namespace Gusto.Models
                 location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X;
                 location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
             }
-            else if (moving)
+            else if (moving && !inCombat)
             {
                 // walking animation
                 if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
                 {
                     currColumnFrame++;
-                    if (currColumnFrame == nColumns)
+                    if (currColumnFrame == 7) // stop before combat frames
                         currColumnFrame = 0;
                     timeSinceLastWalkFrame = 0;
                 }
@@ -162,7 +194,10 @@ namespace Gusto.Models
             }
             else
             {
-                currColumnFrame = 0;
+                if (!inCombat)
+                {
+                    currColumnFrame = 0;
+                }
             }
         }
 

@@ -45,6 +45,7 @@
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
+    <Compile Include="AnimatedSprite\BaseSword.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Tower.cs" />
     <Compile Include="Models\Weapon\IWeapon.cs" />
+    <Compile Include="Models\Weapon\Sword.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\AIUtility.cs" />

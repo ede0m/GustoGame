@@ -19,13 +19,16 @@ namespace Gusto.AnimatedSprite
             timeSinceLastWalkFrame = 0;
             millisecondsPerTurnFrame = 500; // turn speed
             millisecondsPerWalkFrame = 100; // turn speed
+            millisecondsCombatSwing = 75;
 
             //MapModelMovementVectorValues();
-            Texture2D texturePlayerPirate = content.Load<Texture2D>("Pirate1");
+            Texture2D texturePlayerPirate = content.Load<Texture2D>("Pirate1-combat");
             Texture2D texturePlayerPirateBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 texturePlayerPirateBB = new Texture2D(graphics, texturePlayerPirate.Width, texturePlayerPirate.Height);
-            Asset playerPirateAsset = new Asset(texturePlayerPirate, texturePlayerPirateBB, 8, 4, 1.0f, "playerPirate");
+            Asset playerPirateAsset = new Asset(texturePlayerPirate, texturePlayerPirateBB, 11, 4, 1.0f, "playerPirate");
+            // Temporary??
+            playerSword = new BaseSword(team, location, content, graphics);
             SetSpriteAsset(playerPirateAsset, location);
         }
     }

@@ -85,6 +85,18 @@
 /processorParam:TextureFormat=Color
 /build:BaseSailPlayer.png
 
+#begin BaseSword.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BaseSword.png
+
 #begin CannonBall.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -187,6 +199,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Pirate1.png
+
+#begin Pirate1-combat.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Pirate1-combat.png
 
 #begin tower.png
 /importer:TextureImporter

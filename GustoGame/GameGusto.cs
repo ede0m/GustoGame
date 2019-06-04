@@ -27,6 +27,7 @@ namespace Gusto
         BaseShip baseShipAI;
         BaseTower tower;
         PiratePlayer piratePlayer;
+        BaseSword baseSword;
 
         TileGameMap map;
         JObject mapData;
@@ -85,8 +86,10 @@ namespace Gusto
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1");
-            LoadDynamicBoundingBoxPerFrame(4, 8, texturePlayerPirate, "playerPirate", 0.6f);
+            Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
+            LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 0.6f);
+            Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
+            LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 0.6f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
@@ -212,11 +215,13 @@ namespace Gusto
                 {
                     Ship ship = (Ship)sp;
                     ship.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-                } else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                }
+                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower ship = (Tower)sp;
                     tower.Update(kstate, gameTime);
-                } else if (sp.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
+                }
+                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sp;
                     pirate.Update(kstate, gameTime, this.camera);
@@ -293,6 +298,8 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
+                    if (pirate.inCombat)
+                        pirate.playerSword.Draw(spriteBatchView, this.camera);
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
                     else if (pirate.onShip)
