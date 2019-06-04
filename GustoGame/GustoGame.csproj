@@ -73,6 +73,7 @@
     <Compile Include="Models\Sail.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Tower.cs" />
+    <Compile Include="Models\Weapon\IHandHeld.cs" />
     <Compile Include="Models\Weapon\IWeapon.cs" />
     <Compile Include="Models\Weapon\Sword.cs" />
     <Compile Include="Program.cs" />

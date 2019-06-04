@@ -87,9 +87,9 @@ namespace Gusto
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
-            LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 0.6f);
+            LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
-            LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 0.6f);
+            LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
@@ -298,7 +298,7 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
-                    if (pirate.inCombat)
+                    if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
                         pirate.playerSword.Draw(spriteBatchView, this.camera);
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
@@ -309,6 +309,10 @@ namespace Gusto
                         pirate.DrawSwimming(spriteBatchView, this.camera);
                     else if (!pirate.onShip)
                         pirate.Draw(spriteBatchView, this.camera);
+
+                    if (pirate.inCombat && pirate.currRowFrame != 3)
+                        pirate.playerSword.Draw(spriteBatchView, this.camera);
+
                     continue;
                 }
 

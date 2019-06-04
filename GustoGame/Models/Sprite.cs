@@ -1,6 +1,7 @@
 ﻿using System;
 using Comora;
 using Gusto.Models;
+using Gusto.Models.Weapon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -119,13 +120,20 @@ namespace Gusto.AnimatedSprite
         {
             if (bbKey != null)
             {
-                // texture is drawn to orgin, so we must offset our bounding boxes by this manually
-                var orginXOffset = ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2;
-                var orginYOffset = ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2;
-
                 boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
-                boundingBoxRect.X = (((int)location.X + ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2) - ((boundingBoxRect.Right - boundingBoxRect.Left) / 2)) - orginXOffset;
-                boundingBoxRect.Y = (((int)location.Y + ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2) - ((boundingBoxRect.Bottom - boundingBoxRect.Top) / 2)) - orginYOffset;
+                // texture is drawn to orgin, so we must offset our bounding boxes by this manually
+                var originXOffset = ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2;
+                var originYOffset = ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2;
+                if (!(this is IHandHeld))
+                {
+                    boundingBoxRect.X = (((int)location.X + ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2) - ((boundingBoxRect.Right - boundingBoxRect.Left) / 2)) - originXOffset;
+                    boundingBoxRect.Y = (((int)location.Y + ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2) - ((boundingBoxRect.Bottom - boundingBoxRect.Top) / 2)) - originYOffset;
+                }
+                else
+                {
+                    boundingBoxRect.X = (int)location.X  - originXOffset + boundingBoxRect.X;
+                    boundingBoxRect.Y = (int)location.Y - originYOffset + boundingBoxRect.Y;
+                }
             }
         }
 

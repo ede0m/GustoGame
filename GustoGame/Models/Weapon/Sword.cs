@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models
 {
-    public class Sword : Sprite, IWeapon
+    public class Sword : Sprite, IWeapon, IHandHeld
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
