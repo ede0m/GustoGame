@@ -100,6 +100,13 @@ namespace Gusto.Models
                 return;
             }
 
+            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Sword))
+            {
+                Sword sword = (Sword)collidedWith;
+                showHealthBar = true;
+                health -= sword.damage;
+            }
+
             if (collidedWith.bbKey.Equals("landTile"))
             {
                 colliding = false;

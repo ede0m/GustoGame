@@ -16,6 +16,7 @@ namespace Gusto.AnimatedSprite
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
+            damage = 0.2f;
 
             Texture2D textureBaseSword = content.Load<Texture2D>("BaseSword");
             Texture2D textureBaseSwordBB = null;

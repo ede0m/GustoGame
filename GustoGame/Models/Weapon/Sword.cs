@@ -15,7 +15,9 @@ namespace Gusto.Models
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
-        public float baseMovementSpeed;
+
+        public float damage;
+
         public TeamType teamType;
 
         public Sword(TeamType type)
