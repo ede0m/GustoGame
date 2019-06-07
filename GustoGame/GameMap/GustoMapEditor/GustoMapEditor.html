@@ -4,6 +4,7 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+	<script type="text/javascript" src="mapdata.js"></script>
 
 </head>
 <body>
@@ -22,13 +23,13 @@
 					  <input type="number" name="height" value="1024" id="height">
 					  <br>
 					  multX:<br>
-					  <input type="number" name="multX" value="4" id="multX">
+					  <input type="number" name="multX" value="10" id="multX">
 					  <br>
 					  multY:<br>
-					  <input type="number" name="multY" value="4" id="multY">
+					  <input type="number" name="multY" value="10" id="multY">
 					  <br>
 					  tileSize:<br>
-					  <input type="number" name="tileSize" value="64" id="tileSize">
+					  <input type="number" name="tileSize" value="32" id="tileSize">
 					  <br><br>	
 					  <input type="submit" value="init" id="init">
 			  	  </div>
@@ -38,6 +39,8 @@
 					  <input type="text" value="gamemap.json" id="filename">
 					  <br><br>
 					  <input type="submit" value="export-json" id="exportjson">
+					  <br><br>
+					  <input type="submit" value="load mapdata file" id="loadjson">
 				  </div>
 		  	  </div>
 
@@ -51,15 +54,22 @@
 
 
 		  <div id="terrainSelect">
-		  	<div id="ocean1" class="terrain" style="background: #5773B2; border-style: solid;"><p>o1</p></div>
-		  	<div id="ocean2" class="terrain" style="background: aqua"><p>o2</p></div>
-		  	<div id="ocean3" class="terrain" style="background: teal"><p>o3</p></div>
-		  	<div id="ocean4" class="terrain" style="background: navy"><p>o4</p></div>
-		  	<div id="land1" class="terrain" style="background: orange"><p>l1</p></div>
-		  	<div id="land2" class="terrain" style="background: yellow"><p>l2</p></div>
-		  	<div id="land3" class="terrain" style="background: olive"><p>l3</p></div>
-		  	<div id="land4" class="terrain" style="background: green"><p>l4</p></div>
-		  	<div id="land5" class="terrain" style="background: silver"><p>l5</p></div>
+		  	<div>
+			  	<div id="o1" class="terrain" style="background: #5773B2; border-style: solid;"><p>o1</p></div>
+			  	<div id="o2" class="terrain" style="background: aqua"><p>o2</p></div>
+			  	<div id="o3" class="terrain" style="background: teal"><p>o3</p></div>
+			  	<div id="o4" class="terrain" style="background: navy"><p>o4</p></div>
+			  	<div id="l1" class="terrain" style="background: orange"><p>l1</p></div>
+			  	<div id="l2" class="terrain" style="background: yellow"><p>l2</p></div>
+			  	<div id="l3" class="terrain" style="background: olive"><p>l3</p></div>
+			  	<div id="l4" class="terrain" style="background: green"><p>l4</p></div>
+			  	<div id="l5" class="terrain" style="background: silver"><p>l5</p></div>
+		  	</div>
+		  	<br><br>
+		  	<div id="regionList">
+		  		<button id="newRegion">New Region</button>
+		  		<ul></ul>
+		  	</div>
 		  </div>
 		</div>
 	
@@ -69,7 +79,10 @@
 		<div id="map"></div>
 	</div>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script
+  		src="https://code.jquery.com/jquery-3.4.1.min.js"
+  		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  		crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 	<script src="map.js"></script>

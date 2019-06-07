@@ -3,6 +3,11 @@
     --ncols: 0;
     --tileX: 0;
     --tileY: 0;
+
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
 }
 
 #map {
@@ -21,9 +26,15 @@
 	overflow: auto;
 }
 
+#regionList {
+	height: 250px;
+	padding-bottom: 50px;
+	overflow-y: scroll;
+}
+
 #wrap {
 	width: 1400px;
-	height: 550px;
+	height: 600px;
 }
 
 #wrap h2 {
