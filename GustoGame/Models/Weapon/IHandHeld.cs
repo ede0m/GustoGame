@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.Models
+namespace Gusto.Models.Weapon
 {
-    public interface IObject
+    public interface IHandHeld
     {
     }
 }

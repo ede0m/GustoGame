@@ -27,6 +27,7 @@ namespace Gusto.Models
         public int sailIsRightColumn { get; set; }
         public int sailPositionInRespectToShip { get; set; }
         public bool sailDirectlyInWind { get; set; }
+        public bool playerAboard { get; set; }
 
         private int windWindowMin;
         private int windWindowMax;
@@ -118,21 +119,25 @@ namespace Gusto.Models
 
         private void PlayerUpdate(KeyboardState kstate)
         {
-            // sail turning
-            if (kstate.IsKeyDown(Keys.LeftShift))
+            
+            if (playerAboard)
             {
-                if (kstate.IsKeyDown(Keys.A))
-                    currColumnFrame++;
-                else if (kstate.IsKeyDown(Keys.D))
-                    currColumnFrame--;
-            }
-            else
-            {
-                // sail frame follows ship direction
-                if (kstate.IsKeyDown(Keys.A))
-                    currRowFrame++;
-                else if (kstate.IsKeyDown(Keys.D))
-                    currRowFrame--;
+                // sail turning
+                if (kstate.IsKeyDown(Keys.LeftShift))
+                {
+                    if (kstate.IsKeyDown(Keys.A))
+                        currColumnFrame++;
+                    else if (kstate.IsKeyDown(Keys.D))
+                        currColumnFrame--;
+                }
+                else
+                {
+                    // sail frame follows ship direction
+                    if (kstate.IsKeyDown(Keys.A))
+                        currRowFrame++;
+                    else if (kstate.IsKeyDown(Keys.D))
+                        currRowFrame--;
+                }
             }
             Tuple<int, int> frames = BoundFrames(currRowFrame, currColumnFrame);
             currColumnFrame = frames.Item2;

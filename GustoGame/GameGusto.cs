@@ -26,6 +26,8 @@ namespace Gusto
         BaseShip baseShip;
         BaseShip baseShipAI;
         BaseTower tower;
+        PiratePlayer piratePlayer;
+        BaseSword baseSword;
 
         TileGameMap map;
         JObject mapData;
@@ -84,19 +86,20 @@ namespace Gusto
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
-            //textureBaseShip.Dispose();
+            Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
+            LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 1.0f);
+            Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
+            LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
-            //textureBaseSail.Dispose();
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
-            //textureTower.Dispose();
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
-            //
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
-            // 
+            
+            // Tile Pieces
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(1, 4, textureOcean1, "oceanTile", 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
@@ -106,6 +109,7 @@ namespace Gusto
 
             // create Team models and initally place them
             baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, new Vector2(300, -300), Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), Content, GraphicsDevice);
 
@@ -118,17 +122,21 @@ namespace Gusto
 
             // fill draw order list
             DrawOrder.Add(baseShip);
+            DrawOrder.Add(piratePlayer);
             DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
 
             // fill update order list
             UpdateOrder.Add(baseShip);
+            UpdateOrder.Add(piratePlayer);
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
 
             // fill collidable list
             Collidable.Add(baseShip);
             SpatialBounding.SetQuad(baseShip.GetBase());
+            Collidable.Add(piratePlayer);
+            SpatialBounding.SetQuad(piratePlayer);
             Collidable.Add(baseShipAI);
             SpatialBounding.SetQuad(baseShipAI.GetBase());
             Collidable.Add(tower);
@@ -176,9 +184,12 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
             List<Sprite> toRemove = new List<Sprite>();
-            
+
             // camera follows player
-            this.camera.Position = baseShip.location;
+            if (!piratePlayer.onShip)
+                this.camera.Position = piratePlayer.location;
+            else
+                this.camera.Position = piratePlayer.playerOnShip.location;
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -204,10 +215,16 @@ namespace Gusto
                 {
                     Ship ship = (Ship)sp;
                     ship.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-                } else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                }
+                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower ship = (Tower)sp;
                     tower.Update(kstate, gameTime);
+                }
+                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
+                {
+                    PlayerPirate pirate = (PlayerPirate)sp;
+                    pirate.Update(kstate, gameTime, this.camera);
                 }
             }
 
@@ -275,6 +292,27 @@ namespace Gusto
                         if (ship.aiming)
                             ship.DrawAimLine(spriteBatchView, this.camera);
                     }
+                    continue;
+                }
+
+                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
+                {
+                    PlayerPirate pirate = (PlayerPirate)sprite;
+                    if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
+                        pirate.playerSword.Draw(spriteBatchView, this.camera);
+                    if (pirate.nearShip)
+                        pirate.DrawEnterShip(spriteBatchView, this.camera);
+                    else if (pirate.onShip)
+                        pirate.DrawOnShip(spriteBatchView, this.camera);
+
+                    if (pirate.swimming && !pirate.onShip)
+                        pirate.DrawSwimming(spriteBatchView, this.camera);
+                    else if (!pirate.onShip)
+                        pirate.Draw(spriteBatchView, this.camera);
+
+                    if (pirate.inCombat && pirate.currRowFrame != 3)
+                        pirate.playerSword.Draw(spriteBatchView, this.camera);
+
                     continue;
                 }
 
