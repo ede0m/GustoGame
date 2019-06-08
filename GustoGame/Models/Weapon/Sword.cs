@@ -1,7 +1,7 @@
 ﻿
 using global::Gusto.AnimatedSprite;
 using Gusto.Bounding;
-using Gusto.Models.Weapon;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

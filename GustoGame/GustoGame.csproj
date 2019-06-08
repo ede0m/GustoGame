@@ -61,7 +61,9 @@
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\EnemyGround.cs" />
-    <Compile Include="Models\IWalks.cs" />
+    <Compile Include="Models\Interfaces\ICanUpdate.cs" />
+    <Compile Include="Models\Interfaces\IVulnerable.cs" />
+    <Compile Include="Models\Interfaces\IWalks.cs" />
     <Compile Include="Models\PlayerPirate.cs" />
     <Compile Include="Models\TilePiece.cs" />
     <Compile Include="Models\Weapon\CannonBall.cs" />
@@ -72,12 +74,12 @@
     <Compile Include="Bounding\CalculateTextureBoundingBox.cs" />
     <Compile Include="GameGusto.cs" />
     <Compile Include="Models\Asset.cs" />
-    <Compile Include="Models\IShip.cs" />
+    <Compile Include="Models\Interfaces\IShip.cs" />
     <Compile Include="Models\Sail.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Tower.cs" />
-    <Compile Include="Models\Weapon\IHandHeld.cs" />
-    <Compile Include="Models\Weapon\IWeapon.cs" />
+    <Compile Include="Models\Interfaces\IHandHeld.cs" />
+    <Compile Include="Models\Interfaces\IWeapon.cs" />
     <Compile Include="Models\Weapon\Sword.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -3,6 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
+using Gusto.Models.Interfaces;
 using Gusto.GameMap;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -113,23 +114,23 @@ namespace Gusto
             map.SetGameMap(Content, GraphicsDevice);
             Dictionary<string, List<Sprite>> regionMap = map.GetRegionMap();
 
-            //TEMPORARY 
+            //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP
             Random rnd = new Random();
             Sprite GiannaRegionTile = regionMap["Gianna"][rnd.Next(regionMap["Gianna"].Count)];
 
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
-            // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), Content, GraphicsDevice);
-            piratePlayer = new PiratePlayer(TeamType.Player, new Vector2(300, -300), Content, GraphicsDevice);
-            baseTribal = new BaseTribal(TeamType.B, GiannaRegionTile.location, Content, GraphicsDevice);
-            tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), Content, GraphicsDevice);
-
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
+
+            // create Team models and initally place them
+            baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), windArrows, Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, new Vector2(300, -300), Content, GraphicsDevice);
+            baseTribal = new BaseTribal(TeamType.B, GiannaRegionTile.location, Content, GraphicsDevice);
+            tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), windArrows, Content, GraphicsDevice);
 
 
             // fill draw order list
@@ -226,22 +227,8 @@ namespace Gusto
                     Collidable.Remove(sp);
                     toRemove.Add(sp);
                 }
-
-                if (sp.GetType().BaseType == typeof(Gusto.Models.Ship))
-                {
-                    Ship ship = (Ship)sp;
-                    ship.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-                }
-                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
-                {
-                    Tower ship = (Tower)sp;
-                    tower.Update(kstate, gameTime);
-                }
-                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
-                {
-                    PlayerPirate pirate = (PlayerPirate)sp;
-                    pirate.Update(kstate, gameTime, this.camera);
-                }
+                ICanUpdate updateSp = (ICanUpdate)sp;
+                updateSp.Update(kstate, gameTime, this.camera);
             }
 
 
@@ -287,12 +274,16 @@ namespace Gusto
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
             {
-                // Draw a ships sail before a ship
+                if (sprite is IVulnerable)
+                {
+                    IVulnerable v = (IVulnerable) sprite;
+                    v.DrawHealthBar(spriteBatchView, camera);
+                }
+
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
                     ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
-                    ship.DrawHealthBar(spriteBatchView, camera);
 
                     if (ship.sinking)
                     {
@@ -301,6 +292,7 @@ namespace Gusto
                     }
                     else
                     {
+                        // Draw a ships sail before a ship
                         ship.Draw(spriteBatchView, this.camera);
                         ship.shipSail.Draw(spriteBatchView, this.camera);
                         foreach (var shot in ship.Shots)
@@ -335,7 +327,6 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower) sprite;
-                    tower.DrawHealthBar(spriteBatchView, this.camera);
                     sprite.Draw(spriteBatchView, this.camera);
                     // draw any shots this tower has in motion
                     foreach (var shot in tower.Shots)

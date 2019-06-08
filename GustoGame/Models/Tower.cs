@@ -2,6 +2,7 @@
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Mappings;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,7 +14,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models
 {
-    public class Tower : Sprite
+    public class Tower : Sprite, ICanUpdate
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -74,7 +75,7 @@ namespace Gusto.Models
             }
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime)
+        public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;

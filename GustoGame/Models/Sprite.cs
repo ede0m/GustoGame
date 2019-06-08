@@ -1,7 +1,7 @@
 ﻿using System;
 using Comora;
 using Gusto.Models;
-using Gusto.Models.Weapon;
+using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

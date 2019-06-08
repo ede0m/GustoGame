@@ -21,6 +21,9 @@ namespace Gusto.AnimatedSprite
             millisecondsPerWalkFrame = 100; // turn speed
             millisecondsCombatSwing = 75;
 
+            fullHealth = 40;
+            health = fullHealth;
+
             //MapModelMovementVectorValues();
             Texture2D texturePlayerPirate = content.Load<Texture2D>("Pirate1-combat");
             Texture2D texturePlayerPirateBB = null;

@@ -21,6 +21,10 @@ namespace Gusto.AnimatedSprite
             millisecondsPerWalkFrame = 100; // turn speed
             millisecondsCombatSwing = 75;
 
+            fullHealth = 25;
+            health = fullHealth;
+
+
             Texture2D textureBaseTribal = content.Load<Texture2D>("Tribal1");
             Texture2D textureBaseTribalBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

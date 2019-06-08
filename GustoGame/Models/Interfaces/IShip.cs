@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.Models
+namespace Gusto.Models.Interfaces
 {
     public interface IShip
     {
