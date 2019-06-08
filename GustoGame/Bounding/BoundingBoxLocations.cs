@@ -16,6 +16,8 @@ namespace Gusto.Bounding
             {TeamType.A, new List<Tuple<int, int>>() }
         };
 
+        public static Dictionary<string, List<Sprite>> RegionMap = new Dictionary<string, List<Sprite>>();
+
         public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>();
     }
 }

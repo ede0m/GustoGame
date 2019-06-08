@@ -12,7 +12,7 @@ namespace Gusto.AnimatedSprite
 {
     public class BaseTower : Tower
     {
-        public BaseTower(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
+        public BaseTower(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
 
             timeSinceLastShot = 0;
@@ -28,7 +28,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureTowerBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureTowerBB = new Texture2D(graphics, textureTower.Width, textureTower.Height);
-            Asset towerAsset = new Asset(textureTower, textureTowerBB, 1, 1, 0.5f, "tower");
+            Asset towerAsset = new Asset(textureTower, textureTowerBB, 1, 1, 0.5f, "tower", region);
             SetSpriteAsset(towerAsset, location);
         }
 

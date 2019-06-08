@@ -12,7 +12,7 @@ namespace Gusto.AnimatedSprite
 {
     public class BaseCannonBall : CannonBall
     {
-        public BaseCannonBall(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base (location, team)
+        public BaseCannonBall(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base (location, team)
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
@@ -22,7 +22,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBaseCannonBallBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseCannonBallBB = new Texture2D(graphics, textureBaseCannonBall.Width, textureBaseCannonBall.Height);
-            Asset baseCannonBallAsset = new Asset(textureBaseCannonBall, textureBaseCannonBallBB, 2, 1, 1.0f, "baseCannonBall");
+            Asset baseCannonBallAsset = new Asset(textureBaseCannonBall, textureBaseCannonBallBB, 2, 1, 1.0f, "baseCannonBall", region);
             SetSpriteAsset(baseCannonBallAsset, location);
         }
     }

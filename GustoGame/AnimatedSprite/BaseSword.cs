@@ -12,7 +12,7 @@ namespace Gusto.AnimatedSprite
 {
     public class BaseSword : Sword
     {
-        public BaseSword(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team)
+        public BaseSword(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team)
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
@@ -22,7 +22,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBaseSwordBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseSwordBB = new Texture2D(graphics, textureBaseSword.Width, textureBaseSword.Height);
-            Asset baseSwordAsset = new Asset(textureBaseSword, textureBaseSwordBB, 3, 4, 1.0f, "baseSword");
+            Asset baseSwordAsset = new Asset(textureBaseSword, textureBaseSwordBB, 3, 4, 1.0f, "baseSword", region);
             SetSpriteAsset(baseSwordAsset, location);
         }
     }

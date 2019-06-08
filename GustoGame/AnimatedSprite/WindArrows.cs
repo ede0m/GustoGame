@@ -21,7 +21,7 @@ namespace Gusto.AnimatedSprite
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 10000;
             Texture2D textureWindArrows = content.Load<Texture2D>("WindArrows");
-            Asset windArrowsAsset = new Asset(textureWindArrows, null, 2, 8, 1.0f, null);
+            Asset windArrowsAsset = new Asset(textureWindArrows, null, 2, 8, 1.0f, null, null);
             SetSpriteAsset(windArrowsAsset, location);
         }
 

@@ -293,7 +293,7 @@ namespace Gusto.Models
             if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot && playerAboard)
             {
                 Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
-                BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
+                BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
                 cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
                 cannonShot.moving = true;
                 Shots.Add(cannonShot);
@@ -413,7 +413,7 @@ namespace Gusto.Models
                 if (shotDirection != null)
                 {
                     Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
-                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, shipCenter, _content, _graphics);
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shipCenter, _content, _graphics);
                     int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
                     int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
                     cannonShot.location.X -= cannonBallTextureCenterOffsetX;

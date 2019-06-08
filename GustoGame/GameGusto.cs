@@ -112,25 +112,23 @@ namespace Gusto
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
-            Dictionary<string, List<Sprite>> regionMap = map.GetRegionMap();
+            List<Sprite> giannaRegionMap = BoundingBoxLocations.RegionMap["Gianna"];
 
-            //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP
+            //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP
             Random rnd = new Random();
-            Sprite GiannaRegionTile = regionMap["Gianna"][rnd.Next(regionMap["Gianna"].Count)];
-
-
-            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+            Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
 
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
 
+            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
             // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), windArrows, Content, GraphicsDevice);
-            piratePlayer = new PiratePlayer(TeamType.Player, new Vector2(300, -300), Content, GraphicsDevice);
-            baseTribal = new BaseTribal(TeamType.B, GiannaRegionTile.location, Content, GraphicsDevice);
-            tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
+            baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
+            tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
 
 
             // fill draw order list
@@ -227,7 +225,8 @@ namespace Gusto
                     Collidable.Remove(sp);
                     toRemove.Add(sp);
                 }
-                ICanUpdate updateSp = (ICanUpdate)sp;
+                // ICanUpdate is the update for main sprites. Any sub-sprites (items, weapons, sails, etc) that belong to the main sprite are updated within the sprite's personal update method. 
+                ICanUpdate updateSp = (ICanUpdate)sp; 
                 updateSp.Update(kstate, gameTime, this.camera);
             }
 

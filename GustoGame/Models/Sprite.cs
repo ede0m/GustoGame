@@ -22,6 +22,7 @@ namespace Gusto.AnimatedSprite
         public int currColumnFrame;
 
         public string bbKey { get; set; }
+        public string regionKey;
         public bool moving { get; set; }
         public bool colliding { get; set; }
         public bool remove;
@@ -38,6 +39,7 @@ namespace Gusto.AnimatedSprite
             currRowFrame = 0;
             currColumnFrame = 0;
             bbKey = asset.BBKey;
+            regionKey = asset.RegionKey;
             moving = true;
             remove = false;
 

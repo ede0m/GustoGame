@@ -60,8 +60,9 @@
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
-    <Compile Include="Models\EnemyGround.cs" />
+    <Compile Include="Models\GroundEnemy.cs" />
     <Compile Include="Models\Interfaces\ICanUpdate.cs" />
+    <Compile Include="Models\Interfaces\INPC.cs" />
     <Compile Include="Models\Interfaces\IVulnerable.cs" />
     <Compile Include="Models\Interfaces\IWalks.cs" />
     <Compile Include="Models\PlayerPirate.cs" />

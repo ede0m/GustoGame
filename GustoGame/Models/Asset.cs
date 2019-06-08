@@ -15,8 +15,9 @@ namespace Gusto.Models
         public int Rows { get; }
         public float Scale { get; }
         public string BBKey { get; }
+        public string RegionKey { get; }
 
-        public Asset(Texture2D texture, Texture2D bbTexture, int columns, int rows, float scale, string bbKey)
+        public Asset(Texture2D texture, Texture2D bbTexture, int columns, int rows, float scale, string bbKey, string regionKey)
         {
             Texture = texture;
             BBTexture = bbTexture;
@@ -24,6 +25,7 @@ namespace Gusto.Models
             Rows = rows;
             Scale = scale;
             BBKey = bbKey;
+            RegionKey = regionKey;
         }
 
     }

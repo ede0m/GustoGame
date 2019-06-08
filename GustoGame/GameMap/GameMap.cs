@@ -62,22 +62,22 @@ namespace Gusto.GameMap
                     Sprite tile = null;
                     JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
                     string regionName = (string)tileDetails["regionName"];
-                    if (!_regionMap.ContainsKey(regionName))
-                        _regionMap[regionName] = new List<Sprite>();
+                    if (!BoundingBoxLocations.RegionMap.ContainsKey(regionName))
+                        BoundingBoxLocations.RegionMap[regionName] = new List<Sprite>();
 
                     switch(tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(worldLoc, content, graphics, "o1");
-                            _regionMap[regionName].Add(tile);
+                            tile = new OceanTile(worldLoc, regionName, content, graphics, "o1");
+                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "o2":
-                            tile = new OceanTile(worldLoc, content, graphics, "o2");
-                            _regionMap[regionName].Add(tile);
+                            tile = new OceanTile(worldLoc, regionName, content, graphics, "o2");
+                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "l1":
-                            tile = new LandTile(worldLoc, content, graphics, "l1");
-                            _regionMap[regionName].Add(tile);
+                            tile = new LandTile(worldLoc, regionName, content, graphics, "l1");
+                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                     }
 
@@ -114,16 +114,6 @@ namespace Gusto.GameMap
         public void LoadMapData(JObject data)
         {
             _mapData = data;
-        }
-
-        public List<Sprite> GetCollidableTiles()
-        {
-            return collidablePieces;
-        }
-
-        public Dictionary<string, List<Sprite>> GetRegionMap()
-        {
-            return _regionMap;
         }
     }
 }

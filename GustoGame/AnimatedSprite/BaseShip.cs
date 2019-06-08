@@ -13,7 +13,7 @@ namespace Gusto.AnimatedSprite
 {
     public class BaseShip : Ship
     {
-        public BaseShip(TeamType team, Vector2 location, WindArrows wind, ContentManager content, GraphicsDevice graphics) : base (team, wind, content, graphics)
+        public BaseShip(TeamType team, string region, Vector2 location, WindArrows wind, ContentManager content, GraphicsDevice graphics) : base (team, wind, content, graphics)
         {
             timeSinceLastTurn = 0;
             millisecondsPerTurn = 500; // turn speed
@@ -39,9 +39,9 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBaseShipBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseShipBB = new Texture2D(graphics, textureBaseShip.Width, textureBaseShip.Height);
-            Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip");
+            Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip", region);
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
-            shipSail = new BaseSail(team, location, content, graphics);
+            shipSail = new BaseSail(team, region, location, content, graphics);
             shipSail.millisecondsPerFrame = 500; // match turn speed for sail
             SetSpriteAsset(baseShipAsset, location);
         }

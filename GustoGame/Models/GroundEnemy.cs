@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
-    public class EnemyGround : Sprite, IWalks, IVulnerable, ICanUpdate
+    public class GroundEnemy : Sprite, IWalks, IVulnerable, ICanUpdate
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -28,7 +29,6 @@ namespace Gusto.Models
         public bool showHealthBar;
         public int timeShowingHealthBar;
 
-
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
         public bool nearShip;
@@ -40,7 +40,7 @@ namespace Gusto.Models
         ContentManager _content;
         GraphicsDevice _graphics;
 
-        public EnemyGround(TeamType type, ContentManager content, GraphicsDevice graphics)
+        public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
             teamType = type;
             _content = content;
@@ -85,6 +85,9 @@ namespace Gusto.Models
 
             colliding = false;
             swimming = true;
+
+            // Movement
+            //List<Sprite> regionTiles = BoundingBoxLocations.RegionMap
         }
 
 

@@ -15,7 +15,7 @@ namespace Gusto.AnimatedSprite
     public class BaseSail : Sail
     {
 
-        public BaseSail(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team)
+        public BaseSail(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team)
         {
             timeSinceLastFrame = 0;
             sailIsLeftColumn = 2;
@@ -34,7 +34,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBaseSailBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseSailBB = new Texture2D(graphics, textureBaseSail.Width, textureBaseSail.Height);
-            Asset baseSailAsset = new Asset(textureBaseSail, textureBaseSailBB, 3, 8, 0.6f, "baseSail");
+            Asset baseSailAsset = new Asset(textureBaseSail, textureBaseSailBB, 3, 8, 0.6f, "baseSail", region);
             SetSpriteAsset(baseSailAsset, location);
         }
 

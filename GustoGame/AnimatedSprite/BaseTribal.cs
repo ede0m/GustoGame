@@ -11,9 +11,9 @@ using Gusto.Bounds;
 
 namespace Gusto.AnimatedSprite
 {
-    public class BaseTribal : EnemyGround
+    public class BaseTribal : GroundEnemy
     {
-        public BaseTribal(TeamType team, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
+        public BaseTribal(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
             timeSinceLastTurnFrame = 0;
             timeSinceLastWalkFrame = 0;
@@ -29,7 +29,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBaseTribalBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseTribalBB = new Texture2D(graphics, textureBaseTribal.Width, textureBaseTribal.Height);
-            Asset baseTribalAsset = new Asset(textureBaseTribal, textureBaseTribalBB, 12, 4, 0.8f, "baseTribal");
+            Asset baseTribalAsset = new Asset(textureBaseTribal, textureBaseTribalBB, 12, 4, 0.8f, "baseTribal", region);
             SetSpriteAsset(baseTribalAsset, location);
         }
     }
