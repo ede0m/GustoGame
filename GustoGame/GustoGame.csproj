@@ -46,6 +46,7 @@
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\BaseSword.cs" />
+    <Compile Include="AnimatedSprite\BaseTribal.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
@@ -59,6 +60,8 @@
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
+    <Compile Include="Models\EnemyGround.cs" />
+    <Compile Include="Models\IWalks.cs" />
     <Compile Include="Models\PlayerPirate.cs" />
     <Compile Include="Models\TilePiece.cs" />
     <Compile Include="Models\Weapon\CannonBall.cs" />

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
-    public class PlayerPirate : Sprite
+    public class PlayerPirate : Sprite, IWalks
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -55,6 +55,10 @@ namespace Gusto.Models
                     nearShip = true;
                     playerOnShip = (Ship)collidedWith;
                 }
+            }
+            else if (collidedWith is IWalks)
+            {
+                colliding = false;
             }
 
         }

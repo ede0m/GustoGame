@@ -27,6 +27,7 @@ namespace Gusto.GameMap
 
         private List<Sprite> map;
         private List<Sprite> collidablePieces;
+        private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
         private JObject _mapData;
 
         const int tileHeight = 32;
@@ -59,17 +60,24 @@ namespace Gusto.GameMap
                 for (int j = 0; j < _cols; j++)
                 {
                     Sprite tile = null;
+                    JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
+                    string regionName = (string)tileDetails["regionName"];
+                    if (!_regionMap.ContainsKey(regionName))
+                        _regionMap[regionName] = new List<Sprite>();
 
-                    switch(_mapData[index.ToString()].ToString())
+                    switch(tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
                             tile = new OceanTile(worldLoc, content, graphics, "o1");
+                            _regionMap[regionName].Add(tile);
                             break;
                         case "o2":
                             tile = new OceanTile(worldLoc, content, graphics, "o2");
+                            _regionMap[regionName].Add(tile);
                             break;
                         case "l1":
                             tile = new LandTile(worldLoc, content, graphics, "l1");
+                            _regionMap[regionName].Add(tile);
                             break;
                     }
 
@@ -111,6 +119,11 @@ namespace Gusto.GameMap
         public List<Sprite> GetCollidableTiles()
         {
             return collidablePieces;
+        }
+
+        public Dictionary<string, List<Sprite>> GetRegionMap()
+        {
+            return _regionMap;
         }
     }
 }
