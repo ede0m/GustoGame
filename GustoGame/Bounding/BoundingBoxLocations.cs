@@ -12,8 +12,9 @@ namespace Gusto.Bounding
     {
         public static Dictionary<TeamType, List<Tuple<int,int>>> BoundingBoxLocationMap = new Dictionary<TeamType, List<Tuple<int, int>>>()
         {
-            {TeamType.Player, new List<Tuple<int,int>>() },
-            {TeamType.A, new List<Tuple<int, int>>() }
+            {TeamType.Player, new List<Tuple<int,int>>()},
+            {TeamType.A, new List<Tuple<int, int>>() },
+            {TeamType.B, new List<Tuple<int, int>>() }
         };
 
         public static Dictionary<string, List<Sprite>> RegionMap = new Dictionary<string, List<Sprite>>();

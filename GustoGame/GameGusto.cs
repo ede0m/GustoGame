@@ -91,7 +91,7 @@ namespace Gusto
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
             LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
-            LoadDynamicBoundingBoxPerFrame(4, 12, texturePlayerPirate, "baseTribal", 0.8f);
+            LoadDynamicBoundingBoxPerFrame(4, 12, textureBaseTribal, "baseTribal", 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
@@ -353,6 +353,11 @@ namespace Gusto
                 {
                     Tower tower = (Tower)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                }
+                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.PlayerPirate))
+                {
+                    PlayerPirate player = (PlayerPirate)spriteA;
+                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();

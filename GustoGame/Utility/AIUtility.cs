@@ -19,12 +19,22 @@ namespace Gusto.Utility
             {
                 if (AttackMapping.AttackMappings[teamType][otherTeam])
                 {
-                    Tuple<int, int> shotCords;
+                    Tuple<int, int> shotCords = null;
                     if (BoundingBoxLocations.BoundingBoxLocationMap[otherTeam].Any())
                     {
-                        shotCords = BoundingBoxLocations.BoundingBoxLocationMap[otherTeam][0]; // TODO REMOVE HARDCODED random target (pick team member with lowest health)
-                        float vmag = PhysicsUtility.VectorMagnitude(shotCords.Item1, bb.X, shotCords.Item2, bb.Y);
-                        if (vmag <= range)
+                        float minVMag = float.MaxValue;
+                        
+                        foreach (var targetLoc in BoundingBoxLocations.BoundingBoxLocationMap[otherTeam])
+                        {
+                            float vmag = PhysicsUtility.VectorMagnitude(targetLoc.Item1, bb.X, targetLoc.Item2, bb.Y);
+                            if (vmag < minVMag)
+                            {
+                                minVMag = vmag;
+                                shotCords = targetLoc;
+                            }
+
+                        }
+                        if (minVMag <= range)
                             return shotCords;
                     }
                     else
@@ -88,6 +98,99 @@ namespace Gusto.Utility
                 }
             }
             return currRowFrame;
+        }
+
+        public static Tuple<int, int> SetAIGroundMovement(Vector2 target, Vector2 location)
+        {
+            int currRowFrame = 0;
+            int currDirectionalFrame = 0;
+            float slope = (target.Y - location.Y) / (target.X - location.X);
+
+            if (slope > 0)
+            {
+                if (slope < 2.5 && slope > 0.4)
+                {
+                    if ((target.X - location.X) > 0)
+                    {
+                        currRowFrame = 3; // upper right
+                        currDirectionalFrame = 7;
+                    }
+                    else
+                    {
+                        currRowFrame = 0; // lower left
+                        currDirectionalFrame = 3;
+                    }
+                }
+                else if (slope < 0.4 && slope > 0)
+                {
+                    if ((target.X - location.X) > 0)
+                    {
+                        currRowFrame = 1; // right
+                        currDirectionalFrame = 6;
+                    }
+                    else
+                    {
+                        currRowFrame = 2; // left
+                        currDirectionalFrame = 2;
+                    }
+                }
+                else if (slope > 2.5)
+                {
+                    if ((target.Y - location.Y) > 0)
+                    {
+                        currRowFrame = 0; // down
+                        currDirectionalFrame = 4;
+                    }
+                    else
+                    {
+                        currRowFrame = 3; // up
+                        currDirectionalFrame = 0;
+                    }
+                }
+            }
+            else
+            {
+                if (slope > -2.5 && slope < -0.4)
+                {
+                    if ((target.X - location.X) > 0)
+                    {
+                        currRowFrame = 0; // lower right
+                        currDirectionalFrame = 5;
+                    }
+                    else
+                    {
+                        currRowFrame = 3; // upper left
+                        currDirectionalFrame = 1;
+                    }
+                }
+                else if (slope > -0.4 && slope < 0)
+                {
+                    if ((target.X - location.X) > 0)
+                    {
+                        currRowFrame = 1; // right
+                        currDirectionalFrame = 6;
+                    }
+                    else
+                    {
+                        currRowFrame = 2; // left
+                        currDirectionalFrame = 2;
+                    }
+                }
+                else if (slope < -2.5)
+                {
+                    if ((target.Y - location.Y) > 0)
+                    {
+                        currRowFrame = 0; // down
+                        currDirectionalFrame = 4;
+                    }
+                    else
+                    {
+                        currRowFrame = 3; // up
+                        currDirectionalFrame = 0;
+                    }
+                }
+            }
+            return new Tuple<int, int>(currRowFrame, currDirectionalFrame);
         }
 
         public static bool LineIntersectsRect(Vector2 p1, Vector2 p2, Rectangle r)

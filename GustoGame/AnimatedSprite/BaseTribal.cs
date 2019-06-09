@@ -29,7 +29,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBaseTribalBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseTribalBB = new Texture2D(graphics, textureBaseTribal.Width, textureBaseTribal.Height);
-            Asset baseTribalAsset = new Asset(textureBaseTribal, textureBaseTribalBB, 12, 4, 0.8f, "baseTribal", region);
+            Asset baseTribalAsset = new Asset(textureBaseTribal, textureBaseTribalBB, 12, 4, 1.0f, "baseTribal", region);
             SetSpriteAsset(baseTribalAsset, location);
         }
     }

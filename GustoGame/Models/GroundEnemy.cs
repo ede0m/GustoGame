@@ -2,6 +2,8 @@
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Models.Interfaces;
+using Gusto.Utility;
+using GustoGame.Mappings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -34,11 +36,14 @@ namespace Gusto.Models
         public bool nearShip;
         public bool onShip;
         public bool inCombat;
+        public bool roaming;
         public Ship playerOnShip;
+        public Sprite randomRegionRoamTile;
         public TeamType teamType;
 
         ContentManager _content;
         GraphicsDevice _graphics;
+        Random rand;
 
         public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
@@ -46,6 +51,7 @@ namespace Gusto.Models
             _content = content;
             _graphics = graphics;
             timeShowingHealthBar = 0;
+            rand = new Random();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -87,7 +93,69 @@ namespace Gusto.Models
             swimming = true;
 
             // Movement
-            //List<Sprite> regionTiles = BoundingBoxLocations.RegionMap
+            if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
+            {
+                Tuple<int, int> target = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox());
+                if (target != null)
+                {
+                    if (!inCombat)
+                        currColumnFrame = 7;
+                    inCombat = true;
+                    Vector2 targetV = new Vector2(target.Item1, target.Item2);
+                    Tuple<int, int> frames = AIUtility.SetAIGroundMovement(targetV, location);
+                    currRowFrame = frames.Item1;
+                    directionalFrame = frames.Item2;
+                }
+                else
+                {
+                    inCombat = false;
+                    if (roaming)
+                    {
+                        moving = true;
+                        // go towards random tile
+                        Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
+                        currRowFrame = frames.Item1;
+                        directionalFrame = frames.Item2;
+                        if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
+                            roaming = false;
+                    }
+                    else
+                    {
+                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey][rand.Next(BoundingBoxLocations.RegionMap[regionKey].Count)];
+                        roaming = true;
+                    }
+                }
+                timeSinceLastTurnFrame = 0;
+            }
+            if (moving && !inCombat)
+            {
+                // walking animation
+                if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
+                {
+                    currColumnFrame++;
+                    if (currColumnFrame == 7) // stop before combat frames
+                        currColumnFrame = 0;
+                    timeSinceLastWalkFrame = 0;
+                }
+
+                // actual "regular" movement
+                location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
+                location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
+            }
+            else
+            {
+                if (timeSinceSwordSwing > millisecondsCombatSwing)
+                {
+                    currColumnFrame++;
+                    if (currColumnFrame == nColumns)
+                    {
+                        inCombat = false;
+                        currColumnFrame = 0;
+                    }
+                    timeSinceSwordSwing = 0;
+                }
+                timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
+            }
         }
 
 

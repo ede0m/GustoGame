@@ -14,12 +14,21 @@ namespace Gusto.Mappings
             { TeamType.A, new Dictionary<TeamType, bool>
                 {
                     { TeamType.Player, true },
+                    { TeamType.B, true},
                     { TeamType.A, false}
+                }
+            },
+            { TeamType.B, new Dictionary<TeamType, bool>
+                {
+                    { TeamType.Player, true },
+                    { TeamType.A, true},
+                    { TeamType.B, false}
                 }
             },
             { TeamType.Player, new Dictionary<TeamType, bool>
                 {
                     { TeamType.Player, false },
+                    { TeamType.B, true},
                     { TeamType.A, true}
                 }
             },
