@@ -65,6 +65,16 @@ namespace Gusto.Models
                     playerOnShip = (Ship)collidedWith;
                 }
             }
+            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.GroundEnemy))
+            {
+                GroundEnemy enemy = (GroundEnemy)collidedWith;
+                colliding = false;
+                if (enemy.inCombat)
+                {
+                    showHealthBar = true;
+                    health -= enemy.damage;
+                }
+            }
             else if (collidedWith is IWalks)
             {
                 colliding = false;

@@ -23,6 +23,7 @@ namespace Gusto.AnimatedSprite
 
             fullHealth = 25;
             health = fullHealth;
+            damage = 0.05f;
 
 
             Texture2D textureBaseTribal = content.Load<Texture2D>("Tribal1");

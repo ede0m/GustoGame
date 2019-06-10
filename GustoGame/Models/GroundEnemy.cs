@@ -28,6 +28,7 @@ namespace Gusto.Models
 
         public float health;
         public float fullHealth;
+        public float damage;
         public bool showHealthBar;
         public int timeShowingHealthBar;
 
