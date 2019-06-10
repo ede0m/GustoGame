@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models
 {
-    public class Sword : Sprite, IWeapon, IHandHeld
+    public class HandHeld : Sprite, IWeapon, IHandHeld
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
@@ -20,7 +20,7 @@ namespace Gusto.Models
 
         public TeamType teamType;
 
-        public Sword(TeamType type)
+        public HandHeld(TeamType type)
         {
             teamType = type;
         }

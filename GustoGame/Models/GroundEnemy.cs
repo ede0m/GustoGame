@@ -57,11 +57,11 @@ namespace Gusto.Models
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Sword))
+            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.HandHeld))
             {
-                Sword sword = (Sword)collidedWith;
+                HandHeld handHeld = (HandHeld)collidedWith;
                 showHealthBar = true;
-                health -= sword.damage;
+                health -= handHeld.damage;
             }
             else if (collidedWith.bbKey.Equals("landTile"))
             {

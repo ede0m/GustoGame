@@ -306,7 +306,7 @@ namespace Gusto
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
                     if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
-                        pirate.playerSword.Draw(spriteBatchView, this.camera);
+                        pirate.inHand.Draw(spriteBatchView, this.camera);
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
                     else if (pirate.onShip)
@@ -318,7 +318,7 @@ namespace Gusto
                         pirate.Draw(spriteBatchView, this.camera);
 
                     if (pirate.inCombat && pirate.currRowFrame != 3)
-                        pirate.playerSword.Draw(spriteBatchView, this.camera);
+                        pirate.inHand.Draw(spriteBatchView, this.camera);
 
                     continue;
                 }

@@ -35,7 +35,7 @@ namespace Gusto.Models
         public bool onShip;
         public bool inCombat;
         public Ship playerOnShip;
-        public Sword playerSword;
+        public HandHeld inHand;
         public TeamType teamType;
 
         ContentManager _content;
@@ -147,7 +147,7 @@ namespace Gusto.Models
                     {
                         moving = false;
                     }
-                    playerSword.currRowFrame = currRowFrame;
+                    inHand.currRowFrame = currRowFrame;
                 } else
                 {
                     moving = false;
@@ -161,8 +161,8 @@ namespace Gusto.Models
             {
                 inCombat = true;
                 currColumnFrame = 8;
-                playerSword.currColumnFrame = 0;
-                playerSword.location = location;
+                inHand.currColumnFrame = 0;
+                inHand.location = location;
             }
             else if (inCombat)
             {
@@ -170,13 +170,13 @@ namespace Gusto.Models
                 {
 
                     currColumnFrame++;
-                    playerSword.location = location;
-                    playerSword.Update(kstate, gameTime, currRowFrame);
+                    inHand.location = location;
+                    inHand.Update(kstate, gameTime, currRowFrame);
                     if (currColumnFrame == nColumns)
                     {
                         inCombat = false;
                         currColumnFrame = 0;
-                        playerSword.currColumnFrame = 0;
+                        inHand.currColumnFrame = 0;
                     }
                     timeSinceSwordSwing = 0;
                 }

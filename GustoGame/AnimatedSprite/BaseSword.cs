@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite
 {
-    public class BaseSword : Sword
+    public class BaseSword : HandHeld
     {
         public BaseSword(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team)
         {

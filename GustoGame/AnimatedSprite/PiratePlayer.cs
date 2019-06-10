@@ -31,7 +31,7 @@ namespace Gusto.AnimatedSprite
                 texturePlayerPirateBB = new Texture2D(graphics, texturePlayerPirate.Width, texturePlayerPirate.Height);
             Asset playerPirateAsset = new Asset(texturePlayerPirate, texturePlayerPirateBB, 11, 4, 1.0f, "playerPirate", region);
             // Temporary??
-            playerSword = new BaseSword(team, region, location, content, graphics);
+            inHand = new BaseSword(team, region, location, content, graphics);
             SetSpriteAsset(playerPirateAsset, location);
         }
     }

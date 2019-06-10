@@ -81,7 +81,7 @@
     <Compile Include="Models\Tower.cs" />
     <Compile Include="Models\Interfaces\IHandHeld.cs" />
     <Compile Include="Models\Interfaces\IWeapon.cs" />
-    <Compile Include="Models\Weapon\Sword.cs" />
+    <Compile Include="Models\Weapon\HandHeld.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\AIUtility.cs" />
