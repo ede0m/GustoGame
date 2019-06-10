@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Models.Interfaces;
 using GustoGame.Mappings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
-    public class PlayerPirate : Sprite
+    public class PlayerPirate : Sprite, IWalks, IVulnerable, ICanUpdate
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -22,6 +23,12 @@ namespace Gusto.Models
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         public float millisecondsCombatSwing;
+
+        public float health;
+        public float fullHealth;
+        private bool showHealthBar;
+        private int timeShowingHealthBar;
+
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
         public bool nearShip;
@@ -39,6 +46,8 @@ namespace Gusto.Models
             teamType = type;
             _content = content;
             _graphics = graphics;
+
+            timeShowingHealthBar = 0;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -56,6 +65,28 @@ namespace Gusto.Models
                     playerOnShip = (Ship)collidedWith;
                 }
             }
+            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.GroundEnemy))
+            {
+                GroundEnemy enemy = (GroundEnemy)collidedWith;
+                colliding = false;
+                if (enemy.inCombat)
+                {
+                    showHealthBar = true;
+                    health -= enemy.damage;
+                }
+            }
+            else if (collidedWith is IWalks)
+            {
+                colliding = false;
+            }
+            else if (collidedWith.bbKey.Equals("baseCannonBall"))
+            {
+                showHealthBar = true;
+                CannonBall ball = (CannonBall)collidedWith;
+                if (!ball.exploded)
+                    health -= 15;
+                return;
+            }
 
         }
 
@@ -63,6 +94,14 @@ namespace Gusto.Models
         {
             timeSinceLastTurnFrame += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastWalkFrame += gameTime.ElapsedGameTime.Milliseconds;
+
+            if (showHealthBar)
+                timeShowingHealthBar += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeShowingHealthBar > GameOptions.millisecondsToShowHealthBar)
+            {
+                showHealthBar = false;
+                timeShowingHealthBar = 0;
+            }
 
             if (colliding)
                 moving = false;
@@ -243,6 +282,25 @@ namespace Gusto.Models
             sb.Draw(_texture, location, targetRectangle, Color.White * 0.0f, 0f,
                 new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
             sb.End();
+        }
+
+
+        public void DrawHealthBar(SpriteBatch sb, Camera camera)
+        {
+            if (showHealthBar)
+            {
+                Texture2D meterAlive = new Texture2D(_graphics, 1, 1);
+                Texture2D meterDead = new Texture2D(_graphics, 1, 1);
+                meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
+                meterDead.SetData<Color>(new Color[] { Color.IndianRed });
+                float healthLeft = (1f - (1f - (health / fullHealth))) * 60f;
+                Rectangle dead = new Rectangle((int)GetBoundingBox().Center.X - 30, (int)GetBoundingBox().Center.Y - 130, 60, 7);
+                Rectangle alive = new Rectangle((int)GetBoundingBox().Center.X - 30, (int)GetBoundingBox().Center.Y - 130, (int)healthLeft, 7);
+                sb.Begin(camera);
+                sb.Draw(meterDead, dead, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(meterAlive, alive, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.End();
+            }
         }
     }
 }

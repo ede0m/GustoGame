@@ -3,6 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
+using Gusto.Models.Interfaces;
 using Gusto.GameMap;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -27,6 +28,7 @@ namespace Gusto
         BaseShip baseShipAI;
         BaseTower tower;
         PiratePlayer piratePlayer;
+        BaseTribal baseTribal;
         BaseSword baseSword;
 
         TileGameMap map;
@@ -88,6 +90,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
             LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 1.0f);
+            Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
+            LoadDynamicBoundingBoxPerFrame(4, 12, textureBaseTribal, "baseTribal", 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
@@ -105,30 +109,39 @@ namespace Gusto
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
             LoadDynamicBoundingBoxPerFrame(1, 4, textureLand1, "landTile", 1.0f);
 
-            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
-            // create Team models and initally place them
-            baseShip = new BaseShip(TeamType.Player, new Vector2(300, -500), Content, GraphicsDevice);
-            piratePlayer = new PiratePlayer(TeamType.Player, new Vector2(300, -300), Content, GraphicsDevice);
-            tower = new BaseTower(TeamType.A, new Vector2(200, 700), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, new Vector2(470, 0), Content, GraphicsDevice);
+            // Game Map
+            map.SetGameMap(Content, GraphicsDevice);
+            List<Sprite> giannaRegionMap = BoundingBoxLocations.RegionMap["Gianna"];
+
+            //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP
+            Random rnd = new Random();
+            Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
 
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
 
-            // Game Map
-            map.SetGameMap(Content, GraphicsDevice);
+            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+            // create Team models and initally place them
+            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
+            baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
+            tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+
 
             // fill draw order list
             DrawOrder.Add(baseShip);
             DrawOrder.Add(piratePlayer);
+            DrawOrder.Add(baseTribal);
             DrawOrder.Add(baseShipAI);
             DrawOrder.Add(tower);
 
             // fill update order list
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(piratePlayer);
+            UpdateOrder.Add(baseTribal);
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
 
@@ -137,6 +150,8 @@ namespace Gusto
             SpatialBounding.SetQuad(baseShip.GetBase());
             Collidable.Add(piratePlayer);
             SpatialBounding.SetQuad(piratePlayer);
+            Collidable.Add(baseTribal);
+            SpatialBounding.SetQuad(baseTribal);
             Collidable.Add(baseShipAI);
             SpatialBounding.SetQuad(baseShipAI.GetBase());
             Collidable.Add(tower);
@@ -210,22 +225,9 @@ namespace Gusto
                     Collidable.Remove(sp);
                     toRemove.Add(sp);
                 }
-
-                if (sp.GetType().BaseType == typeof(Gusto.Models.Ship))
-                {
-                    Ship ship = (Ship)sp;
-                    ship.Update(kstate, gameTime, windDirection, windSpeed, this.camera);
-                }
-                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
-                {
-                    Tower ship = (Tower)sp;
-                    tower.Update(kstate, gameTime);
-                }
-                else if (sp.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
-                {
-                    PlayerPirate pirate = (PlayerPirate)sp;
-                    pirate.Update(kstate, gameTime, this.camera);
-                }
+                // ICanUpdate is the update for main sprites. Any sub-sprites (items, weapons, sails, etc) that belong to the main sprite are updated within the sprite's personal update method. 
+                ICanUpdate updateSp = (ICanUpdate)sp; 
+                updateSp.Update(kstate, gameTime, this.camera);
             }
 
 
@@ -271,12 +273,16 @@ namespace Gusto
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             foreach (var sprite in DrawOrder)
             {
-                // Draw a ships sail before a ship
+                if (sprite is IVulnerable)
+                {
+                    IVulnerable v = (IVulnerable) sprite;
+                    v.DrawHealthBar(spriteBatchView, camera);
+                }
+
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
                 {
                     Ship ship = (Ship) sprite;
                     ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
-                    ship.DrawHealthBar(spriteBatchView, camera);
 
                     if (ship.sinking)
                     {
@@ -285,6 +291,7 @@ namespace Gusto
                     }
                     else
                     {
+                        // Draw a ships sail before a ship
                         ship.Draw(spriteBatchView, this.camera);
                         ship.shipSail.Draw(spriteBatchView, this.camera);
                         foreach (var shot in ship.Shots)
@@ -319,7 +326,6 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
                 {
                     Tower tower = (Tower) sprite;
-                    tower.DrawHealthBar(spriteBatchView, this.camera);
                     sprite.Draw(spriteBatchView, this.camera);
                     // draw any shots this tower has in motion
                     foreach (var shot in tower.Shots)
@@ -347,6 +353,11 @@ namespace Gusto
                 {
                     Tower tower = (Tower)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                }
+                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.PlayerPirate))
+                {
+                    PlayerPirate player = (PlayerPirate)spriteA;
+                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();

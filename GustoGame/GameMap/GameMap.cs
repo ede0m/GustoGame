@@ -27,6 +27,7 @@ namespace Gusto.GameMap
 
         private List<Sprite> map;
         private List<Sprite> collidablePieces;
+        private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
         private JObject _mapData;
 
         const int tileHeight = 32;
@@ -59,17 +60,24 @@ namespace Gusto.GameMap
                 for (int j = 0; j < _cols; j++)
                 {
                     Sprite tile = null;
+                    JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
+                    string regionName = (string)tileDetails["regionName"];
+                    if (!BoundingBoxLocations.RegionMap.ContainsKey(regionName))
+                        BoundingBoxLocations.RegionMap[regionName] = new List<Sprite>();
 
-                    switch(_mapData[index.ToString()].ToString())
+                    switch(tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(worldLoc, content, graphics, "o1");
+                            tile = new OceanTile(worldLoc, regionName, content, graphics, "o1");
+                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "o2":
-                            tile = new OceanTile(worldLoc, content, graphics, "o2");
+                            tile = new OceanTile(worldLoc, regionName, content, graphics, "o2");
+                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "l1":
-                            tile = new LandTile(worldLoc, content, graphics, "l1");
+                            tile = new LandTile(worldLoc, regionName, content, graphics, "l1");
+                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                     }
 
@@ -106,11 +114,6 @@ namespace Gusto.GameMap
         public void LoadMapData(JObject data)
         {
             _mapData = data;
-        }
-
-        public List<Sprite> GetCollidableTiles()
-        {
-            return collidablePieces;
         }
     }
 }

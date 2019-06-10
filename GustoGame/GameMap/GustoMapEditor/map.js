@@ -79,14 +79,24 @@ $(document).ready(function(){
 		document.getElementById('map').style.setProperty('--tileX', displayTileSizeX.toString() + "px");
 		document.getElementById('map').style.setProperty('--tileY', displayTileSizeY.toString() + "px");
 
+
 		var index = 0;
 		for (var i = 0; i < rows; i++) {
 			for (var j = 0; j < cols; j++) {
 				$('#map').append('<div class="tile" id="'+ index + '" style="width:' + displayTileSizeX + 'px;height:' + displayTileSizeY + 'px;"></div>');
 				var entry = tileDict[index];
+				
+				if (!entry.hasOwnProperty('regionName')) {
+					var saveTile = entry;
+					entry= {};
+					entry['regionName'] = selectedRegionName;
+					entry['terrainPiece'] = saveTile;
+				}
+
 				$('#' + index).css({'background-color': $('#' + entry['terrainPiece']).css("background-color")})
 				$('#' + index).text(entry['regionName'].substring(0, 2))
 		    	$('#' + index).css("fontSize", 10);
+		    	tileDict[index] = entry;
 				index++;
 			}
 		}

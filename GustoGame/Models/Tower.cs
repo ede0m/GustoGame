@@ -2,6 +2,7 @@
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Mappings;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,7 +14,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models
 {
-    public class Tower : Sprite
+    public class Tower : Sprite, ICanUpdate
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -74,7 +75,7 @@ namespace Gusto.Models
             }
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime)
+        public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
@@ -106,7 +107,7 @@ namespace Gusto.Models
                 Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
                 if (shotDirection != null)
                 {
-                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, location, _content, _graphics);
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, location, _content, _graphics);
                     cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), RandomEvents.RandomAimOffset(rand));
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);

@@ -3,7 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.GameMap;
 using Gusto.Mappings;
-using Gusto.Models.Weapon;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace Gusto.Models
 {
-    public class Ship : Sprite, IShip
+    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -32,7 +32,6 @@ namespace Gusto.Models
         public float millisecondToSink;
         public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
-        public int millisecondsToShowHealthBar;
 
         // aim line stuff
         Vector2 edgeFull;
@@ -66,11 +65,13 @@ namespace Gusto.Models
         Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
+        public WindArrows wind;
         public List<CannonBall> Shots;
 
-        public Ship(TeamType type, ContentManager content, GraphicsDevice graphics)
+        public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics)
         {
             Shots = new List<CannonBall>();
+            wind = w;
             teamType = type;
             _content = content;
             _graphics = graphics;
@@ -81,7 +82,6 @@ namespace Gusto.Models
             meterFull = new Texture2D(_graphics, 1, 1);
             meterProg = new Texture2D(_graphics, 1, 1);
 
-            millisecondsToShowHealthBar = 6000;
             timeShowingHealthBar = 0;
         }
 
@@ -133,14 +133,14 @@ namespace Gusto.Models
         }
 
         // logic to find correct frame of sprite from user input and update movement values
-        public void Update(KeyboardState kstate, GameTime gameTime, int windDir, int windSp, Camera camera)
+        public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
 
             if (showHealthBar)
                 timeShowingHealthBar += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeShowingHealthBar > millisecondsToShowHealthBar)
+            if (timeShowingHealthBar > GameOptions.millisecondsToShowHealthBar)
             {
                 showHealthBar = false;
                 timeShowingHealthBar = 0;
@@ -167,6 +167,9 @@ namespace Gusto.Models
                 timeSinceLastExpClean = 0;
             }
 
+            int windDir = wind.getWindDirection();
+            int windSp = wind.getWindSpeed();
+
             if (moving)
             {
                 // map frame to vector movement
@@ -180,6 +183,7 @@ namespace Gusto.Models
             int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
+
             shipSail.Update(kstate, gameTime, windDir, windSp);
             SpatialBounding.SetQuad(GetBase());
 
@@ -289,7 +293,7 @@ namespace Gusto.Models
             if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot && playerAboard)
             {
                 Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
-                BaseCannonBall cannonShot = new BaseCannonBall(teamType, startAimLine, _content, _graphics);
+                BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
                 cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
                 cannonShot.moving = true;
                 Shots.Add(cannonShot);
@@ -409,7 +413,7 @@ namespace Gusto.Models
                 if (shotDirection != null)
                 {
                     Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
-                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, shipCenter, _content, _graphics);
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shipCenter, _content, _graphics);
                     int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
                     int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
                     cannonShot.location.X -= cannonBallTextureCenterOffsetX;
