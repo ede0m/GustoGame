@@ -34,6 +34,7 @@ namespace Gusto.Models
         public bool nearShip;
         public bool onShip;
         public bool inCombat;
+        public List<InventoryItem> inventory;
         public Ship playerOnShip;
         public HandHeld inHand;
         public TeamType teamType;
@@ -43,6 +44,8 @@ namespace Gusto.Models
 
         public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
+            inventory = new List<InventoryItem>();
+
             teamType = type;
             _content = content;
             _graphics = graphics;

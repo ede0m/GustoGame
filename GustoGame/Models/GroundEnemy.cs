@@ -22,15 +22,19 @@ namespace Gusto.Models
         public float timeSinceLastWalkFrame;
         public float timeSinceSwordSwing;
         public float timeSinceExitShipStart;
+        public float timeSinceStartDying;
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         public float millisecondsCombatSwing;
+        public float millisecondToDie;
 
         public float health;
         public float fullHealth;
         public float damage;
         public bool showHealthBar;
         public int timeShowingHealthBar;
+        public bool dying;
+        public float dyingTransparency;
 
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
@@ -38,13 +42,14 @@ namespace Gusto.Models
         public bool onShip;
         public bool inCombat;
         public bool roaming;
+        public List<InventoryItem> inventory;
         public Ship playerOnShip;
         public Sprite randomRegionRoamTile;
         public TeamType teamType;
 
         ContentManager _content;
         GraphicsDevice _graphics;
-        Random rand;
+        public Random rand;
 
         public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
@@ -85,6 +90,29 @@ namespace Gusto.Models
             {
                 showHealthBar = false;
                 timeShowingHealthBar = 0;
+            }
+
+            // dying
+            if (health <= 0)
+            {
+                // drop items
+                foreach (var item in inventory)
+                {
+                    item.inInventory = false;
+                    // scatter items
+                    item.location.X = location.X + rand.Next(-10, 10);
+                    item.location.Y = location.Y + rand.Next(-10, 10);
+                    ItemUtility.ItemsToUpdate.Add(item);
+                }
+                inventory.Clear();
+
+                dying = true;
+                currRowFrame = 2;
+
+                timeSinceStartDying += gameTime.ElapsedGameTime.Milliseconds;
+                dyingTransparency = 1 - (timeSinceStartDying / millisecondToDie);
+                if (dyingTransparency <= 0)
+                    remove = true;
             }
 
             if (colliding)
@@ -128,7 +156,7 @@ namespace Gusto.Models
                 }
                 timeSinceLastTurnFrame = 0;
             }
-            if (moving && !inCombat)
+            if (moving && !inCombat && !dying)
             {
                 // walking animation
                 if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
@@ -145,7 +173,7 @@ namespace Gusto.Models
             }
             else
             {
-                if (timeSinceSwordSwing > millisecondsCombatSwing)
+                if (timeSinceSwordSwing > millisecondsCombatSwing && !dying)
                 {
                     currColumnFrame++;
                     if (currColumnFrame == nColumns)
@@ -176,6 +204,16 @@ namespace Gusto.Models
                 sb.Draw(meterAlive, alive, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
                 sb.End();
             }
+        }
+
+        public void DrawDying(SpriteBatch sb, Camera camera)
+        {
+            targetRectangle.X = (_texture.Width / nColumns) * currColumnFrame;
+            targetRectangle.Y = (_texture.Height / nRows) * currRowFrame;
+            sb.Begin(camera);
+            sb.Draw(_texture, location, targetRectangle, Color.White * dyingTransparency, 0f,
+                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            sb.End();
         }
     }
 }

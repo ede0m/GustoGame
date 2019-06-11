@@ -344,7 +344,7 @@ namespace Gusto.Models
 
                 // collision avoidance take 2
                 bool probesCollides = false;
-                int lineOfSightDistance = 2000;
+                int lineOfSightDistance = 2500;
                 Vector2 shipCenterPoint = GetBoundingBox().Center.ToVector2();
                 int crf = currRowFrame;
                 Dictionary<int, float> nonCollidingLOSMap = new Dictionary<int, float>(); // rowFrame and los distance to target

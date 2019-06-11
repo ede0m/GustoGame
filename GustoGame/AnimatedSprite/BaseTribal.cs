@@ -7,7 +7,7 @@ using System;
 using System.Diagnostics;
 using Gusto.Models;
 using Gusto.Bounds;
-
+using Gusto.Utility;
 
 namespace Gusto.AnimatedSprite
 {
@@ -17,6 +17,7 @@ namespace Gusto.AnimatedSprite
         {
             timeSinceLastTurnFrame = 0;
             timeSinceLastWalkFrame = 0;
+            millisecondToDie = 10000;
             millisecondsPerTurnFrame = 500; // turn speed
             millisecondsPerWalkFrame = 100; // turn speed
             millisecondsCombatSwing = 75;
@@ -25,6 +26,17 @@ namespace Gusto.AnimatedSprite
             health = fullHealth;
             damage = 0.05f;
 
+            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPCDrops(team, rand, 3);
+            List<InventoryItem> inv = new List<InventoryItem>();
+            foreach (var drop in itemDrops)
+            {
+                InventoryItem item = ItemUtility.CreateInventoryItem(drop.Item1, drop.Item2, team, region, location, content, graphics);
+                item.amountStacked = drop.Item2;
+                item.inInventory = true;
+                if (item != null)
+                    inv.Add(item);
+            }
+            inventory = inv;
 
             Texture2D textureBaseTribal = content.Load<Texture2D>("Tribal1");
             Texture2D textureBaseTribalBB = null;
