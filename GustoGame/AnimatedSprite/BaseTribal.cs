@@ -27,16 +27,7 @@ namespace Gusto.AnimatedSprite
             damage = 0.05f;
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPCDrops(team, rand, 3);
-            List<InventoryItem> inv = new List<InventoryItem>();
-            foreach (var drop in itemDrops)
-            {
-                InventoryItem item = ItemUtility.CreateInventoryItem(drop.Item1, drop.Item2, team, region, location, content, graphics);
-                item.amountStacked = drop.Item2;
-                item.inInventory = true;
-                if (item != null)
-                    inv.Add(item);
-            }
-            inventory = inv;
+            inventory = ItemUtility.CreateNPCInventory(itemDrops, team, region, location, content, graphics);
 
             Texture2D textureBaseTribal = content.Load<Texture2D>("Tribal1");
             Texture2D textureBaseTribalBB = null;

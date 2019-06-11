@@ -49,13 +49,10 @@ namespace Gusto.Utility
                     {
                         randomDropAmount = rand.Next(1, (int)maxDropAmount);
                     }
-                    if (drops.Contains(randomItemKey))
-                        dropAmounts[drops.IndexOf(randomItemKey)] += (int)randomDropAmount;
-                    else
-                    {
-                        drops.Add(randomItemKey);
-                        dropAmounts.Add((int)randomDropAmount);
-                    }
+
+                    drops.Add(randomItemKey);
+                    dropAmounts.Add((int)randomDropAmount);
+
                 }
                 i++;
             }

@@ -62,6 +62,7 @@ namespace Gusto.Models
             }
             else if (collidedWith is IShip)
             {
+                colliding = false;
                 if (!onShip)
                 {
                     nearShip = true;

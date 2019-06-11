@@ -15,21 +15,45 @@ namespace Gusto.Utility
     public class ItemUtility
     {
 
+        // Models add to this global list when they drop items. Update order adds these to the UpdateOrder
         public static List<Sprite> ItemsToUpdate = new List<Sprite>();
 
 
-        public static InventoryItem CreateInventoryItem(string key, int amountStacked, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+        public static List<InventoryItem> CreateNPCInventory(List<Tuple<string, int>> itemDrops, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
-            switch (key)
+            List<InventoryItem> returnItems = new List<InventoryItem>();
+            List<string> trackStackable = new List<string>();
+            int index = 0;
+            foreach (var item in itemDrops)
             {
-                case ("tribalTokens"):
-                    return new TribalTokens(team, region, location, content, graphics);
-                    break;
-                case ("shortSword"):
-                    return new ShortSword(team, region, location, content, graphics);
-                    break;
+                if (trackStackable.Contains(item.Item1))
+                {
+                    returnItems[trackStackable.IndexOf(item.Item1)].amountStacked += (int)item.Item2;
+                    continue;
+                }
+
+                string key = item.Item1;
+                int amountDropped = item.Item2;
+                switch (key)
+                {
+                    case ("tribalTokens"):
+                        TribalTokens tt = new TribalTokens(team, region, location, content, graphics);
+                        tt.itemKey = "tribalTokens";
+                        returnItems.Add(tt);
+                        trackStackable.Add("tribalTokens");
+                        break;
+                    case ("shortSword"):
+                        ShortSword ss = new ShortSword(team, region, location, content, graphics);
+                        ss.itemKey = "shortSword";
+                        returnItems.Add(ss);
+                        trackStackable.Add("shortSword");
+                        break;
+                }
+                returnItems[index].inInventory = true;
+                returnItems[index].amountStacked = amountDropped;
+                index++;
             }
-            return null;
+            return returnItems;
         }
 
     }

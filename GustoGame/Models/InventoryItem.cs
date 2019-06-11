@@ -15,6 +15,7 @@ namespace Gusto.Models
 {
     public class InventoryItem : Sprite, IInventoryItem, ICanUpdate
     {
+        public string itemKey;
         PiratePlayer playerNearItem;
 
         public bool inInventory;
@@ -34,20 +35,6 @@ namespace Gusto.Models
             teamType = team;
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
-        {
-
-            if (kstate.IsKeyDown(Keys.E) && canPickUp)
-            {
-                remove = true;
-                inInventory = true;
-                teamType = playerNearItem.teamType;
-                playerNearItem.inventory.Add(this);
-            }
-
-            canPickUp = false;
-        }
-
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
             collidedWith.colliding = false;
@@ -57,6 +44,20 @@ namespace Gusto.Models
                 canPickUp = true;
                 playerNearItem = (PiratePlayer)collidedWith;
             }
+        }
+
+        public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
+        {
+
+            if (kstate.IsKeyDown(Keys.E) && canPickUp && !inInventory)
+            {
+                remove = true;
+                inInventory = true;
+                teamType = playerNearItem.teamType;
+                playerNearItem.inventory.Add(this);
+            }
+
+            canPickUp = false;
         }
 
         public void DrawPickUp(SpriteBatch sb, Camera camera)
