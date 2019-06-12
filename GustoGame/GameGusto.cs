@@ -16,6 +16,9 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Utility;
+using Gusto.Models.Menus;
+using Gusto.Models.Animated;
+using Gusto.Models.Menus;
 
 namespace Gusto
 {
@@ -39,6 +42,7 @@ namespace Gusto
         // static
         WindArrows windArrows;
         Texture2D anchorIcon;
+        Inventory inventory;
 
         SpatialBounding collision;
         GraphicsDeviceManager graphics;
@@ -115,7 +119,6 @@ namespace Gusto
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
             LoadDynamicBoundingBoxPerFrame(1, 4, textureLand1, "landTile", 1.0f);
 
-
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
             List<Sprite> giannaRegionMap = BoundingBoxLocations.RegionMap["Gianna"];
@@ -124,11 +127,12 @@ namespace Gusto
             Random rnd = new Random();
             Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
 
+                        var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
-
-            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+            inventory = new Inventory(screenCenter, Content, GraphicsDevice);
             
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
             baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
@@ -138,15 +142,6 @@ namespace Gusto
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             shortSword = new ShortSword(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
 
-
-            // fill draw order list
-            DrawOrder.Add(baseShip);
-            DrawOrder.Add(piratePlayer);
-            DrawOrder.Add(baseTribal);
-            DrawOrder.Add(baseShipAI);
-            DrawOrder.Add(tower);
-            DrawOrder.Add(shortSword);
-
             // fill update order list
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(piratePlayer);
@@ -154,20 +149,7 @@ namespace Gusto
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(shortSword);
-
-            // fill collidable list
-            Collidable.Add(baseShip);
-            SpatialBounding.SetQuad(baseShip.GetBase());
-            Collidable.Add(piratePlayer);
-            SpatialBounding.SetQuad(piratePlayer);
-            Collidable.Add(baseTribal);
-            SpatialBounding.SetQuad(baseTribal);
-            Collidable.Add(baseShipAI);
-            SpatialBounding.SetQuad(baseShipAI.GetBase());
-            Collidable.Add(tower);
-            SpatialBounding.SetQuad(tower.GetBase());
-            Collidable.Add(shortSword);
-            SpatialBounding.SetQuad(shortSword);
+            UpdateOrder.Add(inventory);
 
         }
 
@@ -222,9 +204,8 @@ namespace Gusto
                 Exit();
             var kstate = Keyboard.GetState();
 
-
             // static update (Wind)
-            windArrows.Update(kstate, gameTime);
+            windArrows.Update(kstate, gameTime, null);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
 
@@ -252,8 +233,11 @@ namespace Gusto
             DrawOrder.Clear();
             foreach (var sp in UpdateOrder)
             {
-                Collidable.Add(sp);
-                SpatialBounding.SetQuad(sp.GetBase());
+                if (!(sp is IMenuGUI))
+                {
+                    Collidable.Add(sp);
+                    SpatialBounding.SetQuad(sp.GetBase());
+                }
                 DrawOrder.Add(sp);
             }
 
@@ -280,8 +264,10 @@ namespace Gusto
             // draw map
             map.DrawMap(spriteBatchView);
 
-            // draw sprites that don't move
+            // draw/set sprites that don't move
             windArrows.Draw(spriteBatchStatic, null);
+            bool showInventoryMenu = false;
+            List<InventoryItem> invItems = null;
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
@@ -301,7 +287,7 @@ namespace Gusto
                         item.DrawPickUp(spriteBatchView, camera);
                 }
 
-                if (sprite.GetType().BaseType == typeof(Gusto.Models.Ship))
+                if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship) sprite;
                     ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
@@ -327,6 +313,13 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
+
+                    if (pirate.showInventory)
+                    {
+                        showInventoryMenu = true;
+                        invItems = pirate.inventory;
+                    }
+
                     if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
                         pirate.inHand.Draw(spriteBatchView, this.camera);
                     if (pirate.nearShip)
@@ -345,7 +338,7 @@ namespace Gusto
                     continue;
                 }
 
-                else if (sprite.GetType().BaseType == typeof(Gusto.Models.GroundEnemy))
+                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
                 {
                     GroundEnemy enemy = (GroundEnemy)sprite;
                     if (enemy.dying)
@@ -365,8 +358,16 @@ namespace Gusto
                         shot.Draw(spriteBatchView, this.camera);
                     continue;
                 }
+
                 sprite.Draw(spriteBatchView, this.camera);
             }
+
+            if (showInventoryMenu)
+            {
+                inventory.Draw(spriteBatchStatic, null);
+                inventory.DrawInventory(invItems, spriteBatchStatic);
+            }
+
             base.Draw(gameTime);
         }
 
@@ -377,17 +378,17 @@ namespace Gusto
 
             foreach (var spriteA in Collidable)
             {
-                if (spriteA.GetType().BaseType == typeof(Gusto.Models.Ship))
+                if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
-                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Tower))
+                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
                 {
                     Tower tower = (Tower)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
                 }
-                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.PlayerPirate))
+                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
                 {
                     PlayerPirate player = (PlayerPirate)spriteA;
                     BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));

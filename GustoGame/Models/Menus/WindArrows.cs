@@ -5,10 +5,12 @@ using System;
 using Gusto.Models;
 using Microsoft.Xna.Framework.Content;
 using Comora;
+using Gusto.AnimatedSprite;
+using Gusto.Models.Interfaces;
 
-namespace Gusto.AnimatedSprite
+namespace Gusto.Models.Menus
 {
-    public class WindArrows : Sprite
+    public class WindArrows : Sprite, ICanUpdate, IMenuGUI
     {
         private Vector2 Location;
         private int timeSinceLastFrame;
@@ -37,7 +39,7 @@ namespace Gusto.AnimatedSprite
         }
 
         // logic to find correct frame of sprite from user input
-        public void Update(KeyboardState kstate, GameTime gameTime) // keeping kstate in here for possible powerup to change wind directrion
+        public void Update(KeyboardState kstate, GameTime gameTime, Camera cam) // keeping kstate in here for possible powerup to change wind directrion
         {
 
             timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
@@ -53,6 +55,7 @@ namespace Gusto.AnimatedSprite
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
+            // TODO: abstract method HandleCollision needs to be a layer down from GUI stuff. 
             throw new NotImplementedException();
         }
 
@@ -68,6 +71,5 @@ namespace Gusto.AnimatedSprite
             if (randomSpeed > 0)
                 currColumnFrame++;
         }
-
     }
 }

@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.Models
+namespace Gusto.Models.Animated
 {
     public class Sail : Sprite
     {

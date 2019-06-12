@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.Models
+namespace Gusto.Models.Animated
 {
     public class GroundEnemy : Sprite, IWalks, IVulnerable, ICanUpdate
     {
@@ -62,7 +62,7 @@ namespace Gusto.Models
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.HandHeld))
+            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.HandHeld))
             {
                 HandHeld handHeld = (HandHeld)collidedWith;
                 showHealthBar = true;

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using Gusto.Models;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
-using Gusto.Bounding;
+using Gusto.Models.Animated;
 
 namespace Gusto.AnimatedSprite
 {

@@ -1,5 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Models;
+using Gusto.Models.Animated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,25 +15,25 @@ namespace Gusto.Bounding
 
         public static bool CheckCollidable(Sprite a, Sprite b)
         {
-            if (a.GetType().BaseType == typeof(Gusto.Models.Ship))
+            if (a.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
             {
                 Ship ship = (Ship)a;
                 // a ship doesn't collide with its any ship's sails
-                if (b.GetType().BaseType == typeof(Gusto.Models.Sail))
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Sail))
                     return false;
                 // ship doesn't collide with its own cannon balls
-                if (b.GetType().BaseType == typeof(Gusto.Models.CannonBall)) {
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.CannonBall)) {
                     CannonBall ball = (CannonBall)b;
                     if (ball.teamType == ship.teamType)
                         return false;
                 }
             }
 
-            else if (a.GetType().BaseType == typeof(Gusto.Models.PlayerPirate))
+            else if (a.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
             {
                 PlayerPirate pirate = (PlayerPirate)a;
                 // a player doesn't collide with its own shots
-                if (b.GetType().BaseType == typeof(Gusto.Models.CannonBall))
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.CannonBall))
                 {
                     CannonBall ball = (CannonBall)b;
                     if (ball.teamType == pirate.teamType)
@@ -40,11 +41,11 @@ namespace Gusto.Bounding
                 }
             }
 
-            else if (a.GetType().BaseType == typeof(Gusto.Models.Tower))
+            else if (a.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
             {
                 BaseTower tower = (BaseTower)a;
                 // a tower doesn't collide with its own shots
-                if (b.GetType().BaseType == typeof(Gusto.Models.CannonBall))
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.CannonBall))
                 {
                     CannonBall ball = (CannonBall)b;
                     if (ball.teamType == tower.teamType)

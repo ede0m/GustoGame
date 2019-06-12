@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
 using GustoGame.Mappings;
 using Microsoft.Xna.Framework;
@@ -12,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.Models
+namespace Gusto.Models.Animated
 {
     public class PlayerPirate : Sprite, IWalks, IVulnerable, ICanUpdate
     {
@@ -34,6 +35,7 @@ namespace Gusto.Models
         public bool nearShip;
         public bool onShip;
         public bool inCombat;
+        public bool showInventory;
         public List<InventoryItem> inventory;
         public Ship playerOnShip;
         public HandHeld inHand;
@@ -69,7 +71,7 @@ namespace Gusto.Models
                     playerOnShip = (Ship)collidedWith;
                 }
             }
-            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.GroundEnemy))
+            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
             {
                 GroundEnemy enemy = (GroundEnemy)collidedWith;
                 colliding = false;
@@ -115,6 +117,15 @@ namespace Gusto.Models
 
             if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
             {
+                // toggle inventory (use turn frame speed here for convenience)
+                if (kstate.IsKeyDown(Keys.Tab))
+                {
+                    if (showInventory)
+                        showInventory = false;
+                    else
+                        showInventory = true;
+                }
+
                 if (!onShip)
                 {
                     moving = true;

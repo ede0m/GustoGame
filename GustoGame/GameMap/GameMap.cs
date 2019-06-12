@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using Gusto.Utility;
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
+using Gusto.Models.Animated;
 
 namespace Gusto.GameMap
 {

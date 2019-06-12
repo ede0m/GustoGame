@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Gusto.Models
+namespace Gusto.Models.Animated
 {
     public class Tower : Sprite, ICanUpdate
     {

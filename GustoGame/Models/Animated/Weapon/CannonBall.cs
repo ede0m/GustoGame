@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 
-namespace Gusto.Models
+namespace Gusto.Models.Animated
 {
     public class CannonBall : Sprite, IWeapon
     {

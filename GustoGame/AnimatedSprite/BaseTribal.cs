@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Gusto.Models;
 using Gusto.Bounds;
 using Gusto.Utility;
+using Gusto.Models.Animated;
 
 namespace Gusto.AnimatedSprite
 {

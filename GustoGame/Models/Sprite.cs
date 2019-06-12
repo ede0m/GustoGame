@@ -5,7 +5,7 @@ using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Gusto.AnimatedSprite
+namespace Gusto.Models
 {
     public abstract class Sprite
     {
@@ -157,6 +157,11 @@ namespace Gusto.AnimatedSprite
         public Vector2 GetTextureCenter()
         {
             return _texture.Bounds.Center.ToVector2();
+        }
+
+        public Texture2D GetTexture()
+        {
+            return _texture;
         }
 
         public double GetWidth()

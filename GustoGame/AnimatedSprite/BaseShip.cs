@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System;
 using System.Diagnostics;
 using Gusto.Models;
-using Gusto.Bounds;
-
+using Gusto.Models.Menus;
+using Gusto.Models.Animated;
 
 namespace Gusto.AnimatedSprite
 {

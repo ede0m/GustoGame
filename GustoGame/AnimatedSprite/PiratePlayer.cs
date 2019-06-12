@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Gusto.Models;
 using Gusto.AnimatedSprite.InventoryItems;
+using Gusto.Models.Animated;
 
 namespace Gusto.AnimatedSprite
 {

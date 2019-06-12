@@ -3,6 +3,8 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.GameMap;
 using Gusto.Mappings;
+using Gusto.Models.Animated;
+using Gusto.Models.Menus;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -14,7 +16,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Gusto.Models
+namespace Gusto.Models.Animated
 {
     public class Ship : Sprite, IShip, IVulnerable, ICanUpdate
     {
@@ -100,7 +102,7 @@ namespace Gusto.Models
                 return;
             }
 
-            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.HandHeld))
+            if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.HandHeld))
             {
                 HandHeld handHeld = (HandHeld)collidedWith;
                 showHealthBar = true;
