@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Comora;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -35,12 +36,14 @@ namespace Gusto.Models.Menus
 
         GraphicsDevice _graphics;
         ContentManager _content;
+        Random rand;
 
         public Inventory(Vector2 location, ContentManager content, GraphicsDevice graphics, PlayerPirate invOfPlayer)
         {
 
             _graphics = graphics;
             _content = content;
+            rand = new Random();
             font = _content.Load<SpriteFont>("helperFont");
             cursor = _content.Load<Texture2D>("pointer");
 
@@ -160,7 +163,13 @@ namespace Gusto.Models.Menus
                         {
                             if (itemMenuFunc.Equals("drop"))
                             {
-
+                                var item = inventoryOfPlayer.inventory[selectedIndex];
+                                item.inInventory = false;
+                                item.remove = false;
+                                item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + rand.Next(-10, 10);
+                                item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + rand.Next(-10, 10);
+                                ItemUtility.ItemsToUpdate.Add(item);
+                                inventoryOfPlayer.inventory.Remove(item);
                             }
                             else if (itemMenuFunc.Equals("eq")) {
                                 inventoryOfPlayer.inventory.Add(inventoryOfPlayer.inHand);

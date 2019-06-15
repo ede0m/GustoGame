@@ -1,6 +1,7 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
 using Gusto.Models.Interfaces;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -55,6 +56,7 @@ namespace Gusto.Models
                 inInventory = true;
                 teamType = playerNearItem.teamType;
                 playerNearItem.inventory.Add(this);
+                ItemUtility.ItemsToUpdate.Remove(this);
             }
 
             canPickUp = false;

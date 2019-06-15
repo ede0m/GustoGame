@@ -48,7 +48,7 @@ namespace Gusto
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
-        List<Sprite> UpdateOrder;
+        HashSet<Sprite> UpdateOrder;
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
@@ -71,7 +71,7 @@ namespace Gusto
         {
             DrawOrder = new List<Sprite>();
             Collidable = new List<Sprite>();
-            UpdateOrder = new List<Sprite>();
+            UpdateOrder = new HashSet<Sprite>();
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
             map = new TileGameMap(this.camera);
@@ -226,7 +226,6 @@ namespace Gusto
                 updateSp.Update(kstate, gameTime, this.camera);
             }
 
-
             // clear any "dead" objects from updating
             foreach (var r in toRemove)
                 UpdateOrder.Remove(r);
@@ -251,6 +250,8 @@ namespace Gusto
             // handle collision
             collision.Update(this.camera.Position);
             SpatialCollision();
+
+            //ItemUtility.ItemsToUpdate.Clear();
 
             this.camera.Update(gameTime);
             base.Update(gameTime);
