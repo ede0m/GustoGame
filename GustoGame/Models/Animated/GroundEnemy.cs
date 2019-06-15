@@ -77,6 +77,14 @@ namespace Gusto.Models.Animated
             {
                 colliding = false;
             }
+            else if (collidedWith.bbKey.Equals("baseCannonBall"))
+            {
+                showHealthBar = true;
+                CannonBall ball = (CannonBall)collidedWith;
+                if (!ball.exploded)
+                    health -= 5;
+                return;
+            }
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)

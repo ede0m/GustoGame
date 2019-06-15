@@ -26,7 +26,7 @@ namespace Gusto.Utility
             int index = 0;
             foreach (var item in itemDrops)
             {
-                if (trackStackable.Contains(item.Item1))
+                if (trackStackable.Contains(item.Item1) && returnItems[trackStackable.IndexOf(item.Item1)].stackable)
                 {
                     returnItems[trackStackable.IndexOf(item.Item1)].amountStacked += (int)item.Item2;
                     continue;

@@ -24,6 +24,8 @@ namespace Gusto.Models.Animated
         public HandHeld(TeamType type, ContentManager content, GraphicsDevice graphics) : base(type, content, graphics)
         {
             teamType = type;
+            stackable = false;
+            amountStacked = 1;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, int currRFrame)

@@ -20,6 +20,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
                 textureTribalTokensBB = new Texture2D(graphics, textureTribalTokens.Width, textureTribalTokens.Height);
             Asset baseTribalTokensAsset = new Asset(textureTribalTokens, textureTribalTokensBB, 1, 1, 0.5f, "tribalTokens", region);
             SetSpriteAsset(baseTribalTokensAsset, location);
+            stackable = true;
         }
     }
 }

@@ -102,7 +102,7 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTribalTokens, "tribalTokens", 0.5f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
-            Texture2D textureShortSword = Content.Load<Texture2D>("BaseSword");
+            Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
             LoadDynamicBoundingBoxPerFrame(4, 3, textureShortSword, "shortSword", 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
@@ -132,15 +132,18 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
-            inventory = new Inventory(screenCenter, Content, GraphicsDevice);
+   
             
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
             baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
             piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
+            inventory = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
+
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             shortSword = new ShortSword(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
+            shortSword.amountStacked = 1;
 
             // fill update order list
             UpdateOrder.Add(baseShip);
@@ -345,8 +348,7 @@ namespace Gusto
                     {
                         enemy.DrawDying(spriteBatchView, this.camera);
                         continue;
-                    }
-                        
+                    } 
                 }
 
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
