@@ -33,7 +33,7 @@ namespace Gusto.Models.Animated
             
         Random rand;
         public TeamType teamType;
-        public List<CannonBall> Shots;
+        public List<Ammo> Shots;
 
         public Tower(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
@@ -41,7 +41,7 @@ namespace Gusto.Models.Animated
             _graphics = graphics;
 
             teamType = type;
-            Shots = new List<CannonBall>();
+            Shots = new List<Ammo>();
             rand = new Random();
 
             millisecondsToShowHealthBar = 6000;
@@ -69,7 +69,7 @@ namespace Gusto.Models.Animated
             else if (collidedWith.bbKey.Equals("baseCannonBall"))
             {
                 showHealthBar = true;
-                CannonBall ball = (CannonBall)collidedWith;
+                Ammo ball = (Ammo)collidedWith;
                 if (!ball.exploded)
                     health -= 5;
             }

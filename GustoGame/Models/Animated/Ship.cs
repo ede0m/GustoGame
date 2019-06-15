@@ -68,11 +68,11 @@ namespace Gusto.Models.Animated
         public TeamType teamType;
         public Sail shipSail { get; set; }
         public WindArrows wind;
-        public List<CannonBall> Shots;
+        public List<Ammo> Shots;
 
         public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics)
         {
-            Shots = new List<CannonBall>();
+            Shots = new List<Ammo>();
             wind = w;
             teamType = type;
             _content = content;
@@ -96,7 +96,7 @@ namespace Gusto.Models.Animated
             if (collidedWith.bbKey.Equals("baseCannonBall"))
             {
                 showHealthBar = true;
-                CannonBall ball = (CannonBall)collidedWith;
+                Ammo ball = (Ammo)collidedWith;
                 if (!ball.exploded)
                     health -= 5;
                 return;

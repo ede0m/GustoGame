@@ -22,8 +22,8 @@ namespace Gusto.Bounding
                 if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Sail))
                     return false;
                 // ship doesn't collide with its own cannon balls
-                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.CannonBall)) {
-                    CannonBall ball = (CannonBall)b;
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo)) {
+                    Ammo ball = (Ammo)b;
                     if (ball.teamType == ship.teamType)
                         return false;
                 }
@@ -33,9 +33,9 @@ namespace Gusto.Bounding
             {
                 PlayerPirate pirate = (PlayerPirate)a;
                 // a player doesn't collide with its own shots
-                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.CannonBall))
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo))
                 {
-                    CannonBall ball = (CannonBall)b;
+                    Ammo ball = (Ammo)b;
                     if (ball.teamType == pirate.teamType)
                         return false;
                 }
@@ -45,9 +45,9 @@ namespace Gusto.Bounding
             {
                 BaseTower tower = (BaseTower)a;
                 // a tower doesn't collide with its own shots
-                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.CannonBall))
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo))
                 {
-                    CannonBall ball = (CannonBall)b;
+                    Ammo ball = (Ammo)b;
                     if (ball.teamType == tower.teamType)
                         return false;
                 }

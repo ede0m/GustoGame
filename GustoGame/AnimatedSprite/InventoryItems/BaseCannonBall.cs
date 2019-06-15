@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite
 {
-    public class BaseCannonBall : CannonBall
+    public class BaseCannonBall : Ammo
     {
         public BaseCannonBall(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base (location, team)
         {

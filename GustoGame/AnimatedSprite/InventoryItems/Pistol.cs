@@ -18,7 +18,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
-            damage = 0.15f;
+            damage = 0.0f;
             shotRange = 150;
             millisecondsNewShot = 2000;
             millisecondsExplosionLasts = 400;

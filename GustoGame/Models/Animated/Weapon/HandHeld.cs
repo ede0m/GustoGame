@@ -29,7 +29,7 @@ namespace Gusto.Models.Animated
         public int shotRange;
 
         public bool aiming;
-        public List<CannonBall> Shots;
+        public List<Ammo> Shots;
 
         Random rand;
         GraphicsDevice _graphics;
@@ -37,7 +37,7 @@ namespace Gusto.Models.Animated
 
         public HandHeld(TeamType type, ContentManager content, GraphicsDevice graphics) : base(type, content, graphics)
         {
-            Shots = new List<CannonBall>();
+            Shots = new List<Ammo>();
             rand = new Random();
             _graphics = graphics;
             _content = content;

@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class CannonBall : Sprite, IWeapon
+    public class Ammo : Sprite, IWeapon
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
@@ -29,7 +29,7 @@ namespace Gusto.Models.Animated
         public Vector2 firedFromLoc;
         public TeamType teamType;
 
-        public CannonBall(Vector2 firedFrom, TeamType type)
+        public Ammo(Vector2 firedFrom, TeamType type)
         {
             teamType = type;
         }

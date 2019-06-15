@@ -88,7 +88,7 @@ namespace Gusto.Models.Animated
             else if (collidedWith.bbKey.Equals("baseCannonBall"))
             {
                 showHealthBar = true;
-                CannonBall ball = (CannonBall)collidedWith;
+                Ammo ball = (Ammo)collidedWith;
                 if (!ball.exploded)
                     health -= 15;
                 return;
@@ -173,7 +173,7 @@ namespace Gusto.Models.Animated
 
             // combat 
             inHand.Update(kstate, gameTime, camera);
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip)
             {
                 inCombat = true;
                 inHand.inCombat = true;

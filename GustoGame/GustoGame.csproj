@@ -42,7 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
