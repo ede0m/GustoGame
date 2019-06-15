@@ -172,26 +172,27 @@ namespace Gusto.Models.Animated
             }
 
             // combat 
+            inHand.Update(kstate, gameTime, camera);
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 inCombat = true;
+                inHand.inCombat = true;
                 currColumnFrame = 8;
-                inHand.currColumnFrame = 0;
+                if (inHand is IRanged)
+                    currColumnFrame = 9;
                 inHand.location = location;
             }
             else if (inCombat)
             {
                 if (timeSinceSwordSwing > millisecondsCombatSwing)
                 {
-
                     currColumnFrame++;
                     inHand.location = location;
-                    inHand.Update(kstate, gameTime, currRowFrame);
+                    inHand.nextFrame = true;
                     if (currColumnFrame == nColumns)
                     {
                         inCombat = false;
                         currColumnFrame = 0;
-                        inHand.currColumnFrame = 0;
                     }
                     timeSinceSwordSwing = 0;
                 }

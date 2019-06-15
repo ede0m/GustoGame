@@ -34,7 +34,7 @@ namespace Gusto
         BaseTower tower;
         PiratePlayer piratePlayer;
         BaseTribal baseTribal;
-        ShortSword shortSword;
+        Pistol pistol;
 
         TileGameMap map;
         JObject mapData;
@@ -102,6 +102,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTribalTokens, "tribalTokens", 0.5f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
+            Texture2D texturePistol = Content.Load<Texture2D>("pistol");
+            LoadDynamicBoundingBoxPerFrame(4, 3, texturePistol, "pistol", 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
             LoadDynamicBoundingBoxPerFrame(4, 3, textureShortSword, "shortSword", 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
@@ -142,8 +144,8 @@ namespace Gusto
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
-            shortSword = new ShortSword(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
-            shortSword.amountStacked = 1;
+            pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
+            pistol.amountStacked = 1;
 
             // fill update order list
             UpdateOrder.Add(baseShip);
@@ -151,7 +153,7 @@ namespace Gusto
             UpdateOrder.Add(baseTribal);
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
-            UpdateOrder.Add(shortSword);
+            UpdateOrder.Add(pistol);
             UpdateOrder.Add(inventory);
 
         }
@@ -338,6 +340,9 @@ namespace Gusto
 
                     if (pirate.inCombat && pirate.currRowFrame != 3)
                         pirate.inHand.Draw(spriteBatchView, this.camera);
+
+                    foreach (var shot in pirate.inHand.Shots)
+                        shot.Draw(spriteBatchView, this.camera);
 
                     continue;
                 }

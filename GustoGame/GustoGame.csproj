@@ -49,6 +49,7 @@
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\TribalTokens.cs" />
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\ShortSword.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\GroundEnemy.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
+    <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />
     <Compile Include="Models\Interfaces\ICanUpdate.cs" />
     <Compile Include="Models\Interfaces\IInventoryItem.cs" />

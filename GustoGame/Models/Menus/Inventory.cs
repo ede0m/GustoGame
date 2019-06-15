@@ -25,6 +25,7 @@ namespace Gusto.Models.Menus
         float timeLClicked;
         Dictionary<int, Rectangle> slotLocations;
         Dictionary<string, Rectangle> itemMenuButtonLocations;
+        Dictionary<InventoryItem, float> saveItemSpriteScale;
         float itemDisplaySizePix;
         Vector2 itemDrawLocStart;
         Vector2 cursorPos;
@@ -55,6 +56,7 @@ namespace Gusto.Models.Menus
             Texture2D textureInventory = new Texture2D(graphics, 500, 275);
             slotLocations = new Dictionary<int, Rectangle>();
             itemMenuButtonLocations = new Dictionary<string, Rectangle>();
+            saveItemSpriteScale = new Dictionary<InventoryItem, float>();
 
             Color[] data = new Color[500 * 275];
             for (int i = 0; i < data.Length; ++i) data[i] = Color.DimGray;
@@ -89,6 +91,10 @@ namespace Gusto.Models.Menus
                 {
                     var item = items[i];
                     Vector2 offsetLocation;
+
+                    if (!saveItemSpriteScale.ContainsKey(item))
+                        saveItemSpriteScale[item] = item.spriteScale;
+
                     if (item is IHandHeld) // handhelds display action frames so scaling them will make them to tiny and offset
                     {
                         item.spriteScale = 1.3f;
@@ -161,20 +167,24 @@ namespace Gusto.Models.Menus
                         itemMenuFunc = entry.Key;
                         if (Mouse.GetState().LeftButton == ButtonState.Pressed && !(timeLClicked < 200))
                         {
+                            var item = inventoryOfPlayer.inventory[selectedIndex];
+                            item.spriteScale = saveItemSpriteScale[item];
+                            saveItemSpriteScale.Remove(item);
+
                             if (itemMenuFunc.Equals("drop"))
                             {
-                                var item = inventoryOfPlayer.inventory[selectedIndex];
                                 item.inInventory = false;
                                 item.remove = false;
                                 item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + rand.Next(-10, 10);
                                 item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + rand.Next(-10, 10);
                                 ItemUtility.ItemsToUpdate.Add(item);
                                 inventoryOfPlayer.inventory.Remove(item);
+                                timeLClicked = 0;
                             }
                             else if (itemMenuFunc.Equals("eq")) {
                                 inventoryOfPlayer.inventory.Add(inventoryOfPlayer.inHand);
-                                inventoryOfPlayer.inHand = (HandHeld)inventoryOfPlayer.inventory[selectedIndex];
-                                inventoryOfPlayer.inventory.Remove(inventoryOfPlayer.inventory[selectedIndex]);
+                                inventoryOfPlayer.inHand = (HandHeld)item;
+                                inventoryOfPlayer.inventory.Remove(item);
                                 timeLClicked = 0;
                             }
                         }
