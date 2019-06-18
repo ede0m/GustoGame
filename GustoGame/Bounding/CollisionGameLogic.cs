@@ -1,6 +1,7 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Models;
 using Gusto.Models.Animated;
+using Gusto.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,13 @@ namespace Gusto.Bounding
                         return false;
                 }
             }
+
+            else if (a is IAmmo)
+            {
+                if (b.GetType().BaseType == typeof(Gusto.Models.TilePiece))
+                    return false;
+            }
+
             return true;
         }
     }

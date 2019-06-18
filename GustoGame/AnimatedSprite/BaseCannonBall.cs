@@ -18,6 +18,8 @@ namespace Gusto.AnimatedSprite
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
             baseMovementSpeed = 2.0f;
+            structureDamage = 5.0f;
+            groundDamage = 10.0f;
 
             Texture2D textureBaseCannonBall = content.Load<Texture2D>("CannonBall");
             Texture2D textureBaseCannonBallBB = null;

@@ -42,7 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AnimatedSprite\InventoryItems\BaseCannonBall.cs" />
+    <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
@@ -50,6 +50,8 @@
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
+    <Compile Include="AnimatedSprite\PistolShot.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\TribalTokens.cs" />
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\ShortSword.cs" />
@@ -65,6 +67,7 @@
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\GroundEnemy.cs" />
+    <Compile Include="Models\Interfaces\IAmmo.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />
@@ -76,7 +79,7 @@
     <Compile Include="Models\InventoryItem.cs" />
     <Compile Include="Models\Animated\PlayerPirate.cs" />
     <Compile Include="Models\TilePiece.cs" />
-    <Compile Include="Models\Animated\Weapon\CannonBall.cs" />
+    <Compile Include="Models\Animated\Weapon\Ammo.cs" />
     <Compile Include="Models\Sprite.cs" />
     <Compile Include="AnimatedSprite\BaseTower.cs" />
     <Compile Include="Models\Menus\WindArrows.cs" />

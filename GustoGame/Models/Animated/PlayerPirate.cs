@@ -85,12 +85,12 @@ namespace Gusto.Models.Animated
             {
                 colliding = false;
             }
-            else if (collidedWith.bbKey.Equals("baseCannonBall"))
+            else if (collidedWith is IAmmo)
             {
-                showHealthBar = true;
                 Ammo ball = (Ammo)collidedWith;
+                showHealthBar = true;
                 if (!ball.exploded)
-                    health -= 15;
+                    health -= ball.groundDamage;
                 return;
             }
 
@@ -179,7 +179,23 @@ namespace Gusto.Models.Animated
                 inHand.inCombat = true;
                 currColumnFrame = 8;
                 if (inHand is IRanged)
+                {
                     currColumnFrame = 9;
+                    if (inHand.ammoLoaded == null)
+                    {
+                        foreach (var item in inventory)
+                        {
+                            if (item.GetType() == inHand.ammoType)
+                            {
+                                if (item.amountStacked > 0)
+                                    inHand.LoadAmmo(item);
+                                else
+                                    inventory.Remove(item);
+                                break;
+                            }
+                        }
+                    }
+                }
                 inHand.location = location;
             }
             else if (inCombat)

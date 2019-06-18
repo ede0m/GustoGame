@@ -35,6 +35,7 @@ namespace Gusto
         PiratePlayer piratePlayer;
         BaseTribal baseTribal;
         Pistol pistol;
+        PistolShotItem pistolAmmo;
 
         TileGameMap map;
         JObject mapData;
@@ -112,6 +113,10 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
+            Texture2D texturePistolShot = Content.Load<Texture2D>("PistolShot");
+            LoadDynamicBoundingBoxPerFrame(1, 2, texturePistolShot, "pistolShot", 1.0f);
+            Texture2D texturePistolShotItem = Content.Load<Texture2D>("PistolShot");
+            LoadDynamicBoundingBoxPerFrame(1, 2, texturePistolShotItem, "pistolShotItem", 1.0f);
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
             
@@ -146,6 +151,8 @@ namespace Gusto
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
+            pistolAmmo = new PistolShotItem(TeamType.A, "GustoGame", new Vector2(220, -300), Content, GraphicsDevice);
+            pistolAmmo.amountStacked = 4;
 
             // fill update order list
             UpdateOrder.Add(baseShip);
@@ -154,6 +161,7 @@ namespace Gusto
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(pistol);
+            UpdateOrder.Add(pistolAmmo);
             UpdateOrder.Add(inventory);
 
         }
@@ -386,6 +394,8 @@ namespace Gusto
 
             foreach (var spriteA in Collidable)
             {
+
+                // BoundBoxLocationMap update - this structure is used for AI locating targets
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship)spriteA;

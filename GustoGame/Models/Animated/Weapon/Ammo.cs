@@ -5,6 +5,7 @@ using Gusto.Bounding;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -12,11 +13,13 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class Ammo : Sprite, IWeapon
+    public class Ammo : Sprite, IWeapon, IAmmo
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
         public float baseMovementSpeed;
+        public float structureDamage;
+        public float groundDamage;
         public bool exploded = false;
         public bool outOfRange = false;
         public float shotDirX;
@@ -29,7 +32,7 @@ namespace Gusto.Models.Animated
         public Vector2 firedFromLoc;
         public TeamType teamType;
 
-        public Ammo(Vector2 firedFrom, TeamType type)
+        public Ammo (Vector2 firedFrom, TeamType type)
         {
             teamType = type;
         }

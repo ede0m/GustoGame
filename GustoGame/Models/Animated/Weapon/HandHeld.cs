@@ -29,6 +29,8 @@ namespace Gusto.Models.Animated
         public int shotRange;
 
         public bool aiming;
+        public InventoryItem ammoLoaded;
+        public Type ammoType;
         public List<Ammo> Shots;
 
         Random rand;
@@ -78,43 +80,49 @@ namespace Gusto.Models.Animated
                     // shooting
                     if (kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
                     {
-                        Tuple<int, int> shotDirection = null;
-                        int shotOffsetX = 0;
-                        int shotOffsetY = 0;
-                        bool shootHorz = false;
-                        switch (currRowFrame)
+                        if (ammoLoaded != null)
                         {
-                            case (0):
-                                //down
-                                shotOffsetY = 30;
-                                shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X, (int)GetBoundingBox().Center.ToVector2().Y + shotRange);
-                                break;
-                            case (1):
-                                //right
-                                shootHorz = true;
-                                shotOffsetX = 30;
-                                shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X + shotRange, (int)GetBoundingBox().Center.ToVector2().Y);
-                                break;
-                            case (2):
-                                //left
-                                shootHorz = true;
-                                shotOffsetX = -13;
-                                shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X - shotRange, (int)GetBoundingBox().Center.ToVector2().Y);
-                                break;
-                            case (3):
-                                //up
-                                shotOffsetY = -10;
-                                shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X, (int)GetBoundingBox().Center.ToVector2().Y - shotRange);
-                                break;
-                        }
+                            Tuple<int, int> shotDirection = null;
+                            int shotOffsetX = 0;
+                            int shotOffsetY = 0;
+                            bool shootHorz = false;
+                            switch (currRowFrame)
+                            {
+                                case (0):
+                                    //down
+                                    shotOffsetY = 30;
+                                    shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X, (int)GetBoundingBox().Center.ToVector2().Y + shotRange);
+                                    break;
+                                case (1):
+                                    //right
+                                    shootHorz = true;
+                                    shotOffsetX = 30;
+                                    shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X + shotRange, (int)GetBoundingBox().Center.ToVector2().Y);
+                                    break;
+                                case (2):
+                                    //left
+                                    shootHorz = true;
+                                    shotOffsetX = -13;
+                                    shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X - shotRange, (int)GetBoundingBox().Center.ToVector2().Y);
+                                    break;
+                                case (3):
+                                    //up
+                                    shotOffsetY = -10;
+                                    shotDirection = new Tuple<int, int>((int)GetBoundingBox().Center.ToVector2().X, (int)GetBoundingBox().Center.ToVector2().Y - shotRange);
+                                    break;
+                            }
 
-                        Vector2 shotStart = new Vector2(GetBoundingBox().Center.ToVector2().X + shotOffsetX, GetBoundingBox().Center.ToVector2().Y + shotOffsetY);
-                        BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shotStart, _content, _graphics);
-                        int offsetStraight = shootHorz ? (cannonShot.GetBoundingBox().Y - shotDirection.Item2) : (cannonShot.GetBoundingBox().X - shotDirection.Item1);
-                        cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), offsetStraight);
-                        cannonShot.moving = true;
-                        Shots.Add(cannonShot);
-                        timeSinceLastShot = 0;
+                            Vector2 shotStart = new Vector2(GetBoundingBox().Center.ToVector2().X + shotOffsetX, GetBoundingBox().Center.ToVector2().Y + shotOffsetY);
+                            PistolShot pistolShot = new PistolShot(teamType, regionKey, shotStart, _content, _graphics);
+                            int offsetStraight = shootHorz ? (pistolShot.GetBoundingBox().Y - shotDirection.Item2) : (pistolShot.GetBoundingBox().X - shotDirection.Item1);
+                            pistolShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), offsetStraight);
+                            pistolShot.moving = true;
+                            Shots.Add(pistolShot);
+                            ammoLoaded.amountStacked -= 1;
+                            if (ammoLoaded.amountStacked == 0)
+                                ammoLoaded = null;
+                            timeSinceLastShot = 0;
+                        }
                     }
                 }
             }
@@ -135,5 +143,9 @@ namespace Gusto.Models.Animated
             SpatialBounding.SetQuad(GetBase());
         }
 
+        public void LoadAmmo(InventoryItem item)
+        {
+            ammoLoaded = item;
+        }
     }
 }

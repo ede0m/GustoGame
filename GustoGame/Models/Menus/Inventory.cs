@@ -174,6 +174,7 @@ namespace Gusto.Models.Menus
                             if (itemMenuFunc.Equals("drop"))
                             {
                                 item.inInventory = false;
+                                item.onGround = true;
                                 item.remove = false;
                                 item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + rand.Next(-10, 10);
                                 item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + rand.Next(-10, 10);

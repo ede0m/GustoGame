@@ -19,8 +19,9 @@ namespace Gusto.Models
         public string itemKey;
         PiratePlayer playerNearItem;
 
+        public bool onGround;
         public bool inInventory;
-        public bool canPickUp;
+        public bool canPickUp; // proximety
         public bool stackable;
         public int amountStacked;
 
@@ -54,6 +55,7 @@ namespace Gusto.Models
             {
                 remove = true;
                 inInventory = true;
+                onGround = false;
                 teamType = playerNearItem.teamType;
                 playerNearItem.inventory.Add(this);
                 ItemUtility.ItemsToUpdate.Remove(this);

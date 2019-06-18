@@ -93,12 +93,12 @@ namespace Gusto.Models.Animated
             if (collidedWith is IWeapon) // weapons don't stop ship movement - its own weapons have already been filtered out
                 colliding = false;
 
-            if (collidedWith.bbKey.Equals("baseCannonBall"))
+            if (collidedWith is IAmmo)
             {
                 showHealthBar = true;
                 Ammo ball = (Ammo)collidedWith;
                 if (!ball.exploded)
-                    health -= 5;
+                    health -= ball.structureDamage;
                 return;
             }
 

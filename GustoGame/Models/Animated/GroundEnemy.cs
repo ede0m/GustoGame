@@ -77,12 +77,12 @@ namespace Gusto.Models.Animated
             {
                 colliding = false;
             }
-            else if (collidedWith.bbKey.Equals("baseCannonBall"))
+            else if (collidedWith is IAmmo)
             {
                 showHealthBar = true;
                 Ammo ball = (Ammo)collidedWith;
                 if (!ball.exploded)
-                    health -= 5;
+                    health -= ball.groundDamage;
                 return;
             }
         }
