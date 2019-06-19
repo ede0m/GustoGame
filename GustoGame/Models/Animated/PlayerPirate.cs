@@ -37,6 +37,7 @@ namespace Gusto.Models.Animated
         public bool inCombat;
         public bool showInventory;
         public List<InventoryItem> inventory;
+        public int maxInventorySlots;
         public Ship playerOnShip;
         public HandHeld inHand;
         public TeamType teamType;
@@ -46,7 +47,6 @@ namespace Gusto.Models.Animated
 
         public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics)
         {
-            inventory = new List<InventoryItem>();
 
             teamType = type;
             _content = content;
@@ -185,12 +185,13 @@ namespace Gusto.Models.Animated
                     {
                         foreach (var item in inventory)
                         {
-                            if (item.GetType() == inHand.ammoType)
+                            //TODO need to set null in tempInv in Inv.Draw..ugh
+                            if (item != null && item.GetType() == inHand.ammoType)
                             {
                                 if (item.amountStacked > 0)
                                     inHand.LoadAmmo(item);
                                 else
-                                    inventory.Remove(item);
+                                    inventory[inventory.IndexOf(item)] = null;
                                 break;
                             }
                         }
@@ -270,6 +271,19 @@ namespace Gusto.Models.Animated
                     currColumnFrame = 0;
                 }
             }
+        }
+
+        public bool AddInventoryItem(InventoryItem itemToAdd)
+        {
+            for (int i = 0; i < inventory.Count(); i++)
+            {
+                if (inventory[i] == null)
+                {
+                    inventory[i] = itemToAdd;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void DrawSwimming(SpriteBatch sb, Camera camera)

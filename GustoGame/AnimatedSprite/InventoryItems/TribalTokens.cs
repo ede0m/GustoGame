@@ -14,6 +14,8 @@ namespace Gusto.AnimatedSprite.InventoryItems
     {
         public TribalTokens(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
+            itemKey = "tribalTokens";
+
             Texture2D textureTribalTokens = content.Load<Texture2D>("TribalTokens");
             Texture2D textureTribalTokensBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

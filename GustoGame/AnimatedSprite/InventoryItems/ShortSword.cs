@@ -18,6 +18,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
             damage = 0.35f;
+            itemKey = "shortSword";
 
             Texture2D textureBaseSword = content.Load<Texture2D>("ShortSword");
             Texture2D textureBaseSwordBB = null;

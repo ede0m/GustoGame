@@ -53,12 +53,14 @@ namespace Gusto.Models
 
             if (kstate.IsKeyDown(Keys.E) && canPickUp && !inInventory)
             {
-                remove = true;
-                inInventory = true;
-                onGround = false;
-                teamType = playerNearItem.teamType;
-                playerNearItem.inventory.Add(this);
-                ItemUtility.ItemsToUpdate.Remove(this);
+                if (playerNearItem.AddInventoryItem(this))
+                {
+                    remove = true;
+                    inInventory = true;
+                    onGround = false;
+                    teamType = playerNearItem.teamType;
+                    ItemUtility.ItemsToUpdate.Remove(this);
+                }
             }
 
             canPickUp = false;

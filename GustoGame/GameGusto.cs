@@ -36,6 +36,7 @@ namespace Gusto
         BaseTribal baseTribal;
         Pistol pistol;
         PistolShotItem pistolAmmo;
+        CannonBallItem cannonAmmo;
 
         TileGameMap map;
         JObject mapData;
@@ -113,6 +114,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
+            Texture2D textureCannonBallItem = Content.Load<Texture2D>("CannonBall");
+            LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBallItem, "cannonBallItem", 1.0f);
             Texture2D texturePistolShot = Content.Load<Texture2D>("PistolShot");
             LoadDynamicBoundingBoxPerFrame(1, 2, texturePistolShot, "pistolShot", 1.0f);
             Texture2D texturePistolShotItem = Content.Load<Texture2D>("PistolShot");
@@ -153,6 +156,8 @@ namespace Gusto
             pistol.amountStacked = 1;
             pistolAmmo = new PistolShotItem(TeamType.A, "GustoGame", new Vector2(220, -300), Content, GraphicsDevice);
             pistolAmmo.amountStacked = 4;
+            cannonAmmo = new CannonBallItem(TeamType.A, "GustoGame", new Vector2(200, -300), Content, GraphicsDevice);
+            cannonAmmo.amountStacked = 10;
 
             // fill update order list
             UpdateOrder.Add(baseShip);
@@ -162,6 +167,7 @@ namespace Gusto
             UpdateOrder.Add(tower);
             UpdateOrder.Add(pistol);
             UpdateOrder.Add(pistolAmmo);
+            UpdateOrder.Add(cannonAmmo);
             UpdateOrder.Add(inventory);
 
         }
@@ -281,7 +287,8 @@ namespace Gusto
             // draw/set sprites that don't move
             windArrows.Draw(spriteBatchStatic, null);
             bool showInventoryMenu = false;
-            List<InventoryItem> invItems = null;
+            List<InventoryItem> invItemsPlayer = null;
+            List<InventoryItem> invItemsShip = null;
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
@@ -331,7 +338,9 @@ namespace Gusto
                     if (pirate.showInventory)
                     {
                         showInventoryMenu = true;
-                        invItems = pirate.inventory;
+                        invItemsPlayer = pirate.inventory;
+                        if (pirate.onShip)
+                            invItemsShip = pirate.playerOnShip.inventory;
                     }
 
                     if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
@@ -381,7 +390,7 @@ namespace Gusto
             if (showInventoryMenu)
             {
                 inventory.Draw(spriteBatchStatic, null);
-                inventory.DrawInventory(invItems, spriteBatchStatic);
+                inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
 
             base.Draw(gameTime);

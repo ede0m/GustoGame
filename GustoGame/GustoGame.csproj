@@ -49,6 +49,7 @@
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\CannonBallItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
     <Compile Include="AnimatedSprite\PistolShot.cs" />

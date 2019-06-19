@@ -14,12 +14,14 @@ namespace Gusto.AnimatedSprite.InventoryItems
     {
         public PistolShotItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
-            Texture2D textureTribalTokens = content.Load<Texture2D>("PistolShot");
-            Texture2D textureTribalTokensBB = null;
+            itemKey = "pistolShot";
+
+            Texture2D texturePistolShotItem = content.Load<Texture2D>("PistolShot");
+            Texture2D texturePistolShotItemBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
-                textureTribalTokensBB = new Texture2D(graphics, textureTribalTokens.Width, textureTribalTokens.Height);
-            Asset baseTribalTokensAsset = new Asset(textureTribalTokens, textureTribalTokensBB, 2, 1, 1.0f, "pistolShotItem", region);
-            SetSpriteAsset(baseTribalTokensAsset, location);
+                texturePistolShotItemBB = new Texture2D(graphics, texturePistolShotItem.Width, texturePistolShotItem.Height);
+            Asset basePistolShotItemAsset = new Asset(texturePistolShotItem, texturePistolShotItemBB, 2, 1, 1.0f, "pistolShotItem", region);
+            SetSpriteAsset(basePistolShotItemAsset, location);
             stackable = true;
         }
     }

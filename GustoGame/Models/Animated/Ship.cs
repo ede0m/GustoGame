@@ -69,10 +69,13 @@ namespace Gusto.Models.Animated
         public Sail shipSail { get; set; }
         public WindArrows wind;
         public List<Ammo> Shots;
+        public List<InventoryItem> inventory;
+        public int maxInventorySlots;
 
         public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics)
         {
             Shots = new List<Ammo>();
+            inventory = inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             wind = w;
             teamType = type;
             _content = content;

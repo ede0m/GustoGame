@@ -18,14 +18,22 @@ namespace Gusto.Models.Menus
     {
         bool menuOpen;
         int maxInventorySlots;
+        int shipInventorySlots;
         int selectedIndex;
         bool openItemMenu;
+        bool openShipInventory;
         string itemMenuFunc;
         float timeRClicked;
         float timeLClicked;
         Dictionary<int, Rectangle> slotLocations;
         Dictionary<string, Rectangle> itemMenuButtonLocations;
         Dictionary<InventoryItem, float> saveItemSpriteScale;
+
+        bool draggingItem;
+        int selectDragIndex;
+        int dropDragIndex;
+        List<InventoryItem> tempInventory;
+
         float itemDisplaySizePix;
         Vector2 itemDrawLocStart;
         Vector2 cursorPos;
@@ -51,14 +59,19 @@ namespace Gusto.Models.Menus
             inventoryOfPlayer = invOfPlayer;
 
             itemDisplaySizePix = 40;
-            maxInventorySlots = 12;
+            maxInventorySlots = inventoryOfPlayer.maxInventorySlots;
+            shipInventorySlots = 0;
             selectedIndex = 0;
-            Texture2D textureInventory = new Texture2D(graphics, 500, 275);
+            dropDragIndex = -1;
+            selectDragIndex = -1;
+            tempInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots + shipInventorySlots).ToList();
+
             slotLocations = new Dictionary<int, Rectangle>();
             itemMenuButtonLocations = new Dictionary<string, Rectangle>();
             saveItemSpriteScale = new Dictionary<InventoryItem, float>();
 
-            Color[] data = new Color[500 * 275];
+            Texture2D textureInventory = new Texture2D(graphics, 440, 275);
+            Color[] data = new Color[440 * 275];
             for (int i = 0; i < data.Length; ++i) data[i] = Color.DimGray;
             textureInventory.SetData(data);
             Asset invetoryAsset = new Asset(textureInventory, null, 1, 1, 1.0f, null, null);
@@ -67,52 +80,81 @@ namespace Gusto.Models.Menus
             itemDrawLocStart = new Vector2(location.X - _texture.Width/2 + 50, location.Y - _texture.Height/2 + 100);
         }
 
-        public void DrawInventory(List<InventoryItem> items, SpriteBatch sb)
+        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, List<InventoryItem> itemsShip)
         {
             Vector2 itemDrawLoc = itemDrawLocStart;
             menuOpen = true;
 
-            for (int i = 0; i < maxInventorySlots; i++)
+            List<InventoryItem> items = itemsPlayer;
+            int showSlots = maxInventorySlots;
+
+            // draw item stat panel
+            Texture2D textureItemStat = new Texture2D(_graphics, 140, 50);
+            Color[] csdata = new Color[50 * 140];
+            for (int j = 0; j < csdata.Length; ++j) csdata[j] = Color.Gray;
+            textureItemStat.SetData(csdata);
+            Vector2 itemStatLoc = new Vector2(itemDrawLoc.X + 100, itemDrawLoc.Y - 80);
+            itemMenuButtonLocations["itemStat"] = new Rectangle((int)itemStatLoc.X, (int)itemStatLoc.Y, textureItemStat.Width, textureItemStat.Height);
+            sb.Begin();
+            sb.Draw(textureItemStat, itemStatLoc, Color.Gray);
+            sb.End();
+
+            // ship inv button
+            if (itemsShip != null)
             {
-                Texture2D textureSlot = new Texture2D(_graphics, 64, 64);
+                Texture2D textureShipButton = new Texture2D(_graphics, 90, 50);
+                Color[] data = new Color[50 * 90];
+                for (int j = 0; j < data.Length; ++j) data[j] = Color.Gray;
+                textureShipButton.SetData(data);
+                Vector2 shipButtonLoc = new Vector2(itemDrawLoc.X, itemDrawLoc.Y - 80);
+                itemMenuButtonLocations["ship"] = new Rectangle((int)shipButtonLoc.X, (int)shipButtonLoc.Y, textureShipButton.Width, textureShipButton.Height);
+                sb.Begin();
+                sb.Draw(textureShipButton, shipButtonLoc , Color.Gray);
+                sb.DrawString(font, "ship", shipButtonLoc, Color.Black);
+                sb.End();
+
+                if (openShipInventory)
+                {
+                    // ship inv addon
+                    Texture2D textureInventoryShip = new Texture2D(_graphics, 440, 220);
+                    Color[] cdata = new Color[440 * 220];
+                    for (int i = 0; i < cdata.Length; ++i) cdata[i] = Color.DimGray;
+                    textureInventoryShip.SetData(cdata);
+                    sb.Begin();
+                    sb.Draw(textureInventoryShip, new Vector2(location.X - _texture.Width/2, location.Y + _texture.Height/2), Color.White);
+                    sb.End();
+
+                    items.AddRange(itemsShip);
+                    shipInventorySlots = inventoryOfPlayer.playerOnShip.maxInventorySlots;
+                    showSlots = maxInventorySlots + shipInventorySlots;
+                    tempInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots + shipInventorySlots).ToList();
+                }
+            }
+
+            int textureHW = 64;
+            int inventorySeparation = 20;
+            // draw slots
+            for (int i = 0; i < showSlots; i++)
+            {
+
+                // some separation between ship and player inventory
+                if (i == maxInventorySlots)
+                    itemDrawLoc.Y += inventorySeparation;
+
+                // draw slots
+                Texture2D textureSlot = new Texture2D(_graphics, textureHW, textureHW);
                 Color[] data = new Color[64 * 64];
                 Color color = Color.DarkGray;
                 if (i == selectedIndex)
                     color = Color.Crimson;
                 for (int j = 0; j < data.Length; ++j) data[j] = color;
                 textureSlot.SetData(data);
-                Rectangle slotLoc = new Rectangle((int)itemDrawLoc.X, (int)itemDrawLoc.Y, 64, 64);
+
+                Rectangle slotLoc = new Rectangle((int)itemDrawLoc.X, (int)itemDrawLoc.Y, textureHW, textureHW);
                 slotLocations[i] = slotLoc;
                 sb.Begin();
                 sb.Draw(textureSlot, itemDrawLoc, Color.DarkGray);
                 sb.End();
-
-                if (items.ElementAtOrDefault(i) != null)
-                {
-                    var item = items[i];
-                    Vector2 offsetLocation;
-
-                    if (!saveItemSpriteScale.ContainsKey(item))
-                        saveItemSpriteScale[item] = item.spriteScale;
-
-                    if (item is IHandHeld) // handhelds display action frames so scaling them will make them to tiny and offset
-                    {
-                        item.spriteScale = 1.3f;
-                        offsetLocation = new Vector2(itemDrawLoc.X + textureSlot.Width / 3, itemDrawLoc.Y + textureSlot.Height / 3);
-                        item.currRowFrame = 0;
-                    }
-                    else
-                    {
-                        item.spriteScale = (float)(itemDisplaySizePix / item.targetRectangle.Width);
-                        offsetLocation = new Vector2(itemDrawLoc.X + textureSlot.Width / 2, itemDrawLoc.Y + textureSlot.Height / 1.7f); // move Y down a little to leave room for stack number display
-                    }
-                    item.location = offsetLocation;
-                    item.Draw(sb, null);
-
-                    sb.Begin();
-                    sb.DrawString(font, "x" + item.amountStacked.ToString(), itemDrawLoc, Color.Black);
-                    sb.End();
-                }
 
                 itemDrawLoc.X += 70;
                 if (itemDrawLoc.X > location.X + GetWidth() / 2 - 50)
@@ -123,10 +165,104 @@ namespace Gusto.Models.Menus
 
             }
 
-            if (openItemMenu)
+            // draw items in list and set new list order if needed
+            List<InventoryItem> tempPlayerInv = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+            List<InventoryItem> tempShipInv = Enumerable.Repeat<InventoryItem>(null, shipInventorySlots).ToList();
+            itemDrawLoc = itemDrawLocStart;
+            int emptyIndex = -1; // used to denote when an item is dragged into an empty slot
+            for (int i = 0; i < showSlots; i++)
             {
-                DrawItemMenu(sb, items);
+                InventoryItem item = null;
+                if (items.ElementAtOrDefault(i) != null)
+                {
+                    item = items[i];
+                    Vector2 offsetLocation;
+                    Vector2 itemLoc = itemDrawLoc;
+
+                    // dragging
+                    if (draggingItem && selectDragIndex == i)
+                        itemLoc = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+
+                    // dropping
+                    if (dropDragIndex >= 0 && selectDragIndex == i)
+                    {
+                        itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
+                        if (tempInventory[dropDragIndex] != null) // switch spots
+                            tempInventory[selectDragIndex] = tempInventory[dropDragIndex];
+                        else
+                        {
+                            tempInventory[selectDragIndex] = null;
+                            emptyIndex = selectDragIndex;
+                        }
+                        tempInventory[dropDragIndex] = item;
+                        dropDragIndex = -1;
+                    }
+
+                    // offset the item location by the ships inventory separation
+                    if (i >= maxInventorySlots)
+                        itemLoc.Y += inventorySeparation;
+
+                    // track sprite scale
+                    if (!saveItemSpriteScale.ContainsKey(item))
+                        saveItemSpriteScale[item] = item.spriteScale;
+
+                    if (item is IHandHeld) // handhelds display action frames so scaling them will make them too tiny and offset
+                    {
+                        item.spriteScale = 1.3f;
+                        offsetLocation = new Vector2(itemLoc.X + textureHW / 3, itemLoc.Y + textureHW / 3);
+                        item.currRowFrame = 0;
+                    }
+                    else
+                    {
+                        item.spriteScale = (float)(itemDisplaySizePix / item.targetRectangle.Width);
+                        offsetLocation = new Vector2(itemLoc.X + textureHW / 2, itemLoc.Y + textureHW / 1.7f); // move Y down a little to leave room for stack number display
+                    }
+
+                    item.location = offsetLocation;
+                    item.Draw(sb, null);
+
+                    sb.Begin();
+                    //stack amount display
+                    sb.DrawString(font, "x" + item.amountStacked.ToString(), itemLoc, Color.Black);
+                    //name display
+                    if (i == selectedIndex)
+                        sb.DrawString(font, item.itemKey, itemStatLoc, Color.Black);
+                    sb.End();
+                }
+
+                itemDrawLoc.X += 70;
+                if (itemDrawLoc.X > location.X + GetWidth() / 2 - 50)
+                {
+                    itemDrawLoc.X = itemDrawLocStart.X;
+                    itemDrawLoc.Y += 70;
+                }
+
+                // keep the items that were not dragged the same 
+                if (tempInventory[i] == null && i != emptyIndex)
+                    tempInventory[i] = item;
+
+                // clear any zero stacked items
+                if (tempInventory[i] != null && tempInventory[i].amountStacked <= 0)
+                    tempInventory[i] = null;
+
             }
+
+            // copy new inventory with any inventory movements
+            for (int i = 0; i <  tempInventory.Count; i++)
+            {
+                if (i < maxInventorySlots)
+                    tempPlayerInv[i] = tempInventory[i];
+                else if (i >= maxInventorySlots)
+                    tempShipInv[i - maxInventorySlots] = tempInventory[i];
+            }
+            // set any inventory movements
+            inventoryOfPlayer.inventory = tempPlayerInv;
+            if (openShipInventory)
+                inventoryOfPlayer.playerOnShip.inventory = tempShipInv;
+
+
+            if (openItemMenu)
+                DrawItemMenu(sb, itemsPlayer);
 
             // draw cursor
             sb.Begin();
@@ -156,7 +292,20 @@ namespace Gusto.Models.Menus
                 foreach (var slot in slotLocations.Values)
                 {
                     if (slot.Intersects(cursorRect))
+                    {
                         selectedIndex = i;
+                        if (Mouse.GetState().LeftButton == ButtonState.Pressed  && !draggingItem)
+                        {
+                            draggingItem = true;
+                            selectDragIndex = selectedIndex;
+                        }
+
+                        if (!(Mouse.GetState().LeftButton == ButtonState.Pressed) && draggingItem)
+                        {
+                            dropDragIndex = i;
+                            draggingItem = false;
+                        }
+                    }
                     i++;
                 }
 
@@ -165,7 +314,14 @@ namespace Gusto.Models.Menus
                     if (entry.Value.Intersects(cursorRect))
                     {
                         itemMenuFunc = entry.Key;
-                        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !(timeLClicked < 200))
+
+                        if (itemMenuFunc.Equals("ship") && (Mouse.GetState().LeftButton == ButtonState.Pressed) && !(timeLClicked < 200))
+                        {
+                            openShipInventory = !openShipInventory;
+                            timeLClicked = 0;
+                        }
+
+                        if (openItemMenu && Mouse.GetState().LeftButton == ButtonState.Pressed && !(timeLClicked < 200))
                         {
                             var item = inventoryOfPlayer.inventory[selectedIndex];
                             item.spriteScale = saveItemSpriteScale[item];
@@ -179,13 +335,14 @@ namespace Gusto.Models.Menus
                                 item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + rand.Next(-10, 10);
                                 item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + rand.Next(-10, 10);
                                 ItemUtility.ItemsToUpdate.Add(item);
-                                inventoryOfPlayer.inventory.Remove(item);
+                                inventoryOfPlayer.inventory[selectedIndex] = null;
+                                tempInventory[selectedIndex] = null;
                                 timeLClicked = 0;
                             }
                             else if (itemMenuFunc.Equals("eq")) {
-                                inventoryOfPlayer.inventory.Add(inventoryOfPlayer.inHand);
+                                inventoryOfPlayer.inventory[selectedIndex] = inventoryOfPlayer.inHand;
+                                tempInventory[selectedIndex] = inventoryOfPlayer.inHand;
                                 inventoryOfPlayer.inHand = (HandHeld)item;
-                                inventoryOfPlayer.inventory.Remove(item);
                                 timeLClicked = 0;
                             }
                         }
