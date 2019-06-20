@@ -172,7 +172,8 @@ namespace Gusto.Models.Animated
             }
 
             // combat 
-            inHand.Update(kstate, gameTime, camera);
+            if (!onShip)
+                inHand.Update(kstate, gameTime, camera);
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip)
             {
                 inCombat = true;
@@ -181,11 +182,12 @@ namespace Gusto.Models.Animated
                 if (inHand is IRanged)
                 {
                     currColumnFrame = 9;
+                    
+                    //load ammo
                     if (inHand.ammoLoaded == null)
                     {
                         foreach (var item in inventory)
                         {
-                            //TODO need to set null in tempInv in Inv.Draw..ugh
                             if (item != null && item.GetType() == inHand.ammoType)
                             {
                                 if (item.amountStacked > 0)
@@ -233,7 +235,7 @@ namespace Gusto.Models.Animated
                     onShip = false;
                     playerOnShip.playerAboard = false;
                     playerOnShip.shipSail.playerAboard = false;
-                    location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X - 70;
+                    location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X - playerOnShip.GetBoundingBox().Width/2 - 20;
                     location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
                     playerOnShip = null;
                 }

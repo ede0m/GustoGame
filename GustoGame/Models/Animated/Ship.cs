@@ -70,6 +70,7 @@ namespace Gusto.Models.Animated
         public WindArrows wind;
         public List<Ammo> Shots;
         public List<InventoryItem> inventory;
+        public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
         public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics)
@@ -297,12 +298,32 @@ namespace Gusto.Models.Animated
             // shooting
             if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot && playerAboard)
             {
-                Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
-                BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
-                cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
-                cannonShot.moving = true;
-                Shots.Add(cannonShot);
-                timeSinceLastShot = 0;
+                // loading ammo
+                if (ammoLoaded == null)
+                {
+                    for (int i = 0; i < inventory.Count(); i++)
+                    {
+                        var item = inventory[i];
+                        if (item != null && item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.CannonBallItem)) // TODO: refactor to support multiple cannon types? Maybe have ship have weaponSelected like inHand
+                        {
+                            if (item.amountStacked > 0)
+                                ammoLoaded = item;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
+                    cannonShot.moving = true;
+                    Shots.Add(cannonShot);
+                    timeSinceLastShot = 0;
+                    ammoLoaded.amountStacked -= 1;
+                    if (ammoLoaded.amountStacked <= 0)
+                        ammoLoaded = null;  
+                }
             }
 
             if (colliding || anchored || !playerAboard || health <= 0)
