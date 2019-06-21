@@ -2,9 +2,10 @@ $(document).ready(function(){
 
 	var tileDict = {};
 	var selectedColor = "#5773B2";
+	var selectedGroundObjectColor = "black"
 	var selectedTerrainKey = "o1";
+	var selectedSittingObjectKey = "null";
 	var selectedRegionName = "GustoMap";
-	var selectedNickName = "GG";
 
 	$('#init').click(function() {
 		var width = parseInt($('#width').val());
@@ -29,14 +30,13 @@ $(document).ready(function(){
 
 	$('#newRegion').click(function(){
 		$('.selectRegion').prop('checked', false);
-		$('#regionList').append('<li><input type="radio" class="selectRegion" checked><input type="text" value="regionName" class="region"><input type="text" value="nickName" class="nickName"></li>')
+		$('#regionList').append('<li><input type="radio" class="selectRegion" checked><input type="text" value="GustoMap" class="region"></li>')
 	});
 
 	$('#regionList').on('click', '.selectRegion', function(e){
 		$('.selectRegion').prop('checked', false);
 		$(this).prop('checked', true);
 		selectedRegionName = $(this).siblings('.region').val();
-		selectedNickName = $(this).siblings('.nickName').val();
 	});
 
 	$('.terrain').click(function() {
@@ -46,6 +46,14 @@ $(document).ready(function(){
 		$(this).css({'border-style':'solid'});
 	});
 
+	$('.groundObject').click(function() {
+		selectedGroundObjectColor = $(this).css("background-color");
+		selectedSittingObjectKey = $(this).text();
+		$('.groundObject').css({"border-style":"none"});
+		$(this).css({'border-style':'solid'});
+	});
+
+	// user setting the map
 	$('#map').on('mousemove', '.tile', function(e){
 		
 		var id = $(this).attr('id');
@@ -54,12 +62,14 @@ $(document).ready(function(){
 	    	$(this).css({'background-color': selectedColor});
 	    	var entry = {
 	    		terrainPiece:selectedTerrainKey,
+	    		sittingObject:selectedSittingObjectKey,
 	    		regionName:selectedRegionName
 	    	};
 	    	tileDict[id] = entry;
 
-	    	$(this).text(selectedNickName);
+	    	$(this).text(selectedRegionName.substring(0, 2));
 	    	$(this).css("fontSize", 10);
+	    	$(this).css("color", selectedGroundObjectColor)
 		}
 	});
 
@@ -86,15 +96,18 @@ $(document).ready(function(){
 				$('#map').append('<div class="tile" id="'+ index + '" style="width:' + displayTileSizeX + 'px;height:' + displayTileSizeY + 'px;"></div>');
 				var entry = tileDict[index];
 				
-				if (!entry.hasOwnProperty('regionName')) {
-					var saveTile = entry;
+				if (!entry.hasOwnProperty('sittingObject')) {
+					var entryTer = tileDict[index]['terrainPiece'];
+					var entryReg = tileDict[index]['regionName'];
 					entry= {};
-					entry['regionName'] = selectedRegionName;
-					entry['terrainPiece'] = saveTile;
+					entry['regionName'] = entryReg;
+					entry['terrainPiece'] = entryTer;
+					entry['sittingObject'] = selectedSittingObjectKey;
 				}
 
-				$('#' + index).css({'background-color': $('#' + entry['terrainPiece']).css("background-color")})
-				$('#' + index).text(entry['regionName'].substring(0, 2))
+				$('#' + index).css({'background-color': $('#' + entry['terrainPiece']).css("background-color")});
+				$('#' + index).text(entry['regionName'].substring(0, 2));
+				$('#' + index).css({'color':$('#' + entry['sittingObject']).css("background-color")});
 		    	$('#' + index).css("fontSize", 10);
 		    	tileDict[index] = entry;
 				index++;
@@ -107,7 +120,7 @@ $(document).ready(function(){
 
 	}
 
-
+	// itital building of a new map
 	function BuildMap(width, height, multX, multY, tileSize) {
 		
 		tileDict = {};
@@ -130,6 +143,7 @@ $(document).ready(function(){
 				$('#map').append('<div class="tile" id="'+ index + '" style="width:' + displayTileSizeX + 'px;height:' + displayTileSizeY + 'px;"></div>');
 		    	var entry = {
 		    		terrainPiece:selectedTerrainKey,
+		    		sittingObject:selectedSittingObjectKey,
 		    		regionName:selectedRegionName
 		    	};
 	    		tileDict[index] = entry;
