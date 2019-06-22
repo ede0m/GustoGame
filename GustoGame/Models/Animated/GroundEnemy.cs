@@ -110,6 +110,7 @@ namespace Gusto.Models.Animated
                     // scatter items
                     item.location.X = location.X + rand.Next(-10, 10);
                     item.location.Y = location.Y + rand.Next(-10, 10);
+                    item.onGround = true;
                     ItemUtility.ItemsToUpdate.Add(item);
                 }
                 inventory.Clear();

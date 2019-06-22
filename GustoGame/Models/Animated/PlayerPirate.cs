@@ -93,6 +93,11 @@ namespace Gusto.Models.Animated
                     health -= ball.groundDamage;
                 return;
             }
+            else if (collidedWith is IGroundObject)
+            {
+                colliding = false;
+                return;
+            }
 
         }
 
@@ -199,7 +204,6 @@ namespace Gusto.Models.Animated
                         }
                     }
                 }
-                inHand.location = location;
             }
             else if (inCombat)
             {
@@ -211,12 +215,15 @@ namespace Gusto.Models.Animated
                     if (currColumnFrame == nColumns)
                     {
                         inCombat = false;
+                        inHand.inCombat = false;
                         currColumnFrame = 0;
                     }
                     timeSinceSwordSwing = 0;
                 }
                 timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
             }
+            inHand.location = location;
+            inHand.SetBoundingBox();
 
             // hop on ship
             if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && timeSinceExitShipStart < 2000)

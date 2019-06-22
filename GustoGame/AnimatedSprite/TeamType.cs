@@ -11,6 +11,7 @@ namespace Gusto.AnimatedSprite
         Player,
         A,
         B,
-        C
+        C,
+        GroundObject
     }
 }
