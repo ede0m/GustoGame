@@ -141,7 +141,6 @@ namespace Gusto.Models
                     boundingBoxRect.X = (int)location.X  - originXOffset + boundingBoxRect.X;
                     boundingBoxRect.Y = (int)location.Y - originYOffset + boundingBoxRect.Y;
                 }
-
             }
         }
 

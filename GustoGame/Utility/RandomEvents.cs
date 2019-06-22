@@ -27,6 +27,11 @@ namespace Gusto.Utility
             return randomGeneration.Next(0, nSelect);
         }
 
+        public static float RandomSelectionRange(int n, Random rand)
+        {
+            return rand.Next(-n, n);
+        }
+
         public static List<Tuple<string, int>> RandomNPCDrops(TeamType team, Random rand, int maxItemDrop)
         {
             List<string> drops = new List<string>();

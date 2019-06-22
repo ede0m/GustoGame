@@ -54,6 +54,14 @@ namespace Gusto.Bounding
                 }
             }
 
+            // hand items only collide when they are being used
+            else if (a is IHandHeld)
+            {
+                HandHeld inHand = (HandHeld)a;
+                if (!inHand.usingItem && !inHand.onGround)
+                    return false;
+            }
+
             else if (a is IAmmo)
             {
                 if (b.GetType().BaseType == typeof(Gusto.Models.TilePiece))

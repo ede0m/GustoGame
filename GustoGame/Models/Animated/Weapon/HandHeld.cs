@@ -28,7 +28,7 @@ namespace Gusto.Models.Animated
         public bool inCombat;
         public int shotRange;
 
-        public bool aiming;
+        public bool usingItem;
         public InventoryItem ammoLoaded;
         public Type ammoType;
         public List<Ammo> Shots;
@@ -66,7 +66,7 @@ namespace Gusto.Models.Animated
                 timeSinceLastExpClean = 0;
             }
 
-            aiming = false;
+            usingItem = false;
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 currColumnFrame = 0;
@@ -74,7 +74,6 @@ namespace Gusto.Models.Animated
                 if (this is IRanged)
                 {
                     currColumnFrame = 1;
-                    aiming = true;
                     timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
 
                     // shooting
@@ -128,6 +127,7 @@ namespace Gusto.Models.Animated
             }
             else if (inCombat)
             {
+                usingItem = true;
                 if (nextFrame)
                 {
                     currColumnFrame++;

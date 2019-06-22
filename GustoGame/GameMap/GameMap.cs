@@ -77,6 +77,8 @@ namespace Gusto.GameMap
                     {
                         groundObject = GetGroundObject((string)tileDetails["sittingObject"], regionName, worldLoc, content, graphics);
                         groundObject.SetTileDesignRow(RandomEvents.RandomSelection(groundObject.nRows, rand));
+                        groundObject.location.X += RandomEvents.RandomSelectionRange(tileWidth, rand);
+                        groundObject.location.Y += RandomEvents.RandomSelectionRange(tileHeight, rand);
                     }
 
                     // set terrain piece

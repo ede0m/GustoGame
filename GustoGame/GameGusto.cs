@@ -156,10 +156,13 @@ namespace Gusto
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
+            pistol.onGround = true;
             pistolAmmo = new PistolShotItem(TeamType.A, "GustoGame", new Vector2(220, -300), Content, GraphicsDevice);
             pistolAmmo.amountStacked = 4;
+            pistolAmmo.onGround = true;
             cannonAmmo = new CannonBallItem(TeamType.A, "GustoGame", new Vector2(200, -300), Content, GraphicsDevice);
             cannonAmmo.amountStacked = 10;
+            cannonAmmo.onGround = true;
 
             // fill update order list
             UpdateOrder.Add(baseShip);
