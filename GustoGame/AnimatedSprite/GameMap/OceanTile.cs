@@ -13,7 +13,7 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class OceanTile : TilePiece
     {
-        public OceanTile(Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key)
+        public OceanTile(Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (groundObj)
         {
             Texture2D textureOceanTile = null;
 

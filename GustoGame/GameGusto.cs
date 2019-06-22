@@ -128,6 +128,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(1, 4, textureOcean1, "oceanTile", 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
             LoadDynamicBoundingBoxPerFrame(1, 4, textureLand1, "landTile", 1.0f);
+            Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
+            LoadDynamicBoundingBoxPerFrame(2, 6, textureTree1, "tree1", 0.4f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -212,6 +214,7 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
             List<Sprite> toRemove = new List<Sprite>();
+            HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
 
             // camera follows player
             if (!piratePlayer.onShip)
@@ -266,6 +269,12 @@ namespace Gusto
             // handle collision
             collision.Update(this.camera.Position);
             SpatialCollision();
+
+            // add ground objects to update order
+            tempUpdateOrder = UpdateOrder;
+            foreach (var obj in BoundingBoxLocations.GroundObjectLocationList)
+                tempUpdateOrder.Add(obj);
+            UpdateOrder = tempUpdateOrder;
 
             //ItemUtility.ItemsToUpdate.Clear();
 

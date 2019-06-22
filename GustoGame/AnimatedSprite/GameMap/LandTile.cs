@@ -14,13 +14,11 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class LandTile : TilePiece
     {
-        public LandTile(Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key)
+        public LandTile(Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (groundObj)
         {
-
-            //MapModelMovementVectorValues();
-            Texture2D textureOceanTile = content.Load<Texture2D>("Land1");
-            Asset oceanTileAsset = new Asset(textureOceanTile, null, 4, 1, 1.0f, "landTile", region);
-            SetSpriteAsset(oceanTileAsset, location);
+            Texture2D textureLandTile = content.Load<Texture2D>("Land1");
+            Asset landTileAsset = new Asset(textureLandTile, null, 4, 1, 1.0f, "landTile", region);
+            SetSpriteAsset(landTileAsset, location);
         }
 
     }

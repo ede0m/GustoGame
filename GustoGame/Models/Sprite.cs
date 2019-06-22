@@ -73,6 +73,11 @@ namespace Gusto.Models
             currColumnFrame = c;
         }
 
+        public void SetTileDesignRow(int r)
+        {
+            currRowFrame = r;
+        }
+
         // handles cycling the frames at sprite sheet end and beginning
         public Tuple<int, int> BoundFrames(int currRowFrame, int currColFrame)
         {

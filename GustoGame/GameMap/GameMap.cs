@@ -61,28 +61,42 @@ namespace Gusto.GameMap
                 for (int j = 0; j < _cols; j++)
                 {
                     Sprite tile = null;
+                    Sprite groundObject = null;
                     JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
+
+
+
+
+                    // region
                     string regionName = (string)tileDetails["regionName"];
                     if (!BoundingBoxLocations.RegionMap.ContainsKey(regionName))
                         BoundingBoxLocations.RegionMap[regionName] = new List<Sprite>();
 
-                    switch(tileDetails["terrainPiece"].ToString())
+                    // ground object
+                    if ((string)tileDetails["sittingObject"] != "null")
+                    {
+                        groundObject = GetGroundObject((string)tileDetails["sittingObject"], regionName, worldLoc, content, graphics);
+                        groundObject.SetTileDesignRow(RandomEvents.RandomSelection(groundObject.nRows, rand));
+                    }
+
+                    // set terrain piece
+                    switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(worldLoc, regionName, content, graphics, "o1");
+                            tile = new OceanTile(groundObject, worldLoc, regionName, content, graphics, "o1");
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "o2":
-                            tile = new OceanTile(worldLoc, regionName, content, graphics, "o2");
+                            tile = new OceanTile(groundObject, worldLoc, regionName, content, graphics, "o2");
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "l1":
-                            tile = new LandTile(worldLoc, regionName, content, graphics, "l1");
+                            tile = new LandTile(groundObject, worldLoc, regionName, content, graphics, "l1");
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                     }
+                    tile.SetTileDesignColumn(RandomEvents.RandomSelection(tile.nColumns, rand));
 
-                    tile.SetTileDesignColumn(RandomEvents.RandomTilePiece(tile.nColumns, rand));
                     worldLoc.X += tileWidth;
                     map.Add(tile);
                     index++;
@@ -92,12 +106,23 @@ namespace Gusto.GameMap
             }
         }
 
+        private Sprite GetGroundObject(string key, string region, Vector2 loc, ContentManager content, GraphicsDevice graphics)
+        {
+            switch (key)
+            {
+                case "t1":
+                    return new Tree1(TeamType.GroundObject, region, loc, content, graphics);
+            }
+            return null;
+        }
+
         public void DrawMap(SpriteBatch sb)
         {
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
             BoundingBoxLocations.LandTileLocationList.Clear();
+            BoundingBoxLocations.GroundObjectLocationList.Clear();
             //collidablePieces.Clear();
             foreach (var tile in map)
             {
@@ -105,9 +130,16 @@ namespace Gusto.GameMap
                 if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
                 {
                     if (tile.bbKey.Equals("landTile"))
+                    {
                         BoundingBoxLocations.LandTileLocationList.Add(tile);
+                    }
                         //collidablePieces.Add(tile);
                     tile.Draw(sb, _cam);
+
+                    TilePiece tileP = (TilePiece)tile;
+                    if (tileP.groundObject != null)
+                        BoundingBoxLocations.GroundObjectLocationList.Add(tileP.groundObject);
+
                 }
             }
         }

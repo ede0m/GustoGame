@@ -93,6 +93,11 @@ namespace Gusto.Models.Animated
                     health -= ball.groundDamage;
                 return;
             }
+            else if (collidedWith is IGroundObject)
+            {
+                colliding = false;
+                return;
+            }
 
         }
 

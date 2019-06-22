@@ -22,9 +22,9 @@ namespace Gusto.Utility
             return randomGeneration.Next(10, 25);
         }
 
-        public static int RandomTilePiece(int nPieces, Random randomGeneration)
+        public static int RandomSelection(int nSelect, Random randomGeneration)
         {
-            return randomGeneration.Next(0, nPieces);
+            return randomGeneration.Next(0, nSelect);
         }
 
         public static List<Tuple<string, int>> RandomNPCDrops(TeamType team, Random rand, int maxItemDrop)
