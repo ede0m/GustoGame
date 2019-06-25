@@ -100,12 +100,14 @@ namespace Gusto.Models
             tRect.X = (_texture.Width / nColumns) * currColumnFrame;
             tRect.Y = (_texture.Height / nRows) * currRowFrame;
 
-            // cut the bottom half of the targetRectangle off to hide the "under water" portion of the body
             tRect.Height = (_texture.Height / nRows) / 2;
 
+            Vector2 origin = new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2);
             // adjust how shadow lays based on sprite
             if (this is IShip)
+            {
                 tRect = targetRectangle;
+            }
 
             // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
             SetBoundingBox();
@@ -116,7 +118,7 @@ namespace Gusto.Models
                 spriteBatch.Begin(camera);
 
             spriteBatch.Draw(_texture, shadowPos, tRect, Color.Black, 0f,
-                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+                origin, spriteScale, SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 

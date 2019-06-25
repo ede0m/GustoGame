@@ -305,6 +305,8 @@ namespace Gusto
         {
             piratePlayer.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(piratePlayer.GetBoundingBox().Center.ToVector2()));
             baseShipAI.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(baseShipAI.GetBoundingBox().Center.ToVector2()));
+            baseShip.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(baseShip.GetBoundingBox().Center.ToVector2()));
+            baseTribal.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(baseTribal.GetBoundingBox().Center.ToVector2()));
         }
 
         /// <summary>

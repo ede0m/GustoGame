@@ -105,6 +105,8 @@ namespace Gusto.GameMap
             if (shadowMap != null)
                 resolveShadowsEffect.Parameters["ShadowMapTexture"].SetValue(shadowMap);
 
+            resolveShadowsEffect.Parameters["cutShadow"].SetValue(30);
+
             resolveShadowsEffect.CurrentTechnique = resolveShadowsEffect.Techniques[techniqueName];
 
             foreach (EffectPass pass in resolveShadowsEffect.CurrentTechnique.Passes)
