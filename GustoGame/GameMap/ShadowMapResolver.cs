@@ -15,7 +15,9 @@ namespace Gusto.GameMap
         Size256 = 7,
         Size512 = 8,
         Size1024 = 9,
-        Size2048 = 10
+        Size2048 = 10,
+        Size4096 = 11,
+        Size10192 = 12
     }
 
     public class ShadowMapResolver
@@ -68,7 +70,6 @@ namespace Gusto.GameMap
             {
                 reductionRT[i] = new RenderTarget2D(graphicsDevice, 2 << i, baseSize, false, SurfaceFormat.HalfVector2, DepthFormat.None);
             }
-
 
             shadowsRT = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
             processedShadowsRT = new RenderTarget2D(graphicsDevice, baseSize, baseSize);

@@ -42,10 +42,10 @@ float4 ComputeDistancesPS(float2 TexCoord  : TEXCOORD0) : COLOR0
 {
 	  float4 color = tex2D(inputSampler, TexCoord);
 	  //compute distance from center
-	  float distance = color.a>0.3f?length(TexCoord - 0.5f):1.0f;
+	  float distance = color.a > 0.3f ? length(TexCoord - 0.5f):1.0f;
 	  //save it to the Red channel
 	  distance *= renderTargetSize.x;
-      return float4(distance,0,0,1);
+      return float4(distance,0,0,1.0f);
 }
 
 float4 DistortPS(float2 TexCoord  : TEXCOORD0) : COLOR0
@@ -129,14 +129,14 @@ float4 DrawShadowsPS(float2 TexCoord  : TEXCOORD0) : COLOR0
 		
 	  //if distance to this pixel is lower than distance from shadowMap, 
 	  //then we are in light
-	  float light = distance < shadowMapDistance ? 1:0;
+	  float light = distance < shadowMapDistance ? 1:(0.5f); // shadow transparency
 	  
 	  // custom code to reduce the length of the shadow
-	  if(distance > shadowMapDistance + 7)
+	  if((distance > shadowMapDistance && distance < shadowMapDistance + 20) || distance > shadowMapDistance + 30)
 	  {
 		light = 1;
 	  }
-
+	  
 	  float4 result = light;
 	  result.b = length(TexCoord - 0.5f);
 	  result.a = 1;
@@ -265,6 +265,15 @@ technique Distort
     {          
         VertexShader = compile vs_2_0 FullScreenVS();
         PixelShader  = compile ps_2_0 DistortPS();
+    }
+}
+
+technique DrawShadows
+{
+    pass P0
+    {          
+        VertexShader = compile vs_3_0 FullScreenVS();
+        PixelShader  = compile ps_3_0 DrawShadowsPS();
     }
 }
 

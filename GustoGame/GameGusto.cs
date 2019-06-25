@@ -98,9 +98,9 @@ namespace Gusto
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
             map.LoadMapData(mapData);
 
-            shadowMapResolver = new ShadowMapResolver(GraphicsDevice, quadRender, ShadowMapSize.Size256, ShadowMapSize.Size1024);
+            shadowMapResolver = new ShadowMapResolver(GraphicsDevice, quadRender, ShadowMapSize.Size2048, ShadowMapSize.Size10192);
             shadowMapResolver.LoadContent(Content);
-            sun = new LightArea(GraphicsDevice, ShadowMapSize.Size2048);
+            sun = new LightArea(GraphicsDevice, ShadowMapSize.Size4096);
             sunPos = new Vector2(0, 200);
             screenShadows = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -304,6 +304,7 @@ namespace Gusto
         private void DrawCasters(LightArea light)
         {
             piratePlayer.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(piratePlayer.GetBoundingBox().Center.ToVector2()));
+            baseShipAI.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(baseShipAI.GetBoundingBox().Center.ToVector2()));
         }
 
         /// <summary>
@@ -321,12 +322,12 @@ namespace Gusto
             shadowMapResolver.ResolveShadows(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(screenShadows);
-            GraphicsDevice.Clear(Color.Black);
+            //GraphicsDevice.Clear(Color.Black);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White);
             spriteBatchView.End();
             GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.Black);
+            //GraphicsDevice.Clear(Color.Black);
 
             // draw map
             map.DrawMap(spriteBatchView);
