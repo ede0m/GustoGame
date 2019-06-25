@@ -42,10 +42,15 @@ namespace Gusto
         JObject mapData;
 
         // static
+        LightArea sun;
+        Vector2 sunPos;
         WindArrows windArrows;
         Texture2D anchorIcon;
         Inventory inventory;
 
+        RenderTarget2D screenShadows;
+        ShadowMapResolver shadowMapResolver;
+        QuadRenderComponent quadRender;
         SpatialBounding collision;
         GraphicsDeviceManager graphics;
         List<Sprite> DrawOrder;
@@ -58,9 +63,11 @@ namespace Gusto
         public GameGusto()
         {
             graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
             graphics.PreferredBackBufferWidth = GameOptions.PrefferedBackBufferWidth;
             graphics.PreferredBackBufferHeight = GameOptions.PrefferedBackBufferHeight;
-            Content.RootDirectory = "Content";
+            quadRender = new QuadRenderComponent(this);
+            this.Components.Add(quadRender);
         }
 
         /// <summary>
@@ -86,8 +93,16 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
+            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
             map.LoadMapData(mapData);
+
+            shadowMapResolver = new ShadowMapResolver(GraphicsDevice, quadRender, ShadowMapSize.Size256, ShadowMapSize.Size1024);
+            shadowMapResolver.LoadContent(Content);
+            sun = new LightArea(GraphicsDevice, ShadowMapSize.Size2048);
+            sunPos = new Vector2(0, 200);
+            screenShadows = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatchView = new SpriteBatch(GraphicsDevice);
@@ -138,8 +153,6 @@ namespace Gusto
             //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP
             Random rnd = new Random();
             Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
-
-                        var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
@@ -216,6 +229,9 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            sunPos.X += 1;
+
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
 
@@ -285,6 +301,11 @@ namespace Gusto
             base.Update(gameTime);
         }
 
+        private void DrawCasters(LightArea light)
+        {
+            piratePlayer.DrawShadow(spriteBatchView, this.camera, light.ToRelativePosition(piratePlayer.GetBoundingBox().Center.ToVector2()));
+        }
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -293,8 +314,30 @@ namespace Gusto
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            sun.LightPosition = sunPos;
+            sun.BeginDrawingShadowCasters();
+            DrawCasters(sun);
+            sun.EndDrawingShadowCasters();
+            shadowMapResolver.ResolveShadows(sun.RenderTarget, sun.RenderTarget, sunPos);
+
+            GraphicsDevice.SetRenderTarget(screenShadows);
+            GraphicsDevice.Clear(Color.Black);
+            spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+            spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White);
+            spriteBatchView.End();
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black);
+
             // draw map
             map.DrawMap(spriteBatchView);
+
+            BlendState blendState = new BlendState();
+            blendState.ColorSourceBlend = Blend.DestinationColor;
+            blendState.ColorDestinationBlend = Blend.SourceColor;
+
+            spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
+            spriteBatchView.Draw(screenShadows, Vector2.Zero, Color.White);
+            spriteBatchView.End();
 
             // draw/set sprites that don't move
             windArrows.Draw(spriteBatchStatic, null);

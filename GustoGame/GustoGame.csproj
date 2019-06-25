@@ -45,6 +45,9 @@
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
+    <Compile Include="GameMap\LightArea.cs" />
+    <Compile Include="GameMap\QuadRenderComponent.cs" />
+    <Compile Include="GameMap\ShadowMapResolver.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />

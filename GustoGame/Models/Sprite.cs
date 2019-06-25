@@ -94,6 +94,51 @@ namespace Gusto.Models
             return new Tuple<int, int>(currRowFrame, currColumnFrame);
         }
 
+        public void DrawShadow(SpriteBatch spriteBatch, Camera camera, Vector2 shadowPos)
+        {
+            int width = _texture.Width / nColumns;
+            int height = _texture.Height / nRows;
+
+            // update target index frame on sprite sheet (x and Y are cords of the sprite)
+            targetRectangle.X = width * currColumnFrame;
+            targetRectangle.Y = height * currRowFrame;
+            targetRectangle.Width = width;
+            targetRectangle.Height = height;
+
+
+            // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
+            SetBoundingBox();
+
+            if (camera == null)
+                spriteBatch.Begin();
+            else
+                spriteBatch.Begin(camera);
+
+            spriteBatch.Draw(_texture, shadowPos, targetRectangle, Color.Green, 0f, 
+                new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.End();
+        }
+
+        public void DrawTile(SpriteBatch spriteBatch, Camera camera)
+        {
+            int width = _texture.Width / nColumns;
+            int height = _texture.Height / nRows;
+
+            // update target index frame on sprite sheet (x and Y are cords of the sprite)
+            targetRectangle.X = width * currColumnFrame;
+            targetRectangle.Y = height * currRowFrame;
+            targetRectangle.Width = width;
+            targetRectangle.Height = height;
+
+            // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
+            SetBoundingBox();
+
+            spriteBatch.Begin(camera, SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearWrap, DepthStencilState.Default, RasterizerState.CullNone);
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f,
+                new Vector2(width / 2, height / 2), spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.End();
+        }
+
         public void Draw(SpriteBatch spriteBatch, Camera camera)
         {
             int width = _texture.Width / nColumns;
@@ -118,8 +163,8 @@ namespace Gusto.Models
                 spriteBatch.Draw(boundingBox, boundingBoxRect.Location.ToVector2(), boundingBoxRect, Color.Orange, 0f,
                     Vector2.Zero, 1.0f, SpriteEffects.None, 0f); // scaling is already done in constructor
             // 
-            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f, 
-                new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f,
+                new Vector2(width / 2, height / 2), spriteScale, SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 

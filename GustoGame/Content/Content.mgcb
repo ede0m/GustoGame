@@ -248,6 +248,18 @@
 /processorParam:TextureFormat=Color
 /build:pointer.png
 
+#begin reductionEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:reductionEffect.fx
+
+#begin resolveShadowsEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:resolveShadowsEffect.fx
+
 #begin ShortSword.png
 /importer:TextureImporter
 /processor:TextureProcessor
