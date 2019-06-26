@@ -17,7 +17,7 @@ namespace Gusto.GameMap
         Size1024 = 9,
         Size2048 = 10,
         Size4096 = 11,
-        Size10192 = 12
+        Size8192 = 12
     }
 
     public class ShadowMapResolver

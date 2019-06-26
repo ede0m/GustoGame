@@ -100,7 +100,7 @@ namespace Gusto
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
             map.LoadMapData(mapData);
 
-            shadowMapResolver = new ShadowMapResolver(GraphicsDevice, quadRender, ShadowMapSize.Size2048, ShadowMapSize.Size10192);
+            shadowMapResolver = new ShadowMapResolver(GraphicsDevice, quadRender, ShadowMapSize.Size2048, ShadowMapSize.Size8192);
             shadowMapResolver.LoadContent(Content);
             sun = new LightArea(GraphicsDevice, ShadowMapSize.Size4096);
             sunPos = new Vector2(0, 200);
@@ -234,7 +234,7 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
 
-            sunPos.X += 1;
+            sunPos.X += 2;
 
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
@@ -334,11 +334,11 @@ namespace Gusto
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(lightBounds);
+            GraphicsDevice.Clear(Color.TransparentBlack);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
             GraphicsDevice.SetRenderTarget(null);
-
 
             sun.BeginDrawingShadowCasters();
             DrawSmallCasters(sun); // draws black sprite texture on sun's render target
@@ -346,6 +346,7 @@ namespace Gusto
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(largeScreenShadows);
+            GraphicsDevice.Clear(Color.TransparentBlack);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
@@ -357,6 +358,7 @@ namespace Gusto
             shadowMapResolver.ResolveShadowsLarge(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(smallScreenShadows);
+            GraphicsDevice.Clear(Color.TransparentBlack);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
@@ -369,11 +371,13 @@ namespace Gusto
             BlendState blendState = new BlendState();
             blendState.ColorSourceBlend = Blend.DestinationColor;
             blendState.ColorDestinationBlend = Blend.SourceColor;
+
             spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
             spriteBatchView.Draw(smallScreenShadows, Vector2.Zero, Color.White);
             spriteBatchView.Draw(largeScreenShadows, Vector2.Zero, Color.White);
             spriteBatchView.End();
 
+            // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
             bool playerOnShip = false;
             Ship playerShip = null;
