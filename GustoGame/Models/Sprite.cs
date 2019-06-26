@@ -101,7 +101,6 @@ namespace Gusto.Models
             tRect.Y = (_texture.Height / nRows) * currRowFrame;
 
             tRect.Height = (_texture.Height / nRows) / 2;
-
             Vector2 origin = new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2);
             // adjust how shadow lays based on sprite
             if (this is IShip)

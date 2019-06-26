@@ -80,7 +80,20 @@ namespace Gusto.GameMap
         public void ResolveShadowsSmall(Texture2D shadowCastersTexture, RenderTarget2D result, Vector2 lightPosition)
         {
             graphicsDevice.BlendState = BlendState.Opaque;
-            resolveShadowsEffect.Parameters["cutShadow"].SetValue(30);
+            resolveShadowsEffect.Parameters["cutShadow"].SetValue(40);
+
+            ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
+            ExecuteTechnique(distancesRT, distortRT, "Distort");
+            ApplyHorizontalReduction(distortRT, shadowMap);
+            ExecuteTechnique(null, shadowsRT, "DrawShadows", shadowMap);
+            ExecuteTechnique(shadowsRT, processedShadowsRT, "BlurHorizontally");
+            ExecuteTechnique(processedShadowsRT, result, "BlurVerticallyAndAttenuate");
+        }
+
+        public void ResolveShadowsMedium(Texture2D shadowCastersTexture, RenderTarget2D result, Vector2 lightPosition)
+        {
+            graphicsDevice.BlendState = BlendState.Opaque;
+            resolveShadowsEffect.Parameters["cutShadow"].SetValue(50);
 
             ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
             ExecuteTechnique(distancesRT, distortRT, "Distort");

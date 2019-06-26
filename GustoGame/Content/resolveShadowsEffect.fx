@@ -130,7 +130,7 @@ float4 DrawShadowsPS(float2 TexCoord  : TEXCOORD0) : COLOR0
 		
 	  //if distance to this pixel is lower than distance from shadowMap, 
 	  //then we are in light
-	  float light = distance < shadowMapDistance ? 1:(0.6f); // shadow transparency
+	  float light = distance < shadowMapDistance ? 1:(0.5f); // shadow transparency
 	  
 	  // custom code to reduce the length of the shadow
 	  if((distance > shadowMapDistance && distance < shadowMapDistance + 20) || distance > shadowMapDistance + cutShadow)
@@ -196,8 +196,8 @@ float4 DrawShadowsPS(float2 TexCoord  : TEXCOORD0) : COLOR0
 
 
 
-static const float minBlur = 1.0f;
-static const float maxBlur = 5.0f;
+static const float minBlur = 2.0f;
+static const float maxBlur = 6.0f;
 static const int g_cKernelSize = 13;
 static const float2 OffsetAndWeight[g_cKernelSize] =
 {
