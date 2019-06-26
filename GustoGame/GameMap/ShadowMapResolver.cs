@@ -32,6 +32,8 @@ namespace Gusto.GameMap
         Effect reductionEffect;
 
         RenderTarget2D distortRT;
+        RenderTarget2D smallShadowMap;
+        RenderTarget2D largeShadowMap;
         RenderTarget2D shadowMap;
         RenderTarget2D shadowsRT;
         RenderTarget2D processedShadowsRT;
@@ -75,9 +77,23 @@ namespace Gusto.GameMap
             processedShadowsRT = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
         }
 
-        public void ResolveShadows(Texture2D shadowCastersTexture, RenderTarget2D result, Vector2 lightPosition)
+        public void ResolveShadowsSmall(Texture2D shadowCastersTexture, RenderTarget2D result, Vector2 lightPosition)
         {
             graphicsDevice.BlendState = BlendState.Opaque;
+            resolveShadowsEffect.Parameters["cutShadow"].SetValue(30);
+
+            ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
+            ExecuteTechnique(distancesRT, distortRT, "Distort");
+            ApplyHorizontalReduction(distortRT, shadowMap);
+            ExecuteTechnique(null, shadowsRT, "DrawShadows", shadowMap);
+            ExecuteTechnique(shadowsRT, processedShadowsRT, "BlurHorizontally");
+            ExecuteTechnique(processedShadowsRT, result, "BlurVerticallyAndAttenuate");
+        }
+
+        public void ResolveShadowsLarge(Texture2D shadowCastersTexture, RenderTarget2D result, Vector2 lightPosition)
+        {
+            graphicsDevice.BlendState = BlendState.Opaque;
+            resolveShadowsEffect.Parameters["cutShadow"].SetValue(60);
 
             ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
             ExecuteTechnique(distancesRT, distortRT, "Distort");
@@ -104,8 +120,6 @@ namespace Gusto.GameMap
                 resolveShadowsEffect.Parameters["InputTexture"].SetValue(source);
             if (shadowMap != null)
                 resolveShadowsEffect.Parameters["ShadowMapTexture"].SetValue(shadowMap);
-
-            resolveShadowsEffect.Parameters["cutShadow"].SetValue(30);
 
             resolveShadowsEffect.CurrentTechnique = resolveShadowsEffect.Techniques[techniqueName];
 

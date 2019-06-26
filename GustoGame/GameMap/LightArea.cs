@@ -12,6 +12,8 @@ namespace Gusto.GameMap
     {
         private GraphicsDevice graphicsDevice;
 
+        public RenderTarget2D RenderTargetSmall { get; private set; }
+        public RenderTarget2D RenderTargetLarge { get; private set; }
         public RenderTarget2D RenderTarget { get; private set; }
         public Vector2 LightPosition { get; set; }
         public Vector2 LightAreaSize { get; set; }
@@ -20,6 +22,8 @@ namespace Gusto.GameMap
         {
             int baseSize = 2 << (int)size;
             LightAreaSize = new Vector2(baseSize);
+            RenderTargetSmall = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
+            RenderTargetLarge = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
             RenderTarget = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
             this.graphicsDevice = graphicsDevice;
         }
@@ -29,8 +33,22 @@ namespace Gusto.GameMap
             return worldPosition - (LightPosition - LightAreaSize * 0.5f);
         }
 
-        public void BeginDrawingShadowCasters()
+        /*public void MergeShadowRenderTargets(SpriteBatch sb)
         {
+            graphicsDevice.SetRenderTarget(RenderTarget);
+            sb.Begin();
+            sb.Draw(RenderTargetLarge, Vector2.Zero, Color.White);
+            sb.Draw(RenderTargetSmall, Vector2.Zero, Color.White);
+            sb.End();
+            graphicsDevice.SetRenderTarget(null);
+        }*/
+
+        public void BeginDrawingShadowCasters(bool small)
+        {
+            /*if (small)
+                graphicsDevice.SetRenderTarget(RenderTargetSmall);
+            else
+                graphicsDevice.SetRenderTarget(RenderTargetLarge);*/
             graphicsDevice.SetRenderTarget(RenderTarget);
             graphicsDevice.Clear(Color.Transparent);
         }
