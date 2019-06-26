@@ -334,7 +334,7 @@ namespace Gusto
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(lightBounds);
-            GraphicsDevice.Clear(Color.TransparentBlack);
+            GraphicsDevice.Clear(Color.SlateGray * 0.07f); // this is the added transparency added to "pitch black"
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
@@ -346,7 +346,7 @@ namespace Gusto
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(largeScreenShadows);
-            GraphicsDevice.Clear(Color.TransparentBlack);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
@@ -358,7 +358,7 @@ namespace Gusto
             shadowMapResolver.ResolveShadowsLarge(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(smallScreenShadows);
-            GraphicsDevice.Clear(Color.TransparentBlack);
+            GraphicsDevice.Clear(Color.Black);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
             spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
