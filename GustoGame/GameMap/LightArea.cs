@@ -33,22 +33,8 @@ namespace Gusto.GameMap
             return worldPosition - (LightPosition - LightAreaSize * 0.5f);
         }
 
-        /*public void MergeShadowRenderTargets(SpriteBatch sb)
+        public void BeginDrawingShadowCasters()
         {
-            graphicsDevice.SetRenderTarget(RenderTarget);
-            sb.Begin();
-            sb.Draw(RenderTargetLarge, Vector2.Zero, Color.White);
-            sb.Draw(RenderTargetSmall, Vector2.Zero, Color.White);
-            sb.End();
-            graphicsDevice.SetRenderTarget(null);
-        }*/
-
-        public void BeginDrawingShadowCasters(bool small)
-        {
-            /*if (small)
-                graphicsDevice.SetRenderTarget(RenderTargetSmall);
-            else
-                graphicsDevice.SetRenderTarget(RenderTargetLarge);*/
             graphicsDevice.SetRenderTarget(RenderTarget);
             graphicsDevice.Clear(Color.Transparent);
         }

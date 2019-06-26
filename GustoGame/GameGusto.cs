@@ -324,41 +324,33 @@ namespace Gusto
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // do shadow mapping
             sun.LightPosition = sunPos;
 
-            sun.BeginDrawingShadowCasters(true);
+            sun.BeginDrawingShadowCasters();
             DrawSmallCasters(sun); // draws black sprite texture on sun's render target
             sun.EndDrawingShadowCasters();
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(largeScreenShadows);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-            spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f);
+            spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            sun.BeginDrawingShadowCasters(false);
+            sun.BeginDrawingShadowCasters();
             DrawLargeCasters(sun);
             sun.EndDrawingShadowCasters();
             shadowMapResolver.ResolveShadowsLarge(sun.RenderTarget, sun.RenderTarget, sunPos);
 
             GraphicsDevice.SetRenderTarget(smallScreenShadows);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-            spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f);
+            spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
             spriteBatchView.End();
             GraphicsDevice.SetRenderTarget(null);
 
             // draw map
             map.DrawMap(spriteBatchView);
-
-            // draw shadows
-            BlendState blendState = new BlendState();
-            blendState.ColorSourceBlend = Blend.DestinationColor;
-            blendState.ColorDestinationBlend = Blend.SourceColor;
-            spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
-            spriteBatchView.Draw(smallScreenShadows, Vector2.Zero, Color.White);
-            spriteBatchView.Draw(largeScreenShadows, Vector2.Zero, Color.White);
-            spriteBatchView.End();
 
             // draw/set sprites that don't move
             windArrows.Draw(spriteBatchStatic, null);
@@ -468,6 +460,15 @@ namespace Gusto
                 inventory.Draw(spriteBatchStatic, null);
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
+
+            // draw shadows
+            BlendState blendState = new BlendState();
+            blendState.ColorSourceBlend = Blend.DestinationColor;
+            blendState.ColorDestinationBlend = Blend.SourceColor;
+            spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
+            spriteBatchView.Draw(smallScreenShadows, Vector2.Zero, Color.White);
+            spriteBatchView.Draw(largeScreenShadows, Vector2.Zero, Color.White);
+            spriteBatchView.End();
 
             base.Draw(gameTime);
         }
