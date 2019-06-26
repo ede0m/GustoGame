@@ -50,6 +50,7 @@ namespace Gusto
 
         RenderTarget2D smallScreenShadows;
         RenderTarget2D largeScreenShadows;
+        RenderTarget2D lightBounds;
         ShadowMapResolver shadowMapResolver;
         QuadRenderComponent quadRender;
         SpatialBounding collision;
@@ -105,6 +106,7 @@ namespace Gusto
             sunPos = new Vector2(0, 200);
             smallScreenShadows = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             largeScreenShadows = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            lightBounds = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatchView = new SpriteBatch(GraphicsDevice);
@@ -328,6 +330,17 @@ namespace Gusto
             sun.LightPosition = sunPos;
 
             sun.BeginDrawingShadowCasters();
+            sun.EndDrawingShadowCasters();
+            shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
+
+            GraphicsDevice.SetRenderTarget(lightBounds);
+            spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+            spriteBatchView.Draw(sun.RenderTarget, sun.LightPosition - sun.LightAreaSize * 0.5f, Color.White * 0.80f); // include some transparency so that we aren't too bright
+            spriteBatchView.End();
+            GraphicsDevice.SetRenderTarget(null);
+
+
+            sun.BeginDrawingShadowCasters();
             DrawSmallCasters(sun); // draws black sprite texture on sun's render target
             sun.EndDrawingShadowCasters();
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
@@ -352,9 +365,18 @@ namespace Gusto
             // draw map
             map.DrawMap(spriteBatchView);
 
-            // draw/set sprites that don't move
-            windArrows.Draw(spriteBatchStatic, null);
+            // draw shadows
+            BlendState blendState = new BlendState();
+            blendState.ColorSourceBlend = Blend.DestinationColor;
+            blendState.ColorDestinationBlend = Blend.SourceColor;
+            spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
+            spriteBatchView.Draw(smallScreenShadows, Vector2.Zero, Color.White);
+            spriteBatchView.Draw(largeScreenShadows, Vector2.Zero, Color.White);
+            spriteBatchView.End();
+
             bool showInventoryMenu = false;
+            bool playerOnShip = false;
+            Ship playerShip = null;
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
 
@@ -379,7 +401,6 @@ namespace Gusto
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship) sprite;
-                    ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
                     if (ship.sinking)
                     {
@@ -416,7 +437,11 @@ namespace Gusto
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
                     else if (pirate.onShip)
+                    {
                         pirate.DrawOnShip(spriteBatchView, this.camera);
+                        playerShip = pirate.playerOnShip;
+                        playerOnShip = true;
+                    }
 
                     if (pirate.swimming && !pirate.onShip)
                         pirate.DrawSwimming(spriteBatchView, this.camera);
@@ -455,20 +480,21 @@ namespace Gusto
                 sprite.Draw(spriteBatchView, this.camera);
             }
 
+            // draw sun bounds to cover up everything else
+            spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
+            spriteBatchView.Draw(lightBounds, Vector2.Zero, Color.White);
+            spriteBatchView.End();
+
+            // static draws 
+            windArrows.Draw(spriteBatchStatic, null);
             if (showInventoryMenu)
             {
                 inventory.Draw(spriteBatchStatic, null);
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
+            if (playerOnShip)
+                playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
-            // draw shadows
-            BlendState blendState = new BlendState();
-            blendState.ColorSourceBlend = Blend.DestinationColor;
-            blendState.ColorDestinationBlend = Blend.SourceColor;
-            spriteBatchView.Begin(SpriteSortMode.Immediate, blendState);
-            spriteBatchView.Draw(smallScreenShadows, Vector2.Zero, Color.White);
-            spriteBatchView.Draw(largeScreenShadows, Vector2.Zero, Color.White);
-            spriteBatchView.End();
 
             base.Draw(gameTime);
         }

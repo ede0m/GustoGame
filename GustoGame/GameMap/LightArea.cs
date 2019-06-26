@@ -12,8 +12,6 @@ namespace Gusto.GameMap
     {
         private GraphicsDevice graphicsDevice;
 
-        public RenderTarget2D RenderTargetSmall { get; private set; }
-        public RenderTarget2D RenderTargetLarge { get; private set; }
         public RenderTarget2D RenderTarget { get; private set; }
         public Vector2 LightPosition { get; set; }
         public Vector2 LightAreaSize { get; set; }
@@ -22,8 +20,6 @@ namespace Gusto.GameMap
         {
             int baseSize = 2 << (int)size;
             LightAreaSize = new Vector2(baseSize);
-            RenderTargetSmall = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
-            RenderTargetLarge = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
             RenderTarget = new RenderTarget2D(graphicsDevice, baseSize, baseSize);
             this.graphicsDevice = graphicsDevice;
         }
