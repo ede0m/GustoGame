@@ -103,6 +103,7 @@ float GetShadowDistanceV(float2 TexCoord, float displacementV)
 }
 
 int cutShadow : CUTSHADOW;
+int shadowPadding : PADSHADOW;
 float4 DrawShadowsPS(float2 TexCoord  : TEXCOORD0) : COLOR0
 {
 	  // distance of this pixel from the center
@@ -131,11 +132,11 @@ float4 DrawShadowsPS(float2 TexCoord  : TEXCOORD0) : COLOR0
 	  //if distance to this pixel is lower than distance from shadowMap, 
 	  //then we are in light
 	  float light = distance < shadowMapDistance ? 1:(0.5f); // shadow transparency
-	  
+
 	  // custom code to reduce the length of the shadow
-	  if((distance > shadowMapDistance && distance < shadowMapDistance + 20) || distance > shadowMapDistance + cutShadow)
+	  if((distance > shadowMapDistance && distance < shadowMapDistance + shadowPadding) || distance > shadowMapDistance + cutShadow)
 	  {
-		light = 1;
+	  	light = 1;
 	  }
 	  
 	  float4 result = light;

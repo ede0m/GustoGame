@@ -356,6 +356,7 @@ namespace Gusto
             DrawSmallCasters(sun); // draws black sprite texture on sun's render target
             sun.EndDrawingShadowCasters();
             shadowMapResolver.ResolveShadowsSmall(sun.RenderTarget, sun.RenderTarget, sunPos);
+
             GraphicsDevice.SetRenderTarget(smallScreenShadows);
             GraphicsDevice.Clear(Color.Black);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
@@ -367,6 +368,7 @@ namespace Gusto
             DrawMediumCasters(sun); // draws black sprite texture on sun's render target
             sun.EndDrawingShadowCasters();
             shadowMapResolver.ResolveShadowsMedium(sun.RenderTarget, sun.RenderTarget, sunPos);
+
             GraphicsDevice.SetRenderTarget(mediumScreenShadows);
             GraphicsDevice.Clear(Color.Black);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);
@@ -378,6 +380,7 @@ namespace Gusto
             DrawLargeCasters(sun);
             sun.EndDrawingShadowCasters();
             shadowMapResolver.ResolveShadowsLarge(sun.RenderTarget, sun.RenderTarget, sunPos);
+
             GraphicsDevice.SetRenderTarget(largeScreenShadows);
             GraphicsDevice.Clear(Color.Black);
             spriteBatchView.Begin(SpriteSortMode.Deferred, BlendState.Additive);

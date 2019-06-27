@@ -81,6 +81,7 @@ namespace Gusto.GameMap
         {
             graphicsDevice.BlendState = BlendState.Opaque;
             resolveShadowsEffect.Parameters["cutShadow"].SetValue(40);
+            resolveShadowsEffect.Parameters["shadowPadding"].SetValue(20);
 
             ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
             ExecuteTechnique(distancesRT, distortRT, "Distort");
@@ -93,7 +94,8 @@ namespace Gusto.GameMap
         public void ResolveShadowsMedium(Texture2D shadowCastersTexture, RenderTarget2D result, Vector2 lightPosition)
         {
             graphicsDevice.BlendState = BlendState.Opaque;
-            resolveShadowsEffect.Parameters["cutShadow"].SetValue(50);
+            resolveShadowsEffect.Parameters["cutShadow"].SetValue(40);
+            resolveShadowsEffect.Parameters["shadowPadding"].SetValue(10);
 
             ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
             ExecuteTechnique(distancesRT, distortRT, "Distort");
@@ -107,6 +109,7 @@ namespace Gusto.GameMap
         {
             graphicsDevice.BlendState = BlendState.Opaque;
             resolveShadowsEffect.Parameters["cutShadow"].SetValue(60);
+            resolveShadowsEffect.Parameters["shadowPadding"].SetValue(20);
 
             ExecuteTechnique(shadowCastersTexture, distancesRT, "ComputeDistances");
             ExecuteTechnique(distancesRT, distortRT, "Distort");

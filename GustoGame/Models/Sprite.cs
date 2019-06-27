@@ -15,6 +15,8 @@ namespace Gusto.Models
         private Rectangle boundingBoxRect;
         public float spriteScale;
 
+        //RenderTarget2D shadow;
+
         public Vector2 location;
         public int nRows { get; set; }
         public int nColumns { get; set; }
@@ -103,7 +105,7 @@ namespace Gusto.Models
             tRect.Height = (_texture.Height / nRows) / 2;
             Vector2 origin = new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2);
             // adjust how shadow lays based on sprite
-            if (this is IShip)
+            if (this is IShip || this is IGroundObject)
             {
                 tRect = targetRectangle;
             }
