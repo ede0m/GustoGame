@@ -30,12 +30,13 @@ namespace Gusto.GameMap
         ContentManager _content;
         GraphicsDevice _graphics;
         RenderTarget2D ambientLight;
+        RenderTarget2D sunRiseSetRange;
         Effect ambientLightEff;
 
         public DayLight(ContentManager content, GraphicsDevice graphics)
         {
             currentMsOfDay = 0;
-            dayLengthMs = 60000; // how long the day takes
+            dayLengthMs = 60000 * 10; // how long the day takes
 
             maxBlackoutIntensity = 40;
             minIntensity = 1;
@@ -49,7 +50,7 @@ namespace Gusto.GameMap
             _content = content;
             _graphics = graphics;
 
-            ambientLight = new RenderTarget2D(_graphics, _graphics.Viewport.Height, _graphics.Viewport.Height);
+            sunRiseSetRange = new RenderTarget2D(_graphics, _graphics.Viewport.Width, _graphics.Viewport.Height / 2);
             ambientLightEff = _content.Load<Effect>("ambientLight");
         }
 
@@ -100,9 +101,19 @@ namespace Gusto.GameMap
             // ambient light
             sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             ambientLightEff.Parameters["ambient"].SetValue(currentIntensity);
-            ambientLightEff.CurrentTechnique.Passes[0].Apply();
+            ambientLightEff.Parameters["percentThroughDay"].SetValue(percentDayComplete);
+            ExecuteTechnique("ambientLightDayNight");
             sb.Draw(gameScene, Vector2.Zero, Color.White);
             sb.End();
+        }
+
+        public void ExecuteTechnique(string techniqueName)
+        {
+            ambientLightEff.CurrentTechnique = ambientLightEff.Techniques[techniqueName];
+            foreach (EffectPass pass in ambientLightEff.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+            }
         }
     }
 }
