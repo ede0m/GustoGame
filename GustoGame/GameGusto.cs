@@ -337,7 +337,6 @@ namespace Gusto
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship) sprite;
-                    ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
                     if (ship.sinking)
                     {
@@ -374,7 +373,11 @@ namespace Gusto
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
                     else if (pirate.onShip)
+                    {
                         pirate.DrawOnShip(spriteBatchView, this.camera);
+                        playerShip = pirate.playerOnShip;
+                        playerOnShip = true;
+                    }
 
                     if (pirate.swimming && !pirate.onShip)
                         pirate.DrawSwimming(spriteBatchView, this.camera);
@@ -427,6 +430,8 @@ namespace Gusto
                 inventory.Draw(spriteBatchStatic, null);
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
+            if (playerOnShip)
+                playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
             base.Draw(gameTime);
         }
