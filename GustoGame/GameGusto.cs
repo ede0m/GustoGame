@@ -309,8 +309,10 @@ namespace Gusto
             // draw map
             map.DrawMap(spriteBatchView);
 
-            // handling for sprites that don't move
+            // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
+            bool playerOnShip = false;
+            Ship playerShip = null;
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
 
@@ -429,6 +431,8 @@ namespace Gusto
             base.Draw(gameTime);
         }
 
+
+        // collision handling beef
         private void SpatialCollision()
         {
             foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
