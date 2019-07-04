@@ -64,9 +64,6 @@ namespace Gusto.GameMap
                     Sprite groundObject = null;
                     JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
 
-
-
-
                     // region
                     string regionName = (string)tileDetails["regionName"];
                     if (!BoundingBoxLocations.RegionMap.ContainsKey(regionName))

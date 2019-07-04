@@ -36,7 +36,7 @@ namespace Gusto.GameMap
         public DayLight(ContentManager content, GraphicsDevice graphics)
         {
             currentMsOfDay = 0;
-            dayLengthMs = 60000 * 10; // how long the day takes
+            dayLengthMs = 60000 * 30; // how long the day takes
 
             maxBlackoutIntensity = 50;
             minIntensity = 1;
