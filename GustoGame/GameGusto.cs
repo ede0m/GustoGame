@@ -46,8 +46,12 @@ namespace Gusto
         Texture2D anchorIcon;
         Inventory inventory;
 
-        SpatialBounding collision;
         GraphicsDeviceManager graphics;
+        RenderTarget2D gameScene;
+
+        DayLight dayLight;
+
+        SpatialBounding collision;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
         HashSet<Sprite> UpdateOrder;
@@ -77,6 +81,9 @@ namespace Gusto
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
             map = new TileGameMap(this.camera);
+
+            dayLight = new DayLight(Content, GraphicsDevice);
+            gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
 
@@ -86,6 +93,7 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
+
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
             map.LoadMapData(mapData);
 
@@ -216,8 +224,13 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
+            var kstate = Keyboard.GetState();
+
+            // daylight shader 
+            dayLight.Update(kstate, gameTime, this.camera);
 
             // camera follows player
             if (!piratePlayer.onShip)
@@ -227,7 +240,6 @@ namespace Gusto
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            var kstate = Keyboard.GetState();
 
             // static update (Wind)
             windArrows.Update(kstate, gameTime, null);
@@ -291,14 +303,16 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.SetRenderTarget(gameScene);
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // draw map
             map.DrawMap(spriteBatchView);
 
-            // draw/set sprites that don't move
-            windArrows.Draw(spriteBatchStatic, null);
+            // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
+            bool playerOnShip = false;
+            Ship playerShip = null;
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
 
@@ -323,7 +337,6 @@ namespace Gusto
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship) sprite;
-                    ship.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
                     if (ship.sinking)
                     {
@@ -360,7 +373,11 @@ namespace Gusto
                     if (pirate.nearShip)
                         pirate.DrawEnterShip(spriteBatchView, this.camera);
                     else if (pirate.onShip)
+                    {
                         pirate.DrawOnShip(spriteBatchView, this.camera);
+                        playerShip = pirate.playerOnShip;
+                        playerOnShip = true;
+                    }
 
                     if (pirate.swimming && !pirate.onShip)
                         pirate.DrawSwimming(spriteBatchView, this.camera);
@@ -399,15 +416,28 @@ namespace Gusto
                 sprite.Draw(spriteBatchView, this.camera);
             }
 
+            // return to render on device
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.White);
+
+            // daylight shader
+            dayLight.Draw(spriteBatchStatic, gameScene);
+
+            // draw static and menu sprites
+            windArrows.Draw(spriteBatchStatic, null);
             if (showInventoryMenu)
             {
                 inventory.Draw(spriteBatchStatic, null);
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
+            if (playerOnShip)
+                playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
             base.Draw(gameTime);
         }
 
+
+        // collision handling beef
         private void SpatialCollision()
         {
             foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)

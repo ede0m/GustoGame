@@ -25,6 +25,12 @@
 /processorParam:TextureFormat=Color
 /build:../../../../GameSprites/BaseShip.png;BaseShip.png
 
+#begin ambientLight.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:ambientLight.fx
+
 #begin anchor-shape.png
 /importer:TextureImporter
 /processor:TextureProcessor
