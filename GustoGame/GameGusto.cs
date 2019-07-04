@@ -46,8 +46,13 @@ namespace Gusto
         Texture2D anchorIcon;
         Inventory inventory;
 
-        SpatialBounding collision;
         GraphicsDeviceManager graphics;
+        RenderTarget2D gameScene;
+        RenderTarget2D ambientLight;
+        Effect ambientLightEff;
+        float ambientLightIntensity;
+
+        SpatialBounding collision;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
         HashSet<Sprite> UpdateOrder;
@@ -77,6 +82,9 @@ namespace Gusto
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
             map = new TileGameMap(this.camera);
+            ambientLightIntensity = 1.0f;
+            ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
 
@@ -86,6 +94,8 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
+            ambientLightEff = Content.Load<Effect>("ambientLight");
+
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
             map.LoadMapData(mapData);
 
@@ -216,6 +226,9 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            ambientLightIntensity += 0.01f;
+
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
 
@@ -291,6 +304,7 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.SetRenderTarget(gameScene);
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // draw map
@@ -404,6 +418,17 @@ namespace Gusto
                 inventory.Draw(spriteBatchStatic, null);
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
+
+            // return to render on device
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.White);
+
+            // ambient light
+            spriteBatchStatic.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            ambientLightEff.Parameters["ambient"].SetValue(ambientLightIntensity);
+            ambientLightEff.CurrentTechnique.Passes[0].Apply();
+            spriteBatchStatic.Draw(gameScene, Vector2.Zero, Color.White);
+            spriteBatchStatic.End();
 
             base.Draw(gameTime);
         }
