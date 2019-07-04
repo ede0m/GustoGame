@@ -309,8 +309,7 @@ namespace Gusto
             // draw map
             map.DrawMap(spriteBatchView);
 
-            // draw/set sprites that don't move
-            windArrows.Draw(spriteBatchStatic, null);
+            // handling for sprites that don't move
             bool showInventoryMenu = false;
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
@@ -412,17 +411,20 @@ namespace Gusto
                 sprite.Draw(spriteBatchView, this.camera);
             }
 
+            // return to render on device
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.White);
+
+            // daylight shader
+            dayLight.Draw(spriteBatchStatic, gameScene);
+
+            // draw static and menu sprites
+            windArrows.Draw(spriteBatchStatic, null);
             if (showInventoryMenu)
             {
                 inventory.Draw(spriteBatchStatic, null);
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
-
-            // return to render on device
-            GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.White);
-
-            dayLight.Draw(spriteBatchStatic, gameScene);
 
             base.Draw(gameTime);
         }

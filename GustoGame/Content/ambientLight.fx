@@ -40,39 +40,46 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// sun set/rise blending 
 	float exposeRed = (1 + (.39 - input.TextureCoordinates.y) * 8); // overexpose red
 	float exposeGreen = (1 + (.39 - input.TextureCoordinates.y) * 2); // some extra green for the blue pixels
+	float exposeBlue = (1 + (.39 - input.TextureCoordinates.y) * 6); // some extra blue 
 
 	// happens on top 3rd of screen
 	if (input.TextureCoordinates.y < 0.70f) {
 
 		float redAdder = max(1, (exposeRed * (percentThroughDay/0.25f))); // be at full exposure at 25% of day gone
 		float greenAdder = max(1, (exposeGreen * (percentThroughDay/0.25f))); // be at full exposure at 25% of day gone
+		float blueAdder = max(1, (exposeBlue * (percentThroughDay/0.25f))); // be at full exposure at 25% of day gone
 
 		// begin reducing adders
 		if (percentThroughDay >= 0.25f && percentThroughDay < 0.50f) {
 			redAdder = max(1, (exposeRed * (1-(percentThroughDay - 0.25f)/0.25f)));
 			greenAdder = max(1, (exposeGreen * (1-(percentThroughDay - 0.25f)/0.25f)));
+			blueAdder = max(1, (exposeGreen * (1-(percentThroughDay - 0.25f)/0.25f)));
 		}
 		
 		//mid day
 		else if (percentThroughDay >= 0.50f && percentThroughDay < 0.75f) {
 			redAdder = 1;
 			greenAdder = 1;
+			blueAdder = 1;
 		}
 		
 		// add adders back for sunset
 		else if (percentThroughDay >= 0.75f && percentThroughDay < 0.85f) {
 			redAdder = max(1, (exposeRed * ((percentThroughDay - 0.75f)/0.10f)));
 			greenAdder = max(1, (exposeGreen * ((percentThroughDay - 0.75f)/0.10f)));
+			blueAdder = max(1, (exposeBlue * ((percentThroughDay - 0.75f)/0.10f)));
 		}
 		
 		// begin reducing adders
 		else if (percentThroughDay >= 0.85f) {
 			redAdder = max(1, (exposeRed * (1-(percentThroughDay - 0.85f)/0.15f)));
 			greenAdder = max(1, (exposeGreen * (1-(percentThroughDay - 0.85f)/0.15f)));
+			blueAdder = max(1, (exposeBlue * (1-(percentThroughDay - 0.85f)/0.15f)));
 		}
 
 		outputColor.r = outputColor.r * redAdder;
 		outputColor.g = outputColor.g * greenAdder;
+		outputColor.b = outputColor.b * blueAdder;
 	}
 
 	// Sepia
