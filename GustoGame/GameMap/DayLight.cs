@@ -36,9 +36,9 @@ namespace Gusto.GameMap
         public DayLight(ContentManager content, GraphicsDevice graphics)
         {
             currentMsOfDay = 0;
-            dayLengthMs = 60000 * 10; // how long the day takes
+            dayLengthMs = 60000; // how long the day takes
 
-            maxBlackoutIntensity = 40;
+            maxBlackoutIntensity = 50;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;

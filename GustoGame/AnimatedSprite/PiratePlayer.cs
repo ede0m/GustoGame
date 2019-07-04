@@ -14,7 +14,7 @@ namespace Gusto.AnimatedSprite
         {
             timeSinceLastTurnFrame = 0;
             timeSinceLastWalkFrame = 0;
-            millisecondsPerTurnFrame = 500; // turn speed
+            millisecondsPerTurnFrame = 300; // turn speed
             millisecondsPerWalkFrame = 100; // turn speed
             millisecondsCombatSwing = 75;
 

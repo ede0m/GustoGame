@@ -30,14 +30,6 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 {
 	float4 pixelColor = tex2D(s0, input.TextureCoordinates);
     float4 outputColor = pixelColor;
-    
-	// Sepia
-	//outputColor.r = (pixelColor.r * 0.393) + (pixelColor.g * 0.769) + (pixelColor.b * 0.189);
-    //outputColor.g = (pixelColor.r * 0.349) + (pixelColor.g * 0.686) + (pixelColor.b * 0.168);    
-    //aaoutputColor.b = (pixelColor.r * 0.272) + (pixelColor.g * 0.534) + (pixelColor.b * 0.131);
-
-	// Greyscale
-	//float value = (pixelColor.r + pixelColor.g + pixelColor.b) / 3;
 	
 	// lighting intensity is gradient of pixel position
 	float Intensity = 1 + (1  - input.TextureCoordinates.y) * 1.3;
@@ -82,6 +74,17 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 		outputColor.r = outputColor.r * redAdder;
 		outputColor.g = outputColor.g * greenAdder;
 	}
+
+	// Sepia
+	//outputColor.r = (pixelColor.r * 0.393) + (pixelColor.g * 0.769) + (pixelColor.b * 0.189);
+    //outputColor.g = (pixelColor.r * 0.349) + (pixelColor.g * 0.686) + (pixelColor.b * 0.168);    
+    //outputColor.b = (pixelColor.r * 0.272) + (pixelColor.g * 0.534) + (pixelColor.b * 0.131);
+
+	// Greyscale
+	//float value = (pixelColor.r + pixelColor.g + pixelColor.b) / 3;
+	//outputColor.r = value;
+	//outputColor.g = value;
+	//outputColor.b = value;
 
 	return outputColor;
 }
