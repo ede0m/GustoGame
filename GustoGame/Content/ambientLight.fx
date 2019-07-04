@@ -33,7 +33,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// Sepia
 	//outputColor.r = (pixelColor.r * 0.393) + (pixelColor.g * 0.769) + (pixelColor.b * 0.189);
     //outputColor.g = (pixelColor.r * 0.349) + (pixelColor.g * 0.686) + (pixelColor.b * 0.168);    
-    //outputColor.b = (pixelColor.r * 0.272) + (pixelColor.g * 0.534) + (pixelColor.b * 0.131);
+    //aaoutputColor.b = (pixelColor.r * 0.272) + (pixelColor.g * 0.534) + (pixelColor.b * 0.131);
 
 	// Greyscale
 	//float value = (pixelColor.r + pixelColor.g + pixelColor.b) / 3;
@@ -43,8 +43,6 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	outputColor.b = outputColor.b / ambient;
 
 	return outputColor;
-	//return AmbientColor * AmbientIntensity * pixelColor;
-
 }
 
 technique SpriteDrawing

@@ -48,9 +48,8 @@ namespace Gusto
 
         GraphicsDeviceManager graphics;
         RenderTarget2D gameScene;
-        RenderTarget2D ambientLight;
-        Effect ambientLightEff;
-        float ambientLightIntensity;
+
+        DayLight dayLight;
 
         SpatialBounding collision;
         List<Sprite> DrawOrder;
@@ -82,8 +81,8 @@ namespace Gusto
             this.camera = new Camera(GraphicsDevice);
             collision = new SpatialBounding(new Rectangle(0, 0, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight), this.camera);
             map = new TileGameMap(this.camera);
-            ambientLightIntensity = 1.0f;
-            ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+            dayLight = new DayLight(Content, GraphicsDevice);
             gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
@@ -94,7 +93,6 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
-            ambientLightEff = Content.Load<Effect>("ambientLight");
 
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
             map.LoadMapData(mapData);
@@ -227,10 +225,12 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
 
-            ambientLightIntensity += 0.01f;
-
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
+            var kstate = Keyboard.GetState();
+
+            // daylight shader 
+            dayLight.Update(kstate, gameTime, this.camera);
 
             // camera follows player
             if (!piratePlayer.onShip)
@@ -240,7 +240,6 @@ namespace Gusto
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            var kstate = Keyboard.GetState();
 
             // static update (Wind)
             windArrows.Update(kstate, gameTime, null);
@@ -423,12 +422,7 @@ namespace Gusto
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
 
-            // ambient light
-            spriteBatchStatic.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            ambientLightEff.Parameters["ambient"].SetValue(ambientLightIntensity);
-            ambientLightEff.CurrentTechnique.Passes[0].Apply();
-            spriteBatchStatic.Draw(gameScene, Vector2.Zero, Color.White);
-            spriteBatchStatic.End();
+            dayLight.Draw(spriteBatchStatic, gameScene);
 
             base.Draw(gameTime);
         }
