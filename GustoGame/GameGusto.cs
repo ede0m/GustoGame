@@ -147,7 +147,7 @@ namespace Gusto
             Random rnd = new Random();
             Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
 
-                        var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
@@ -191,6 +191,8 @@ namespace Gusto
             int width = source.Width / columns;
             int height = source.Height / rows;
             BoundingBoxTextures.DynamicBoundingBoxTextures.Add(key, new Dictionary<string, Rectangle>());
+            if (polygon)
+                BoundingBoxTextures.DynamicBoundingPolygons.Add(key, new Dictionary<string, Polygon>());
             // create custom bounding box for each ship frame (8 rows, 3 columns)
             for (int i = 0; i < columns; i++) // columns
             {
@@ -202,9 +204,14 @@ namespace Gusto
                     source.GetData(0, sourceRectangle, data, 0, data.Length);
                     cropTexture.SetData(data);
 
-                    List <Line> bp = null;
+                    Polygon poly = null;
                     if (polygon)
-                        bp = CalculateTextureBoundingBox.CropTextureToPolygon(cropTexture);
+                    {
+                        poly = new Polygon();
+                        poly.Verts = CalculateTextureBoundingBox.CropTextureToPolygon(cropTexture);
+                        poly.UpperLeftPoint = Vector2.Zero;
+                        BoundingBoxTextures.DynamicBoundingPolygons[key].Add(i.ToString() + j.ToString(), poly);
+                    }
 
                     // store the BB texture 
                     Rectangle bb = CalculateTextureBoundingBox.GetSmallestRectangleFromTexture(cropTexture, scale);

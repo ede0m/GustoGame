@@ -123,8 +123,14 @@ namespace Gusto.Models
             spriteBatch.End();
         }
 
+        // SETS Location of bounding box using width and height from preprocessed bb size. 
         public void SetBoundingBox()
         {
+            //TODO: need to work in polygons here. Need to transpose the polygon into world space. Use bounding box upper left hand corner location. Add values from DynamicBoundingPolygon
+            // to upper left hand corner values ?? because the polygons were calculated from 0, 0. So we treat the upper left hand corner from bounding box as 0, 0. 
+            // We wil do this transforming on a per sprite class polygon field (need to add to sprite class) where the vert points change based on the location, but always have the same polygon
+            // form stated in DynamicBoundingPolygon
+
             if (bbKey != null)
             {
                 boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
