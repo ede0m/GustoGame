@@ -43,7 +43,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	float exposeBlue = (1 + (.39 - input.TextureCoordinates.y) * 6); // some extra blue 
 
 	// happens on top 3rd of screen
-	if (input.TextureCoordinates.y < 0.70f) {
+	if (input.TextureCoordinates.y < 1.0f) {
 
 		float redAdder = max(1, (exposeRed * (percentThroughDay/0.25f))); // be at full exposure at 25% of day gone
 		float greenAdder = max(1, (exposeGreen * (percentThroughDay/0.25f))); // be at full exposure at 25% of day gone
