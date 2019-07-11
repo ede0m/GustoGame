@@ -42,7 +42,7 @@ namespace Gusto.Bounds
             //return new Rectangle(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
         }
 
-        public static List<Line> CropTextureToPolygon(Texture2D Texture)
+        public static List<Line> CropTextureToPolygon(Texture2D Texture, float scale)
         {
 
             List<Vector2> verticies = new List<Vector2>();
@@ -58,9 +58,7 @@ namespace Gusto.Bounds
                     {
                         // if pixel before or after this pixel is transparent, we are on an edge pixel
                         if (Colors[a, b - 1].A == 0 || Colors[a, b + 1].A == 0 || Colors[a - 1, b].A == 0 || Colors[a + 1, b].A == 0)
-                        {
-                            verticies.Add(new Vector2(a, b));
-                        }
+                            verticies.Add(new Vector2(a * scale, b * scale));
                     }
                 }
             }

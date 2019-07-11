@@ -51,7 +51,7 @@ namespace Gusto.Models.Animated
         GraphicsDevice _graphics;
         public Random rand;
 
-        public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics)
+        public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             teamType = type;
             _content = content;

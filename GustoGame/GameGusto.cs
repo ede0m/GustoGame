@@ -137,7 +137,7 @@ namespace Gusto
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureLand1, "landTile", 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
-            LoadDynamicBoundingBoxPerFrame(false, 2, 6, textureTree1, "tree1", 0.4f);
+            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -208,7 +208,7 @@ namespace Gusto
                     if (polygon)
                     {
                         poly = new Polygon();
-                        poly.Verts = CalculateTextureBoundingBox.CropTextureToPolygon(cropTexture);
+                        poly.Verts = CalculateTextureBoundingBox.CropTextureToPolygon(cropTexture, scale);
                         poly.UpperLeftPoint = Vector2.Zero;
                         BoundingBoxTextures.DynamicBoundingPolygons[key].Add(i.ToString() + j.ToString(), poly);
                     }
@@ -452,11 +452,14 @@ namespace Gusto
         // collision handling beef
         private void SpatialCollision()
         {
+
             foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
                 BoundingBoxLocations.BoundingBoxLocationMap[team].Clear();
 
             foreach (var spriteA in Collidable)
             {
+
+                Polygon polyA = null;
 
                 // BoundBoxLocationMap update - this structure is used for AI locating targets
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
@@ -476,6 +479,9 @@ namespace Gusto
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();
+                if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(spriteA.bbKey))
+                    polyA = BoundingBoxTextures.DynamicBoundingPolygons[spriteA.bbKey][spriteA.currColumnFrame.ToString() + spriteA.currRowFrame.ToString()];
+
                 HashSet<string> quadKeys = collision.GetQuadKey(bbA);
                 HashSet<Sprite> possible = new HashSet<Sprite>();
                 foreach (var key in quadKeys)
@@ -486,19 +492,56 @@ namespace Gusto
                     if (spriteB == spriteA)
                         continue;
 
+                    Polygon polyB = null;
+                    if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(spriteB.bbKey))
+                        polyB = BoundingBoxTextures.DynamicBoundingPolygons[spriteB.bbKey][spriteB.currColumnFrame.ToString() + spriteB.currRowFrame.ToString()];
+
                     var bbB = spriteB.GetBoundingBox();
 
-                    if (bbA.Intersects(bbB) && CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
+                    // pass collision game logic - this filters out some collisions that are colliding but we don't want to handle a collision (trees colliding with other trees)
+                    if (CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
                     {
-                        spriteA.colliding = true;
-                        spriteB.colliding = true;
-                        Rectangle overlap = Rectangle.Intersect(bbA, bbB);
-                        spriteA.HandleCollision(spriteB, overlap);
-                        spriteB.HandleCollision(spriteA, overlap);
+
+                        // spatial intersection for rect, poly
+                        if (polyA != null || polyB != null)
+                        {
+                            // poly vs rect
+                            if (polyA != null && polyB == null)
+                            {
+                                if (polyA.IntersectsRect(bbB))
+                                    MarkCollision(spriteA, spriteB);
+                            }
+                            else if (polyB != null && polyA == null)
+                            {
+                                if (polyB.IntersectsRect(bbA))
+                                    MarkCollision(spriteA, spriteB);
+                            }
+                            else
+                            {
+                                // poly vs poly
+                                if (polyA.IntersectsPoly(polyB))
+                                    MarkCollision(spriteA, spriteB);
+                            }
+                        }
+                        else
+                        {
+                            // rect vs rect
+                            if (bbA.Intersects(bbB))
+                                MarkCollision(spriteA, spriteB);
+                        }
                     }
                 }
             }
             collision.Clear();
+        }
+
+        private void MarkCollision(Sprite spriteA, Sprite spriteB)
+        {
+            spriteA.colliding = true;
+            spriteB.colliding = true;
+            Rectangle overlap = Rectangle.Intersect(spriteA.GetBoundingBox(), spriteB.GetBoundingBox());
+            spriteA.HandleCollision(spriteB, overlap);
+            spriteB.HandleCollision(spriteA, overlap);
         }
     }
 }

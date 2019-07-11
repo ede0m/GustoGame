@@ -32,7 +32,7 @@ namespace Gusto.Models.Animated
         public Vector2 firedFromLoc;
         public TeamType teamType;
 
-        public Ammo (Vector2 firedFrom, TeamType type)
+        public Ammo (Vector2 firedFrom, TeamType type) : base(null)
         {
             teamType = type;
         }

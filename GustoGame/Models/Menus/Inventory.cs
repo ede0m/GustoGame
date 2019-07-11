@@ -47,7 +47,7 @@ namespace Gusto.Models.Menus
         ContentManager _content;
         Random rand;
 
-        public Inventory(Vector2 location, ContentManager content, GraphicsDevice graphics, PlayerPirate invOfPlayer)
+        public Inventory(Vector2 location, ContentManager content, GraphicsDevice graphics, PlayerPirate invOfPlayer) : base(graphics)
         {
 
             _graphics = graphics;

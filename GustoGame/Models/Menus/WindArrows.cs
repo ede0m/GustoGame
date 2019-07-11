@@ -17,7 +17,7 @@ namespace Gusto.Models.Menus
         private int millisecondsPerFrame;
         Random randomGeneration;
 
-        public WindArrows(Vector2 location, ContentManager content, GraphicsDevice graphics)
+        public WindArrows(Vector2 location, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             randomGeneration = new Random();
             timeSinceLastFrame = 0;

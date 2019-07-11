@@ -13,7 +13,7 @@ namespace Gusto.Models
         public Sprite groundObject; // any tree, rock, etc asset we want to set to this tile.
 
 
-        public TilePiece(Sprite _groundObject)
+        public TilePiece(Sprite _groundObject) : base(null)
         {
             groundObject = _groundObject;
         }
