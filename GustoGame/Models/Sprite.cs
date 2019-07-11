@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Comora;
 using Gusto.Bounds;
 using Gusto.Models;
@@ -63,8 +64,9 @@ namespace Gusto.Models
                 // polygon
                 if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(bbKey))
                 {
-                    boundingPolygon = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
-                    boundingPolygon.UpperLeftPoint = boundingBoxRect.Location.ToVector2();
+                    boundingPolygon = new Polygon();
+                    boundingPolygon.Verts = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()].Verts;
+                    boundingPolygon.UpperLeftPoint = Vector2.Zero;
                 }
             }
 
@@ -152,10 +154,6 @@ namespace Gusto.Models
         // SETS Location of bounding box using width and height from preprocessed bb size. 
         public void SetBoundingBox()
         {
-            //TODO: need to work in polygons here. Need to transpose the polygon into world space. Use bounding box upper left hand corner location. Add values from DynamicBoundingPolygon
-            // to upper left hand corner values ?? because the polygons were calculated from 0, 0. So we treat the upper left hand corner from bounding box as 0, 0. 
-            // We wil do this transforming on a per sprite class polygon field (need to add to sprite class) where the vert points change based on the location, but always have the same polygon
-            // form stated in DynamicBoundingPolygon
 
             if (bbKey != null)
             {
@@ -177,7 +175,7 @@ namespace Gusto.Models
                 // polygon
                 if (boundingPolygon != null)
                 {
-                    boundingPolygon = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
+                    boundingPolygon.Verts = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()].Verts; // TODO - Bug! we nee a copy here, not the static ref
                     boundingPolygon.UpperLeftPoint = new Vector2(location.X - originXOffset, location.Y - originYOffset);
                 }
             }
@@ -185,7 +183,7 @@ namespace Gusto.Models
 
         private void DrawPolygonBB(SpriteBatch sb)
         {
-            foreach (var line in boundingPolygon.VertsInWorld())
+            foreach (var line in boundingPolygon.VertsInWorld(boundingPolygon.Verts, boundingPolygon.UpperLeftPoint))
             {
                 Texture2D lineText = new Texture2D(_graphics, 1, 1, false, SurfaceFormat.Color);
                 lineText.SetData<Color>(new Color[] { Color.White });// fill the texture with white

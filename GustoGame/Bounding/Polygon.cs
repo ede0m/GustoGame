@@ -21,7 +21,7 @@ namespace Gusto.Bounds
             rectPoints.Add(new Point(rect.Right, rect.Top));
             rectPoints.Add(new Point(rect.Right, rect.Bottom));
 
-            List<Line> vertsInWorld = VertsInWorld();
+            List<Line> vertsInWorld = VertsInWorld(Verts, UpperLeftPoint);
 
             foreach (var point in rectPoints)
             {
@@ -33,7 +33,17 @@ namespace Gusto.Bounds
 
         public bool IntersectsPoly(Polygon poly)
         {
-            //TODO
+            List<Point> polyPoints = new List<Point>();
+            List<Line> polyVertsInWorld = poly.VertsInWorld(poly.Verts, poly.UpperLeftPoint);
+            foreach (var line in polyVertsInWorld)
+                polyPoints.Add(new Point((int)line.Start.X, (int)line.Start.Y)); // don't need to test start and end because the next starting point will be the last ending point
+
+            List<Line> vertsInWorld = VertsInWorld(Verts, UpperLeftPoint);
+            foreach (var point in polyPoints)
+            {
+                if (PointInPoly(point, vertsInWorld))
+                    return true;
+            }
             return false;
         }
 
@@ -57,14 +67,14 @@ namespace Gusto.Bounds
             return inside;
         }
 
-        public List<Line> VertsInWorld()
+        public List<Line> VertsInWorld(List<Line> verts, Vector2 upperLeftLoc)
         {
             List<Line> vertsInWorld = new List<Line>();
-            foreach(var vert in Verts)
+            foreach(var vert in verts)
             {
                 Line line = new Line();
-                line.Start = new Vector2(UpperLeftPoint.X + vert.Start.X, UpperLeftPoint.Y + vert.Start.Y);
-                line.End = new Vector2(UpperLeftPoint.X + vert.End.X, UpperLeftPoint.Y + vert.End.Y);
+                line.Start = new Vector2(upperLeftLoc.X + vert.Start.X, upperLeftLoc.Y + vert.Start.Y);
+                line.End = new Vector2(upperLeftLoc.X + vert.End.X, upperLeftLoc.Y + vert.End.Y);
                 vertsInWorld.Add(line);
             }
             return vertsInWorld;

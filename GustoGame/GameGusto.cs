@@ -137,7 +137,7 @@ namespace Gusto
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureLand1, "landTile", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
-            LoadDynamicBoundingBoxPerFrame(false, 2, 6, textureTree1, "tree1", 0.4f, 0.4f);
+            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -480,7 +480,7 @@ namespace Gusto
 
                 Rectangle bbA = spriteA.GetBoundingBox();
                 if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(spriteA.bbKey))
-                    polyA = BoundingBoxTextures.DynamicBoundingPolygons[spriteA.bbKey][spriteA.currColumnFrame.ToString() + spriteA.currRowFrame.ToString()];
+                    polyA = spriteA.GetBoundingPolygon();
 
                 HashSet<string> quadKeys = collision.GetQuadKey(bbA);
                 HashSet<Sprite> possible = new HashSet<Sprite>();
@@ -489,19 +489,18 @@ namespace Gusto
 
                 foreach (var spriteB in possible)
                 {
+                    var bbB = spriteB.GetBoundingBox();
+
                     if (Object.ReferenceEquals(spriteA, spriteB))
                         continue;
 
                     Polygon polyB = null;
                     if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(spriteB.bbKey))
-                        polyB = BoundingBoxTextures.DynamicBoundingPolygons[spriteB.bbKey][spriteB.currColumnFrame.ToString() + spriteB.currRowFrame.ToString()];
-
-                    var bbB = spriteB.GetBoundingBox();
+                        polyB = spriteB.GetBoundingPolygon();
 
                     // pass collision game logic - this filters out some collisions that are colliding but we don't want to handle a collision (trees colliding with other trees)
                     if (CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
                     {
-
                         // spatial intersection for rect, poly
                         if (polyA != null || polyB != null)
                         {
