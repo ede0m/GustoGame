@@ -40,6 +40,8 @@ namespace Gusto.Bounding
                     if (ball.teamType == pirate.teamType)
                         return false;
                 }
+                else if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Tree))
+                    return false;
             }
 
             else if (a.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
@@ -63,6 +65,12 @@ namespace Gusto.Bounding
             }
 
             else if (a is IAmmo)
+            {
+                if (b.GetType().BaseType == typeof(Gusto.Models.TilePiece))
+                    return false;
+            }
+
+            else if (a is IGroundObject)
             {
                 if (b.GetType().BaseType == typeof(Gusto.Models.TilePiece))
                     return false;

@@ -15,7 +15,6 @@ namespace Gusto.Bounds
 
         public bool IntersectsRect(Rectangle rect)
         {
-            bool inside = false;
             List<Point> rectPoints = new List<Point>();
             rectPoints.Add(new Point(rect.Left, rect.Top));
             rectPoints.Add(new Point(rect.Left, rect.Bottom));
@@ -24,30 +23,38 @@ namespace Gusto.Bounds
 
             List<Line> vertsInWorld = VertsInWorld();
 
-            foreach(var point in rectPoints)
+            foreach (var point in rectPoints)
             {
-                foreach (var side in vertsInWorld)
-                {
-                    if (point.Y > Math.Min(side.Start.Y, side.End.Y))
-                        if (point.Y <= Math.Max(side.Start.Y, side.End.Y))
-                            if (point.X <= Math.Max(side.Start.X, side.End.X))
-                            {
-                                if (side.Start.Y != side.End.Y)
-                                {
-                                    float xIntersection = (point.Y - side.Start.Y) * (side.End.X - side.Start.X) / (side.End.Y - side.Start.Y) + side.Start.X;
-                                    if (side.Start.X == side.End.X || point.X <= xIntersection)
-                                        inside = !inside;
-                                }
-                            }
-                }
+                if (PointInPoly(point, vertsInWorld))
+                    return true;
             }
-            return inside;
+            return false;
         }
 
         public bool IntersectsPoly(Polygon poly)
         {
             //TODO
             return false;
+        }
+
+        private bool PointInPoly(Point point, List<Line> vertsInWorld)
+        {
+            bool inside = false;
+            foreach (var side in vertsInWorld)
+            {
+                if (point.Y > Math.Min(side.Start.Y, side.End.Y))
+                    if (point.Y <= Math.Max(side.Start.Y, side.End.Y))
+                        if (point.X <= Math.Max(side.Start.X, side.End.X))
+                        {
+                            if (side.Start.Y != side.End.Y)
+                            {
+                                float xIntersection = (point.Y - side.Start.Y) * (side.End.X - side.Start.X) / (side.End.Y - side.Start.Y) + side.Start.X;
+                                if (side.Start.X == side.End.X || point.X <= xIntersection)
+                                    inside = !inside;
+                            }
+                        }
+            }
+            return inside;
         }
 
         public List<Line> VertsInWorld()

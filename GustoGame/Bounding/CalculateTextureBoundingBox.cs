@@ -11,7 +11,7 @@ namespace Gusto.Bounds
 
 
         //Get smallest rectangle from Texture, cased on color
-        public static Rectangle GetSmallestRectangleFromTexture(Texture2D Texture, float scale)
+        public static Rectangle GetSmallestRectangleFromTexture(Texture2D Texture, float scale, float scaleBB)
         {
             //Create our index of sprite frames
             Color[,] Colors = TextureUtility.TextureTo2DArray(Texture);
@@ -37,7 +37,7 @@ namespace Gusto.Bounds
             }
 
             //We now have our smallest possible rectangle for this texture
-            return new Rectangle(x1, y1, (int)((x2 - x1 + 1) * scale), (int)((y2 - y1 + 1) * scale)); // check for rounding errors here with scale
+            return new Rectangle(x1, y1, (int)((x2 - x1 + 1) * scale * scaleBB), (int)((y2 - y1 + 1) * scale * scaleBB)); // check for rounding errors here with scale
 
             //return new Rectangle(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
         }
