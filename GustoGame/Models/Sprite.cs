@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Comora;
+using Gusto.Bounds;
 using Gusto.Models;
 using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
@@ -9,10 +11,13 @@ namespace Gusto.Models
 {
     public abstract class Sprite
     {
+        private GraphicsDevice _graphics; 
+
         protected Texture2D _texture;
         protected Texture2D boundingBox;
         public Rectangle targetRectangle;
         private Rectangle boundingBoxRect;
+        private Polygon boundingPolygon;
         public float spriteScale;
 
         public Vector2 location;
@@ -27,7 +32,10 @@ namespace Gusto.Models
         public bool colliding { get; set; }
         public bool remove;
 
-        public Sprite(){}
+        public Sprite(GraphicsDevice graphics)
+        {
+            _graphics = graphics;
+        }
 
         public void SetSpriteAsset(Asset asset, Vector2 startingLoc)
         {
@@ -52,6 +60,14 @@ namespace Gusto.Models
                 boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
                 boundingBoxRect.X = ((int)location.X + ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2) - ((boundingBoxRect.Right - boundingBoxRect.Left) / 2);
                 boundingBoxRect.Y = ((int)location.Y + ((int)(targetRectangle.Bottom * spriteScale) - (int)(targetRectangle.Top * spriteScale)) / 2) - ((boundingBoxRect.Bottom - boundingBoxRect.Top) / 2);
+
+                // polygon
+                if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(bbKey))
+                {
+                    boundingPolygon = new Polygon();
+                    boundingPolygon.Verts = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()].Verts;
+                    boundingPolygon.UpperLeftPoint = Vector2.Zero;
+                }
             }
 
             // For DEBUG highlighting bounding box
@@ -113,18 +129,32 @@ namespace Gusto.Models
                 spriteBatch.Begin();
             else
                 spriteBatch.Begin(camera);
+            
             // TEST STUFF for trying to draw bounding box around sprite
             if (boundingBox != null)
-                spriteBatch.Draw(boundingBox, boundingBoxRect.Location.ToVector2(), boundingBoxRect, Color.Orange, 0f,
-                    Vector2.Zero, 1.0f, SpriteEffects.None, 0f); // scaling is already done in constructor
-            // 
+            {
+                if (boundingPolygon != null)
+                    DrawPolygonBB(spriteBatch);
+                else
+                    spriteBatch.Draw(boundingBox, boundingBoxRect.Location.ToVector2(), boundingBoxRect, Color.Orange, 0f,
+                        Vector2.Zero, 1.0f, SpriteEffects.None, 0f); // scaling is already done in constructor
+            }
+            
+            // normal drawing call
             spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f, 
                 new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
+
+
+            if (boundingPolygon != null)
+                DrawPolygonBB(spriteBatch);
+
             spriteBatch.End();
         }
 
+        // SETS Location of bounding box using width and height from preprocessed bb size. 
         public void SetBoundingBox()
         {
+
             if (bbKey != null)
             {
                 boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
@@ -141,7 +171,51 @@ namespace Gusto.Models
                     boundingBoxRect.X = (int)location.X  - originXOffset + boundingBoxRect.X;
                     boundingBoxRect.Y = (int)location.Y - originYOffset + boundingBoxRect.Y;
                 }
+
+                // polygon
+                if (boundingPolygon != null)
+                {
+                    boundingPolygon.Verts = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()].Verts; // TODO - Bug! we nee a copy here, not the static ref
+                    boundingPolygon.UpperLeftPoint = new Vector2(location.X - originXOffset, location.Y - originYOffset);
+                }
             }
+        }
+
+        private void DrawPolygonBB(SpriteBatch sb)
+        {
+            foreach (var line in boundingPolygon.VertsInWorld(boundingPolygon.Verts, boundingPolygon.UpperLeftPoint))
+            {
+                Texture2D lineText = new Texture2D(_graphics, 1, 1, false, SurfaceFormat.Color);
+                lineText.SetData<Color>(new Color[] { Color.White });// fill the texture with white
+
+                DrawLine(sb, //draw line
+                    line.Start, //start of line
+                    line.End, //end of line
+                    lineText
+                );
+            }
+        }
+
+        private void DrawLine(SpriteBatch sb, Vector2 start, Vector2 end, Texture2D t)
+        {
+            Vector2 edge = end - start;
+            // calculate angle to rotate line
+            float angle =
+                (float)Math.Atan2(edge.Y, edge.X);
+
+            sb.Draw(t,
+                new Rectangle(// rectangle defines shape of line and position of start of line
+                    (int)start.X,
+                    (int)start.Y,
+                    (int)edge.Length(), //sb will strech the texture to fill this rectangle
+                    1), //width of line, change this to make thicker line
+                null,
+                Color.Red, //colour of line
+                angle,     //angle of line (calulated above)
+                new Vector2(0, 0), // point in line about which to rotate
+                SpriteEffects.None,
+                0);
+
         }
 
         public float GetYPosition()
@@ -177,6 +251,11 @@ namespace Gusto.Models
         public Rectangle GetBoundingBox()
         {
             return boundingBoxRect;
+        }
+
+        public Polygon GetBoundingPolygon()
+        {
+            return boundingPolygon;
         }
 
         public Sprite GetBase()

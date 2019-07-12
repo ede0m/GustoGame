@@ -60,6 +60,8 @@
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
     <Compile Include="Bounding\BoundingBoxLocations.cs" />
     <Compile Include="Bounding\CollisionGameLogic.cs" />
+    <Compile Include="Bounding\Line.cs" />
+    <Compile Include="Bounding\Polygon.cs" />
     <Compile Include="Bounding\SpatialBounding.cs" />
     <Compile Include="GameMap\DayLight.cs" />
     <Compile Include="GameMap\GameMap.cs" />

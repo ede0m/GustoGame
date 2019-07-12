@@ -45,7 +45,7 @@ namespace Gusto.Models.Animated
         ContentManager _content;
         GraphicsDevice _graphics;
 
-        public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics)
+        public PlayerPirate(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
 
             teamType = type;

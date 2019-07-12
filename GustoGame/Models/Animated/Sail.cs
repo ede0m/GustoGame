@@ -36,7 +36,7 @@ namespace Gusto.Models.Animated
         private int lastWindDir;
         private int lastRowFrame;
 
-        public Sail(TeamType type)
+        public Sail(TeamType type, GraphicsDevice graphics) : base(graphics)
         {
             teamType = type;
         }

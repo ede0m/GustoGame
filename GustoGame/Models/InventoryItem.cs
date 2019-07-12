@@ -30,7 +30,7 @@ namespace Gusto.Models
 
         public TeamType teamType;
 
-        public InventoryItem(TeamType team, ContentManager content, GraphicsDevice graphics)
+        public InventoryItem(TeamType team, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             _content = content;
             _graphics = graphics;

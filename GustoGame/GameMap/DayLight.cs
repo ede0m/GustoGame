@@ -29,7 +29,6 @@ namespace Gusto.GameMap
 
         ContentManager _content;
         GraphicsDevice _graphics;
-        RenderTarget2D ambientLight;
         RenderTarget2D sunRiseSetRange;
         Effect ambientLightEff;
 

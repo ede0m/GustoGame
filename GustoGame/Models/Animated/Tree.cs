@@ -31,7 +31,7 @@ namespace Gusto.Models.Animated
 
         Vector2 startingLoc;
 
-        public Tree (TeamType t, ContentManager content, GraphicsDevice graphics)
+        public Tree (TeamType t, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             team = t;
             _content = content;

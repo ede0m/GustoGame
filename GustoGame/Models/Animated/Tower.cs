@@ -35,7 +35,7 @@ namespace Gusto.Models.Animated
         public TeamType teamType;
         public List<Ammo> Shots;
 
-        public Tower(TeamType type, ContentManager content, GraphicsDevice graphics)
+        public Tower(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             _content = content;
             _graphics = graphics;

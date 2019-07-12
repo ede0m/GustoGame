@@ -103,41 +103,41 @@ namespace Gusto
 
             // PREPROCESSING
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
-            LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseShip, "baseShip", 0.6f);
+            LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
-            LoadDynamicBoundingBoxPerFrame(4, 11, texturePlayerPirate, "playerPirate", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
-            LoadDynamicBoundingBoxPerFrame(4, 12, textureBaseTribal, "baseTribal", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 12, textureBaseTribal, "baseTribal", 1.0f, 1.0f);
             Texture2D textureTribalTokens = Content.Load<Texture2D>("TribalTokens");
-            LoadDynamicBoundingBoxPerFrame(1, 1, textureTribalTokens, "tribalTokens", 0.5f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTribalTokens, "tribalTokens", 0.5f, 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
-            LoadDynamicBoundingBoxPerFrame(4, 3, textureBaseSword, "baseSword", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
-            LoadDynamicBoundingBoxPerFrame(4, 3, texturePistol, "pistol", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePistol, "pistol", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
-            LoadDynamicBoundingBoxPerFrame(4, 3, textureShortSword, "shortSword", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShortSword, "shortSword", 1.0f, 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
-            LoadDynamicBoundingBoxPerFrame(8, 3, textureBaseSail, "baseSail", 0.6f);
+            LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
-            LoadDynamicBoundingBoxPerFrame(1, 1, textureTower, "tower", 0.5f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTower, "tower", 0.5f, 1.0f);
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
-            LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBall, "baseCannonBall", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureCannonBall, "baseCannonBall", 1.0f, 1.0f);
             Texture2D textureCannonBallItem = Content.Load<Texture2D>("CannonBall");
-            LoadDynamicBoundingBoxPerFrame(1, 2, textureCannonBallItem, "cannonBallItem", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureCannonBallItem, "cannonBallItem", 1.0f, 1.0f);
             Texture2D texturePistolShot = Content.Load<Texture2D>("PistolShot");
-            LoadDynamicBoundingBoxPerFrame(1, 2, texturePistolShot, "pistolShot", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShot, "pistolShot", 1.0f, 1.0f);
             Texture2D texturePistolShotItem = Content.Load<Texture2D>("PistolShot");
-            LoadDynamicBoundingBoxPerFrame(1, 2, texturePistolShotItem, "pistolShotItem", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShotItem, "pistolShotItem", 1.0f, 1.0f);
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
-            LoadDynamicBoundingBoxPerFrame(8, 1, textureBaseCannon, "baseCannon", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
             
             // Tile Pieces
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
-            LoadDynamicBoundingBoxPerFrame(1, 4, textureOcean1, "oceanTile", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureOcean1, "oceanTile", 1.0f, 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
-            LoadDynamicBoundingBoxPerFrame(1, 4, textureLand1, "landTile", 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureLand1, "landTile", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
-            LoadDynamicBoundingBoxPerFrame(2, 6, textureTree1, "tree1", 0.4f);
+            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -147,7 +147,7 @@ namespace Gusto
             Random rnd = new Random();
             Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
 
-                        var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
+            var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
@@ -186,11 +186,13 @@ namespace Gusto
         }
 
         // creates dynamic bounding boxes for each sprite frame
-        private void LoadDynamicBoundingBoxPerFrame(int rows, int columns, Texture2D source, string key, float scale)
+        private void LoadDynamicBoundingBoxPerFrame(bool polygon, int rows, int columns, Texture2D source, string key, float scale, float scaleBoundingBox)
         {
             int width = source.Width / columns;
             int height = source.Height / rows;
             BoundingBoxTextures.DynamicBoundingBoxTextures.Add(key, new Dictionary<string, Rectangle>());
+            if (polygon)
+                BoundingBoxTextures.DynamicBoundingPolygons.Add(key, new Dictionary<string, Polygon>());
             // create custom bounding box for each ship frame (8 rows, 3 columns)
             for (int i = 0; i < columns; i++) // columns
             {
@@ -201,8 +203,18 @@ namespace Gusto
                     Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
                     source.GetData(0, sourceRectangle, data, 0, data.Length);
                     cropTexture.SetData(data);
+
+                    Polygon poly = null;
+                    if (polygon)
+                    {
+                        poly = new Polygon();
+                        poly.Verts = CalculateTextureBoundingBox.CropTextureToPolygon(cropTexture, scale);
+                        poly.UpperLeftPoint = Vector2.Zero;
+                        BoundingBoxTextures.DynamicBoundingPolygons[key].Add(i.ToString() + j.ToString(), poly);
+                    }
+
                     // store the BB texture 
-                    Rectangle bb = CalculateTextureBoundingBox.GetSmallestRectangleFromTexture(cropTexture, scale);
+                    Rectangle bb = CalculateTextureBoundingBox.GetSmallestRectangleFromTexture(cropTexture, scale, scaleBoundingBox);
                     BoundingBoxTextures.DynamicBoundingBoxTextures[key].Add(i.ToString() + j.ToString(), bb);
                 }
             }
@@ -440,11 +452,14 @@ namespace Gusto
         // collision handling beef
         private void SpatialCollision()
         {
+
             foreach (var team in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
                 BoundingBoxLocations.BoundingBoxLocationMap[team].Clear();
 
             foreach (var spriteA in Collidable)
             {
+
+                Polygon polyA = null;
 
                 // BoundBoxLocationMap update - this structure is used for AI locating targets
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
@@ -464,6 +479,9 @@ namespace Gusto
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();
+                if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(spriteA.bbKey))
+                    polyA = spriteA.GetBoundingPolygon();
+
                 HashSet<string> quadKeys = collision.GetQuadKey(bbA);
                 HashSet<Sprite> possible = new HashSet<Sprite>();
                 foreach (var key in quadKeys)
@@ -471,22 +489,58 @@ namespace Gusto
 
                 foreach (var spriteB in possible)
                 {
-                    if (spriteB == spriteA)
-                        continue;
-
                     var bbB = spriteB.GetBoundingBox();
 
-                    if (bbA.Intersects(bbB) && CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
+                    if (Object.ReferenceEquals(spriteA, spriteB))
+                        continue;
+
+                    Polygon polyB = null;
+                    if (BoundingBoxTextures.DynamicBoundingPolygons.ContainsKey(spriteB.bbKey))
+                        polyB = spriteB.GetBoundingPolygon();
+
+                    // pass collision game logic - this filters out some collisions that are colliding but we don't want to handle a collision (trees colliding with other trees)
+                    if (CollisionGameLogic.CheckCollidable(spriteA, spriteB) && CollisionGameLogic.CheckCollidable(spriteB, spriteA))
                     {
-                        spriteA.colliding = true;
-                        spriteB.colliding = true;
-                        Rectangle overlap = Rectangle.Intersect(bbA, bbB);
-                        spriteA.HandleCollision(spriteB, overlap);
-                        spriteB.HandleCollision(spriteA, overlap);
+                        // spatial intersection for rect, poly
+                        if (polyA != null || polyB != null)
+                        {
+                            // poly vs rect
+                            if (polyA != null && polyB == null)
+                            {
+                                if (polyA.IntersectsRect(bbB))
+                                    MarkCollision(spriteA, spriteB);
+                            }
+                            else if (polyB != null && polyA == null)
+                            {
+                                if (polyB.IntersectsRect(bbA))
+                                    MarkCollision(spriteA, spriteB);
+                            }
+                            else
+                            {
+                                // poly vs poly
+                                if (polyA.IntersectsPoly(polyB))
+                                    MarkCollision(spriteA, spriteB);
+                            }
+                        }
+                        else
+                        {
+                            // rect vs rects
+                            if (bbA.Intersects(bbB))
+                                MarkCollision(spriteA, spriteB);
+                        }
                     }
                 }
             }
             collision.Clear();
+        }
+
+        private void MarkCollision(Sprite spriteA, Sprite spriteB)
+        {
+            spriteA.colliding = true;
+            spriteB.colliding = true;
+            Rectangle overlap = Rectangle.Intersect(spriteA.GetBoundingBox(), spriteB.GetBoundingBox());
+            spriteA.HandleCollision(spriteB, overlap);
+            spriteB.HandleCollision(spriteA, overlap);
         }
     }
 }

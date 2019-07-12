@@ -73,7 +73,7 @@ namespace Gusto.Models.Animated
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
-        public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics)
+        public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             Shots = new List<Ammo>();
             inventory = inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
