@@ -27,6 +27,7 @@ float percentThroughDay = 0.0f;
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
 
+	float4 constant = 1.5f;
 	float4 pixelColor = tex2D(s0, input.TextureCoordinates);
 	float4 outputColor = pixelColor;
 
@@ -88,7 +89,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	if (lightMaskColor.r != 0.0f || lightMaskColor.g != 0.0f || lightMaskColor.b != 0.0f) 
 	{
 		// we are in the light so don't apply ambient light
-		return pixelColor * (lightMaskColor + outputColor); // have to offset by outputColor here because the lightMask is pure black
+		return pixelColor * (lightMaskColor + outputColor) * constant; // have to offset by outputColor here because the lightMask is pure black
 	}
 	
 	// Sepia
@@ -102,7 +103,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	//outputColor.g = value;
 	//outputColor.b = value;
 
-	return outputColor * pixelColor; // must multiply by pixelColor here to offset the lightMask bounds. TODO: could try to restore original color by removing this multiplaction and factoring in more of an offset on ln 91
+	return outputColor * pixelColor * constant; // must multiply by pixelColor here to offset the lightMask bounds. TODO: could try to restore original color by removing this multiplaction and factoring in more of an offset on ln 91
 }
 
 technique ambientLightDayNight
