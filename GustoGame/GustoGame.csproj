@@ -77,6 +77,7 @@
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
+    <Compile Include="Models\Light.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />
     <Compile Include="Models\Interfaces\ICanUpdate.cs" />
     <Compile Include="Models\Interfaces\IInventoryItem.cs" />

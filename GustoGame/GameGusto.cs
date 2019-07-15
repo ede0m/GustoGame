@@ -38,6 +38,8 @@ namespace Gusto
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
 
+        Light lanternLight;
+
         TileGameMap map;
         JObject mapData;
 
@@ -48,6 +50,9 @@ namespace Gusto
 
         GraphicsDeviceManager graphics;
         RenderTarget2D gameScene;
+        RenderTarget2D ambientLight;
+        RenderTarget2D lightsTarget;
+        Effect lanternEffect;
 
         DayLight dayLight;
 
@@ -83,6 +88,8 @@ namespace Gusto
             map = new TileGameMap(this.camera);
 
             dayLight = new DayLight(Content, GraphicsDevice);
+            lightsTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
@@ -152,16 +159,20 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
-   
-            
+
+            // Effects
+            lanternEffect = Content.Load<Effect>("lighteffect");
+
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
             baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
             piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
             inventory = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
-
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+
+            lanternLight = new Light(Content, GraphicsDevice);
+
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
             pistol.onGround = true;
@@ -171,6 +182,9 @@ namespace Gusto
             cannonAmmo = new CannonBallItem(TeamType.A, "GustoGame", new Vector2(200, -300), Content, GraphicsDevice);
             cannonAmmo.amountStacked = 10;
             cannonAmmo.onGround = true;
+
+
+
 
             // fill update order list
             UpdateOrder.Add(baseShip);
@@ -315,6 +329,11 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // other lights
+            GraphicsDevice.SetRenderTarget(lightsTarget);
+            GraphicsDevice.Clear(Color.Black);
+            lanternLight.Draw(spriteBatchView, this.camera, new Vector2(piratePlayer.location.X - 130, piratePlayer.location.Y - 130)); // TODO - need to bind this to lanterns location
+
             GraphicsDevice.SetRenderTarget(gameScene);
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -428,12 +447,21 @@ namespace Gusto
                 sprite.Draw(spriteBatchView, this.camera);
             }
 
-            // return to render on device
+
+            // lighting shader - for ambient day/night light and lanterns
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
+            dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
 
-            // daylight shader
-            dayLight.Draw(spriteBatchStatic, gameScene);
+            // draw gamescene with lanternLight overlay
+            /*GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black);
+            spriteBatchView.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            lanternEffect.Parameters["lightMask"].SetValue(lightsTarget);
+            lanternEffect.CurrentTechnique.Passes[0].Apply();
+            spriteBatchView.Draw(ambientLight, Vector2.Zero, Color.White);
+            spriteBatchView.End();*/
+
 
             // draw static and menu sprites
             windArrows.Draw(spriteBatchStatic, null);
