@@ -49,6 +49,7 @@ namespace Gusto
         Inventory inventory;
 
         GraphicsDeviceManager graphics;
+        FrameCounter _frameCounter;
         RenderTarget2D gameScene;
         RenderTarget2D ambientLight;
         RenderTarget2D lightsTarget;
@@ -60,12 +61,14 @@ namespace Gusto
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
         HashSet<Sprite> UpdateOrder;
+        SpriteFont font;
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
         
         public GameGusto()
         {
+            _frameCounter = new FrameCounter();
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = GameOptions.PrefferedBackBufferWidth;
             graphics.PreferredBackBufferHeight = GameOptions.PrefferedBackBufferHeight;
@@ -108,7 +111,7 @@ namespace Gusto
             spriteBatchView = new SpriteBatch(GraphicsDevice);
             spriteBatchStatic = new SpriteBatch(GraphicsDevice);
 
-            // PREPROCESSING
+            // PREPROCESSING Bounding Sprites
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
@@ -159,6 +162,7 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
+            font = Content.Load<SpriteFont>("helperFont");
 
             // Effects
             lanternEffect = Content.Load<Effect>("lighteffect");
@@ -473,6 +477,13 @@ namespace Gusto
             if (playerOnShip)
                 playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
+            // fps
+            var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            _frameCounter.Update(deltaTime);
+            var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
+            spriteBatchStatic.Begin();
+            spriteBatchStatic.DrawString(font, fps, new Vector2(10, 10), Color.Green);
+            spriteBatchStatic.End();
             base.Draw(gameTime);
         }
 
