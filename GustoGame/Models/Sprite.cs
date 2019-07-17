@@ -144,10 +144,6 @@ namespace Gusto.Models
             spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f, 
                 new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
 
-
-            if (boundingPolygon != null)
-                DrawPolygonBB(spriteBatch);
-
             spriteBatch.End();
         }
 

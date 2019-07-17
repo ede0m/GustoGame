@@ -50,6 +50,7 @@
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\CannonBallItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Lantern.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
     <Compile Include="AnimatedSprite\PistolShot.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Models\Animated\Tree.cs" />
     <Compile Include="Models\Interfaces\IAmmo.cs" />
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
+    <Compile Include="Models\Interfaces\ILight.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Light.cs" />

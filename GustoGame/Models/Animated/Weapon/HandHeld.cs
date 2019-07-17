@@ -32,6 +32,7 @@ namespace Gusto.Models.Animated
         public InventoryItem ammoLoaded;
         public Type ammoType;
         public List<Ammo> Shots;
+        public Light emittingLight; // if this handheld emits any light
 
         Random rand;
         GraphicsDevice _graphics;
@@ -64,6 +65,12 @@ namespace Gusto.Models.Animated
                         Shots.RemoveAt(i);
                 }
                 timeSinceLastExpClean = 0;
+            }
+
+            // lighting items
+            if (emittingLight != null)
+            {
+                emittingLight.Update(kstate, gameTime, GetBoundingBox().Center.ToVector2());
             }
 
             usingItem = false;
