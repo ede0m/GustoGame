@@ -149,6 +149,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureLand1, "landTile", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
             LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
+            Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureGrass1, "grass1", 1.5f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
