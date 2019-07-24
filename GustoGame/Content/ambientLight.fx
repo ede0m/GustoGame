@@ -27,7 +27,7 @@ float percentThroughDay = 0.0f;
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
 
-	float4 constant = 1.5f;
+	float4 constant = 1.2f;
 	float4 pixelColor = tex2D(s0, input.TextureCoordinates);
 	float4 outputColor = pixelColor;
 

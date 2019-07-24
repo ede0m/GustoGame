@@ -29,9 +29,9 @@ namespace Gusto.Models
             _graphics = graphics;
             lightMask = content.Load<Texture2D>("lightmask3");
 
-            // RANDOM COLOR
+            // TODO: RANDOM COLOR
 
-            // light radius
+            // TODO: light radius
         }
 
         public void Draw(SpriteBatch sb, Camera cam)
