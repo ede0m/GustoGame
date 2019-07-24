@@ -41,10 +41,9 @@ namespace Gusto.Models.Animated
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith is IWalks && !animate)
-            {
+            // grass walk through animation
+            if (collidedWith is IWalks && collidedWith.moving && !animate)
                 animate = true;
-            }
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
