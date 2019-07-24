@@ -111,6 +111,8 @@ namespace Gusto.GameMap
             {
                 case "t1":
                     return new Tree1(TeamType.GroundObject, region, loc, content, graphics);
+                case "gr1":
+                    return new Grass1(TeamType.GroundObject, region, loc, content, graphics);
             }
             return null;
         }

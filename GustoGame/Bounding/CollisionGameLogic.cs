@@ -68,6 +68,8 @@ namespace Gusto.Bounding
             {
                 if (b.GetType().BaseType == typeof(Gusto.Models.TilePiece))
                     return false;
+                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Grass))
+                    return false;
             }
 
             else if (a is IGroundObject)

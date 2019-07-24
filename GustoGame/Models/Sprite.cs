@@ -19,6 +19,7 @@ namespace Gusto.Models
         private Rectangle boundingBoxRect;
         private Polygon boundingPolygon;
         public float spriteScale;
+        public float rotation;
 
         public Vector2 location;
         public int nRows { get; set; }
@@ -41,6 +42,7 @@ namespace Gusto.Models
         {
             _texture = asset.Texture;
             spriteScale = asset.Scale;
+            rotation = 0;
             location = startingLoc;
             nRows = asset.Rows;
             nColumns = asset.Columns;
@@ -141,7 +143,7 @@ namespace Gusto.Models
             }
             
             // normal drawing call
-            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, 0f, 
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.White, rotation,
                 new Vector2(width/2, height/2), spriteScale, SpriteEffects.None, 0f);
 
             spriteBatch.End();
