@@ -22,5 +22,6 @@ namespace Gusto.Bounding
 
         public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>();
         public static HashSet<Sprite> GroundObjectLocationList = new HashSet<Sprite>();
+        public static HashSet<Light> LightLocationList = new HashSet<Light>();
     }
 }

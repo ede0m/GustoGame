@@ -37,7 +37,7 @@ namespace Gusto.GameMap
             currentMsOfDay = 0;
             dayLengthMs = 60000; // how long the day takes
 
-            maxBlackoutIntensity = 50;
+            maxBlackoutIntensity = 60;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
@@ -102,14 +102,15 @@ namespace Gusto.GameMap
         }
 
         // draws the game scene with post processing ambient light
-        public void Draw(SpriteBatch sb, RenderTarget2D gameScene)
+        public void Draw(SpriteBatch sb, RenderTarget2D ambientLight, RenderTarget2D lightMaskTarget)
         {
             // ambient light
             sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             ambientLightEff.Parameters["ambient"].SetValue(currentIntensity);
             ambientLightEff.Parameters["percentThroughDay"].SetValue(percentDayComplete);
+            ambientLightEff.Parameters["lightMask"].SetValue(lightMaskTarget);
             ExecuteTechnique("ambientLightDayNight");
-            sb.Draw(gameScene, Vector2.Zero, Color.White);
+            sb.Draw(ambientLight, Vector2.Zero, Color.White);
             sb.End();
         }
 

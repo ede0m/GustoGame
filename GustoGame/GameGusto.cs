@@ -37,6 +37,7 @@ namespace Gusto
         Pistol pistol;
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
+        Lantern lantern;
 
         TileGameMap map;
         JObject mapData;
@@ -47,7 +48,11 @@ namespace Gusto
         Inventory inventory;
 
         GraphicsDeviceManager graphics;
+        FrameCounter _frameCounter;
         RenderTarget2D gameScene;
+        RenderTarget2D ambientLight;
+        RenderTarget2D lightsTarget;
+        Effect lanternEffect;
 
         DayLight dayLight;
 
@@ -55,12 +60,14 @@ namespace Gusto
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
         HashSet<Sprite> UpdateOrder;
+        SpriteFont font;
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
         
         public GameGusto()
         {
+            _frameCounter = new FrameCounter();
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = GameOptions.PrefferedBackBufferWidth;
             graphics.PreferredBackBufferHeight = GameOptions.PrefferedBackBufferHeight;
@@ -83,6 +90,8 @@ namespace Gusto
             map = new TileGameMap(this.camera);
 
             dayLight = new DayLight(Content, GraphicsDevice);
+            lightsTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
@@ -101,7 +110,7 @@ namespace Gusto
             spriteBatchView = new SpriteBatch(GraphicsDevice);
             spriteBatchStatic = new SpriteBatch(GraphicsDevice);
 
-            // PREPROCESSING
+            // PREPROCESSING Bounding Sprites
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
@@ -130,7 +139,9 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShotItem, "pistolShotItem", 1.0f, 1.0f);
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
-            
+            Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
+
             // Tile Pieces
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureOcean1, "oceanTile", 1.0f, 1.0f);
@@ -152,16 +163,16 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
-   
-            
+            font = Content.Load<SpriteFont>("helperFont");
+
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
             baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
             piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
             inventory = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
-
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
             pistol.onGround = true;
@@ -171,6 +182,9 @@ namespace Gusto
             cannonAmmo = new CannonBallItem(TeamType.A, "GustoGame", new Vector2(200, -300), Content, GraphicsDevice);
             cannonAmmo.amountStacked = 10;
             cannonAmmo.onGround = true;
+            lantern = new Lantern(TeamType.A, "GustoGame", new Vector2(180, -300), Content, GraphicsDevice);
+            lantern.onGround = true;
+
 
             // fill update order list
             UpdateOrder.Add(baseShip);
@@ -182,6 +196,7 @@ namespace Gusto
             UpdateOrder.Add(pistolAmmo);
             UpdateOrder.Add(cannonAmmo);
             UpdateOrder.Add(inventory);
+            UpdateOrder.Add(lantern);
 
         }
 
@@ -315,6 +330,14 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // setup lightTarget for spot lights
+            GraphicsDevice.SetRenderTarget(lightsTarget);
+            GraphicsDevice.Clear(Color.Black);
+            foreach (var light in BoundingBoxLocations.LightLocationList)
+                light.Draw(spriteBatchView, this.camera);
+            BoundingBoxLocations.LightLocationList.Clear(); // clear after we have drawn the light mask
+
+            // set up gamescene draw
             GraphicsDevice.SetRenderTarget(gameScene);
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -399,6 +422,9 @@ namespace Gusto
                     if (pirate.inCombat && pirate.currRowFrame != 3)
                         pirate.inHand.Draw(spriteBatchView, this.camera);
 
+                    /*if (pirate.inHand.emittingLight != null)
+                        pirate.inHand.emittingLight.Draw(spriteBatchView, this.camera, lightsTarget, gameScene);*/
+
                     foreach (var shot in pirate.inHand.Shots)
                         shot.Draw(spriteBatchView, this.camera);
 
@@ -425,15 +451,20 @@ namespace Gusto
                     continue;
                 }
 
+                // scene spot light mask
+                /*if (sprite is ILight)
+                {
+                    HandHeld light = (HandHeld)sprite;
+                    light.emittingLight.Draw(spriteBatchView, this.camera, lightsTarget, gameScene);
+                }*/
+
                 sprite.Draw(spriteBatchView, this.camera);
             }
 
-            // return to render on device
+            // lighting shader - for ambient day/night light and lanterns
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
-
-            // daylight shader
-            dayLight.Draw(spriteBatchStatic, gameScene);
+            dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
 
             // draw static and menu sprites
             windArrows.Draw(spriteBatchStatic, null);
@@ -445,6 +476,13 @@ namespace Gusto
             if (playerOnShip)
                 playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
 
+            // fps
+            var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            _frameCounter.Update(deltaTime);
+            var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
+            spriteBatchStatic.Begin();
+            spriteBatchStatic.DrawString(font, fps, new Vector2(10, 10), Color.Green);
+            spriteBatchStatic.End();
             base.Draw(gameTime);
         }
 
