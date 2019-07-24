@@ -22,7 +22,8 @@ namespace Gusto.AnimatedSprite.InventoryItems
                 textureLanternBB = new Texture2D(graphics, textureLantern.Width, textureLantern.Height);
             Asset baseLantern = new Asset(textureLantern, textureLanternBB, 3, 4, 1.0f, "lantern", region);
 
-            Light lanternLight = new Light(content, graphics);
+            // todo: random size?? Color?
+            Light lanternLight = new Light(content, graphics, 1.0f);
             emittingLight = lanternLight;
             
             SetSpriteAsset(baseLantern, location);

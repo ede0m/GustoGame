@@ -16,6 +16,8 @@ namespace Gusto.Models
     {
         GraphicsDevice _graphics;
         Color color;
+        float baseSize;
+        float scaleSize;
         Texture2D lightMask;
         Vector2 location;
 
@@ -24,14 +26,14 @@ namespace Gusto.Models
         float toggleMs = 500;
         float msButtonHit;
 
-        public Light(ContentManager content, GraphicsDevice graphics)
+        public Light(ContentManager content, GraphicsDevice graphics, float size)
         {
             _graphics = graphics;
             lightMask = content.Load<Texture2D>("lightmask3");
+            baseSize = size;
 
             // TODO: RANDOM COLOR
 
-            // TODO: light radius
         }
 
         public void Draw(SpriteBatch sb, Camera cam)
@@ -43,7 +45,7 @@ namespace Gusto.Models
             if ((location.X >= minCorner.X && location.X <= maxCorner.X) && (location.Y >= minCorner.Y && location.Y <= maxCorner.Y))
             {
                 sb.Begin(cam, SpriteSortMode.Immediate, BlendState.Additive);
-                sb.Draw(lightMask, location, null, Color.MediumPurple, 0f, new Vector2(lightMask.Width / 2, lightMask.Height / 2), 1.0f, SpriteEffects.None, 0f);
+                sb.Draw(lightMask, location, null, Color.MediumPurple, 0f, new Vector2(lightMask.Width / 2, lightMask.Height / 2), scaleSize, SpriteEffects.None, 0f);
                 sb.End();
             }
 
@@ -64,10 +66,13 @@ namespace Gusto.Models
                 }
             }
 
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                scaleSize = baseSize * 1.4f;
+            else
+                scaleSize = baseSize;
+
             if (lit)
-            {
                 BoundingBoxLocations.LightLocationList.Add(this);
-            }
         }
     }
 }
