@@ -26,15 +26,16 @@ namespace Gusto.AnimatedSprite
             fullHealth = 25;
             health = fullHealth;
             damage = 0.05f;
+            string objKey = "baseTribal";
 
-            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPCDrops(team, rand, 3);
-            inventory = ItemUtility.CreateNPCInventory(itemDrops, team, region, location, content, graphics);
+            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, rand, 3);
+            inventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
 
             Texture2D textureBaseTribal = content.Load<Texture2D>("Tribal1");
             Texture2D textureBaseTribalBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseTribalBB = new Texture2D(graphics, textureBaseTribal.Width, textureBaseTribal.Height);
-            Asset baseTribalAsset = new Asset(textureBaseTribal, textureBaseTribalBB, 12, 4, 1.0f, "baseTribal", region);
+            Asset baseTribalAsset = new Asset(textureBaseTribal, textureBaseTribalBB, 12, 4, 1.0f, objKey, region);
             SetSpriteAsset(baseTribalAsset, location);
         }
     }

@@ -32,20 +32,21 @@ namespace Gusto.Utility
             return rand.Next(-n, n);
         }
 
-        public static List<Tuple<string, int>> RandomNPCDrops(TeamType team, Random rand, int maxItemDrop)
+        // maxItemDrop is different than maxDrop key. maxItemDrop is number of attempts to get items. number of drops by inventory will  not exceed maxItemDrop.
+        public static List<Tuple<string, int>> RandomNPDrops(string objKey, Random rand, int maxItemDrop)
         {
             List<string> drops = new List<string>();
             List<int> dropAmounts = new List<int>();
 
-            int itemSetCount = ItemDropMappings.ItemDrops[team].Count;
-            List<string> itemSet = Enumerable.ToList(ItemDropMappings.ItemDrops[team].Keys);
+            int itemSetCount = ItemDropMappings.ItemDrops[objKey].Count;
+            List<string> itemSet = Enumerable.ToList(ItemDropMappings.ItemDrops[objKey].Keys);
 
             int i = 0;
             while (i < maxItemDrop)
             {
                 string randomItemKey = itemSet[rand.Next(itemSetCount)];
-                float percentWillDrop = ItemDropMappings.ItemDrops[team][randomItemKey]["percentDrop"];
-                float maxDropAmount = ItemDropMappings.ItemDrops[team][randomItemKey]["maxDrop"];
+                float percentWillDrop = ItemDropMappings.ItemDrops[objKey][randomItemKey]["percentDrop"];
+                float maxDropAmount = ItemDropMappings.ItemDrops[objKey][randomItemKey]["maxDrop"];
                 float dropP = rand.Next(0, 100);
                 if (dropP <= percentWillDrop)
                 {

@@ -286,6 +286,13 @@ namespace Gusto.Models.Animated
         {
             for (int i = 0; i < inventory.Count(); i++)
             {
+                // auto stack - TODO MAX STACK
+                if (inventory[i] != null && inventory[i].bbKey == itemToAdd.bbKey && itemToAdd.stackable)
+                {
+                    inventory[i].amountStacked += itemToAdd.amountStacked;
+                    return true;
+                }
+
                 if (inventory[i] == null)
                 {
                     inventory[i] = itemToAdd;

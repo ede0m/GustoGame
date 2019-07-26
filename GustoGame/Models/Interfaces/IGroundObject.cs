@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace Gusto.Models.Interfaces
 {
     public interface IGroundObject
     {
+        void UpdateRespawn(GameTime gt);
     }
 }
