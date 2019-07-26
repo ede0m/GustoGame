@@ -16,7 +16,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
         {
             itemKey = "softWood";
 
-            Texture2D textureSoftWood = content.Load<Texture2D>("TribalTokens");
+            Texture2D textureSoftWood = content.Load<Texture2D>("softwoodpile");
             Texture2D textureSoftWoodBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureSoftWoodBB = new Texture2D(graphics, textureSoftWood.Width, textureSoftWood.Height);

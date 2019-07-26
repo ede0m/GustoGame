@@ -16,7 +16,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
         {
             itemKey = "islandGrass";
 
-            Texture2D textureIslandGrass = content.Load<Texture2D>("TribalTokens");
+            Texture2D textureIslandGrass = content.Load<Texture2D>("islandGrass");
             Texture2D textureIslandGrassBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureIslandGrassBB = new Texture2D(graphics, textureIslandGrass.Width, textureIslandGrass.Height);
