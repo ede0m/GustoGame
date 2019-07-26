@@ -9,9 +9,9 @@ namespace Gusto.Mappings
 {
     public class ItemDropMappings
     {
-        public static Dictionary<TeamType, Dictionary<string, Dictionary<string, float>>> ItemDrops = new Dictionary<TeamType, Dictionary<string, Dictionary<string, float>>>
+        public static Dictionary<string, Dictionary<string, Dictionary<string, float>>> ItemDrops = new Dictionary<string, Dictionary<string, Dictionary<string, float>>>
         {
-            { TeamType.B, new Dictionary<string, Dictionary<string, float>>
+            { "baseTribal", new Dictionary<string, Dictionary<string, float>>
                 {
                     {"tribalTokens", new Dictionary<string, float>
                         {
@@ -26,6 +26,26 @@ namespace Gusto.Mappings
                             {"percentDrop", 50 }
                         }
                     }
+                }
+            },
+            { "tree1", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"softWood", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 4 },
+                            {"percentDrop", 100 }
+                        }
+                    },
+                }
+            },
+            { "grass1", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"islandGrass", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 4 },
+                            {"percentDrop", 80}
+                        }
+                    },
                 }
             },
 

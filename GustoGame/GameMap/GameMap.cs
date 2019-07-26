@@ -15,6 +15,7 @@ using Gusto.Utility;
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Models.Animated;
+using Gusto.Models.Interfaces;
 
 namespace Gusto.GameMap
 {
@@ -31,8 +32,8 @@ namespace Gusto.GameMap
         private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
         private JObject _mapData;
 
-        const int tileHeight = 32;
-        const int tileWidth = 32;
+        int tileHeight = GameOptions.tileHeight;
+        int tileWidth = GameOptions.tileWidth;
         Vector2 startMapPoint;
 
         Random rand;
@@ -117,7 +118,7 @@ namespace Gusto.GameMap
             return null;
         }
 
-        public void DrawMap(SpriteBatch sb)
+        public void DrawMap(SpriteBatch sb, GameTime gameTime)
         {
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
@@ -139,7 +140,20 @@ namespace Gusto.GameMap
 
                     TilePiece tileP = (TilePiece)tile;
                     if (tileP.groundObject != null)
-                        BoundingBoxLocations.GroundObjectLocationList.Add(tileP.groundObject);
+                    {
+                        if (!tileP.groundObject.remove)
+                            BoundingBoxLocations.GroundObjectLocationList.Add(tileP.groundObject);
+                        else
+                        {
+                            if (tileP.groundObject is IGroundObject)
+                            {
+                                IGroundObject go = (IGroundObject)tileP.groundObject;
+                                go.UpdateRespawn(gameTime);
+                            }
+                        }
+
+
+                    }
 
                 }
             }

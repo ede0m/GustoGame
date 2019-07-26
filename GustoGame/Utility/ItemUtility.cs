@@ -19,7 +19,7 @@ namespace Gusto.Utility
         public static List<Sprite> ItemsToUpdate = new List<Sprite>();
 
 
-        public static List<InventoryItem> CreateNPCInventory(List<Tuple<string, int>> itemDrops, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+        public static List<InventoryItem> CreateNPInventory(List<Tuple<string, int>> itemDrops, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             List<InventoryItem> returnItems = new List<InventoryItem>();
             List<string> trackStackable = new List<string>();
@@ -47,6 +47,18 @@ namespace Gusto.Utility
                         ss.itemKey = "shortSword";
                         returnItems.Add(ss);
                         trackStackable.Add("shortSword");
+                        break;
+                    case ("softWood"):
+                        SoftWood sw = new SoftWood(team, region, location, content, graphics);
+                        sw.itemKey = "softWood";
+                        returnItems.Add(sw);
+                        trackStackable.Add("softWood");
+                        break;
+                    case ("islandGrass"):
+                        IslandGrass ig = new IslandGrass(team, region, location, content, graphics);
+                        ig.itemKey = "islandGrass";
+                        returnItems.Add(ig);
+                        trackStackable.Add("islandGrass");
                         break;
                 }
                 returnItems[index].inInventory = true;
