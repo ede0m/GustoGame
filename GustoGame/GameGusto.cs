@@ -37,6 +37,7 @@ namespace Gusto
         Pistol pistol;
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
+        BasePlank basePlank;
         Lantern lantern;
 
         TileGameMap map;
@@ -45,6 +46,7 @@ namespace Gusto
         // static
         WindArrows windArrows;
         Texture2D anchorIcon;
+        Texture2D repairIcon;
         Inventory inventory;
 
         GraphicsDeviceManager graphics;
@@ -155,6 +157,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIslandGrass, "islandGrass", 0.5f, 1.0f);
             Texture2D textureTribalTokens = Content.Load<Texture2D>("TribalTokens");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTribalTokens, "tribalTokens", 0.5f, 1.0f);
+            Texture2D textureBasePlank = Content.Load<Texture2D>("TribalTokens");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureBasePlank, "basePlank", 0.5f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -169,6 +173,7 @@ namespace Gusto
             // static 
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
+            repairIcon = Content.Load<Texture2D>("work-hammer-");
             font = Content.Load<SpriteFont>("helperFont");
 
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
@@ -190,6 +195,9 @@ namespace Gusto
             cannonAmmo.onGround = true;
             lantern = new Lantern(TeamType.A, "GustoGame", new Vector2(180, -300), Content, GraphicsDevice);
             lantern.onGround = true;
+            basePlank = new BasePlank(TeamType.A, "GustoGame", new Vector2(150, -300), Content, GraphicsDevice);
+            basePlank.onGround = true;
+            basePlank.amountStacked = 10;
 
 
             // fill update order list
@@ -201,6 +209,7 @@ namespace Gusto
             UpdateOrder.Add(pistol);
             UpdateOrder.Add(pistolAmmo);
             UpdateOrder.Add(cannonAmmo);
+            UpdateOrder.Add(basePlank);
             UpdateOrder.Add(inventory);
             UpdateOrder.Add(lantern);
 
@@ -480,7 +489,10 @@ namespace Gusto
                 inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
             if (playerOnShip)
+            {
                 playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
+                playerShip.DrawRepairHammer(spriteBatchStatic, new Vector2(1600, 30), repairIcon);
+            }
 
             // fps
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;

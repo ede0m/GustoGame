@@ -20,6 +20,7 @@ namespace Gusto.AnimatedSprite
             millisecondsPerTurn = 500; // turn speed
             timeSinceStartAnchor = 0;
             millisecondsToAnchor = 1000;
+            msToRepair = 5000;
             timeSinceLastExpClean = 0;
             millisecondsExplosionLasts = 400;
             timeSinceLastShot = 0;
