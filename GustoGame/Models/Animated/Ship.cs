@@ -67,7 +67,7 @@ namespace Gusto.Models.Animated
         public bool anchored;
         public bool playerAboard;
 
-        Random rand;
+        public Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
         public WindArrows wind;
@@ -207,13 +207,27 @@ namespace Gusto.Models.Animated
                 sinkingTransparency = 1 - (timeSinceStartSinking / millisecondToSink);
                 shipSail.sinkingTransparency = sinkingTransparency;
                 if(sinkingTransparency <= 0)
+                {
                     remove = true;
+
+                    // drop items
+                    foreach (var item in inventory)
+                    {
+                        item.inInventory = false;
+                        // scatter items
+                        item.location.X = location.X + rand.Next(-10, 10);
+                        item.location.Y = location.Y + rand.Next(-10, 10);
+                        item.onGround = true;
+                        ItemUtility.ItemsToUpdate.Add(item);
+                    }
+                    inventory.Clear();
+                }
             }
         }
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            //health = 40; UNLIMITED HEALTH
+            health = 40; //UNLIMITED HEALTH
             
             // turning
             if (timeSinceLastTurn > millisecondsPerTurn && playerAboard)

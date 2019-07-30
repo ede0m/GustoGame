@@ -42,6 +42,12 @@ namespace Gusto.Utility
                         returnItems.Add(tt);
                         trackStackable.Add("tribalTokens");
                         break;
+                    case ("basePlank"):
+                        BasePlank bp = new BasePlank(team, region, location, content, graphics);
+                        bp.itemKey = "basePlank";
+                        returnItems.Add(bp);
+                        trackStackable.Add("basePlank");
+                        break;
                     case ("shortSword"):
                         ShortSword ss = new ShortSword(team, region, location, content, graphics);
                         ss.itemKey = "shortSword";

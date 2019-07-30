@@ -9,6 +9,7 @@ using Gusto.Models;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using System.Linq;
+using Gusto.Utility;
 
 namespace Gusto.AnimatedSprite
 {
@@ -36,15 +37,23 @@ namespace Gusto.AnimatedSprite
             attackRange = 400f;
             maxInventorySlots = 15;
 
+            string objKey = "baseShip";
 
             //MapModelMovementVectorValues();
             Texture2D textureBaseShip = content.Load<Texture2D>("BaseShip");
             Texture2D textureBaseShipBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBaseShipBB = new Texture2D(graphics, textureBaseShip.Width, textureBaseShip.Height);
-            Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, "baseShip", region);
+            Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, objKey, region);
 
-            inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+            // inventory
+            if (team != TeamType.Player)
+            {
+                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, rand, 3);
+                inventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
+            }
+            else
+                inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
 
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(team, region, location, content, graphics);
