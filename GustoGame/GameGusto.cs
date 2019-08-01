@@ -153,6 +153,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSoftWood, "softWood", 0.5f, 1.0f);
             Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureGrass1, "grass1", 1.5f, 1.0f);
+            Texture2D textureRock1 = Content.Load<Texture2D>("Rock1");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 4, textureRock1, "rock1", 0.3f, 1.0f);
             Texture2D textureIslandGrass = Content.Load<Texture2D>("islandGrass");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIslandGrass, "islandGrass", 0.5f, 1.0f);
             Texture2D textureTribalTokens = Content.Load<Texture2D>("TribalTokens");

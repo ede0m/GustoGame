@@ -64,6 +64,11 @@ namespace Gusto.Mappings
                     },
                 }
             },
+            { "rock1", new Dictionary<string, Dictionary<string, float>>
+                {
+
+                }
+            },
 
         };
     }
