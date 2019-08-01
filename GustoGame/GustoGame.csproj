@@ -46,6 +46,7 @@
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
     <Compile Include="Models\Interfaces\ILight.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
+    <Compile Include="Models\Interfaces\IPlank.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Light.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />

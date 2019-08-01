@@ -25,12 +25,14 @@ namespace Gusto.Models.Animated
 
         public float timeSinceLastShot;
         public float timeSinceStartAnchor;
+        public float timeSinceStartRepairing;
         public float timeSinceStartSinking;
         public int timeSinceLastExpClean;
         public int timeSinceLastTurn;
         public int timeShowingHealthBar;
         public float millisecondsNewShot;
         public float millisecondsToAnchor;
+        public float msToRepair;
         public float millisecondToSink;
         public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
@@ -50,6 +52,7 @@ namespace Gusto.Models.Animated
         public float stopRange;
         public float movementSpeed;
         public float percentNotAnchored;
+        public float percentNotRepaired;
         public float sinkingTransparency;
         public int maxShotsMoving;
         public int nSails;
@@ -64,7 +67,7 @@ namespace Gusto.Models.Animated
         public bool anchored;
         public bool playerAboard;
 
-        Random rand;
+        public Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
         public WindArrows wind;
@@ -204,13 +207,28 @@ namespace Gusto.Models.Animated
                 sinkingTransparency = 1 - (timeSinceStartSinking / millisecondToSink);
                 shipSail.sinkingTransparency = sinkingTransparency;
                 if(sinkingTransparency <= 0)
+                {
                     remove = true;
+
+                    // drop items
+                    foreach (var item in inventory)
+                    {
+                        item.inInventory = false;
+                        // scatter items
+                        item.location.X = location.X + rand.Next(-10, 10);
+                        item.location.Y = location.Y + rand.Next(-10, 10);
+                        item.onGround = true;
+                        ItemUtility.ItemsToUpdate.Add(item);
+                    }
+                    inventory.Clear();
+                }
             }
         }
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            health = 40;
+            health = 40; //UNLIMITED HEALTH
+            
             // turning
             if (timeSinceLastTurn > millisecondsPerTurn && playerAboard)
             {
@@ -260,6 +278,53 @@ namespace Gusto.Models.Animated
                 else
                     percentNotAnchored = 1;
                 timeSinceStartAnchor = 0;
+            }
+
+            // repairing
+            //TODO - divide repair time by number of crew on board
+
+            if (kstate.IsKeyDown(Keys.R) && playerAboard && percentNotRepaired > 0)
+            {
+
+                int? plankIndex = null;
+                // find plank 
+                for (int i = 0; i < inventory.Count(); i++)
+                {
+                    var item = inventory[i];
+                    if (item != null && item is IPlank && item.amountStacked > 0)
+                    {
+                        plankIndex = i;
+                        break;
+                    }
+                }
+
+                if (plankIndex != null)
+                {
+                    percentNotRepaired = 1 - (timeSinceStartRepairing / msToRepair);
+                    timeSinceStartRepairing += gameTime.ElapsedGameTime.Milliseconds;
+
+                    if (percentNotRepaired <= 0 && plankIndex != null)
+                    {
+                        var item = inventory[(int)plankIndex];
+                        health += item.restorePoints;
+                        timeSinceStartRepairing = 0;
+
+                        item.amountStacked -= 1;
+                        if (item.amountStacked <= 0)
+                            item = null;
+                    }
+
+                }
+
+            }
+            else
+            {
+                if (health >= fullHealth)
+                    percentNotRepaired = 0;
+                else
+                    percentNotRepaired = 1; // for one repair action..
+
+                timeSinceStartRepairing = 0;
             }
 
 
@@ -540,6 +605,23 @@ namespace Gusto.Models.Animated
                 sb.Draw(meterFull, full, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
                 sb.Draw(meterProg, prog, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
                 sb.Draw(anchorIcon, full, null, Color.AliceBlue, 0, Vector2.Zero, SpriteEffects.None, 0);
+                sb.End();
+            }
+        }
+
+        public void DrawRepairHammer(SpriteBatch sb, Vector2 pos, Texture2D repairIcon)
+        {
+            if (teamType == TeamType.Player)
+            {
+                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
+                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
+                float progress = (1f - percentNotRepaired) * 40f;
+                Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
+                Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
+                sb.Begin();
+                sb.Draw(meterFull, full, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(meterProg, prog, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(repairIcon, full, null, Color.AliceBlue, 0, Vector2.Zero, SpriteEffects.None, 0);
                 sb.End();
             }
         }

@@ -19,6 +19,8 @@ namespace Gusto.Models
         public string itemKey;
         PiratePlayer playerNearItem;
 
+        public int restorePoints;
+
         public bool onGround;
         public bool inInventory;
         public bool canPickUp; // proximety

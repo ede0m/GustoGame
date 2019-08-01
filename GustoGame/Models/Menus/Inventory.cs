@@ -168,6 +168,9 @@ namespace Gusto.Models.Menus
             // draw items in list and set new list order if needed
             List<InventoryItem> tempPlayerInv = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             List<InventoryItem> tempShipInv = Enumerable.Repeat<InventoryItem>(null, shipInventorySlots).ToList();
+            List<InventoryItem> invMap = itemsPlayer;
+            if (itemsShip != null)
+                invMap.AddRange(itemsShip);
             itemDrawLoc = itemDrawLocStart;
             int emptyIndex = -1; // used to denote when an item is dragged into an empty slot
             for (int i = 0; i < showSlots; i++)
@@ -187,8 +190,8 @@ namespace Gusto.Models.Menus
                     if (dropDragIndex >= 0 && selectDragIndex == i)
                     {
                         itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
-                        if (tempInventory[dropDragIndex] != null) // switch spots
-                            tempInventory[selectDragIndex] = tempInventory[dropDragIndex];
+                        if (invMap[dropDragIndex] != null) // switch spots
+                            tempInventory[selectDragIndex] = invMap[dropDragIndex];
                         else
                         {
                             tempInventory[selectDragIndex] = null;
