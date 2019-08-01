@@ -110,7 +110,7 @@ namespace Gusto.Models.Animated
             {
                 timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 // debris animation
-                if (timeSinceLastFrame > 50)
+                if (timeSinceLastFrame > 80)
                 {
                     currColumnFrame++;
                     if (currColumnFrame >= nColumns)
@@ -140,14 +140,6 @@ namespace Gusto.Models.Animated
                     msNow = msAnimate;
                     animateHarvest = false;
                 }
-
-                //timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-
-                /*if (timeSinceLastFrame > 200) // frametime
-                {
-                    animateHarvest = false;
-                    timeSinceLastFrame = 0;
-                }*/
             }
             else
                 currColumnFrame = 0;
