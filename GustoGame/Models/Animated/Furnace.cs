@@ -57,7 +57,6 @@ namespace Gusto.Models.Animated
                 int nGrass = 0;
                 int nCoal = 0;
                 int nOre = 0;
-                string oreName = null;
                 foreach (var item in playerNearItem.inventory)
                 {
                     if (item is IWood )
@@ -72,6 +71,7 @@ namespace Gusto.Models.Animated
                             nOre = item.amountStacked;
                     }
                 }
+                canCraft = true; //TEMPORARY@!
                 if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 7) // 2 wood, 2 grass, 1 coal, 8 ore required
                     canCraft = true;
             }
@@ -88,7 +88,6 @@ namespace Gusto.Models.Animated
                 bool hasGrass = false;
                 bool hasWood = false;
                 bool hasCoal = false;
-                string oreType = null;
 
                 // Remove items from inv TODO: for now this just takes the first ore, grass, wood etc in inventory
                 if (!smelting)
@@ -134,14 +133,25 @@ namespace Gusto.Models.Animated
                 }
             }
 
-            // create bar when done smelting
+            // create and drop bar when done smelting
             if (msSmelting > msToSmelt)
             {
-                switch (oreType)
+                if (oreType != null)
                 {
-                    case "iron":
-                        break;
+                    InventoryItem bar = null;
+                    Vector2 dropLoc = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
+                    switch (oreType)
+                    {
+                        case "iron":
+                            bar = new IronBar(teamType, regionKey, dropLoc, _content, _graphics);
+                            break;
+                    }
+                    bar.onGround = true;
+                    bar.amountStacked = 1;
+                    ItemUtility.ItemsToUpdate.Add(bar);
                 }
+
+                // reset
                 smelting = false;
                 msSmelting = 0;
                 oreType = null;
@@ -149,7 +159,7 @@ namespace Gusto.Models.Animated
                 emittingLight.lit = false;
             }
 
-            // lighting items
+            // lighting the furnace when running
             if (emittingLight.lit)
                 emittingLight.Update(kstate, gameTime, GetBoundingBox().Center.ToVector2());
 
