@@ -22,7 +22,7 @@ namespace Gusto.AnimatedSprite
                 textureBB = new Texture2D(graphics, texture.Width, texture.Height);
             Asset asset = new Asset(texture, textureBB, 6, 1, 0.5f, "clayFurnace", region);
 
-            Light lanternLight = new Light(content, graphics, 1.0f);
+            Light lanternLight = new Light(content, graphics, 1.0f, Color.Orange);
             emittingLight = lanternLight;
 
             SetSpriteAsset(asset, location);

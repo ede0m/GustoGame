@@ -26,13 +26,13 @@ namespace Gusto.Models
         float toggleMs = 500;
         float msButtonHit;
 
-        public Light(ContentManager content, GraphicsDevice graphics, float size)
+        public Light(ContentManager content, GraphicsDevice graphics, float size, Color c)
         {
             _graphics = graphics;
             lightMask = content.Load<Texture2D>("lightmask3");
             baseSize = size;
 
-            // TODO: RANDOM COLOR
+            color = c;
 
         }
 
@@ -45,7 +45,7 @@ namespace Gusto.Models
             if ((location.X >= minCorner.X && location.X <= maxCorner.X) && (location.Y >= minCorner.Y && location.Y <= maxCorner.Y))
             {
                 sb.Begin(cam, SpriteSortMode.Immediate, BlendState.Additive);
-                sb.Draw(lightMask, location, null, Color.MediumPurple, 0f, new Vector2(lightMask.Width / 2, lightMask.Height / 2), scaleSize, SpriteEffects.None, 0f);
+                sb.Draw(lightMask, location, null, color, 0f, new Vector2(lightMask.Width / 2, lightMask.Height / 2), scaleSize, SpriteEffects.None, 0f);
                 sb.End();
             }
 
