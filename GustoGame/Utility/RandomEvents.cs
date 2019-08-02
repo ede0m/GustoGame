@@ -53,7 +53,7 @@ namespace Gusto.Utility
                     float randomDropAmount = 1;
                     if (maxDropAmount > 1)
                     {
-                        randomDropAmount = rand.Next(1, (int)maxDropAmount);
+                        randomDropAmount = rand.Next(1, (int)maxDropAmount+1);
                     }
 
                     drops.Add(randomItemKey);
