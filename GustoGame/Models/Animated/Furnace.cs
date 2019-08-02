@@ -44,52 +44,74 @@ namespace Gusto.Models.Animated
                 playerNearItem = (PiratePlayer)collidedWith;
 
                 // check inventory to see if we have required materials
-                bool hasWood = false;
-                bool hasGrass = false;
-                bool hasCoal = false;
-                bool hasOre = false;
-                string oreType = null;
+                int nWood = 0;
+                int nGrass = 0;
+                int nCoal = 0;
+                int nOre = 0;
+                string oreName = null;
                 foreach (var item in playerNearItem.inventory)
                 {
-                    if (item is IWood && item.amountStacked >= 2) // 2 wood needed to start furnace
-                        hasWood = true;
-                    if (item is IGrass && item.amountStacked >= 2) // 2 grass needed to start furnace
-                        hasGrass = true;
+                    if (item is IWood )
+                        nWood = item.amountStacked;
+                    if (item is IGrass) 
+                        nGrass = item.amountStacked;
                     if (item is IOre)
                     {
                         if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal))
-                            hasCoal = true;
+                            nCoal = item.amountStacked;
                         else
-                        {
-                            oreType = CheckOreType(item.GetType());
-                            if (item.amountStacked >= 8)
-                                hasOre = true;
-                        }
+                            nOre = item.amountStacked;
                     }
                 }
-                if (hasWood && hasGrass && hasCoal && hasOre)
-                {
+                if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 8)
                     canCraft = true;
-                    switch (oreType)
-                    {
-                        // TODO: take items from inventory and return a new bar of type ore type, then set canCraft = false
-                    }
-                }
             }
         }        
         
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            if (canCraft)
+            if (canCraft && kstate.IsKeyDown(Keys.C)) // TODO: and keypress time
             {
-                if (kstate.IsKeyDown(Keys.C))
-                {
+                    // TODO: animate
 
-                }
+                    bool hasOre = false;
+                    bool hasGrass = false;
+                    bool hasWood = false;
+                    bool hasCoal = false;
+                    string oreType = null;
+
+                    // Remove items from inv TODO: for now this just takes the first ore, grass, wood etc in inventory
+                    foreach (var item in playerNearItem.inventory)
+                    {
+                        if (item is IWood && !hasWood)
+                        {
+                            item.amountStacked -= 2;
+                        }
+                        if (item is IGrass && !hasGrass)
+                        {
+                            item.amountStacked -= 2;
+                        }
+                        if (item is IOre)
+                        {
+                            if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal) && !hasCoal)
+                                item.amountStacked -= 1;
+                            else if (!hasOre)
+                            {
+                                oreType = CheckOreType(item.GetType());
+                                item.amountStacked -= 8;
+                            }
+                        }
+                    }
+
+                    switch(oreType)
+                    {
+                        case "iron":
+                            // TODO: Create new iron bar and drop it (maybe a timer)
+                            break;
+                    }
+                    
             }
-
-
             canCraft = false;
         }
 
