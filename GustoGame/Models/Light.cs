@@ -21,7 +21,7 @@ namespace Gusto.Models
         Texture2D lightMask;
         Vector2 location;
 
-        bool lit;
+        public bool lit;
 
         float toggleMs = 500;
         float msButtonHit;

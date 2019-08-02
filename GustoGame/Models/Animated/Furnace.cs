@@ -19,8 +19,15 @@ namespace Gusto.Models.Animated
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
+        string oreType;
         public bool canCraft;
+        public bool smelting;
         float msPerFrame;
+        float msThisFrame;
+        float msToSmelt; 
+        float msSmelting;
+
+        public Light emittingLight;
 
 
         Random rand;
@@ -34,6 +41,8 @@ namespace Gusto.Models.Animated
 
             teamType = type;
             rand = new Random();
+            msToSmelt = 10000;
+            msPerFrame = 200;
 
         }
 
@@ -63,7 +72,7 @@ namespace Gusto.Models.Animated
                             nOre = item.amountStacked;
                     }
                 }
-                if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 8)
+                if (nWood > 1 && nGrass > 1 && nCoal >= 0 && nOre > 8) // TODO: change coal back to >
                     canCraft = true;
             }
         }        
@@ -73,15 +82,17 @@ namespace Gusto.Models.Animated
         {
             if (canCraft && kstate.IsKeyDown(Keys.C)) // TODO: and keypress time
             {
-                    // TODO: animate
+                // TODO: animate
 
-                    bool hasOre = false;
-                    bool hasGrass = false;
-                    bool hasWood = false;
-                    bool hasCoal = false;
-                    string oreType = null;
+                bool hasOre = false;
+                bool hasGrass = false;
+                bool hasWood = false;
+                bool hasCoal = false;
+                string oreType = null;
 
-                    // Remove items from inv TODO: for now this just takes the first ore, grass, wood etc in inventory
+                // Remove items from inv TODO: for now this just takes the first ore, grass, wood etc in inventory
+                if (!smelting)
+                {
                     foreach (var item in playerNearItem.inventory)
                     {
                         if (item is IWood && !hasWood)
@@ -103,15 +114,46 @@ namespace Gusto.Models.Animated
                             }
                         }
                     }
-
-                    switch(oreType)
-                    {
-                        case "iron":
-                            // TODO: Create new iron bar and drop it (maybe a timer)
-                            break;
-                    }
+                    smelting = true;
+                }
                     
             }
+
+            if (smelting)
+            {
+                emittingLight.lit = true;
+                // smelting so animate and being timer
+                msSmelting += gameTime.ElapsedGameTime.Milliseconds;
+                msThisFrame += gameTime.ElapsedGameTime.Milliseconds;
+                if (msThisFrame > msPerFrame)
+                {
+                    currColumnFrame++;
+                    msThisFrame = 0;
+                    if (currColumnFrame == nColumns)
+                        currColumnFrame = 1;
+                }
+            }
+
+            // create bar when done smelting
+            if (msSmelting > msToSmelt)
+            {
+                switch (oreType)
+                {
+                    case "iron":
+                        break;
+                }
+                smelting = false;
+                msSmelting = 0;
+                oreType = null;
+                currColumnFrame = 0;
+                emittingLight.lit = false;
+            }
+
+            // lighting items
+            if (emittingLight.lit)
+                emittingLight.Update(kstate, gameTime, GetBoundingBox().Center.ToVector2());
+
+
             canCraft = false;
         }
 

@@ -456,9 +456,6 @@ namespace Gusto
                     if (pirate.inCombat && pirate.currRowFrame != 3)
                         pirate.inHand.Draw(spriteBatchView, this.camera);
 
-                    /*if (pirate.inHand.emittingLight != null)
-                        pirate.inHand.emittingLight.Draw(spriteBatchView, this.camera, lightsTarget, gameScene);*/
-
                     foreach (var shot in pirate.inHand.Shots)
                         shot.Draw(spriteBatchView, this.camera);
 
@@ -484,13 +481,6 @@ namespace Gusto
                         shot.Draw(spriteBatchView, this.camera);
                     continue;
                 }
-
-                // scene spot light mask
-                /*if (sprite is ILight)
-                {
-                    HandHeld light = (HandHeld)sprite;
-                    light.emittingLight.Draw(spriteBatchView, this.camera, lightsTarget, gameScene);
-                }*/
 
                 sprite.Draw(spriteBatchView, this.camera);
             }
