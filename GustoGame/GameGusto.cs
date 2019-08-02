@@ -39,6 +39,7 @@ namespace Gusto
         CannonBallItem cannonAmmo;
         BasePlank basePlank;
         Lantern lantern;
+        ClayFurnace furnace;
 
         TileGameMap map;
         JObject mapData;
@@ -142,6 +143,9 @@ namespace Gusto
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
 
+            Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
+
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureOcean1, "oceanTile", 1.0f, 1.0f);
@@ -189,6 +193,8 @@ namespace Gusto
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+            furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
+
 
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
@@ -218,6 +224,7 @@ namespace Gusto
             UpdateOrder.Add(basePlank);
             UpdateOrder.Add(inventory);
             UpdateOrder.Add(lantern);
+            UpdateOrder.Add(furnace);
 
         }
 
