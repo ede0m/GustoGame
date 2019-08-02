@@ -64,6 +64,22 @@ namespace Gusto.Mappings
                     },
                 }
             },
+            { "rock1", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"coal", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 2 },
+                            {"percentDrop", 30}
+                        }
+                    },
+                    {"ironOre", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 3},
+                            {"percentDrop", 80}
+                        }
+                    },
+                }
+            },
 
         };
     }

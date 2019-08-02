@@ -68,7 +68,7 @@ namespace Gusto.Models.Animated
                 showHealthBar = true;
                 health -= handHeld.damage;
             }
-            else if (collidedWith.bbKey.Equals("landTile"))
+            else if (collidedWith.bbKey.Equals("landTile") || collidedWith is IGroundObject)
             {
                 colliding = false;
                 swimming = false;
@@ -171,7 +171,7 @@ namespace Gusto.Models.Animated
                 if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
                 {
                     currColumnFrame++;
-                    if (currColumnFrame == 7) // stop before combat frames
+                    if (currColumnFrame >= 7) // stop before combat frames
                         currColumnFrame = 0;
                     timeSinceLastWalkFrame = 0;
                 }
@@ -185,10 +185,10 @@ namespace Gusto.Models.Animated
                 if (timeSinceSwordSwing > millisecondsCombatSwing && !dying)
                 {
                     currColumnFrame++;
-                    if (currColumnFrame == nColumns)
+                    if (currColumnFrame >= nColumns)
                     {
                         inCombat = false;
-                        currColumnFrame = 0;
+                        currColumnFrame = 7;
                     }
                     timeSinceSwordSwing = 0;
                 }

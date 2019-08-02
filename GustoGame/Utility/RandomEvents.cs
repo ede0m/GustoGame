@@ -42,7 +42,7 @@ namespace Gusto.Utility
             List<string> itemSet = Enumerable.ToList(ItemDropMappings.ItemDrops[objKey].Keys);
 
             int i = 0;
-            while (i < maxItemDrop)
+            while (i < maxItemDrop && itemSetCount > 0)
             {
                 string randomItemKey = itemSet[rand.Next(itemSetCount)];
                 float percentWillDrop = ItemDropMappings.ItemDrops[objKey][randomItemKey]["percentDrop"];

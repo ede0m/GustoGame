@@ -115,6 +115,18 @@
 /processorParam:TextureFormat=Color
 /build:CannonBall.png
 
+#begin coal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:coal.png
+
 #begin DecomposedBaseSail.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -145,6 +157,18 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:helperFont.spritefont
+
+#begin IronOre.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:IronOre.png
 
 #begin islandgrass.png
 /importer:TextureImporter
@@ -325,6 +349,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:pointer.png
+
+#begin Rock1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Rock1.png
 
 #begin ShortSword.png
 /importer:TextureImporter
