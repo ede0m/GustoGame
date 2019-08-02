@@ -86,12 +86,16 @@
     <Compile Include="Models\Animated\GroundObject\Rock.cs" />
     <Compile Include="Models\Animated\GroundObject\Tree.cs" />
     <Compile Include="Models\Interfaces\IAmmo.cs" />
+    <Compile Include="Models\Interfaces\ICraftingObject.cs" />
+    <Compile Include="Models\Interfaces\IGrass.cs" />
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
     <Compile Include="Models\Interfaces\ILight.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
+    <Compile Include="Models\Interfaces\IOre.cs" />
     <Compile Include="Models\Interfaces\IPlaceable.cs" />
     <Compile Include="Models\Interfaces\IPlank.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
+    <Compile Include="Models\Interfaces\IWood.cs" />
     <Compile Include="Models\Light.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />
     <Compile Include="Models\Interfaces\ICanUpdate.cs" />

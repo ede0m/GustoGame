@@ -397,6 +397,12 @@ namespace Gusto
                         item.DrawPickUp(spriteBatchView, camera);
                 }
 
+                if (sprite is ICraftingObject)
+                {
+                    ICraftingObject craftObj = (ICraftingObject)sprite;
+                    craftObj.DrawCanCraft(spriteBatchView, camera);
+                }
+
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship) sprite;
