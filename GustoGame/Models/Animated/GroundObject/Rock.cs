@@ -110,7 +110,7 @@ namespace Gusto.Models.Animated
             {
                 timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 // debris animation
-                if (timeSinceLastFrame > 80)
+                if (timeSinceLastFrame > 80) // debris animation frame rate time
                 {
                     currColumnFrame++;
                     if (currColumnFrame >= nColumns)

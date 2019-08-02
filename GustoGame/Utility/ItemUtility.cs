@@ -66,6 +66,18 @@ namespace Gusto.Utility
                         returnItems.Add(ig);
                         trackStackable.Add("islandGrass");
                         break;
+                    case ("coal"):
+                        Coal c = new Coal(team, region, location, content, graphics);
+                        c.itemKey = key;
+                        returnItems.Add(c);
+                        trackStackable.Add(key);
+                        break;
+                    case ("ironOre"):
+                        IronOre io = new IronOre(team, region, location, content, graphics);
+                        io.itemKey = key;
+                        returnItems.Add(io);
+                        trackStackable.Add(key);
+                        break;
                 }
                 returnItems[index].inInventory = true;
                 returnItems[index].amountStacked = amountDropped;
