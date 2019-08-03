@@ -305,7 +305,7 @@ namespace Gusto.Models.Menus
                 Rectangle cursorRect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, cursor.Width, cursor.Height);
 
                 selectedIndex = -1;
-                if (itemMenuIndex != -1)
+                if (itemMenuIndex != -1)  // don't switch slots when item menu open
                 {
                     selectedIndex = itemMenuIndex;
                 }
@@ -314,7 +314,7 @@ namespace Gusto.Models.Menus
                     int i = 0;
                     foreach (var slot in slotLocations.Values)
                     {
-                        if (slot.Intersects(cursorRect)) // don't switch slots when item menu open
+                        if (slot.Intersects(cursorRect))
                         {
                             selectedIndex = i;
                             if (Mouse.GetState().LeftButton == ButtonState.Pressed && !draggingItem)
@@ -396,7 +396,8 @@ namespace Gusto.Models.Menus
                     if (openItemMenu)
                     {
                         itemMenuIndex = selectedIndex;
-                        itemMenuPos = slotLocations[selectedIndex].Center.ToVector2();
+                        if (selectedIndex != -1)
+                            itemMenuPos = slotLocations[selectedIndex].Center.ToVector2();
                     }
                     else
                         itemMenuIndex = -1;

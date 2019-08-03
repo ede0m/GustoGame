@@ -33,51 +33,13 @@ namespace Gusto.Utility
 
                 string key = item.Item1;
                 int amountDropped = item.Item2;
-                switch (key)
+                InventoryItem itm = CreateItem(key, team, region, location, content, graphics);
+                if (itm != null)
                 {
-                    case ("tribalTokens"):
-                        TribalTokens tt = new TribalTokens(team, region, location, content, graphics);
-                        tt.itemKey = "tribalTokens";
-                        returnItems.Add(tt);
-                        trackStackable.Add("tribalTokens");
-                        break;
-                    case ("basePlank"):
-                        BasePlank bp = new BasePlank(team, region, location, content, graphics);
-                        bp.itemKey = "basePlank";
-                        returnItems.Add(bp);
-                        trackStackable.Add("basePlank");
-                        break;
-                    case ("shortSword"):
-                        ShortSword ss = new ShortSword(team, region, location, content, graphics);
-                        ss.itemKey = "shortSword";
-                        returnItems.Add(ss);
-                        trackStackable.Add("shortSword");
-                        break;
-                    case ("softWood"):
-                        SoftWood sw = new SoftWood(team, region, location, content, graphics);
-                        sw.itemKey = "softWood";
-                        returnItems.Add(sw);
-                        trackStackable.Add("softWood");
-                        break;
-                    case ("islandGrass"):
-                        IslandGrass ig = new IslandGrass(team, region, location, content, graphics);
-                        ig.itemKey = "islandGrass";
-                        returnItems.Add(ig);
-                        trackStackable.Add("islandGrass");
-                        break;
-                    case ("coal"):
-                        Coal c = new Coal(team, region, location, content, graphics);
-                        c.itemKey = key;
-                        returnItems.Add(c);
-                        trackStackable.Add(key);
-                        break;
-                    case ("ironOre"):
-                        IronOre io = new IronOre(team, region, location, content, graphics);
-                        io.itemKey = key;
-                        returnItems.Add(io);
-                        trackStackable.Add(key);
-                        break;
+                    returnItems.Add(itm);
+                    trackStackable.Add(key);
                 }
+
                 returnItems[index].inInventory = true;
                 returnItems[index].amountStacked = amountDropped;
                 index++;
@@ -85,5 +47,43 @@ namespace Gusto.Utility
             return returnItems;
         }
 
+
+        public static InventoryItem CreateItem(string key, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+        {
+            InventoryItem item = null;
+            switch (key)
+            {
+                case ("tribalTokens"):
+                    item = new TribalTokens(team, region, location, content, graphics);
+                    break;
+                case ("basePlank"):
+                    item = new BasePlank(team, region, location, content, graphics);
+                    break;
+                case ("shortSword"):
+                    item = new ShortSword(team, region, location, content, graphics);
+                    break;
+                case ("softWood"):
+                    item = new SoftWood(team, region, location, content, graphics);
+                    break;
+                case ("islandGrass"):
+                    item = new IslandGrass(team, region, location, content, graphics);
+                    break;
+                case ("coal"):
+                    item = new Coal(team, region, location, content, graphics);
+                    break;
+                case ("ironOre"):
+                    item = new IronOre(team, region, location, content, graphics);
+                    break;
+                case ("baseSword"):
+                    item = new BaseSword(team, region, location, content, graphics);
+                    break;
+                case ("anvilItem"):
+                    item = new AnvilItem(team, region, location, content, graphics);
+                    item.placeableVersion = new CraftingAnvil(team, region, location, content, graphics);
+                    break;
+            }
+            item.itemKey = key;
+            return item;
+        }
     }
 }

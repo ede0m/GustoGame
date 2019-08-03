@@ -88,7 +88,7 @@ namespace Gusto.Mappings
         // TODO:could make this a narrowing index by ingredients
         public static Dictionary<string, Dictionary<string, int>> CraftingRecipes = new Dictionary<string, Dictionary<string, int>>
         {
-            { "craftingAnvil", new Dictionary<string, int>
+            { "anvilItem", new Dictionary<string, int>
                 {
                     {"ironBar", 1} // TODO: change back to 5
                 }

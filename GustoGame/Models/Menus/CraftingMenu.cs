@@ -3,6 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,6 +19,8 @@ namespace Gusto.Models.Menus
     public class CraftingMenu : Sprite, ICanUpdate, IMenuGUI
     {
         bool menuOpen;
+        bool emptySpotAvailable; // can we place in the player's inventory?
+
         int selectedIndex;
         string itemMenuFunc;
         float timeRClicked;
@@ -25,6 +28,7 @@ namespace Gusto.Models.Menus
         Dictionary<int, Rectangle> slotLocations;
         Dictionary<string, Rectangle> itemMenuButtonLocations;
         Dictionary<InventoryItem, float> saveItemSpriteScale;
+        Dictionary<string, Dictionary<string, int>> ingredientsAmountDifferences; // tracks the differences in player inv ingredient amounts and required amounts 
 
         float itemDisplaySizePix;
         Vector2 itemDrawLocStart;
@@ -34,6 +38,7 @@ namespace Gusto.Models.Menus
         SpriteFont font;
 
         PlayerPirate inventoryOfPlayer;
+        List<InventoryItem> craftableItemsChecked;
 
         GraphicsDevice _graphics;
         ContentManager _content;
@@ -51,9 +56,11 @@ namespace Gusto.Models.Menus
 
             itemDisplaySizePix = 60;
 
+            craftableItemsChecked = new List<InventoryItem>();
             slotLocations = new Dictionary<int, Rectangle>();
             itemMenuButtonLocations = new Dictionary<string, Rectangle>();
             saveItemSpriteScale = new Dictionary<InventoryItem, float>();
+            ingredientsAmountDifferences = new Dictionary<string, Dictionary<string, int>>();
 
             Texture2D textureInventory = new Texture2D(graphics, 440, 400);
             Color[] data = new Color[440 * 400];
@@ -67,7 +74,7 @@ namespace Gusto.Models.Menus
             // just used to display the crafting textures in the menu. Not used in game.
             IconTextures = new Dictionary<string, InventoryItem>
             {
-                {"craftingAnvil", new AnvilItem(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+                {"anvilItem", new AnvilItem(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
                 {"baseSword", new BaseSword(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
             };
         }
@@ -91,10 +98,7 @@ namespace Gusto.Models.Menus
             sb.End();
 
 
-            List<InventoryItem> craftableItemsChecked = SearchCraftingRecipes(itemsPlayer);
-            
-
-            // TODO: When something is actually crafted - I will need to account for if it is placable or not (and create the placable object first)
+            craftableItemsChecked = SearchCraftingRecipes(itemsPlayer);
             
             int textureHW = 64;
             // draw slots
@@ -178,45 +182,6 @@ namespace Gusto.Models.Menus
         }
 
 
-        // returns a list of craftabale items based on the invetory of the player
-        private List<InventoryItem> SearchCraftingRecipes(List<InventoryItem> itemsPlayer)
-        {
-            List<InventoryItem> craftableItems = new List<InventoryItem>();
-
-            // hash map the players available items
-            Dictionary<string, int> playInvMap = new Dictionary<string, int>();
-            foreach (var item in itemsPlayer)
-            {
-                if (item == null)
-                    continue;
-
-                if (playInvMap.ContainsKey(item.bbKey))
-                    playInvMap[item.bbKey] += item.amountStacked;
-                else
-                    playInvMap.Add(item.bbKey, item.amountStacked);
-            }
-            // now check our available items against the crafting recipes 
-            foreach (KeyValuePair<string, Dictionary<string, int>> craftingItem in Mappings.ItemMappings.CraftingRecipes)
-            {
-                int ingredientCount = 0;
-                foreach (KeyValuePair<string, int> ingredient in craftingItem.Value)
-                {
-                    // if we have the item and enough of the item
-                    if (!(playInvMap.ContainsKey(ingredient.Key) && playInvMap[ingredient.Key] >= ingredient.Value))
-                        break;
-                    else
-                    {
-                        ingredientCount += 1;
-                        if (ingredientCount >= craftingItem.Value.Count) // we have all the ingredients
-                            craftableItems.Add(IconTextures[craftingItem.Key]);
-
-                    }
-                }
-            }
-
-            return craftableItems;
-        }
-
         public void Update(KeyboardState kstate, GameTime gameTime, Camera cam)
         {
             if (menuOpen)
@@ -233,7 +198,52 @@ namespace Gusto.Models.Menus
                         selectedIndex = i;
                         if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                         {
-                            // create item
+                            bool canCreateItem = false;
+                            if (craftableItemsChecked.Count > 0)
+                            {
+                                var item = craftableItemsChecked[selectedIndex]; // get item from menu icons
+                                if (emptySpotAvailable)
+                                    canCreateItem = true;
+                                else
+                                {
+                                    // check to see if the ingredients used will free up a spot
+                                    foreach (KeyValuePair<string, int> ingredient in ingredientsAmountDifferences[item.bbKey])
+                                    {
+                                        if (ingredient.Value <= 0)
+                                        {
+                                            canCreateItem = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                InventoryItem itemCreated = null;
+                                if (canCreateItem)
+                                {
+                                    // remove ingredients from player inv
+                                    foreach (var itm in inventoryOfPlayer.inventory)
+                                    {
+                                        if (itm == null)
+                                            continue;
+                                        foreach (var ing in Mappings.ItemMappings.CraftingRecipes[item.bbKey])
+                                        {
+                                            if (itm.bbKey.Equals(ing.Key))
+                                                itm.amountStacked -= ing.Value;
+                                        }
+
+                                    }
+                                    // TODO: When something is actually crafted - I will need to account for if it is placable or not (and create the placable object first)
+
+                                    // create item and add to players inv
+                                    itemCreated = ItemUtility.CreateItem(item.bbKey, inventoryOfPlayer.teamType, inventoryOfPlayer.regionKey, item.location, _content, _graphics);
+                                    if (inventoryOfPlayer.AddInventoryItem(itemCreated))
+                                    {
+                                        itemCreated.inInventory = true;
+                                        itemCreated.onGround = false;
+                                        itemCreated.amountStacked = 1; // TODO: maybe want a item creation to make stacked amount greater in some cases
+                                    }
+                                }
+                            }
                         }
                     }
                     i++;
@@ -242,6 +252,68 @@ namespace Gusto.Models.Menus
 
             }
             menuOpen = false;
+        }
+
+
+        // returns a list of craftabale items based on the invetory of the player
+        private List<InventoryItem> SearchCraftingRecipes(List<InventoryItem> itemsPlayer)
+        {
+            List<InventoryItem> craftableItems = new List<InventoryItem>();
+            ingredientsAmountDifferences.Clear();
+            emptySpotAvailable = false;
+            // hash map the players available items
+            Dictionary<string, int> playInvMap = new Dictionary<string, int>();
+            foreach (var item in itemsPlayer)
+            {
+                if (item == null)
+                {
+                    emptySpotAvailable = true;
+                    continue;
+                }
+
+                if (playInvMap.ContainsKey(item.bbKey))
+                    playInvMap[item.bbKey] += item.amountStacked;
+                else
+                    playInvMap.Add(item.bbKey, item.amountStacked);
+            }
+            // now check our available items against the crafting recipes 
+            foreach (KeyValuePair<string, Dictionary<string, int>> craftingItem in Mappings.ItemMappings.CraftingRecipes)
+            {
+                int ingredientCount = 0;
+                foreach (KeyValuePair<string, int> ingredient in craftingItem.Value)
+                {
+                    
+                    if (!(playInvMap.ContainsKey(ingredient.Key) && playInvMap[ingredient.Key] >= ingredient.Value))
+                    {
+                        break;
+                    }
+                    // if we have the item and enough of the item
+                    else
+                    {
+                        ingredientCount += 1;
+                        if (ingredientCount >= craftingItem.Value.Count)
+                        {
+                            // we have all the ingredients
+                            craftableItems.Add(IconTextures[craftingItem.Key]);
+                        }
+
+                        // save the difference to check later if we have space to add item to inventory.
+                        int amountDiff = playInvMap[ingredient.Key] - ingredient.Value;
+                        if (ingredientsAmountDifferences.ContainsKey(craftingItem.Key))
+                        {
+                            ingredientsAmountDifferences[craftingItem.Key].Add(ingredient.Key, amountDiff);
+                        }
+                        else
+                        {
+                            Dictionary<string, int> diffsByIngredient = new Dictionary<string, int>();
+                            diffsByIngredient.Add(ingredient.Key, amountDiff);
+                            ingredientsAmountDifferences.Add(craftingItem.Key, diffsByIngredient);
+                        }
+                    }
+                }
+            }
+
+            return craftableItems;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
