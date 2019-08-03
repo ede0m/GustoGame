@@ -39,7 +39,6 @@ namespace Gusto.Models.Animated
         float msNow;
 
         public List<InventoryItem> drops;
-        public Random rand;
 
 
         public Rock(TeamType t, ContentManager content, GraphicsDevice graphics) : base(graphics)
@@ -51,7 +50,6 @@ namespace Gusto.Models.Animated
             msNow = msAnimate;
 
             drops = new List<InventoryItem>();
-            rand = new Random();
 
         }
 
@@ -96,8 +94,8 @@ namespace Gusto.Models.Animated
                     {
                         item.inInventory = false;
                         // scatter items
-                        item.location.X = location.X + rand.Next(-10, 10);
-                        item.location.Y = location.Y + rand.Next(-10, 10);
+                        item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
+                        item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
                         item.onGround = true;
                         ItemUtility.ItemsToUpdate.Add(item);
                     }
@@ -152,10 +150,10 @@ namespace Gusto.Models.Animated
             respawnTimeCountMs += gt.ElapsedGameTime.Milliseconds;
             if (respawnTimeCountMs > msRespawn)
             {
-                SetTileDesignRow(RandomEvents.RandomSelection(nRows, rand));
-                location.X += RandomEvents.RandomSelectionRange(GameOptions.tileWidth, rand);
-                location.Y += RandomEvents.RandomSelectionRange(GameOptions.tileHeight, rand);
-                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(bbKey, rand, 2);
+                SetTileDesignRow(RandomEvents.rand.Next(0, nRows));
+                location.X += RandomEvents.rand.Next(-GameOptions.tileWidth, GameOptions.tileWidth);
+                location.Y += RandomEvents.rand.Next(-GameOptions.tileHeight, GameOptions.tileHeight);
+                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(bbKey, 2);
                 drops = ItemUtility.CreateNPInventory(itemDrops, team, regionKey, location, _content, _graphics);
                 remove = false;
                 respawnTimeCountMs = 0;

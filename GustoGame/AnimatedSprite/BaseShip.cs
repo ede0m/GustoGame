@@ -49,7 +49,7 @@ namespace Gusto.AnimatedSprite
             // inventory
             if (team != TeamType.Player)
             {
-                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, rand, 3);
+                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);
                 inventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
             }
             else

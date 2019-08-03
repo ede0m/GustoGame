@@ -34,7 +34,6 @@ namespace Gusto.Models.Animated
         float msPickupTimer;
         float msSinceStartPickupTimer;
 
-        Random rand;
         PiratePlayer playerNearItem;
         public TeamType teamType;
 
@@ -44,7 +43,6 @@ namespace Gusto.Models.Animated
             _graphics = graphics;
 
             teamType = type;
-            rand = new Random();
             msPickupTimer = 5000;
             msToSmelt = 10000;
             msPerFrame = 200;

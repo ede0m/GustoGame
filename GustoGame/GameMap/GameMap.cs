@@ -36,8 +36,6 @@ namespace Gusto.GameMap
         int tileWidth = GameOptions.tileWidth;
         Vector2 startMapPoint;
 
-        Random rand;
-
         public TileGameMap(Camera camera)
         {
 
@@ -50,7 +48,6 @@ namespace Gusto.GameMap
             _cam = camera;
             map = new List<Sprite>();
             collidablePieces = new List<Sprite>();
-            rand = new Random();
         }
 
         public void SetGameMap(ContentManager content, GraphicsDevice graphics)
@@ -74,9 +71,9 @@ namespace Gusto.GameMap
                     if ((string)tileDetails["sittingObject"] != "null")
                     {
                         groundObject = GetGroundObject((string)tileDetails["sittingObject"], regionName, worldLoc, content, graphics);
-                        groundObject.SetTileDesignRow(RandomEvents.RandomSelection(groundObject.nRows, rand));
-                        groundObject.location.X += RandomEvents.RandomSelectionRange(tileWidth, rand);
-                        groundObject.location.Y += RandomEvents.RandomSelectionRange(tileHeight, rand);
+                        groundObject.SetTileDesignRow(RandomEvents.rand.Next(0, groundObject.nRows));
+                        groundObject.location.X += RandomEvents.rand.Next(-tileWidth, tileWidth);
+                        groundObject.location.Y += RandomEvents.rand.Next(-tileHeight, tileHeight);
                     }
 
                     // set terrain piece
@@ -95,7 +92,7 @@ namespace Gusto.GameMap
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                     }
-                    tile.SetTileDesignColumn(RandomEvents.RandomSelection(tile.nColumns, rand));
+                    tile.SetTileDesignColumn(RandomEvents.rand.Next(0, tile.nColumns));
 
                     worldLoc.X += tileWidth;
                     map.Add(tile);

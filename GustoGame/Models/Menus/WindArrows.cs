@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content;
 using Comora;
 using Gusto.AnimatedSprite;
 using Gusto.Models.Interfaces;
+using Gusto.Utility;
 
 namespace Gusto.Models.Menus
 {
@@ -15,11 +16,9 @@ namespace Gusto.Models.Menus
         private Vector2 Location;
         private int timeSinceLastFrame;
         private int millisecondsPerFrame;
-        Random randomGeneration;
 
         public WindArrows(Vector2 location, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
-            randomGeneration = new Random();
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 10000;
             Texture2D textureWindArrows = content.Load<Texture2D>("WindArrows");
@@ -61,13 +60,13 @@ namespace Gusto.Models.Menus
 
         private void RandomWind()
         {
-            int randomDirection = randomGeneration.Next(-100, 200); 
+            int randomDirection = RandomEvents.rand.Next(-100, 200); 
             if (randomDirection < 0)
                 currRowFrame++;
             else if (randomDirection >= 0 && randomDirection < 100) // over 100 direction stays the same
                 currRowFrame--;
 
-            int randomSpeed = randomGeneration.Next(-100, 100); // if > 0, the wind stays the same
+            int randomSpeed = RandomEvents.rand.Next(-100, 100); // if > 0, the wind stays the same
             if (randomSpeed > 0)
                 currColumnFrame++;
         }

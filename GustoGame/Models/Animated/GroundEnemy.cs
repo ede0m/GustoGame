@@ -49,7 +49,6 @@ namespace Gusto.Models.Animated
 
         ContentManager _content;
         GraphicsDevice _graphics;
-        public Random rand;
 
         public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
@@ -57,7 +56,6 @@ namespace Gusto.Models.Animated
             _content = content;
             _graphics = graphics;
             timeShowingHealthBar = 0;
-            rand = new Random();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -108,8 +106,8 @@ namespace Gusto.Models.Animated
                 {
                     item.inInventory = false;
                     // scatter items
-                    item.location.X = location.X + rand.Next(-10, 10);
-                    item.location.Y = location.Y + rand.Next(-10, 10);
+                    item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
+                    item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
                     item.onGround = true;
                     ItemUtility.ItemsToUpdate.Add(item);
                 }
@@ -159,7 +157,7 @@ namespace Gusto.Models.Animated
                     }
                     else
                     {
-                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey][rand.Next(BoundingBoxLocations.RegionMap[regionKey].Count)];
+                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey][RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].Count)];
                         roaming = true;
                     }
                 }

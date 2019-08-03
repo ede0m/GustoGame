@@ -182,8 +182,7 @@ namespace Gusto
             List<Sprite> giannaRegionMap = BoundingBoxLocations.RegionMap["Gianna"];
 
             //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP
-            Random rnd = new Random();
-            Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
+            Sprite GiannaRegionTile = giannaRegionMap[RandomEvents.rand.Next(giannaRegionMap.Count)];
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 

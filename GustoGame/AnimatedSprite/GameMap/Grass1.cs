@@ -21,7 +21,7 @@ namespace Gusto.AnimatedSprite.GameMap
             msRespawn = GameOptions.GameDayLengthMs / 2;
             string objKey = "grass1";
 
-            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, rand, 2);
+            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 2);
             drops = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
 
             Texture2D textureGrass1 = content.Load<Texture2D>("Grass1");

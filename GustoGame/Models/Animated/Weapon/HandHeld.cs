@@ -34,14 +34,12 @@ namespace Gusto.Models.Animated
         public List<Ammo> Shots;
         public Light emittingLight; // if this handheld emits any light
 
-        Random rand;
         GraphicsDevice _graphics;
         ContentManager _content;
 
         public HandHeld(TeamType type, ContentManager content, GraphicsDevice graphics) : base(type, content, graphics)
         {
             Shots = new List<Ammo>();
-            rand = new Random();
             _graphics = graphics;
             _content = content;
             teamType = type;
@@ -121,7 +119,7 @@ namespace Gusto.Models.Animated
                             Vector2 shotStart = new Vector2(GetBoundingBox().Center.ToVector2().X + shotOffsetX, GetBoundingBox().Center.ToVector2().Y + shotOffsetY);
                             PistolShot pistolShot = new PistolShot(teamType, regionKey, shotStart, _content, _graphics);
                             int offsetStraight = shootHorz ? (pistolShot.GetBoundingBox().Y - shotDirection.Item2) : (pistolShot.GetBoundingBox().X - shotDirection.Item1);
-                            pistolShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), offsetStraight);
+                            pistolShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), offsetStraight);
                             pistolShot.moving = true;
                             Shots.Add(pistolShot);
                             ammoLoaded.amountStacked -= 1;

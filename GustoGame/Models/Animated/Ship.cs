@@ -67,7 +67,6 @@ namespace Gusto.Models.Animated
         public bool anchored;
         public bool playerAboard;
 
-        public Random rand;
         public TeamType teamType;
         public Sail shipSail { get; set; }
         public WindArrows wind;
@@ -84,7 +83,6 @@ namespace Gusto.Models.Animated
             teamType = type;
             _content = content;
             _graphics = graphics;
-            rand = new Random();
 
             // anchor feat init
             percentNotAnchored = 1;
@@ -215,8 +213,8 @@ namespace Gusto.Models.Animated
                     {
                         item.inInventory = false;
                         // scatter items
-                        item.location.X = location.X + rand.Next(-10, 10);
-                        item.location.Y = location.Y + rand.Next(-10, 10);
+                        item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
+                        item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
                         item.onGround = true;
                         ItemUtility.ItemsToUpdate.Add(item);
                     }
@@ -381,7 +379,7 @@ namespace Gusto.Models.Animated
                 {
                     Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
                     BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
-                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(this.rand), 0);
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), 0);
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                     timeSinceLastShot = 0;
@@ -509,7 +507,7 @@ namespace Gusto.Models.Animated
                     int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
                     cannonShot.location.X -= cannonBallTextureCenterOffsetX;
                     cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
-                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), RandomEvents.RandomAimOffset(rand));
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                 }
