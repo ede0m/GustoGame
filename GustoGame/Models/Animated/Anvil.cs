@@ -23,6 +23,7 @@ namespace Gusto.Models.Animated
         float msThisFrame;
 
         bool nearAnvil;
+        public bool drawCraftingMenu;
 
         int nTimesHit;
         private int hitsToPickUp;
@@ -73,10 +74,18 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            if (nearAnvil && kstate.IsKeyDown(Keys.C))
+            if (nearAnvil && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu)
             {
                 // TODO: bring up crafting menu
+                drawCraftingMenu = true;
+            }
 
+            if (drawCraftingMenu)
+            {
+                if (kstate.IsKeyDown(Keys.Escape) || !nearAnvil)
+                {
+                    drawCraftingMenu = false;
+                }
             }
 
             if (canPickUp)

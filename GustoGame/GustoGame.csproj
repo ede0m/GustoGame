@@ -103,6 +103,7 @@
     <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Interfaces\IWood.cs" />
     <Compile Include="Models\Light.cs" />
+    <Compile Include="Models\Menus\CraftingMenu.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />
     <Compile Include="Models\Interfaces\ICanUpdate.cs" />
     <Compile Include="Models\Interfaces\IInventoryItem.cs" />
