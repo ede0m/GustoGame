@@ -41,6 +41,7 @@ namespace Gusto
         Hammer hammer;
         Lantern lantern;
         ClayFurnace furnace;
+        CraftingAnvil craftingAnvil;
 
         TileGameMap map;
         JObject mapData;
@@ -148,6 +149,8 @@ namespace Gusto
 
             Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
+            Texture2D textureCraftingAnvil = Content.Load<Texture2D>("Anvil");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCraftingAnvil, "craftingAnvil", 0.5f, 1.0f);
 
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
@@ -175,7 +178,9 @@ namespace Gusto
             Texture2D textureBasePlank = Content.Load<Texture2D>("TribalTokens");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureBasePlank, "basePlank", 0.5f, 1.0f);
             Texture2D textureClayFurnaceItem = Content.Load<Texture2D>("Furnace");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
+            Texture2D textureAnvilItem = Content.Load<Texture2D>("Furnace");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureAnvilItem, "anvilItem", 1.0f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -200,6 +205,7 @@ namespace Gusto
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
+            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 120), Content, GraphicsDevice);
 
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
@@ -234,6 +240,7 @@ namespace Gusto
             UpdateOrder.Add(inventory);
             UpdateOrder.Add(lantern);
             UpdateOrder.Add(furnace);
+            UpdateOrder.Add(craftingAnvil);
 
         }
 

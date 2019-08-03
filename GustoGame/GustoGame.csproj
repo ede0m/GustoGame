@@ -42,12 +42,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\ClayFurnace.cs" />
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
     <Compile Include="AnimatedSprite\GameMap\Rock1.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\AnvilItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
+    <Compile Include="Models\Animated\Anvil.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />
     <Compile Include="Models\Animated\GroundEnemy.cs" />
