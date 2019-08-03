@@ -190,6 +190,9 @@ namespace Gusto.Models.Menus
         {
             if (menuOpen)
             {
+                timeRClicked += gameTime.ElapsedGameTime.Milliseconds;
+                timeLClicked += gameTime.ElapsedGameTime.Milliseconds;
+
                 cursorPos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 Rectangle cursorRect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, cursor.Width, cursor.Height);
 
@@ -200,7 +203,8 @@ namespace Gusto.Models.Menus
                     if (slot.Intersects(cursorRect))
                     {
                         selectedIndex = i;
-                        if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                        // TODO: have this start timer for crafting (do some sort of animation) and then create item when timer is done. OR have a sound effect
+                        if (Mouse.GetState().LeftButton == ButtonState.Pressed && !(timeLClicked < 400)) // click timer
                         {
                             bool canCreateItem = false;
                             if (craftableItemsChecked.Count > 0)
@@ -238,7 +242,6 @@ namespace Gusto.Models.Menus
                                         }
 
                                     }
-                                    // TODO: When something is actually crafted - I will need to account for if it is placable or not (and create the placable object first)
 
                                     // create item and add to players inv
                                     itemCreated = ItemUtility.CreateItem(item.bbKey, inventoryOfPlayer.teamType, inventoryOfPlayer.regionKey, item.location, _content, _graphics);
@@ -247,6 +250,8 @@ namespace Gusto.Models.Menus
                                         itemCreated.inInventory = true;
                                         itemCreated.onGround = false;
                                     }
+
+                                    timeLClicked = 0;
                                 }
                             }
                         }
