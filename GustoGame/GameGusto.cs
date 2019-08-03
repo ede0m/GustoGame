@@ -311,7 +311,7 @@ namespace Gusto
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
 
-            // add any dropped items
+            // add any dropped items (and placable items)
             foreach (var item in ItemUtility.ItemsToUpdate)
                 UpdateOrder.Add(item);
 

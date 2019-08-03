@@ -18,7 +18,7 @@ namespace Gusto.Models
     {
         public string itemKey;
         PiratePlayer playerNearItem;
-
+       
         public int restorePoints;
 
         public bool onGround;
@@ -26,6 +26,8 @@ namespace Gusto.Models
         public bool canPickUp; // proximety
         public bool stackable;
         public int amountStacked;
+
+        public IPlaceable placeableVersion;
 
         private ContentManager _content;
         private GraphicsDevice _graphics;

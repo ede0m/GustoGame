@@ -191,9 +191,10 @@ namespace Gusto.Models.Animated
                 // pick up the item
                 if (playerNearItem != null && kstate.IsKeyDown(Keys.P))
                 {
-                    ClayFurnaceItem cfi = new ClayFurnaceItem(playerNearItem.teamType, regionKey, location, _content, _graphics);
+                    InventoryItem cfi = new ClayFurnaceItem(playerNearItem.teamType, regionKey, location, _content, _graphics);
                     if (playerNearItem.AddInventoryItem(cfi))
                     {
+                        cfi.placeableVersion = this;
                         cfi.inInventory = true;
                         cfi.onGround = false;
                         cfi.stackable = false;
