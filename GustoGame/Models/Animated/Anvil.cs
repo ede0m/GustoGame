@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Bounding;
 using Gusto.Mappings;
 using Gusto.Models.Interfaces;

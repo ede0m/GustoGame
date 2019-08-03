@@ -1,4 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Models;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,7 +101,6 @@ namespace Gusto.Mappings
             },
 
         };
-
 
     }
 }

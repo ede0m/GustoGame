@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.AnimatedSprite
+namespace Gusto.AnimatedSprite.InventoryItems
 {
     public class AnvilItem : InventoryItem
     {
@@ -21,7 +21,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBB = new Texture2D(graphics, texture.Width, texture.Height);
-            Asset asset = new Asset(texture, textureBB, 1, 1, 1.0f, itemKey, region);
+            Asset asset = new Asset(texture, textureBB, 1, 1, 0.5f, itemKey, region);
 
             SetSpriteAsset(asset, location);
             stackable = true;

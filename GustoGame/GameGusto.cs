@@ -457,11 +457,11 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
+                    invItemsPlayer = pirate.inventory;
 
                     if (pirate.showInventory)
                     {
                         showInventoryMenu = true;
-                        invItemsPlayer = pirate.inventory;
                         if (pirate.onShip)
                             invItemsShip = pirate.playerOnShip.inventory;
                     }

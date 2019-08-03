@@ -1,4 +1,6 @@
 ﻿using Comora;
+using Gusto.AnimatedSprite;
+using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
@@ -37,6 +39,8 @@ namespace Gusto.Models.Menus
         GraphicsDevice _graphics;
         ContentManager _content;
 
+        Dictionary<string, InventoryItem> IconTextures; 
+
         public CraftingMenu(Vector2 location, ContentManager content, GraphicsDevice graphics, PlayerPirate invOfPlayer) : base(graphics)
         {
             _graphics = graphics;
@@ -46,8 +50,9 @@ namespace Gusto.Models.Menus
 
             inventoryOfPlayer = invOfPlayer;
 
-            itemDisplaySizePix = 40;
+            itemDisplaySizePix = 60;
 
+            slotLocations = new Dictionary<int, Rectangle>();
             itemMenuButtonLocations = new Dictionary<string, Rectangle>();
             saveItemSpriteScale = new Dictionary<InventoryItem, float>();
 
@@ -59,6 +64,12 @@ namespace Gusto.Models.Menus
             SetSpriteAsset(invetoryAsset, location);
 
             itemDrawLocStart = new Vector2(location.X - _texture.Width / 2 + 50, location.Y - _texture.Height / 2 + 100);
+
+            IconTextures = new Dictionary<string, InventoryItem>
+            {
+                {"craftingAnvil", new AnvilItem(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+                {"baseSword", new BaseSword(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+            };
         }
 
         public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer)
@@ -80,8 +91,10 @@ namespace Gusto.Models.Menus
             sb.End();
 
 
-            List<string> craftableItemsChecked = SearchCraftingRecipes(itemsPlayer);
+            List<InventoryItem> craftableItemsChecked = SearchCraftingRecipes(itemsPlayer);
             
+
+            // TODO: When something is actually crafted - I will need to account for if it is placable or not (and create the placable object first)
             
             int textureHW = 64;
             // draw slots
@@ -112,17 +125,71 @@ namespace Gusto.Models.Menus
 
             }
 
+            // draw items
+            itemDrawLoc = itemDrawLocStart;
+            for (int i = 0; i < craftableItemsChecked.Count; i++)
+            {
+                var item = craftableItemsChecked[i];
+                Vector2 offsetLocation;
+                Vector2 itemLoc = itemDrawLoc;
+                // track sprite scale
+                if (!saveItemSpriteScale.ContainsKey(item))
+                    saveItemSpriteScale[item] = item.spriteScale;
+
+                if (item is IHandHeld) // handhelds display action frames so scaling them will make them too tiny and offset
+                {
+                    item.spriteScale = 1.3f;
+                    offsetLocation = new Vector2(itemLoc.X + textureHW / 3, itemLoc.Y + textureHW / 3);
+                    item.currRowFrame = 0;
+                }
+                else
+                {
+                    item.spriteScale = (float)(itemDisplaySizePix / item.targetRectangle.Width);
+                    offsetLocation = new Vector2(itemLoc.X + textureHW / 2, itemLoc.Y + textureHW / 1.7f); // move Y down a little to leave room for stack number display
+                }
+
+                item.location = offsetLocation;
+
+                item.currColumnFrame = 0;
+                item.currRowFrame = 0;
+                item.Draw(sb, null);
+
+                sb.Begin();
+                //name display
+                if (i == selectedIndex)
+                    sb.DrawString(font, item.itemKey, itemStatLoc, Color.Black);
+                sb.End();
+
+                itemDrawLoc.X += 70;
+                if (itemDrawLoc.X > location.X + GetWidth() / 2 - 50)
+                {
+                    itemDrawLoc.X = itemDrawLocStart.X;
+                    itemDrawLoc.Y += 70;
+                }
+            }
+
+            // draw cursor
+            sb.Begin();
+            sb.Draw(cursor, cursorPos, Color.White);
+            sb.End();
+
+            // reset itemDrawLoc
+            itemDrawLoc = itemDrawLocStart;
         }
 
+
         // returns a list of craftabale items based on the invetory of the player
-        private List<string> SearchCraftingRecipes(List<InventoryItem> itemsPlayer)
+        private List<InventoryItem> SearchCraftingRecipes(List<InventoryItem> itemsPlayer)
         {
-            List<string> craftableItems = new List<string>();
+            List<InventoryItem> craftableItems = new List<InventoryItem>();
 
             // hash map the players available items
             Dictionary<string, int> playInvMap = new Dictionary<string, int>();
             foreach (var item in itemsPlayer)
             {
+                if (item == null)
+                    continue;
+
                 if (playInvMap.ContainsKey(item.bbKey))
                     playInvMap[item.bbKey] += item.amountStacked;
                 else
@@ -135,13 +202,13 @@ namespace Gusto.Models.Menus
                 foreach (KeyValuePair<string, int> ingredient in craftingItem.Value)
                 {
                     // if we have the item and enough of the item
-                    if (!(playInvMap.ContainsKey(ingredient.Key) && playInvMap[ingredient.Key] > ingredient.Value))
+                    if (!(playInvMap.ContainsKey(ingredient.Key) && playInvMap[ingredient.Key] >= ingredient.Value))
                         break;
                     else
                     {
                         ingredientCount += 1;
                         if (ingredientCount >= craftingItem.Value.Count) // we have all the ingredients
-                            craftableItems.Add(craftingItem.Key);
+                            craftableItems.Add(IconTextures[craftingItem.Key]);
 
                     }
                 }
@@ -154,6 +221,23 @@ namespace Gusto.Models.Menus
         {
             if (menuOpen)
             {
+                cursorPos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                Rectangle cursorRect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, cursor.Width, cursor.Height);
+
+                int i = 0;
+                foreach (var slot in slotLocations.Values)
+                {
+                    if (slot.Intersects(cursorRect))
+                    {
+                        selectedIndex = i;
+                        if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                        {
+                            // create item
+                        }
+                    }
+                    i++;
+                }
+
 
             }
             menuOpen = false;
@@ -163,5 +247,6 @@ namespace Gusto.Models.Menus
         {
             throw new NotImplementedException();
         }
+
     }
 }

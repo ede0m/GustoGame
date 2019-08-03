@@ -56,7 +56,7 @@ namespace Gusto.Models.Menus
 
             inventoryOfPlayer = invOfPlayer;
 
-            itemDisplaySizePix = 40;
+            itemDisplaySizePix = 60;
             maxInventorySlots = inventoryOfPlayer.maxInventorySlots;
             shipInventorySlots = 0;
             selectedIndex = 0;
@@ -189,7 +189,18 @@ namespace Gusto.Models.Menus
                     {
                         itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
                         if (invMap[dropDragIndex] != null) // switch spots
-                            tempInventory[selectDragIndex] = invMap[dropDragIndex];
+                        {
+                            if (invMap[dropDragIndex].bbKey.Equals(tempInventory[selectDragIndex].bbKey))
+                            {
+                                // stack items
+                                item.amountStacked += invMap[selectDragIndex].amountStacked;
+                                tempInventory[selectDragIndex] = null;
+                                emptyIndex = selectDragIndex;
+                            }
+                            else
+                                tempInventory[selectDragIndex] = invMap[dropDragIndex];
+                                
+                        } 
                         else
                         {
                             tempInventory[selectDragIndex] = null;
