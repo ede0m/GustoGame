@@ -99,6 +99,11 @@ namespace Gusto.Mappings
                     {"softWood", 2}
                 }
             },
+            { "nails", new Dictionary<string, int>
+                {
+                    {"ironOre", 2}
+                }
+            },
 
         };
 

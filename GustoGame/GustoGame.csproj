@@ -63,6 +63,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\IronOre.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IslandGrass.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Lantern.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Nails.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\SoftWood.cs" />

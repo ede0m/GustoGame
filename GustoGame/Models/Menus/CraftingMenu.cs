@@ -20,6 +20,7 @@ namespace Gusto.Models.Menus
     {
         bool menuOpen;
         bool emptySpotAvailable; // can we place in the player's inventory?
+        bool itemCanStack; // can we stack in the player's inventory?
 
         int selectedIndex;
         string itemMenuFunc;
@@ -29,6 +30,7 @@ namespace Gusto.Models.Menus
         Dictionary<string, Rectangle> itemMenuButtonLocations;
         Dictionary<InventoryItem, float> saveItemSpriteScale;
         Dictionary<string, Dictionary<string, int>> ingredientsAmountDifferences; // tracks the differences in player inv ingredient amounts and required amounts 
+        Dictionary<string, bool> playerInvCanStackItem; // tracks if the player has this crafting item in the inventory already;
 
         float itemDisplaySizePix;
         Vector2 itemDrawLocStart;
@@ -61,6 +63,7 @@ namespace Gusto.Models.Menus
             itemMenuButtonLocations = new Dictionary<string, Rectangle>();
             saveItemSpriteScale = new Dictionary<InventoryItem, float>();
             ingredientsAmountDifferences = new Dictionary<string, Dictionary<string, int>>();
+            playerInvCanStackItem = new Dictionary<string, bool>();
 
             Texture2D textureInventory = new Texture2D(graphics, 440, 400);
             Color[] data = new Color[440 * 400];
@@ -76,6 +79,7 @@ namespace Gusto.Models.Menus
             {
                 {"anvilItem", new AnvilItem(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
                 {"baseSword", new BaseSword(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+                {"nails", new Nails(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
             };
         }
 
@@ -202,8 +206,10 @@ namespace Gusto.Models.Menus
                             if (craftableItemsChecked.Count > 0)
                             {
                                 var item = craftableItemsChecked[selectedIndex]; // get item from menu icons
-                                if (emptySpotAvailable)
+
+                                if (emptySpotAvailable || (item.stackable && playerInvCanStackItem[item.bbKey]))
                                     canCreateItem = true;
+
                                 else
                                 {
                                     // check to see if the ingredients used will free up a spot
@@ -240,7 +246,6 @@ namespace Gusto.Models.Menus
                                     {
                                         itemCreated.inInventory = true;
                                         itemCreated.onGround = false;
-                                        itemCreated.amountStacked = 1; // TODO: maybe want a item creation to make stacked amount greater in some cases
                                     }
                                 }
                             }
@@ -260,6 +265,7 @@ namespace Gusto.Models.Menus
         {
             List<InventoryItem> craftableItems = new List<InventoryItem>();
             ingredientsAmountDifferences.Clear();
+            playerInvCanStackItem.Clear();
             emptySpotAvailable = false;
             // hash map the players available items
             Dictionary<string, int> playInvMap = new Dictionary<string, int>();
@@ -279,6 +285,9 @@ namespace Gusto.Models.Menus
             // now check our available items against the crafting recipes 
             foreach (KeyValuePair<string, Dictionary<string, int>> craftingItem in Mappings.ItemMappings.CraftingRecipes)
             {
+                // save if we are crafting anything we already have in the inventory.
+                playerInvCanStackItem.Add(craftingItem.Key, playInvMap.ContainsKey(craftingItem.Key));
+
                 int ingredientCount = 0;
                 foreach (KeyValuePair<string, int> ingredient in craftingItem.Value)
                 {

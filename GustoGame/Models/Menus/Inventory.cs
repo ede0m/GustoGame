@@ -192,7 +192,7 @@ namespace Gusto.Models.Menus
                         itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
                         if (invMap[dropDragIndex] != null) // switch spots
                         {
-                            if (invMap[dropDragIndex].bbKey.Equals(tempInventory[selectDragIndex].bbKey))
+                            if (invMap[dropDragIndex].bbKey.Equals(tempInventory[selectDragIndex].bbKey) && invMap[dropDragIndex].stackable)
                             {
                                 // stack items
                                 item.amountStacked += invMap[selectDragIndex].amountStacked;

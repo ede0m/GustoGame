@@ -41,7 +41,7 @@ namespace Gusto.Utility
                 }
 
                 returnItems[index].inInventory = true;
-                returnItems[index].amountStacked = amountDropped;
+                returnItems[index].amountStacked = amountDropped; // override CreateItem default amount created with random drop amount
                 index++;
             }
             return returnItems;
@@ -51,6 +51,7 @@ namespace Gusto.Utility
         public static InventoryItem CreateItem(string key, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             InventoryItem item = null;
+            int amountStacked = 1;
             switch (key)
             {
                 case ("tribalTokens"):
@@ -81,8 +82,13 @@ namespace Gusto.Utility
                     item = new AnvilItem(team, region, location, content, graphics);
                     item.placeableVersion = new CraftingAnvil(team, region, location, content, graphics);
                     break;
+                case ("nails"):
+                    item = new Nails(team, region, location, content, graphics);
+                    amountStacked = 5; 
+                    break;
             }
             item.itemKey = key;
+            item.amountStacked = amountStacked;
             return item;
         }
     }
