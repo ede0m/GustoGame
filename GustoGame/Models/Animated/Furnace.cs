@@ -28,7 +28,11 @@ namespace Gusto.Models.Animated
         float msSmelting;
 
         public Light emittingLight;
-
+        int nTimesHit;
+        private int hitsToPickUp;
+        private bool canPickUp;
+        float msPickupTimer;
+        float msSinceStartPickupTimer;
 
         Random rand;
         PiratePlayer playerNearItem;
@@ -41,8 +45,10 @@ namespace Gusto.Models.Animated
 
             teamType = type;
             rand = new Random();
+            msPickupTimer = 5000;
             msToSmelt = 10000;
             msPerFrame = 200;
+            hitsToPickUp = 10;
 
         }
 
@@ -74,6 +80,22 @@ namespace Gusto.Models.Animated
                 canCraft = true; //TEMPORARY@!
                 if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 7) // 2 wood, 2 grass, 1 coal, 8 ore required
                     canCraft = true;
+            }
+
+            if (collidedWith.bbKey.Equals("hammer"))
+            {
+                if (collidedWith.GetBoundingBox().Top > (GetBoundingBox().Center.ToVector2().Y + GetBoundingBox().Height / 3)) // MOVE UP
+                    location.Y -= 10;
+                else if (collidedWith.GetBoundingBox().Left > (GetBoundingBox().Center.ToVector2().X + GetBoundingBox().Width / 3)) // move left
+                    location.X -= 10;
+                else if (collidedWith.GetBoundingBox().Right < (GetBoundingBox().Center.ToVector2().X - GetBoundingBox().Width / 3))
+                    location.X += 10;
+                else if (collidedWith.GetBoundingBox().Bottom < (GetBoundingBox().Center.ToVector2().Y - GetBoundingBox().Height / 3))
+                    location.Y += 10;
+
+                nTimesHit += 1;
+                if (nTimesHit >= hitsToPickUp)
+                    canPickUp = true;
             }
         }        
         
@@ -163,8 +185,37 @@ namespace Gusto.Models.Animated
             if (emittingLight.lit)
                 emittingLight.Update(kstate, gameTime, GetBoundingBox().Center.ToVector2());
 
+            if (canPickUp)
+            {
+
+                // pick up the item
+                if (playerNearItem != null && kstate.IsKeyDown(Keys.P))
+                {
+                    ClayFurnaceItem cfi = new ClayFurnaceItem(playerNearItem.teamType, regionKey, location, _content, _graphics);
+                    if (playerNearItem.AddInventoryItem(cfi))
+                    {
+                        cfi.inInventory = true;
+                        cfi.onGround = false;
+                        cfi.stackable = false;
+                        cfi.amountStacked = 1;
+                        remove = true;
+                    }
+                }
+
+
+                // there is a timer for how long you have to pick up item once you have the required number of hits
+                msSinceStartPickupTimer += gameTime.ElapsedGameTime.Milliseconds;
+                if (msSinceStartPickupTimer > msPickupTimer)
+                {
+                    msSinceStartPickupTimer = 0;
+                    canPickUp = false;
+                    nTimesHit = 0;
+                }
+            }
+
 
             canCraft = false;
+            playerNearItem = null;
         }
 
         public void DrawCanCraft(SpriteBatch sb, Camera camera)
@@ -178,7 +229,18 @@ namespace Gusto.Models.Animated
             }
         }
 
-        
+        public void DrawCanPickUp(SpriteBatch sb, Camera camera)
+        {
+            if (playerNearItem != null && canPickUp)
+            {
+                SpriteFont font = _content.Load<SpriteFont>("helperFont");
+                sb.Begin(camera);
+                sb.DrawString(font, "p", new Vector2(GetBoundingBox().X + 20, GetBoundingBox().Y - 50), Color.Black);
+                sb.End();
+            }
+        }
+
+
         private string CheckOreType(Type t)
         {
             string ret = null;

@@ -245,7 +245,7 @@ namespace Gusto.Models.Menus
                     tempInventory[i] = item;
 
                 // clear any zero stacked items
-                if (tempInventory[i] != null && tempInventory[i].amountStacked <= 0)
+                if (tempInventory[i] != null && tempInventory[i].stackable && tempInventory[i].amountStacked <= 0)
                     tempInventory[i] = null;
 
             }
