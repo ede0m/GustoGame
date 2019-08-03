@@ -75,7 +75,6 @@ namespace Gusto.Models.Animated
                             nOre = item.amountStacked;
                     }
                 }
-                canCraft = true; //TEMPORARY@!
                 if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 7) // 2 wood, 2 grass, 1 coal, 8 ore required
                     canCraft = true;
             }
