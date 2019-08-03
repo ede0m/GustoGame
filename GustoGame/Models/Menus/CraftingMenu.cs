@@ -18,7 +18,6 @@ namespace Gusto.Models.Menus
     public class CraftingMenu : Sprite, ICanUpdate, IMenuGUI
     {
         bool menuOpen;
-        int maxInventorySlots;
         int selectedIndex;
         string itemMenuFunc;
         float timeRClicked;
@@ -65,6 +64,7 @@ namespace Gusto.Models.Menus
 
             itemDrawLocStart = new Vector2(location.X - _texture.Width / 2 + 50, location.Y - _texture.Height / 2 + 100);
 
+            // just used to display the crafting textures in the menu. Not used in game.
             IconTextures = new Dictionary<string, InventoryItem>
             {
                 {"craftingAnvil", new AnvilItem(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
@@ -224,6 +224,7 @@ namespace Gusto.Models.Menus
                 cursorPos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 Rectangle cursorRect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, cursor.Width, cursor.Height);
 
+                selectedIndex = -1;
                 int i = 0;
                 foreach (var slot in slotLocations.Values)
                 {

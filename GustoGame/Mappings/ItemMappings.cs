@@ -90,7 +90,7 @@ namespace Gusto.Mappings
         {
             { "craftingAnvil", new Dictionary<string, int>
                 {
-                    {"ironBar", 5}
+                    {"ironBar", 1} // TODO: change back to 5
                 }
             },
             { "baseSword", new Dictionary<string, int>
