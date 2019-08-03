@@ -80,7 +80,7 @@
     <Compile Include="GameMap\DayLight.cs" />
     <Compile Include="GameMap\GameMap.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
-    <Compile Include="Mappings\ItemDropMappings.cs" />
+    <Compile Include="Mappings\ItemMappings.cs" />
     <Compile Include="Mappings\PlayerMovementVectorMappings.cs" />
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />

@@ -47,7 +47,6 @@ namespace Gusto.Models.Menus
             inventoryOfPlayer = invOfPlayer;
 
             itemDisplaySizePix = 40;
-            maxInventorySlots = inventoryOfPlayer.maxInventorySlots;
 
             itemMenuButtonLocations = new Dictionary<string, Rectangle>();
             saveItemSpriteScale = new Dictionary<InventoryItem, float>();
@@ -68,13 +67,87 @@ namespace Gusto.Models.Menus
             menuOpen = true;
 
             List<InventoryItem> items = itemsPlayer;
-            int showSlots = maxInventorySlots;
+
+            // draw item stat panel
+            Texture2D textureItemStat = new Texture2D(_graphics, 140, 50);
+            Color[] csdata = new Color[50 * 140];
+            for (int j = 0; j < csdata.Length; ++j) csdata[j] = Color.Gray;
+            textureItemStat.SetData(csdata);
+            Vector2 itemStatLoc = new Vector2(itemDrawLoc.X, itemDrawLoc.Y - 80);
+            itemMenuButtonLocations["itemStat"] = new Rectangle((int)itemStatLoc.X, (int)itemStatLoc.Y, textureItemStat.Width, textureItemStat.Height);
+            sb.Begin();
+            sb.Draw(textureItemStat, itemStatLoc, Color.Gray);
+            sb.End();
+
+
+            List<string> craftableItemsChecked = SearchCraftingRecipes(itemsPlayer);
+            
+            
+            int textureHW = 64;
+            // draw slots
+            for (int i = 0; i < craftableItemsChecked.Count; i++)
+            {
+
+                // draw slots
+                Texture2D textureSlot = new Texture2D(_graphics, textureHW, textureHW);
+                Color[] data = new Color[64 * 64];
+                Color color = Color.DarkGray;
+                if (i == selectedIndex)
+                    color = Color.Crimson;
+                for (int j = 0; j < data.Length; ++j) data[j] = color;
+                textureSlot.SetData(data);
+
+                Rectangle slotLoc = new Rectangle((int)itemDrawLoc.X, (int)itemDrawLoc.Y, textureHW, textureHW);
+                slotLocations[i] = slotLoc;
+                sb.Begin();
+                sb.Draw(textureSlot, itemDrawLoc, Color.DarkGray);
+                sb.End();
+
+                itemDrawLoc.X += 70;
+                if (itemDrawLoc.X > location.X + GetWidth() / 2 - 50)
+                {
+                    itemDrawLoc.X = itemDrawLocStart.X;
+                    itemDrawLoc.Y += 70;
+                }
+
+            }
 
         }
 
-        public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
+        // returns a list of craftabale items based on the invetory of the player
+        private List<string> SearchCraftingRecipes(List<InventoryItem> itemsPlayer)
         {
-            throw new NotImplementedException();
+            List<string> craftableItems = new List<string>();
+
+            // hash map the players available items
+            Dictionary<string, int> playInvMap = new Dictionary<string, int>();
+            foreach (var item in itemsPlayer)
+            {
+                if (playInvMap.ContainsKey(item.bbKey))
+                    playInvMap[item.bbKey] += item.amountStacked;
+                else
+                    playInvMap.Add(item.bbKey, item.amountStacked);
+            }
+            // now check our available items against the crafting recipes 
+            foreach (KeyValuePair<string, Dictionary<string, int>> craftingItem in Mappings.ItemMappings.CraftingRecipes)
+            {
+                int ingredientCount = 0;
+                foreach (KeyValuePair<string, int> ingredient in craftingItem.Value)
+                {
+                    // if we have the item and enough of the item
+                    if (!(playInvMap.ContainsKey(ingredient.Key) && playInvMap[ingredient.Key] > ingredient.Value))
+                        break;
+                    else
+                    {
+                        ingredientCount += 1;
+                        if (ingredientCount >= craftingItem.Value.Count) // we have all the ingredients
+                            craftableItems.Add(craftingItem.Key);
+
+                    }
+                }
+            }
+
+            return craftableItems;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera cam)
@@ -84,6 +157,11 @@ namespace Gusto.Models.Menus
 
             }
             menuOpen = false;
+        }
+
+        public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
+        {
+            throw new NotImplementedException();
         }
     }
 }

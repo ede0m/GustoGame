@@ -206,7 +206,7 @@ namespace Gusto
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
-            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 120), Content, GraphicsDevice);
+            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 10), Content, GraphicsDevice);
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             hammer.onGround = true;

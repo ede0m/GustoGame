@@ -18,7 +18,6 @@ namespace Gusto.Utility
         // Models add to this global list when they drop items. Update order adds these to the UpdateOrder
         public static List<Sprite> ItemsToUpdate = new List<Sprite>();
 
-
         public static List<InventoryItem> CreateNPInventory(List<Tuple<string, int>> itemDrops, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             List<InventoryItem> returnItems = new List<InventoryItem>();

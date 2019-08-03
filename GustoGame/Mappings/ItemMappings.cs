@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Mappings
 {
-    public class ItemDropMappings
+    public class ItemMappings
     {
         public static Dictionary<string, Dictionary<string, Dictionary<string, float>>> ItemDrops = new Dictionary<string, Dictionary<string, Dictionary<string, float>>>
         {
@@ -82,5 +82,24 @@ namespace Gusto.Mappings
             },
 
         };
+
+        // TODO:could make this a narrowing index by ingredients
+        public static Dictionary<string, Dictionary<string, int>> CraftingRecipes = new Dictionary<string, Dictionary<string, int>>
+        {
+            { "craftingAnvil", new Dictionary<string, int>
+                {
+                    {"ironBar", 5}
+                }
+            },
+            { "baseSword", new Dictionary<string, int>
+                {
+                    {"ironBar", 2},
+                    {"softWood", 2}
+                }
+            },
+
+        };
+
+
     }
 }
