@@ -98,6 +98,12 @@ namespace Gusto.Models.Animated
                 colliding = false;
                 return;
             }
+            else if (collidedWith is IPlaceable)
+            {
+                // Todo: Do I want to collide with these objects?
+                colliding = false;
+                return;
+            }
 
         }
 

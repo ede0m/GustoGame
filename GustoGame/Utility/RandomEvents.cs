@@ -12,28 +12,15 @@ namespace Gusto.Utility
     public static class RandomEvents
     {
 
-        public static int RandomAimOffset(Random randomGeneration)
-        {
-            return randomGeneration.Next(-120, 120);
-        }
+        public static Random rand = new Random();
 
-        public static int RandomShotSpeed(Random randomGeneration)
-        {
-            return randomGeneration.Next(10, 25);
-        }
-
-        public static int RandomSelection(int nSelect, Random randomGeneration)
-        {
-            return randomGeneration.Next(0, nSelect);
-        }
-
-        public static float RandomSelectionRange(int n, Random rand)
+        public static float RandomSelectionRange(int n)
         {
             return rand.Next(-n, n);
         }
 
         // maxItemDrop is different than maxDrop key. maxItemDrop is number of attempts to get items. number of drops by inventory will  not exceed maxItemDrop.
-        public static List<Tuple<string, int>> RandomNPDrops(string objKey, Random rand, int maxItemDrop)
+        public static List<Tuple<string, int>> RandomNPDrops(string objKey, int maxItemDrop)
         {
             List<string> drops = new List<string>();
             List<int> dropAmounts = new List<int>();
@@ -53,7 +40,7 @@ namespace Gusto.Utility
                     float randomDropAmount = 1;
                     if (maxDropAmount > 1)
                     {
-                        randomDropAmount = rand.Next(1, (int)maxDropAmount);
+                        randomDropAmount = rand.Next(1, (int)maxDropAmount+1);
                     }
 
                     drops.Add(randomItemKey);

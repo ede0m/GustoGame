@@ -28,7 +28,7 @@ namespace Gusto.AnimatedSprite
             damage = 0.05f;
             string objKey = "baseTribal";
 
-            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, rand, 3);
+            List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);
             inventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
 
             Texture2D textureBaseTribal = content.Load<Texture2D>("Tribal1");

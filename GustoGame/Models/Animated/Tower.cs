@@ -31,7 +31,6 @@ namespace Gusto.Models.Animated
         public float fullHealth;
         private bool showHealthBar;
             
-        Random rand;
         public TeamType teamType;
         public List<Ammo> Shots;
 
@@ -42,7 +41,6 @@ namespace Gusto.Models.Animated
 
             teamType = type;
             Shots = new List<Ammo>();
-            rand = new Random();
 
             millisecondsToShowHealthBar = 6000;
             timeShowingHealthBar = 0;
@@ -108,7 +106,7 @@ namespace Gusto.Models.Animated
                 if (shotDirection != null)
                 {
                     BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, location, _content, _graphics);
-                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.RandomShotSpeed(rand), RandomEvents.RandomAimOffset(rand));
+                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                 }

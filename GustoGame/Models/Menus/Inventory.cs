@@ -45,14 +45,12 @@ namespace Gusto.Models.Menus
 
         GraphicsDevice _graphics;
         ContentManager _content;
-        Random rand;
 
         public Inventory(Vector2 location, ContentManager content, GraphicsDevice graphics, PlayerPirate invOfPlayer) : base(graphics)
         {
 
             _graphics = graphics;
             _content = content;
-            rand = new Random();
             font = _content.Load<SpriteFont>("helperFont");
             cursor = _content.Load<Texture2D>("pointer");
 
@@ -245,7 +243,7 @@ namespace Gusto.Models.Menus
                     tempInventory[i] = item;
 
                 // clear any zero stacked items
-                if (tempInventory[i] != null && tempInventory[i].amountStacked <= 0)
+                if (tempInventory[i] != null && tempInventory[i].stackable && tempInventory[i].amountStacked <= 0)
                     tempInventory[i] = null;
 
             }
@@ -332,12 +330,25 @@ namespace Gusto.Models.Menus
 
                             if (itemMenuFunc.Equals("drop"))
                             {
-                                item.inInventory = false;
-                                item.onGround = true;
-                                item.remove = false;
-                                item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + rand.Next(-10, 10);
-                                item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + rand.Next(-10, 10);
-                                ItemUtility.ItemsToUpdate.Add(item);
+                                // placable item?
+                                if (item.placeableVersion != null)
+                                {
+                                    Sprite placeableItem = (Sprite)item.placeableVersion;
+                                    placeableItem.remove = false;
+                                    placeableItem.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + RandomEvents.rand.Next(-10, 10);
+                                    placeableItem.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + RandomEvents.rand.Next(-10, 10);
+                                    ItemUtility.ItemsToUpdate.Add(placeableItem);
+                                }
+                                else
+                                {
+                                    item.inInventory = false;
+                                    item.onGround = true;
+                                    item.remove = false;
+                                    item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + RandomEvents.rand.Next(-10, 10);
+                                    item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + RandomEvents.rand.Next(-10, 10);
+                                    ItemUtility.ItemsToUpdate.Add(item);
+                                }
+
                                 inventoryOfPlayer.inventory[selectedIndex] = null;
                                 tempInventory[selectedIndex] = null;
                                 timeLClicked = 0;

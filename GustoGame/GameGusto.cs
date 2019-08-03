@@ -38,7 +38,9 @@ namespace Gusto
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
         BasePlank basePlank;
+        Hammer hammer;
         Lantern lantern;
+        ClayFurnace furnace;
 
         TileGameMap map;
         JObject mapData;
@@ -123,6 +125,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePistol, "pistol", 1.0f, 1.0f);
+            Texture2D textureHammer = Content.Load<Texture2D>("ShortSword");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureHammer, "hammer", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShortSword, "shortSword", 1.0f, 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
@@ -142,6 +146,9 @@ namespace Gusto
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
 
+            Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
+
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureOcean1, "oceanTile", 1.0f, 1.0f);
@@ -157,22 +164,25 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 2, 4, textureRock1, "rock1", 0.3f, 1.0f);
             Texture2D textureIslandGrass = Content.Load<Texture2D>("islandGrass");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIslandGrass, "islandGrass", 0.5f, 1.0f);
-            Texture2D textureCoal = Content.Load<Texture2D>("islandGrass");
+            Texture2D textureCoal = Content.Load<Texture2D>("coal");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCoal, "coal", 1.0f, 1.0f);
-            Texture2D textureIronOre = Content.Load<Texture2D>("islandGrass");
+            Texture2D textureIronOre = Content.Load<Texture2D>("IronOre");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIronOre, "ironOre", 1.0f, 1.0f);
+            Texture2D textureIronBar = Content.Load<Texture2D>("IronBar");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIronBar, "ironBar", 1.0f, 1.0f);
             Texture2D textureTribalTokens = Content.Load<Texture2D>("TribalTokens");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTribalTokens, "tribalTokens", 0.5f, 1.0f);
             Texture2D textureBasePlank = Content.Load<Texture2D>("TribalTokens");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureBasePlank, "basePlank", 0.5f, 1.0f);
+            Texture2D textureClayFurnaceItem = Content.Load<Texture2D>("Furnace");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
             List<Sprite> giannaRegionMap = BoundingBoxLocations.RegionMap["Gianna"];
 
             //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP
-            Random rnd = new Random();
-            Sprite GiannaRegionTile = giannaRegionMap[rnd.Next(giannaRegionMap.Count)];
+            Sprite GiannaRegionTile = giannaRegionMap[RandomEvents.rand.Next(giannaRegionMap.Count)];
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
@@ -189,7 +199,11 @@ namespace Gusto
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+            furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
 
+
+            hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
+            hammer.onGround = true;
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
             pistol.onGround = true;
@@ -213,11 +227,13 @@ namespace Gusto
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(pistol);
+            UpdateOrder.Add(hammer);
             UpdateOrder.Add(pistolAmmo);
             UpdateOrder.Add(cannonAmmo);
             UpdateOrder.Add(basePlank);
             UpdateOrder.Add(inventory);
             UpdateOrder.Add(lantern);
+            UpdateOrder.Add(furnace);
 
         }
 
@@ -294,7 +310,7 @@ namespace Gusto
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
 
-            // add any dropped items
+            // add any dropped items (and placable items)
             foreach (var item in ItemUtility.ItemsToUpdate)
                 UpdateOrder.Add(item);
 
@@ -390,6 +406,18 @@ namespace Gusto
                         item.DrawPickUp(spriteBatchView, camera);
                 }
 
+                if (sprite is ICraftingObject)
+                {
+                    ICraftingObject craftObj = (ICraftingObject)sprite;
+                    craftObj.DrawCanCraft(spriteBatchView, camera);
+                }
+
+                if (sprite is IPlaceable)
+                {
+                    IPlaceable placeObj = (IPlaceable)sprite;
+                    placeObj.DrawCanPickUp(spriteBatchView, camera);
+                }
+
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship) sprite;
@@ -443,9 +471,6 @@ namespace Gusto
                     if (pirate.inCombat && pirate.currRowFrame != 3)
                         pirate.inHand.Draw(spriteBatchView, this.camera);
 
-                    /*if (pirate.inHand.emittingLight != null)
-                        pirate.inHand.emittingLight.Draw(spriteBatchView, this.camera, lightsTarget, gameScene);*/
-
                     foreach (var shot in pirate.inHand.Shots)
                         shot.Draw(spriteBatchView, this.camera);
 
@@ -471,13 +496,6 @@ namespace Gusto
                         shot.Draw(spriteBatchView, this.camera);
                     continue;
                 }
-
-                // scene spot light mask
-                /*if (sprite is ILight)
-                {
-                    HandHeld light = (HandHeld)sprite;
-                    light.emittingLight.Draw(spriteBatchView, this.camera, lightsTarget, gameScene);
-                }*/
 
                 sprite.Draw(spriteBatchView, this.camera);
             }
