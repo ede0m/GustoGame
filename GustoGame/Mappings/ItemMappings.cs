@@ -38,6 +38,12 @@ namespace Gusto.Mappings
                             {"percentDrop", 50 }
                         }
                     },
+                    {"baseChestItem", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 25 }
+                        }
+                    },
                 }
             },
             { "tree1", new Dictionary<string, Dictionary<string, float>>
@@ -106,6 +112,22 @@ namespace Gusto.Mappings
                         {
                             {"maxDrop", 3},
                             {"percentDrop", 25}
+                        }
+                    },
+                }
+            },
+             { "baseChest", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"tribalTokens", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 16 },
+                            {"percentDrop", 85 }
+                        }
+                    },
+                     {"ironBar", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 4},
+                            {"percentDrop", 55}
                         }
                     },
                 }

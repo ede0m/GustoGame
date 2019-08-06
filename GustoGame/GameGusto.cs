@@ -44,6 +44,8 @@ namespace Gusto
         CraftingAnvil craftingAnvil;
         BaseBarrel barrelLand;
         BaseBarrel barrelOcean;
+        BaseChest chestLand;
+        BaseChest chestOcean;
 
         TileGameMap map;
         JObject mapData;
@@ -151,6 +153,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
             Texture2D textureBarrel = Content.Load<Texture2D>("Barrel");
             LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrel, "baseBarrel", 0.5f, 1.0f);
+            Texture2D textureChest = Content.Load<Texture2D>("Barrel");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureChest, "baseChest", 0.5f, 1.0f);
 
             Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
@@ -190,6 +194,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureAnvilItem, "anvilItem", 1.0f, 1.0f);
             Texture2D textureBarrelItem = Content.Load<Texture2D>("Barrel");
             LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrelItem, "baseBarrelItem", 1.0f, 1.0f);
+            Texture2D textureChestItem = Content.Load<Texture2D>("BaseChest");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureChestItem, "baseChestItem", 1.0f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -217,6 +223,8 @@ namespace Gusto
             craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 10), Content, GraphicsDevice);
             barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(80, 30), Content, GraphicsDevice);
             barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(380, 30), Content, GraphicsDevice);
+            chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -40), Content, GraphicsDevice);
+            chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 80), Content, GraphicsDevice);
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             hammer.onGround = true;
@@ -259,6 +267,8 @@ namespace Gusto
             UpdateOrder.Add(craftingAnvil);
             UpdateOrder.Add(barrelLand);
             UpdateOrder.Add(barrelOcean);
+            UpdateOrder.Add(chestLand);
+            UpdateOrder.Add(chestOcean);
 
         }
 

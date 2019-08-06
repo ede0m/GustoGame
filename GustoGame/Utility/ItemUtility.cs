@@ -97,6 +97,10 @@ namespace Gusto.Utility
                 case ("baseBarrelItem"):
                     item = new BaseBarrelItem(team, region, location, content, graphics);
                     break;
+                case ("baseChestItem"):
+                    item = new BaseChestItem(team, region, location, content, graphics);
+                    item.placeableVersion = new BaseChest(team, region, location, content, graphics);
+                    break;
                 case ("ironBar"):
                     item = new IronBar(team, region, location, content, graphics);
                     break;

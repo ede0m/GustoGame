@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimatedSprite\BaseBarrel.cs" />
+    <Compile Include="AnimatedSprite\BaseChest.cs" />
     <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="AnimatedSprite\GameMap\Rock1.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\AnvilItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseBarrelItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\BaseChestItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\Anvil.cs" />
     <Compile Include="Models\Animated\Barrel.cs" />
+    <Compile Include="Models\Animated\Chest.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />
     <Compile Include="Models\Animated\GroundEnemy.cs" />
