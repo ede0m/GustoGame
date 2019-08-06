@@ -1,4 +1,5 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.Models.Animated;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace Gusto.Models
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            
+
         }
 
     }

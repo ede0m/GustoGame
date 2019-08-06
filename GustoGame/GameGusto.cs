@@ -42,6 +42,8 @@ namespace Gusto
         Lantern lantern;
         ClayFurnace furnace;
         CraftingAnvil craftingAnvil;
+        BarrelItem barrelLand;
+        BarrelItem barrelOcean;
 
         TileGameMap map;
         JObject mapData;
@@ -147,6 +149,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
+            Texture2D textureBarrel = Content.Load<Texture2D>("Barrel");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrel, "barrelItem", 0.5f, 1.0f);
 
             Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
@@ -209,6 +213,8 @@ namespace Gusto
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
             craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 10), Content, GraphicsDevice);
+            barrelLand = new BarrelItem(TeamType.A, "GustoGame", new Vector2(80, 30), Content, GraphicsDevice);
+            barrelOcean = new BarrelItem(TeamType.A, "GustoGame", new Vector2(380, 30), Content, GraphicsDevice);
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             hammer.onGround = true;
@@ -249,6 +255,8 @@ namespace Gusto
             UpdateOrder.Add(lantern);
             UpdateOrder.Add(furnace);
             UpdateOrder.Add(craftingAnvil);
+            UpdateOrder.Add(barrelLand);
+            UpdateOrder.Add(barrelOcean);
 
         }
 

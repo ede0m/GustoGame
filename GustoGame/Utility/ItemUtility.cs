@@ -86,6 +86,14 @@ namespace Gusto.Utility
                     item = new Nails(team, region, location, content, graphics);
                     amountStacked = 5; 
                     break;
+                case ("cannonBall"):
+                    item = new CannonBallItem(team, region, location, content, graphics);
+                    amountStacked = 3;
+                    break;
+                case ("pistolShot"):
+                    item = new PistolShotItem(team, region, location, content, graphics);
+                    amountStacked = 5;
+                    break;
             }
             item.itemKey = key;
             item.amountStacked = amountStacked;
