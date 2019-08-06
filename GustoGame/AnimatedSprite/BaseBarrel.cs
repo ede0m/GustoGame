@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class BarrelItem : Barrel
+    public class BaseBarrel : Barrel
     {
-        public BarrelItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, region, content, graphics)
+        public BaseBarrel(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, region, content, graphics)
         {
             nHitsToDestroy = 5;
-            var objKey = "barrelItem";
+            var objKey = "baseBarrel";
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 4);
             drops = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);

@@ -42,6 +42,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\BaseBarrel.cs" />
     <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
@@ -50,7 +51,7 @@
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
     <Compile Include="AnimatedSprite\GameMap\Rock1.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\AnvilItem.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\BarrelItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\BaseBarrelItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />

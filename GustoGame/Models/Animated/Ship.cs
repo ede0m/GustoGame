@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Gusto.AnimatedSprite.InventoryItems;
 
 namespace Gusto.Models.Animated
 {
@@ -211,12 +212,16 @@ namespace Gusto.Models.Animated
                     // drop items
                     foreach (var item in inventory)
                     {
-                        item.inInventory = false;
-                        // scatter items
-                        item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
-                        item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
-                        item.onGround = true;
-                        ItemUtility.ItemsToUpdate.Add(item);
+                        // TODO: drop (package up) all items as barrels/chests
+
+                        if (item.bbKey.Equals("baseBarrelItem"))
+                        {
+                            BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);
+                            // scatter items
+                            b.location.X = location.X + RandomEvents.rand.Next(-10, 10);
+                            b.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
+                            ItemUtility.ItemsToUpdate.Add(b);
+                        }
                     }
                     inventory.Clear();
                 }

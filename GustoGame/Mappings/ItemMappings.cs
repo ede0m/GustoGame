@@ -32,7 +32,7 @@ namespace Gusto.Mappings
             },
             { "baseShip", new Dictionary<string, Dictionary<string, float>>
                 {
-                    {"barrelItem", new Dictionary<string, float>
+                    {"baseBarrelItem", new Dictionary<string, float>
                         {
                             {"maxDrop", 4 },
                             {"percentDrop", 50 }
@@ -76,7 +76,7 @@ namespace Gusto.Mappings
                     },
                 }
             },
-            { "barrelItem", new Dictionary<string, Dictionary<string, float>>
+            { "baseBarrel", new Dictionary<string, Dictionary<string, float>>
                 {
                     {"coal", new Dictionary<string, float>
                         {

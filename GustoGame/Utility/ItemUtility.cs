@@ -94,6 +94,12 @@ namespace Gusto.Utility
                     item = new PistolShotItem(team, region, location, content, graphics);
                     amountStacked = 5;
                     break;
+                case ("baseBarrelItem"):
+                    item = new BaseBarrelItem(team, region, location, content, graphics);
+                    break;
+                case ("ironBar"):
+                    item = new IronBar(team, region, location, content, graphics);
+                    break;
             }
             item.itemKey = key;
             item.amountStacked = amountStacked;
