@@ -12,14 +12,16 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class BaseChest : Chest
+    public class BaseChest : Storage
     {
         public BaseChest(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, region, content, graphics)
         {
+            nInventorySlots = 5;
             var objKey = "baseChest";
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 4);
-            inventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
+            List<InventoryItem> items = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
+            inventory = Enumerable.Repeat<InventoryItem>(null, nInventorySlots).ToList();
 
             Texture2D texture = content.Load<Texture2D>("BaseChest");
             Texture2D textureBB = null;
@@ -28,6 +30,13 @@ namespace Gusto.AnimatedSprite.InventoryItems
             Asset asset = new Asset(texture, textureBB, 3, 2, 0.5f, objKey, region);
 
             SetSpriteAsset(asset, location);
+
+            foreach (var i in items)
+            {
+                if (AddInventoryItem(i))
+                    i.inInventory = true;
+            }
+
         }
     }
 }

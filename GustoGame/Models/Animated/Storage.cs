@@ -15,13 +15,16 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Chest : Sprite, ICanUpdate, IPlaceable
+    public class Storage : Sprite, ICanUpdate, IPlaceable, IStorage
     {
         public bool inWater;
+        public int nInventorySlots;
+        public bool canOpenStorage;
+        public bool storageOpen;
 
         int nTimesHit;
-        private int hitsToPickUp;
-        private bool canPickUp;
+        int hitsToPickUp;
+        bool canPickUp;
         float msPickupTimer;
         float msSinceStartPickupTimer;
         float msPerFrame;
@@ -33,7 +36,7 @@ namespace Gusto.Models.Animated
         PiratePlayer playerNearItem;
         public List<InventoryItem> inventory;
 
-        public Chest(TeamType type, string region, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public Storage(TeamType type, string region, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             msPerFrame = 250;
             hitsToPickUp = 10;
@@ -51,8 +54,10 @@ namespace Gusto.Models.Animated
             }
 
             if (collidedWith.bbKey.Equals("playerPirate"))
+            {
                 playerNearItem = (PiratePlayer)collidedWith;
-
+                canOpenStorage = true;
+            }
 
             if (collidedWith.bbKey.Equals("hammer"))
             {
@@ -74,6 +79,20 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+
+            if (canOpenStorage && !storageOpen && kstate.IsKeyDown(Keys.O))
+            {
+                storageOpen = true;
+            }
+
+            if (storageOpen)
+            {
+                if (kstate.IsKeyDown(Keys.Escape) || !canOpenStorage)
+                {
+                    storageOpen = false;
+                }
+            }
+
 
             if (canPickUp)
             {
@@ -122,8 +141,29 @@ namespace Gusto.Models.Animated
 
 
             inWater = true;
+            canOpenStorage = false;
             playerNearItem = null;
 
+        }
+
+        public bool AddInventoryItem(InventoryItem itemToAdd)
+        {
+            for (int i = 0; i < inventory.Count(); i++)
+            {
+                // auto stack - TODO MAX STACK
+                if (inventory[i] != null && inventory[i].bbKey == itemToAdd.bbKey && itemToAdd.stackable)
+                {
+                    inventory[i].amountStacked += itemToAdd.amountStacked;
+                    return true;
+                }
+
+                if (inventory[i] == null)
+                {
+                    inventory[i] = itemToAdd;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void DrawCanPickUp(SpriteBatch sb, Camera camera)
@@ -133,6 +173,17 @@ namespace Gusto.Models.Animated
                 SpriteFont font = _content.Load<SpriteFont>("helperFont");
                 sb.Begin(camera);
                 sb.DrawString(font, "p", new Vector2(GetBoundingBox().X + 20, GetBoundingBox().Y - 50), Color.Black);
+                sb.End();
+            }
+        }
+
+        public void DrawOpenStorage(SpriteBatch sb, Camera camera)
+        {
+            if (playerNearItem != null && canOpenStorage)
+            {
+                SpriteFont font = _content.Load<SpriteFont>("helperFont");
+                sb.Begin(camera);
+                sb.DrawString(font, "o", new Vector2(GetBoundingBox().X, GetBoundingBox().Y - 50), Color.Black);
                 sb.End();
             }
         }

@@ -419,10 +419,12 @@ namespace Gusto
             // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
             bool showCraftingMenu = false;
+            bool showStorageMenu = false;
             bool playerOnShip = false;
             Ship playerShip = null;
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
+            Storage invStorage = null;
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
@@ -452,6 +454,17 @@ namespace Gusto
                 {
                     IPlaceable placeObj = (IPlaceable)sprite;
                     placeObj.DrawCanPickUp(spriteBatchView, camera);
+                }
+
+                if (sprite is IStorage)
+                {
+                    Storage storage = (Storage)sprite;
+                    storage.DrawOpenStorage(spriteBatchView, camera);
+                    if (storage.storageOpen)
+                    {
+                        showStorageMenu = true;
+                        invStorage = storage;
+                    }
                 }
 
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
@@ -553,12 +566,17 @@ namespace Gusto
             if (showInventoryMenu)
             {
                 inventoryMenu.Draw(spriteBatchStatic, null);
-                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
+                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, null);
             }
             else if (showCraftingMenu)
             {
                 craftingMenu.Draw(spriteBatchStatic, null);
                 craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer);
+            }
+            else if (showStorageMenu)
+            {
+                inventoryMenu.Draw(spriteBatchStatic, null);
+                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, invStorage);
             }
             
             if (playerOnShip)

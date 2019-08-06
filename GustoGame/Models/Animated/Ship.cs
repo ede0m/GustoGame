@@ -79,7 +79,7 @@ namespace Gusto.Models.Animated
         public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             Shots = new List<Ammo>();
-            inventory = inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+            inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             wind = w;
             teamType = type;
             _content = content;
