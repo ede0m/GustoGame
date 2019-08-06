@@ -42,12 +42,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\ClayFurnace.cs" />
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
     <Compile Include="AnimatedSprite\GameMap\Rock1.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\AnvilItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\IronOre.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IslandGrass.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Lantern.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Nails.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\SoftWood.cs" />
@@ -78,11 +81,12 @@
     <Compile Include="GameMap\DayLight.cs" />
     <Compile Include="GameMap\GameMap.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
-    <Compile Include="Mappings\ItemDropMappings.cs" />
+    <Compile Include="Mappings\ItemMappings.cs" />
     <Compile Include="Mappings\PlayerMovementVectorMappings.cs" />
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
+    <Compile Include="Models\Animated\Anvil.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />
     <Compile Include="Models\Animated\GroundEnemy.cs" />
@@ -100,6 +104,7 @@
     <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Interfaces\IWood.cs" />
     <Compile Include="Models\Light.cs" />
+    <Compile Include="Models\Menus\CraftingMenu.cs" />
     <Compile Include="Models\Menus\Inventory.cs" />
     <Compile Include="Models\Interfaces\ICanUpdate.cs" />
     <Compile Include="Models\Interfaces\IInventoryItem.cs" />

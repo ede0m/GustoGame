@@ -20,6 +20,7 @@ namespace Gusto.Models.Menus
         int maxInventorySlots;
         int shipInventorySlots;
         int selectedIndex;
+        int itemMenuIndex;
         bool openItemMenu;
         bool openShipInventory;
         string itemMenuFunc;
@@ -56,12 +57,13 @@ namespace Gusto.Models.Menus
 
             inventoryOfPlayer = invOfPlayer;
 
-            itemDisplaySizePix = 40;
+            itemDisplaySizePix = 60;
             maxInventorySlots = inventoryOfPlayer.maxInventorySlots;
             shipInventorySlots = 0;
             selectedIndex = 0;
             dropDragIndex = -1;
             selectDragIndex = -1;
+            itemMenuIndex = -1;
             tempInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots + shipInventorySlots).ToList();
 
             slotLocations = new Dictionary<int, Rectangle>();
@@ -184,12 +186,23 @@ namespace Gusto.Models.Menus
                     if (draggingItem && selectDragIndex == i)
                         itemLoc = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
 
-                    // dropping
+                    // dropping on drag
                     if (dropDragIndex >= 0 && selectDragIndex == i)
                     {
                         itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
                         if (invMap[dropDragIndex] != null) // switch spots
-                            tempInventory[selectDragIndex] = invMap[dropDragIndex];
+                        {
+                            if (invMap[dropDragIndex].bbKey.Equals(tempInventory[selectDragIndex].bbKey) && invMap[dropDragIndex].stackable)
+                            {
+                                // stack items
+                                item.amountStacked += invMap[selectDragIndex].amountStacked;
+                                tempInventory[selectDragIndex] = null;
+                                emptyIndex = selectDragIndex;
+                            }
+                            else
+                                tempInventory[selectDragIndex] = invMap[dropDragIndex];
+                                
+                        } 
                         else
                         {
                             tempInventory[selectDragIndex] = null;
@@ -207,11 +220,13 @@ namespace Gusto.Models.Menus
                     if (!saveItemSpriteScale.ContainsKey(item))
                         saveItemSpriteScale[item] = item.spriteScale;
 
+                    // draw the items TODO: could move it icon method like CraftingMenu
                     if (item is IHandHeld) // handhelds display action frames so scaling them will make them too tiny and offset
                     {
                         item.spriteScale = 1.3f;
                         offsetLocation = new Vector2(itemLoc.X + textureHW / 3, itemLoc.Y + textureHW / 3);
                         item.currRowFrame = 0;
+                        item.currColumnFrame = 0;
                     }
                     else
                     {
@@ -289,25 +304,34 @@ namespace Gusto.Models.Menus
                 cursorPos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 Rectangle cursorRect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, cursor.Width, cursor.Height);
 
-                int i = 0;
-                foreach (var slot in slotLocations.Values)
+                selectedIndex = -1;
+                if (itemMenuIndex != -1)  // don't switch slots when item menu open
                 {
-                    if (slot.Intersects(cursorRect))
+                    selectedIndex = itemMenuIndex;
+                }
+                else
+                {
+                    int i = 0;
+                    foreach (var slot in slotLocations.Values)
                     {
-                        selectedIndex = i;
-                        if (Mouse.GetState().LeftButton == ButtonState.Pressed  && !draggingItem)
+                        if (slot.Intersects(cursorRect))
                         {
-                            draggingItem = true;
-                            selectDragIndex = selectedIndex;
-                        }
+                            selectedIndex = i;
+                            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !draggingItem)
+                            {
+                                draggingItem = true;
+                                selectDragIndex = selectedIndex;
+                            }
 
-                        if (!(Mouse.GetState().LeftButton == ButtonState.Pressed) && draggingItem)
-                        {
-                            dropDragIndex = i;
-                            draggingItem = false;
+                            if (!(Mouse.GetState().LeftButton == ButtonState.Pressed) && draggingItem)
+                            {
+                                dropDragIndex = i;
+                                draggingItem = false;
+                            }
+
                         }
+                        i++;
                     }
-                    i++;
                 }
 
                 foreach (var entry in itemMenuButtonLocations)
@@ -322,6 +346,7 @@ namespace Gusto.Models.Menus
                             timeLClicked = 0;
                         }
 
+                        // display item menu options
                         if (openItemMenu && Mouse.GetState().LeftButton == ButtonState.Pressed && !(timeLClicked < 200))
                         {
                             var item = inventoryOfPlayer.inventory[selectedIndex];
@@ -368,7 +393,14 @@ namespace Gusto.Models.Menus
                 if (toggleItemMenu && !(timeRClicked < 200))
                 {
                     openItemMenu = !openItemMenu;
-                    itemMenuPos = cursorPos;
+                    if (openItemMenu)
+                    {
+                        itemMenuIndex = selectedIndex;
+                        if (selectedIndex != -1)
+                            itemMenuPos = slotLocations[selectedIndex].Center.ToVector2();
+                    }
+                    else
+                        itemMenuIndex = -1;
                     timeRClicked = 0;
                 }
             }

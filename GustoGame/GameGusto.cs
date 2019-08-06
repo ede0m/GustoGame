@@ -41,6 +41,7 @@ namespace Gusto
         Hammer hammer;
         Lantern lantern;
         ClayFurnace furnace;
+        CraftingAnvil craftingAnvil;
 
         TileGameMap map;
         JObject mapData;
@@ -49,7 +50,8 @@ namespace Gusto
         WindArrows windArrows;
         Texture2D anchorIcon;
         Texture2D repairIcon;
-        Inventory inventory;
+        Inventory inventoryMenu;
+        CraftingMenu craftingMenu;
 
         GraphicsDeviceManager graphics;
         FrameCounter _frameCounter;
@@ -148,6 +150,8 @@ namespace Gusto
 
             Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
+            Texture2D textureCraftingAnvil = Content.Load<Texture2D>("Anvil");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCraftingAnvil, "craftingAnvil", 0.5f, 1.0f);
 
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
@@ -166,6 +170,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIslandGrass, "islandGrass", 0.5f, 1.0f);
             Texture2D textureCoal = Content.Load<Texture2D>("coal");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCoal, "coal", 1.0f, 1.0f);
+            Texture2D textureNails = Content.Load<Texture2D>("Nails");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureNails, "nails", 1.0f, 1.0f);
             Texture2D textureIronOre = Content.Load<Texture2D>("IronOre");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIronOre, "ironOre", 1.0f, 1.0f);
             Texture2D textureIronBar = Content.Load<Texture2D>("IronBar");
@@ -175,7 +181,9 @@ namespace Gusto
             Texture2D textureBasePlank = Content.Load<Texture2D>("TribalTokens");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureBasePlank, "basePlank", 0.5f, 1.0f);
             Texture2D textureClayFurnaceItem = Content.Load<Texture2D>("Furnace");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
+            Texture2D textureAnvilItem = Content.Load<Texture2D>("Furnace");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureAnvilItem, "anvilItem", 1.0f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -186,21 +194,21 @@ namespace Gusto
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
-            // static 
-            windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
+            // static load
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
             repairIcon = Content.Load<Texture2D>("work-hammer-");
             font = Content.Load<SpriteFont>("helperFont");
+            windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
+
 
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
             baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
             piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
-            inventory = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
-
+            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 10), Content, GraphicsDevice);
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             hammer.onGround = true;
@@ -220,6 +228,11 @@ namespace Gusto
             basePlank.amountStacked = 10;
 
 
+            // static init
+            inventoryMenu = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
+            craftingMenu = new CraftingMenu(screenCenter, Content, GraphicsDevice, piratePlayer);
+
+
             // fill update order list
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(piratePlayer);
@@ -231,9 +244,11 @@ namespace Gusto
             UpdateOrder.Add(pistolAmmo);
             UpdateOrder.Add(cannonAmmo);
             UpdateOrder.Add(basePlank);
-            UpdateOrder.Add(inventory);
+            UpdateOrder.Add(inventoryMenu);
+            UpdateOrder.Add(craftingMenu);
             UpdateOrder.Add(lantern);
             UpdateOrder.Add(furnace);
+            UpdateOrder.Add(craftingAnvil);
 
         }
 
@@ -302,7 +317,7 @@ namespace Gusto
             else
                 this.camera.Position = piratePlayer.playerOnShip.location;
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F4))
                 Exit();
 
             // static update (Wind)
@@ -383,6 +398,7 @@ namespace Gusto
 
             // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
+            bool showCraftingMenu = false;
             bool playerOnShip = false;
             Ship playerShip = null;
             List<InventoryItem> invItemsPlayer = null;
@@ -443,11 +459,11 @@ namespace Gusto
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                 {
                     PlayerPirate pirate = (PlayerPirate)sprite;
+                    invItemsPlayer = pirate.inventory;
 
                     if (pirate.showInventory)
                     {
                         showInventoryMenu = true;
-                        invItemsPlayer = pirate.inventory;
                         if (pirate.onShip)
                             invItemsShip = pirate.playerOnShip.inventory;
                     }
@@ -475,6 +491,13 @@ namespace Gusto
                         shot.Draw(spriteBatchView, this.camera);
 
                     continue;
+                }
+
+                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Anvil))
+                {
+                    Anvil anvil = (Anvil)sprite;
+                    if (anvil.drawCraftingMenu)
+                        showCraftingMenu = true;
                 }
 
                 else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
@@ -509,9 +532,15 @@ namespace Gusto
             windArrows.Draw(spriteBatchStatic, null);
             if (showInventoryMenu)
             {
-                inventory.Draw(spriteBatchStatic, null);
-                inventory.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
+                inventoryMenu.Draw(spriteBatchStatic, null);
+                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
             }
+            else if (showCraftingMenu)
+            {
+                craftingMenu.Draw(spriteBatchStatic, null);
+                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer);
+            }
+            
             if (playerOnShip)
             {
                 playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);

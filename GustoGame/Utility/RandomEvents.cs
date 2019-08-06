@@ -25,15 +25,15 @@ namespace Gusto.Utility
             List<string> drops = new List<string>();
             List<int> dropAmounts = new List<int>();
 
-            int itemSetCount = ItemDropMappings.ItemDrops[objKey].Count;
-            List<string> itemSet = Enumerable.ToList(ItemDropMappings.ItemDrops[objKey].Keys);
+            int itemSetCount = ItemMappings.ItemDrops[objKey].Count;
+            List<string> itemSet = Enumerable.ToList(ItemMappings.ItemDrops[objKey].Keys);
 
             int i = 0;
             while (i < maxItemDrop && itemSetCount > 0)
             {
                 string randomItemKey = itemSet[rand.Next(itemSetCount)];
-                float percentWillDrop = ItemDropMappings.ItemDrops[objKey][randomItemKey]["percentDrop"];
-                float maxDropAmount = ItemDropMappings.ItemDrops[objKey][randomItemKey]["maxDrop"];
+                float percentWillDrop = ItemMappings.ItemDrops[objKey][randomItemKey]["percentDrop"];
+                float maxDropAmount = ItemMappings.ItemDrops[objKey][randomItemKey]["maxDrop"];
                 float dropP = rand.Next(0, 100);
                 if (dropP <= percentWillDrop)
                 {

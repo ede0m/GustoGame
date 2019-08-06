@@ -18,7 +18,6 @@ namespace Gusto.Utility
         // Models add to this global list when they drop items. Update order adds these to the UpdateOrder
         public static List<Sprite> ItemsToUpdate = new List<Sprite>();
 
-
         public static List<InventoryItem> CreateNPInventory(List<Tuple<string, int>> itemDrops, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             List<InventoryItem> returnItems = new List<InventoryItem>();
@@ -34,57 +33,63 @@ namespace Gusto.Utility
 
                 string key = item.Item1;
                 int amountDropped = item.Item2;
-                switch (key)
+                InventoryItem itm = CreateItem(key, team, region, location, content, graphics);
+                if (itm != null)
                 {
-                    case ("tribalTokens"):
-                        TribalTokens tt = new TribalTokens(team, region, location, content, graphics);
-                        tt.itemKey = "tribalTokens";
-                        returnItems.Add(tt);
-                        trackStackable.Add("tribalTokens");
-                        break;
-                    case ("basePlank"):
-                        BasePlank bp = new BasePlank(team, region, location, content, graphics);
-                        bp.itemKey = "basePlank";
-                        returnItems.Add(bp);
-                        trackStackable.Add("basePlank");
-                        break;
-                    case ("shortSword"):
-                        ShortSword ss = new ShortSword(team, region, location, content, graphics);
-                        ss.itemKey = "shortSword";
-                        returnItems.Add(ss);
-                        trackStackable.Add("shortSword");
-                        break;
-                    case ("softWood"):
-                        SoftWood sw = new SoftWood(team, region, location, content, graphics);
-                        sw.itemKey = "softWood";
-                        returnItems.Add(sw);
-                        trackStackable.Add("softWood");
-                        break;
-                    case ("islandGrass"):
-                        IslandGrass ig = new IslandGrass(team, region, location, content, graphics);
-                        ig.itemKey = "islandGrass";
-                        returnItems.Add(ig);
-                        trackStackable.Add("islandGrass");
-                        break;
-                    case ("coal"):
-                        Coal c = new Coal(team, region, location, content, graphics);
-                        c.itemKey = key;
-                        returnItems.Add(c);
-                        trackStackable.Add(key);
-                        break;
-                    case ("ironOre"):
-                        IronOre io = new IronOre(team, region, location, content, graphics);
-                        io.itemKey = key;
-                        returnItems.Add(io);
-                        trackStackable.Add(key);
-                        break;
+                    returnItems.Add(itm);
+                    trackStackable.Add(key);
                 }
+
                 returnItems[index].inInventory = true;
-                returnItems[index].amountStacked = amountDropped;
+                returnItems[index].amountStacked = amountDropped; // override CreateItem default amount created with random drop amount
                 index++;
             }
             return returnItems;
         }
 
+
+        public static InventoryItem CreateItem(string key, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+        {
+            InventoryItem item = null;
+            int amountStacked = 1;
+            switch (key)
+            {
+                case ("tribalTokens"):
+                    item = new TribalTokens(team, region, location, content, graphics);
+                    break;
+                case ("basePlank"):
+                    item = new BasePlank(team, region, location, content, graphics);
+                    break;
+                case ("shortSword"):
+                    item = new ShortSword(team, region, location, content, graphics);
+                    break;
+                case ("softWood"):
+                    item = new SoftWood(team, region, location, content, graphics);
+                    break;
+                case ("islandGrass"):
+                    item = new IslandGrass(team, region, location, content, graphics);
+                    break;
+                case ("coal"):
+                    item = new Coal(team, region, location, content, graphics);
+                    break;
+                case ("ironOre"):
+                    item = new IronOre(team, region, location, content, graphics);
+                    break;
+                case ("baseSword"):
+                    item = new BaseSword(team, region, location, content, graphics);
+                    break;
+                case ("anvilItem"):
+                    item = new AnvilItem(team, region, location, content, graphics);
+                    item.placeableVersion = new CraftingAnvil(team, region, location, content, graphics);
+                    break;
+                case ("nails"):
+                    item = new Nails(team, region, location, content, graphics);
+                    amountStacked = 5; 
+                    break;
+            }
+            item.itemKey = key;
+            item.amountStacked = amountStacked;
+            return item;
+        }
     }
 }
