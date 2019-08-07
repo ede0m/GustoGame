@@ -218,9 +218,17 @@ namespace Gusto.Models.Animated
                         {
                             BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);
                             // scatter items
-                            b.location.X = location.X + RandomEvents.rand.Next(-10, 10);
-                            b.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
+                            b.location.X = location.X + RandomEvents.rand.Next(-40, 40);
+                            b.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
                             ItemUtility.ItemsToUpdate.Add(b);
+                        }
+                        else if (item.bbKey.Equals("baseChestItem"))
+                        {
+                            BaseChest c = new BaseChest(teamType, regionKey, location, _content, _graphics);
+                            // scatter items
+                            c.location.X = location.X + RandomEvents.rand.Next(-40, 40);
+                            c.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
+                            ItemUtility.ItemsToUpdate.Add(c);
                         }
                     }
                     inventory.Clear();
