@@ -273,7 +273,7 @@ namespace Gusto.Models.Menus
                     }
                     else
                     {
-                        item.spriteScale = (float)(itemDisplaySizePix / item.targetRectangle.Width);
+                        item.spriteScale = (float)(itemDisplaySizePix / item.GetWidth());
                         offsetLocation = new Vector2(itemLoc.X + textureHW / 2, itemLoc.Y + textureHW / 1.7f); // move Y down a little to leave room for stack number display
                     }
 
