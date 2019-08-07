@@ -220,11 +220,11 @@ namespace Gusto
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
-            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 10), Content, GraphicsDevice);
-            barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(80, 30), Content, GraphicsDevice);
-            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(380, 30), Content, GraphicsDevice);
-            chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -40), Content, GraphicsDevice);
-            chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 80), Content, GraphicsDevice);
+            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 40), Content, GraphicsDevice);
+            barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(-20, -160), Content, GraphicsDevice);
+            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(320, -60), Content, GraphicsDevice);
+            chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
+            chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             hammer.onGround = true;
