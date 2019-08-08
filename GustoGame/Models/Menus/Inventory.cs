@@ -19,6 +19,7 @@ namespace Gusto.Models.Menus
         bool menuOpen;
         int maxInventorySlots;
         int shipInventorySlots;
+        int storageInvSlots;
         int selectedIndex;
         int itemMenuIndex;
         bool openItemMenu;
@@ -37,12 +38,15 @@ namespace Gusto.Models.Menus
 
         float itemDisplaySizePix;
         Vector2 itemDrawLocStart;
+        Vector2 storageItemDrawLoc;
+        Vector2 storageItemDrawLocStart;
         Vector2 cursorPos;
         Vector2 itemMenuPos;
         Texture2D cursor;
         SpriteFont font;
 
         PlayerPirate inventoryOfPlayer;
+        Storage storageContainer;
 
         GraphicsDevice _graphics;
         ContentManager _content;
@@ -60,6 +64,7 @@ namespace Gusto.Models.Menus
             itemDisplaySizePix = 60;
             maxInventorySlots = inventoryOfPlayer.maxInventorySlots;
             shipInventorySlots = 0;
+            storageInvSlots = 0;
             selectedIndex = 0;
             dropDragIndex = -1;
             selectDragIndex = -1;
@@ -80,13 +85,16 @@ namespace Gusto.Models.Menus
             itemDrawLocStart = new Vector2(location.X - _texture.Width/2 + 50, location.Y - _texture.Height/2 + 100);
         }
 
-        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, List<InventoryItem> itemsShip)
+        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, List<InventoryItem> itemsShip, Storage storage)
         {
+            storageContainer = storage;
             Vector2 itemDrawLoc = itemDrawLocStart;
             menuOpen = true;
 
             List<InventoryItem> items = itemsPlayer;
             int showSlots = maxInventorySlots;
+
+            List<InventoryItem> itemsStorage = null;
 
             // draw item stat panel
             Texture2D textureItemStat = new Texture2D(_graphics, 140, 50);
@@ -131,15 +139,46 @@ namespace Gusto.Models.Menus
                 }
             }
 
+            // storage inv add on
+            else if (storage != null)
+            {
+                itemsStorage = storage.inventory;
+                Texture2D textureInvStorage = new Texture2D(_graphics, 150, 400);
+                Color[] cdata = new Color[400 * 150];
+                for (int i = 0; i < cdata.Length; ++i) cdata[i] = Color.DimGray;
+                textureInvStorage.SetData(cdata);
+                sb.Begin();
+                sb.Draw(textureInvStorage, new Vector2(location.X + (_texture.Width / 2) + 50, location.Y - (_texture.Height / 2)), Color.White);
+                sb.End();
+
+                items.AddRange(itemsStorage);
+                storageInvSlots = itemsStorage.Count;
+                showSlots = maxInventorySlots + storageInvSlots; // BUG?
+                storageItemDrawLocStart = new Vector2(location.X + (_texture.Width / 2) + 90, location.Y - (_texture.Height / 2) + 30);
+                storageItemDrawLoc = storageItemDrawLocStart;
+                tempInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots + storageInvSlots).ToList();
+            }
+
             int textureHW = 64;
             int inventorySeparation = 20;
             // draw slots
             for (int i = 0; i < showSlots; i++)
             {
-
-                // some separation between ship and player inventory
-                if (i == maxInventorySlots)
+                // some separation between ship/storage and player inventory
+                if (i == maxInventorySlots && itemsShip != null)
                     itemDrawLoc.Y += inventorySeparation;
+
+                // position storage items in storage
+                if (i >= maxInventorySlots && itemsStorage != null)
+                {
+                    itemDrawLoc = storageItemDrawLoc;
+                    storageItemDrawLoc.X += 70;
+                    if (storageItemDrawLoc.X > location.X + (GetWidth() / 2) - 50)
+                    {
+                        storageItemDrawLoc.X = storageItemDrawLocStart.X;
+                        storageItemDrawLoc.Y += 70;
+                    }
+                }
 
                 // draw slots
                 Texture2D textureSlot = new Texture2D(_graphics, textureHW, textureHW);
@@ -168,10 +207,11 @@ namespace Gusto.Models.Menus
             // draw items in list and set new list order if needed
             List<InventoryItem> tempPlayerInv = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             List<InventoryItem> tempShipInv = Enumerable.Repeat<InventoryItem>(null, shipInventorySlots).ToList();
+            List<InventoryItem> tempStorageInv = Enumerable.Repeat<InventoryItem>(null, storageInvSlots).ToList();
+
             List<InventoryItem> invMap = itemsPlayer;
-            if (itemsShip != null)
-                invMap.AddRange(itemsShip);
             itemDrawLoc = itemDrawLocStart;
+            storageItemDrawLoc = storageItemDrawLocStart;
             int emptyIndex = -1; // used to denote when an item is dragged into an empty slot
             for (int i = 0; i < showSlots; i++)
             {
@@ -181,6 +221,13 @@ namespace Gusto.Models.Menus
                     item = items[i];
                     Vector2 offsetLocation;
                     Vector2 itemLoc = itemDrawLoc;
+
+                    // offset the item location by the ships inventory separation
+                    if (i >= maxInventorySlots && itemsShip != null)
+                        itemLoc.Y += inventorySeparation;
+                    // position storage items in storage
+                    if (i >= maxInventorySlots && itemsStorage != null)
+                        itemLoc = storageItemDrawLoc;
 
                     // dragging
                     if (draggingItem && selectDragIndex == i)
@@ -192,7 +239,7 @@ namespace Gusto.Models.Menus
                         itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
                         if (invMap[dropDragIndex] != null) // switch spots
                         {
-                            if (invMap[dropDragIndex].bbKey.Equals(tempInventory[selectDragIndex].bbKey) && invMap[dropDragIndex].stackable)
+                            if (invMap[dropDragIndex].bbKey.Equals(invMap[selectDragIndex].bbKey) && invMap[dropDragIndex].stackable)
                             {
                                 // stack items
                                 item.amountStacked += invMap[selectDragIndex].amountStacked;
@@ -201,8 +248,8 @@ namespace Gusto.Models.Menus
                             }
                             else
                                 tempInventory[selectDragIndex] = invMap[dropDragIndex];
-                                
-                        } 
+
+                        }
                         else
                         {
                             tempInventory[selectDragIndex] = null;
@@ -211,10 +258,6 @@ namespace Gusto.Models.Menus
                         tempInventory[dropDragIndex] = item;
                         dropDragIndex = -1;
                     }
-
-                    // offset the item location by the ships inventory separation
-                    if (i >= maxInventorySlots)
-                        itemLoc.Y += inventorySeparation;
 
                     // track sprite scale
                     if (!saveItemSpriteScale.ContainsKey(item))
@@ -230,7 +273,7 @@ namespace Gusto.Models.Menus
                     }
                     else
                     {
-                        item.spriteScale = (float)(itemDisplaySizePix / item.targetRectangle.Width);
+                        item.spriteScale = (float)(itemDisplaySizePix / item.GetWidth());
                         offsetLocation = new Vector2(itemLoc.X + textureHW / 2, itemLoc.Y + textureHW / 1.7f); // move Y down a little to leave room for stack number display
                     }
 
@@ -246,11 +289,22 @@ namespace Gusto.Models.Menus
                     sb.End();
                 }
 
+                // advance inventory spot
                 itemDrawLoc.X += 70;
                 if (itemDrawLoc.X > location.X + GetWidth() / 2 - 50)
                 {
                     itemDrawLoc.X = itemDrawLocStart.X;
                     itemDrawLoc.Y += 70;
+                }
+                // advance storage spot if we are in that range
+                if (i >= maxInventorySlots && itemsStorage != null)
+                {
+                    storageItemDrawLoc.X += 70;
+                    if (storageItemDrawLoc.X > location.X + (GetWidth() / 2) - 50)
+                    {
+                        storageItemDrawLoc.X = storageItemDrawLocStart.X;
+                        storageItemDrawLoc.Y += 70;
+                    }
                 }
 
                 // keep the items that were not dragged the same 
@@ -268,14 +322,19 @@ namespace Gusto.Models.Menus
             {
                 if (i < maxInventorySlots)
                     tempPlayerInv[i] = tempInventory[i];
-                else if (i >= maxInventorySlots)
+                else if (i >= maxInventorySlots && itemsShip != null && openShipInventory)
                     tempShipInv[i - maxInventorySlots] = tempInventory[i];
+                else if (i >= maxInventorySlots && itemsStorage != null)
+                    tempStorageInv[i - maxInventorySlots] = tempInventory[i];
             }
+
             // set any inventory movements
             inventoryOfPlayer.inventory = tempPlayerInv;
-            if (openShipInventory)
+            if (openShipInventory && itemsShip != null)
                 inventoryOfPlayer.playerOnShip.inventory = tempShipInv;
-
+            // storage movements
+            if (itemsStorage != null)
+                storage.inventory = tempStorageInv;
 
             if (openItemMenu)
                 DrawItemMenu(sb, itemsPlayer);
@@ -349,7 +408,27 @@ namespace Gusto.Models.Menus
                         // display item menu options
                         if (openItemMenu && Mouse.GetState().LeftButton == ButtonState.Pressed && !(timeLClicked < 200))
                         {
-                            var item = inventoryOfPlayer.inventory[selectedIndex];
+                            InventoryItem item = null;
+                            List<InventoryItem> inv = null;
+                            if (selectedIndex < maxInventorySlots)
+                            {
+                                item = inventoryOfPlayer.inventory[selectedIndex];
+                                inv = inventoryOfPlayer.inventory;
+                            }
+                            else
+                            {
+                                if (openShipInventory)
+                                {
+                                    item = inventoryOfPlayer.playerOnShip.inventory[selectedIndex - maxInventorySlots];
+                                    inv = inventoryOfPlayer.playerOnShip.inventory;
+                                }
+
+                                else
+                                {
+                                    item = storageContainer.inventory[selectedIndex - maxInventorySlots];
+                                    inv = storageContainer.inventory;
+                                }
+                            }
                             item.spriteScale = saveItemSpriteScale[item];
                             saveItemSpriteScale.Remove(item);
 
@@ -374,7 +453,10 @@ namespace Gusto.Models.Menus
                                     ItemUtility.ItemsToUpdate.Add(item);
                                 }
 
-                                inventoryOfPlayer.inventory[selectedIndex] = null;
+                                if (selectedIndex < maxInventorySlots)
+                                    inv[selectedIndex] = null;
+                                else
+                                    inv[selectedIndex - maxInventorySlots] = null;
                                 tempInventory[selectedIndex] = null;
                                 timeLClicked = 0;
                             }

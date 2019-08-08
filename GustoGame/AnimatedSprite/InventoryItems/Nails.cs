@@ -21,7 +21,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
             Texture2D textureIronOreBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureIronOreBB = new Texture2D(graphics, textureIronOre.Width, textureIronOre.Height);
-            Asset IronOreAsset = new Asset(textureIronOre, textureIronOreBB, 1, 1, 1.0f, itemKey, region);
+            Asset IronOreAsset = new Asset(textureIronOre, textureIronOreBB, 1, 1, 0.4f, itemKey, region);
             SetSpriteAsset(IronOreAsset, location);
             stackable = true;
         }

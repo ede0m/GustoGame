@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Gusto.AnimatedSprite.InventoryItems;
 
 namespace Gusto.Models.Animated
 {
@@ -78,7 +79,7 @@ namespace Gusto.Models.Animated
         public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             Shots = new List<Ammo>();
-            inventory = inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+            inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             wind = w;
             teamType = type;
             _content = content;
@@ -211,12 +212,24 @@ namespace Gusto.Models.Animated
                     // drop items
                     foreach (var item in inventory)
                     {
-                        item.inInventory = false;
-                        // scatter items
-                        item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
-                        item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
-                        item.onGround = true;
-                        ItemUtility.ItemsToUpdate.Add(item);
+                        // TODO: drop (package up) all items as barrels/chests
+
+                        if (item.bbKey.Equals("baseBarrelItem"))
+                        {
+                            BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);
+                            // scatter items
+                            b.location.X = location.X + RandomEvents.rand.Next(-40, 40);
+                            b.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
+                            ItemUtility.ItemsToUpdate.Add(b);
+                        }
+                        else if (item.bbKey.Equals("baseChestItem"))
+                        {
+                            BaseChest c = new BaseChest(teamType, regionKey, location, _content, _graphics);
+                            // scatter items
+                            c.location.X = location.X + RandomEvents.rand.Next(-40, 40);
+                            c.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
+                            ItemUtility.ItemsToUpdate.Add(c);
+                        }
                     }
                     inventory.Clear();
                 }

@@ -129,9 +129,16 @@ namespace Gusto.Models.Animated
                         }
                     }
                 }
+
+                if (emittingLight != null)
+                    emittingLight.scaleSize = emittingLight.baseSize * 1.4f;
+  
             }
             else if (inCombat)
             {
+                if (emittingLight != null)
+                    emittingLight.scaleSize = emittingLight.baseSize;
+
                 usingItem = true;
                 if (nextFrame)
                 {

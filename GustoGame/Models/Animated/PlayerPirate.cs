@@ -60,7 +60,10 @@ namespace Gusto.Models.Animated
             if (collidedWith.bbKey.Equals("landTile"))
             {
                 colliding = false;
-                swimming = false;
+                // narrow the collision to just the feet (appears more realistic)
+                Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height/3);
+                if (footSpace.Intersects(collidedWith.GetBoundingBox()))
+                    swimming = false;
             }
             else if (collidedWith is IShip)
             {

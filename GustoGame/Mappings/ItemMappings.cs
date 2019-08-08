@@ -32,16 +32,16 @@ namespace Gusto.Mappings
             },
             { "baseShip", new Dictionary<string, Dictionary<string, float>>
                 {
-                    {"softWood", new Dictionary<string, float>
+                    {"baseBarrelItem", new Dictionary<string, float>
                         {
                             {"maxDrop", 4 },
                             {"percentDrop", 50 }
                         }
                     },
-                    {"basePlank", new Dictionary<string, float>
+                    {"baseChestItem", new Dictionary<string, float>
                         {
-                            {"maxDrop", 2 },
-                            {"percentDrop", 75 }
+                            {"maxDrop", 1 },
+                            {"percentDrop", 25 }
                         }
                     },
                 }
@@ -78,6 +78,56 @@ namespace Gusto.Mappings
                         {
                             {"maxDrop", 3},
                             {"percentDrop", 80}
+                        }
+                    },
+                }
+            },
+            { "baseBarrel", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"coal", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 2 },
+                            {"percentDrop", 50}
+                        }
+                    },
+                    {"ironBar", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 2},
+                            {"percentDrop", 15}
+                        }
+                    },
+                    {"nails", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 10},
+                            {"percentDrop", 50}
+                        }
+                    },
+                    {"pistolShot", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 6},
+                            {"percentDrop", 30}
+                        }
+                    },
+                    {"cannonBall", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 3},
+                            {"percentDrop", 25}
+                        }
+                    },
+                }
+            },
+             { "baseChest", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"tribalTokens", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 16 },
+                            {"percentDrop", 85 }
+                        }
+                    },
+                     {"ironBar", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 4},
+                            {"percentDrop", 55}
                         }
                     },
                 }

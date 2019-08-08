@@ -42,6 +42,10 @@ namespace Gusto
         Lantern lantern;
         ClayFurnace furnace;
         CraftingAnvil craftingAnvil;
+        BaseBarrel barrelLand;
+        BaseBarrel barrelOcean;
+        BaseChest chestLand;
+        BaseChest chestOcean;
 
         TileGameMap map;
         JObject mapData;
@@ -147,6 +151,10 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
+            Texture2D textureBarrel = Content.Load<Texture2D>("Barrel");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrel, "baseBarrel", 0.5f, 1.0f);
+            Texture2D textureChest = Content.Load<Texture2D>("Barrel");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureChest, "baseChest", 0.5f, 1.0f);
 
             Texture2D textureClayFurnace = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureClayFurnace, "clayFurnace", 0.5f, 1.0f);
@@ -171,7 +179,7 @@ namespace Gusto
             Texture2D textureCoal = Content.Load<Texture2D>("coal");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCoal, "coal", 1.0f, 1.0f);
             Texture2D textureNails = Content.Load<Texture2D>("Nails");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureNails, "nails", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureNails, "nails", 0.4f, 1.0f);
             Texture2D textureIronOre = Content.Load<Texture2D>("IronOre");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIronOre, "ironOre", 1.0f, 1.0f);
             Texture2D textureIronBar = Content.Load<Texture2D>("IronBar");
@@ -184,6 +192,10 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
             Texture2D textureAnvilItem = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureAnvilItem, "anvilItem", 1.0f, 1.0f);
+            Texture2D textureBarrelItem = Content.Load<Texture2D>("Barrel");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrelItem, "baseBarrelItem", 1.0f, 1.0f);
+            Texture2D textureChestItem = Content.Load<Texture2D>("BaseChest");
+            LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureChestItem, "baseChestItem", 1.0f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -208,7 +220,11 @@ namespace Gusto
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
-            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 10), Content, GraphicsDevice);
+            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 40), Content, GraphicsDevice);
+            barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(-20, -160), Content, GraphicsDevice);
+            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(320, -60), Content, GraphicsDevice);
+            chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
+            chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
 
             hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             hammer.onGround = true;
@@ -249,6 +265,10 @@ namespace Gusto
             UpdateOrder.Add(lantern);
             UpdateOrder.Add(furnace);
             UpdateOrder.Add(craftingAnvil);
+            UpdateOrder.Add(barrelLand);
+            UpdateOrder.Add(barrelOcean);
+            UpdateOrder.Add(chestLand);
+            UpdateOrder.Add(chestOcean);
 
         }
 
@@ -399,10 +419,12 @@ namespace Gusto
             // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
             bool showCraftingMenu = false;
+            bool showStorageMenu = false;
             bool playerOnShip = false;
             Ship playerShip = null;
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
+            Storage invStorage = null;
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
@@ -432,6 +454,17 @@ namespace Gusto
                 {
                     IPlaceable placeObj = (IPlaceable)sprite;
                     placeObj.DrawCanPickUp(spriteBatchView, camera);
+                }
+
+                if (sprite is IStorage)
+                {
+                    Storage storage = (Storage)sprite;
+                    storage.DrawOpenStorage(spriteBatchView, camera);
+                    if (storage.storageOpen)
+                    {
+                        showStorageMenu = true;
+                        invStorage = storage;
+                    }
                 }
 
                 if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
@@ -533,12 +566,17 @@ namespace Gusto
             if (showInventoryMenu)
             {
                 inventoryMenu.Draw(spriteBatchStatic, null);
-                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip);
+                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, null);
             }
             else if (showCraftingMenu)
             {
                 craftingMenu.Draw(spriteBatchStatic, null);
                 craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer);
+            }
+            else if (showStorageMenu)
+            {
+                inventoryMenu.Draw(spriteBatchStatic, null);
+                inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, invStorage);
             }
             
             if (playerOnShip)

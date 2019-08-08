@@ -10,7 +10,7 @@ namespace Gusto.Utility
     {
         public static float sin45deg = (float)(1 / Math.Sqrt(2));
         public static float baseShipMovementSpeed = 0.2f;
-        public static float basePlayerMovementSpeed = 0.8f;
+        public static float basePlayerMovementSpeed = 1.0f;
 
         public static float VectorMagnitude(float x2, float x1, float y2, float y1)
         {

@@ -16,8 +16,8 @@ namespace Gusto.Models
     {
         GraphicsDevice _graphics;
         Color color;
-        float baseSize;
-        float scaleSize;
+        public float baseSize;
+        public float scaleSize;
         Texture2D lightMask;
         Vector2 location;
 
@@ -31,9 +31,9 @@ namespace Gusto.Models
             _graphics = graphics;
             lightMask = content.Load<Texture2D>("lightmask3");
             baseSize = size;
+            scaleSize = baseSize;
 
             color = c;
-
         }
 
         public void Draw(SpriteBatch sb, Camera cam)
@@ -65,11 +65,6 @@ namespace Gusto.Models
                     msButtonHit = 0;
                 }
             }
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-                scaleSize = baseSize * 1.4f;
-            else
-                scaleSize = baseSize;
 
             if (lit)
                 BoundingBoxLocations.LightLocationList.Add(this);
