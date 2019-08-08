@@ -56,6 +56,7 @@ namespace Gusto
         Texture2D repairIcon;
         Inventory inventoryMenu;
         CraftingMenu craftingMenu;
+        float sunPosX = 90;
 
         GraphicsDeviceManager graphics;
         FrameCounter _frameCounter;
@@ -324,6 +325,8 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
 
+            sunPosX -= 0.1f;
+
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
             var kstate = Keyboard.GetState();
@@ -425,6 +428,14 @@ namespace Gusto
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
             Storage invStorage = null;
+
+            foreach(var sprite in DrawOrder)
+            {
+                if (sprite is IShadowCaster)
+                {
+                    sprite.DrawShadow(spriteBatchView, camera, sunPosX);
+                }
+            }
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));

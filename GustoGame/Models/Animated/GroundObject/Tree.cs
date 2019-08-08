@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Gusto.Models.Animated
 {
-    public class Tree : Sprite, ICanUpdate, IGroundObject
+    public class Tree : Sprite, ICanUpdate, IGroundObject, IShadowCaster
     {
 
         int timeSinceLastFrame;

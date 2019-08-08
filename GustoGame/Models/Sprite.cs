@@ -15,6 +15,7 @@ namespace Gusto.Models
 
         protected Texture2D _texture;
         protected Texture2D boundingBox;
+        protected Texture2D shadowText;
         public Rectangle targetRectangle;
         private Rectangle boundingBoxRect;
         private Polygon boundingPolygon;
@@ -177,6 +178,29 @@ namespace Gusto.Models
                     boundingPolygon.UpperLeftPoint = new Vector2(location.X - originXOffset, location.Y - originYOffset);
                 }
             }
+        }
+
+        public void DrawShadow(SpriteBatch spriteBatch, Camera camera, float sunAngleX)
+        {
+            int width = _texture.Width / nColumns;
+            int height = _texture.Height / nRows;
+
+            sunAngleX = -1 * sunAngleX;
+
+            targetRectangle.X = width * currColumnFrame;
+            targetRectangle.Y = height * currRowFrame;
+            targetRectangle.Width = width;
+            targetRectangle.Height = height;
+
+            Matrix slant = Matrix.CreateTranslation(-location.X + sunAngleX, -location.Y, 0f) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(-1 * sunAngleX)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(30)) *
+                Matrix.CreateScale(1.0f, 1.0f, 0) *
+                Matrix.CreateTranslation(location.X + sunAngleX, location.Y, 0f);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, slant * camera.ViewportOffset.InvertAbsolute);
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * 0.2f, 0, new Vector2(width / 2, height / 2), spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.End();
         }
 
         private void DrawPolygonBB(SpriteBatch sb)
