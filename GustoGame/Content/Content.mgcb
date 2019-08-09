@@ -362,6 +362,18 @@
 /processorParam:TextureFormat=Color
 /build:Ocean2.png
 
+#begin pickaxe.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:pickaxe.png
+
 #begin Pirate1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -409,6 +421,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:PistolShot.png
+
+#begin plank.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:plank.png
 
 #begin pointer.png
 /importer:TextureImporter

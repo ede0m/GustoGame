@@ -15,7 +15,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
 
             itemKey = "basePlank";
 
-            Texture2D textureBasePlank = content.Load<Texture2D>("TribalTokens");
+            Texture2D textureBasePlank = content.Load<Texture2D>("plank");
             Texture2D textureBasePlankBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBasePlankBB = new Texture2D(graphics, textureBasePlank.Width, textureBasePlank.Height);

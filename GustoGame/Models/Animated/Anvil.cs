@@ -55,7 +55,7 @@ namespace Gusto.Models.Animated
                 playerNearItem = (PiratePlayer)collidedWith;
             }
 
-            if (collidedWith.bbKey.Equals("hammer"))
+            if (collidedWith.bbKey.Equals("pickaxe"))
             {
                 if (collidedWith.GetBoundingBox().Top > (GetBoundingBox().Center.ToVector2().Y + GetBoundingBox().Height / 3)) // MOVE UP
                     location.Y -= 10;
