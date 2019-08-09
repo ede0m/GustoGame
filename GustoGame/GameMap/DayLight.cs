@@ -14,6 +14,9 @@ namespace Gusto.GameMap
 {
     public class DayLight : ICanUpdate
     {
+        float sunAngleXStart; 
+        public float sunAngleX; 
+
         float currentMsOfDay;
         float dayLengthMs;
 
@@ -37,7 +40,7 @@ namespace Gusto.GameMap
             currentMsOfDay = 0;
             dayLengthMs = GameOptions.GameDayLengthMs; // how long the day takes
 
-            maxBlackoutIntensity = 60;
+            maxBlackoutIntensity = 50;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
@@ -46,6 +49,8 @@ namespace Gusto.GameMap
             sunSetPercent = 0.835f; // sunset happens at 83.5% of day
             halfDayPercent = 0.5f;
 
+            sunAngleXStart = 40; // angle for casting shadows. (-60 to 60) should take up sun time
+            sunAngleX = sunAngleXStart;
             _content = content;
             _graphics = graphics;
 
@@ -55,9 +60,14 @@ namespace Gusto.GameMap
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera cam)
         {
+            
             float elapsedMs = gameTime.ElapsedGameTime.Milliseconds;
             currentMsOfDay += elapsedMs;
             percentDayComplete = currentMsOfDay / dayLengthMs;
+
+            sunAngleX -= (gameTime.ElapsedGameTime.Milliseconds / dayLengthMs) * sunAngleXStart * 2; 
+            if (sunAngleX < -1 * sunAngleXStart)
+                sunAngleX = -1 * sunAngleXStart;
 
             float ambientIntensityChange = 0;
             float intensityDelta = 0;
@@ -94,6 +104,7 @@ namespace Gusto.GameMap
             // reset day
             if (percentDayComplete > 1.0f)
             {
+                sunAngleX = sunAngleXStart;
                 percentDayComplete = 0.0f;
                 currentMsOfDay = 0;
                 currentIntensity = maxBlackoutIntensity;

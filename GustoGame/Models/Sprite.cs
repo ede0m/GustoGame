@@ -192,14 +192,19 @@ namespace Gusto.Models
             targetRectangle.Width = width;
             targetRectangle.Height = height;
 
-            Matrix slant = Matrix.CreateTranslation(-location.X + sunAngleX, -location.Y, 0f) *
+            if (!(this is IShip)) // don't rotate ship shadow as much - doesn't look right
+                sunAngleX = sunAngleX * 1.75f;
+
+            Matrix slant = Matrix.CreateTranslation(-location.X, -location.Y + ((GetBoundingBox().Height/2)), 0f) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(-1 * sunAngleX)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(30)) *
-                Matrix.CreateScale(1.0f, 1.0f, 0) *
-                Matrix.CreateTranslation(location.X + sunAngleX, location.Y, 0f);
+                Matrix.CreateScale(1.0f, 1.0f, 0) * /*some x stretch and y compress*/
+                Matrix.CreateTranslation(location.X, location.Y + ((GetBoundingBox().Height/2)), 0f);
+
+            Vector2 rotateAtBottomOrigin = new Vector2((width / 2), (height / 2) + (GetBoundingBox().Height / spriteScale)); // divide by spritescale here to reverse the scale before sending through draw
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, slant * camera.ViewportOffset.InvertAbsolute);
-            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * 0.2f, 0, new Vector2(width / 2, height / 2), spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * 0.15f, 0, rotateAtBottomOrigin, spriteScale, SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 
