@@ -426,16 +426,17 @@ namespace Gusto
             List<InventoryItem> invItemsShip = null;
             Storage invStorage = null;
 
-            foreach(var sprite in DrawOrder)
+            // draw shadows
+            foreach (var sprite in DrawOrder)
             {
                 if (sprite is IShadowCaster)
                 {
-                    sprite.DrawShadow(spriteBatchView, camera, dayLight.sunAngleX);
-                    /*if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
+                    sprite.DrawShadow(spriteBatchView, camera, dayLight.sunAngleX, dayLight.shadowTransparency);
+                    if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                     {
                         Ship ship = (Ship)sprite;
-                        ship.shipSail.DrawShadow(spriteBatchView, this.camera, dayLight.sunAngleX);
-                    }*/
+                        ship.shipSail.DrawShadow(spriteBatchView, this.camera, dayLight.sunAngleX, dayLight.shadowTransparency);
+                    }
                 }
             }
 

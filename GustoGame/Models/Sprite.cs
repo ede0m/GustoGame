@@ -180,7 +180,7 @@ namespace Gusto.Models
             }
         }
 
-        public void DrawShadow(SpriteBatch spriteBatch, Camera camera, float sunAngleX)
+        public void DrawShadow(SpriteBatch spriteBatch, Camera camera, float sunAngleX, float shadowTransparency)
         {
             int width = _texture.Width / nColumns;
             int height = _texture.Height / nRows;
@@ -197,14 +197,14 @@ namespace Gusto.Models
 
             Matrix slant = Matrix.CreateTranslation(-location.X, -location.Y + ((GetBoundingBox().Height/2)), 0f) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(-1 * sunAngleX)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(30)) *
-                Matrix.CreateScale(1.0f, 1.0f, 0) * /*some x stretch and y compress*/
+                Matrix.CreateRotationY(MathHelper.ToRadians(40)) *
+                Matrix.CreateScale(1.3f, 1.0f, 0) * /*some x stretch and y compress*/
                 Matrix.CreateTranslation(location.X, location.Y + ((GetBoundingBox().Height/2)), 0f);
 
             Vector2 rotateAtBottomOrigin = new Vector2((width / 2), (height / 2) + (GetBoundingBox().Height / spriteScale)); // divide by spritescale here to reverse the scale before sending through draw
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, slant * camera.ViewportOffset.InvertAbsolute);
-            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * 0.15f, 0, rotateAtBottomOrigin, spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * shadowTransparency, 0, rotateAtBottomOrigin, spriteScale, SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 
