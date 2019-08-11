@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class Hammer : HandHeld
+    public class Pickaxe : HandHeld
     {
-        public Hammer(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
+        public Pickaxe(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
             damage = 0.1f;
-            itemKey = "hammer";
+            itemKey = "pickaxe";
 
-            Texture2D texture = content.Load<Texture2D>("ShortSword");
+            Texture2D texture = content.Load<Texture2D>("pickaxe");
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBB = new Texture2D(graphics, texture.Width, texture.Height);
-            Asset baseSwordAsset = new Asset(texture, textureBB, 3, 4, 1.0f, "hammer", region);
+            Asset baseSwordAsset = new Asset(texture, textureBB, 3, 4, 1.0f, itemKey, region);
             SetSpriteAsset(baseSwordAsset, location);
         }
     }

@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class Ammo : Sprite, IWeapon, IAmmo
+    public class Ammo : Sprite, IWeapon, IAmmo, IShadowCaster
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed

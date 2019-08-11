@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class GroundEnemy : Sprite, IWalks, IVulnerable, ICanUpdate
+    public class GroundEnemy : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;

@@ -38,7 +38,7 @@ namespace Gusto
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
         BasePlank basePlank;
-        Hammer hammer;
+        Pickaxe pickaxe;
         Lantern lantern;
         ClayFurnace furnace;
         CraftingAnvil craftingAnvil;
@@ -131,8 +131,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePistol, "pistol", 1.0f, 1.0f);
-            Texture2D textureHammer = Content.Load<Texture2D>("ShortSword");
-            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureHammer, "hammer", 1.0f, 1.0f);
+            Texture2D texturePickaxe = Content.Load<Texture2D>("pickaxe");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePickaxe, "pickaxe", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShortSword, "shortSword", 1.0f, 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
@@ -186,7 +186,7 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIronBar, "ironBar", 1.0f, 1.0f);
             Texture2D textureTribalTokens = Content.Load<Texture2D>("TribalTokens");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTribalTokens, "tribalTokens", 0.5f, 1.0f);
-            Texture2D textureBasePlank = Content.Load<Texture2D>("TribalTokens");
+            Texture2D textureBasePlank = Content.Load<Texture2D>("plank");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureBasePlank, "basePlank", 0.5f, 1.0f);
             Texture2D textureClayFurnaceItem = Content.Load<Texture2D>("Furnace");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureClayFurnaceItem, "clayFurnaceItem", 1.0f, 1.0f);
@@ -226,8 +226,8 @@ namespace Gusto
             chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
             chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
 
-            hammer = new Hammer(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
-            hammer.onGround = true;
+            pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
+            pickaxe.onGround = true;
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
             pistol.onGround = true;
@@ -256,7 +256,7 @@ namespace Gusto
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(pistol);
-            UpdateOrder.Add(hammer);
+            UpdateOrder.Add(pickaxe);
             UpdateOrder.Add(pistolAmmo);
             UpdateOrder.Add(cannonAmmo);
             UpdateOrder.Add(basePlank);
@@ -425,6 +425,20 @@ namespace Gusto
             List<InventoryItem> invItemsPlayer = null;
             List<InventoryItem> invItemsShip = null;
             Storage invStorage = null;
+
+            // draw shadows
+            foreach (var sprite in DrawOrder)
+            {
+                if (sprite is IShadowCaster)
+                {
+                    sprite.DrawShadow(spriteBatchView, camera, dayLight.sunAngleX, dayLight.shadowTransparency);
+                    if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
+                    {
+                        Ship ship = (Ship)sprite;
+                        ship.shipSail.DrawShadow(spriteBatchView, this.camera, dayLight.sunAngleX, dayLight.shadowTransparency);
+                    }
+                }
+            }
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));

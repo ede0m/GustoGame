@@ -19,7 +19,7 @@ using Gusto.AnimatedSprite.InventoryItems;
 
 namespace Gusto.Models.Animated
 {
-    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate
+    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;

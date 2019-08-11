@@ -15,6 +15,7 @@ namespace Gusto.Models
 
         protected Texture2D _texture;
         protected Texture2D boundingBox;
+        protected Texture2D shadowText;
         public Rectangle targetRectangle;
         private Rectangle boundingBoxRect;
         private Polygon boundingPolygon;
@@ -177,6 +178,34 @@ namespace Gusto.Models
                     boundingPolygon.UpperLeftPoint = new Vector2(location.X - originXOffset, location.Y - originYOffset);
                 }
             }
+        }
+
+        public void DrawShadow(SpriteBatch spriteBatch, Camera camera, float sunAngleX, float shadowTransparency)
+        {
+            int width = _texture.Width / nColumns;
+            int height = _texture.Height / nRows;
+
+            sunAngleX = -1 * sunAngleX;
+
+            targetRectangle.X = width * currColumnFrame;
+            targetRectangle.Y = height * currRowFrame;
+            targetRectangle.Width = width;
+            targetRectangle.Height = height;
+
+            if (!(this is IShip)) // don't rotate ship shadow as much - doesn't look right
+                sunAngleX = sunAngleX * 1.75f;
+
+            Matrix slant = Matrix.CreateTranslation(-location.X, -location.Y + ((GetBoundingBox().Height/2)), 0f) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(-1 * sunAngleX)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(40)) *
+                Matrix.CreateScale(1.3f, 1.0f, 0) * /*some x stretch and y compress*/
+                Matrix.CreateTranslation(location.X, location.Y + ((GetBoundingBox().Height/2)), 0f);
+
+            Vector2 rotateAtBottomOrigin = new Vector2((width / 2), (height / 2) + (GetBoundingBox().Height / spriteScale)); // divide by spritescale here to reverse the scale before sending through draw
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, slant * camera.ViewportOffset.InvertAbsolute);
+            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * shadowTransparency, 0, rotateAtBottomOrigin, spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.End();
         }
 
         private void DrawPolygonBB(SpriteBatch sb)

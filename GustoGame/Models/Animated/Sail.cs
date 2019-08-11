@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Sail : Sprite
+    public class Sail : Sprite, IShadowCaster
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
