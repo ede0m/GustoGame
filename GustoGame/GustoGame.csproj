@@ -70,6 +70,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\Nails.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Shovel.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\SoftWood.cs" />
     <Compile Include="AnimatedSprite\PistolShot.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\TribalTokens.cs" />

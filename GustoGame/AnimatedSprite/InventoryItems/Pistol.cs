@@ -31,6 +31,8 @@ namespace Gusto.AnimatedSprite.InventoryItems
                 texturePistolBB = new Texture2D(graphics, texturePistol.Width, texturePistol.Height);
             Asset basePistolAsset = new Asset(texturePistol, texturePistolBB, 3, 4, 1.0f, "pistol", region);
             SetSpriteAsset(basePistolAsset, location);
+
+            stackable = false;
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Gusto
         PiratePlayer piratePlayer;
         BaseTribal baseTribal;
         Pistol pistol;
+        Shovel shovel;
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
         BasePlank basePlank;
@@ -135,6 +136,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePickaxe, "pickaxe", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShortSword, "shortSword", 1.0f, 1.0f);
+            Texture2D textureShovel = Content.Load<Texture2D>("Shovel");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShovel, "shovel", 1.0f, 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
@@ -226,6 +229,8 @@ namespace Gusto
             chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
             chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
 
+            shovel = new Shovel(TeamType.A, "GustoGame", new Vector2(200, -330), Content, GraphicsDevice);
+            shovel.onGround = true;
             pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
             pickaxe.onGround = true;
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
@@ -269,6 +274,7 @@ namespace Gusto
             UpdateOrder.Add(barrelOcean);
             UpdateOrder.Add(chestLand);
             UpdateOrder.Add(chestOcean);
+            UpdateOrder.Add(shovel);
 
         }
 

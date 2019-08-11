@@ -188,6 +188,7 @@ namespace Gusto.Models.Animated
             // combat 
             if (!onShip)
                 inHand.Update(kstate, gameTime, camera);
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip)
             {
                 inCombat = true;
@@ -195,7 +196,7 @@ namespace Gusto.Models.Animated
                 currColumnFrame = 8;
                 if (inHand is IRanged)
                 {
-                    currColumnFrame = 9;
+                    currColumnFrame = 9; // better frame for "holding" a ranged weapon
                     
                     //load ammo
                     if (inHand.ammoLoaded == null)
@@ -216,7 +217,7 @@ namespace Gusto.Models.Animated
             }
             else if (inCombat)
             {
-                if (timeSinceSwordSwing > millisecondsCombatSwing)
+                if (timeSinceSwordSwing > millisecondsCombatSwing) 
                 {
                     currColumnFrame++;
                     inHand.location = location;
@@ -231,6 +232,7 @@ namespace Gusto.Models.Animated
                 }
                 timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
             }
+
             inHand.location = location;
             inHand.SetBoundingBox();
 

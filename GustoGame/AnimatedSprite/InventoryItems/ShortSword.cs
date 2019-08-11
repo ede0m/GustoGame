@@ -26,6 +26,8 @@ namespace Gusto.AnimatedSprite.InventoryItems
                 textureBaseSwordBB = new Texture2D(graphics, textureBaseSword.Width, textureBaseSword.Height);
             Asset baseSwordAsset = new Asset(textureBaseSword, textureBaseSwordBB, 3, 4, 1.0f, "shortSword", region);
             SetSpriteAsset(baseSwordAsset, location);
+
+            stackable = false;
         }
     }
 }
