@@ -20,7 +20,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBB = new Texture2D(graphics, texture.Width, texture.Height);
-            Asset asset = new Asset(texture, textureBB, 3, 2, 0.5f, itemKey, region);
+            Asset asset = new Asset(texture, textureBB, 3, 2, 1.0f, itemKey, region);
 
             SetSpriteAsset(asset, location);
         }

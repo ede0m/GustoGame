@@ -189,7 +189,7 @@ namespace Gusto.Models.Animated
             if (!onShip)
                 inHand.Update(kstate, gameTime, camera);
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip && !showInventory)
             {
                 inCombat = true;
                 inHand.inCombat = true;

@@ -22,7 +22,7 @@ namespace Gusto.AnimatedSprite.GameMap
             else if (key.Equals("o2"))
                 textureOceanTile = content.Load<Texture2D>("Ocean2");
 
-            Asset oceanTileAsset = new Asset(textureOceanTile, null, 4, 1, 1.0f, "oceanTile", region);
+            Asset oceanTileAsset = new Asset(textureOceanTile, null, 1, 4, 1.0f, "oceanTile", region);
             SetSpriteAsset(oceanTileAsset, location);
         }
 

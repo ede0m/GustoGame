@@ -92,7 +92,7 @@ namespace Gusto.GameMap
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                     }
-                    tile.SetTileDesignColumn(RandomEvents.rand.Next(0, tile.nColumns));
+                    tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
 
                     worldLoc.X += tileWidth;
                     map.Add(tile);

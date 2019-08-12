@@ -166,9 +166,9 @@ namespace Gusto
 
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureOcean1, "oceanTile", 1.0f, 1.0f);
-            Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureLand1, "landTile", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
+            Texture2D textureLand1 = Content.Load<Texture2D>("Land1Holes");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 4, textureLand1, "landTile", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
             LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
@@ -225,13 +225,13 @@ namespace Gusto
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
             craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 40), Content, GraphicsDevice);
             barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(-20, -160), Content, GraphicsDevice);
-            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(320, -60), Content, GraphicsDevice);
+            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(380, -60), Content, GraphicsDevice);
             chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
             chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
 
             shovel = new Shovel(TeamType.A, "GustoGame", new Vector2(200, -330), Content, GraphicsDevice);
             shovel.onGround = true;
-            pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
+            pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, -430), Content, GraphicsDevice);
             pickaxe.onGround = true;
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
