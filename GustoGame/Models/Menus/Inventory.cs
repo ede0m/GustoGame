@@ -107,6 +107,8 @@ namespace Gusto.Models.Menus
             sb.Draw(textureItemStat, itemStatLoc, Color.Gray);
             sb.End();
 
+            tempInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+
             // ship inv button
             if (itemsShip != null)
             {
@@ -285,7 +287,15 @@ namespace Gusto.Models.Menus
                     sb.DrawString(font, "x" + item.amountStacked.ToString(), itemLoc, Color.Black);
                     //name display
                     if (i == selectedIndex)
+                    {
                         sb.DrawString(font, item.itemKey, itemStatLoc, Color.Black);
+                        if (item.bbKey.Equals("treasureMapItem"))
+                        {
+                            TreasureMap map = (TreasureMap)item;
+                            Vector2 extraInfoLoc = new Vector2(itemStatLoc.X, itemStatLoc.Y + 20);
+                            sb.DrawString(font, map.treasureInRegion, extraInfoLoc, Color.Black);
+                        }
+                    }
                     sb.End();
                 }
 

@@ -518,6 +518,18 @@
 /processorParam:TextureFormat=Color
 /build:tower.png
 
+#begin TreasureMap.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TreasureMap.png
+
 #begin Tree1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -577,4 +589,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:work-hammer-.png
+
+#begin XSpot.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:XSpot.png
 

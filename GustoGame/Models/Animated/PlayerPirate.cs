@@ -1,7 +1,9 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
+using Gusto.Utility;
 using GustoGame.Mappings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -32,6 +34,7 @@ namespace Gusto.Models.Animated
 
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
+        public bool canBury;
         public bool nearShip;
         public bool onShip;
         public bool inCombat;
@@ -41,6 +44,8 @@ namespace Gusto.Models.Animated
         public Ship playerOnShip;
         public HandHeld inHand;
         public TeamType teamType;
+
+        TilePiece buryTile;
 
         ContentManager _content;
         GraphicsDevice _graphics;
@@ -64,6 +69,23 @@ namespace Gusto.Models.Animated
                 Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height/3);
                 if (footSpace.Intersects(collidedWith.GetBoundingBox()))
                     swimming = false;
+
+                // can bury item?
+                TilePiece tp = (TilePiece)collidedWith;
+                if (tp.canFillHole)
+                {
+                    foreach (var item in inventory)
+                    {
+                        if (item == null)
+                            continue;
+                        if (item.placeableVersion != null && item.placeableVersion is IStorage)
+                        {
+                            buryTile = tp;
+                            canBury = true;
+                            break;
+                        }
+                    }
+                }
             }
             else if (collidedWith is IShip)
             {
@@ -114,6 +136,26 @@ namespace Gusto.Models.Animated
         {
             timeSinceLastTurnFrame += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastWalkFrame += gameTime.ElapsedGameTime.Milliseconds;
+
+            // check inventory for treasure maps
+            BoundingBoxLocations.treasureLocationsList.Clear();
+            List<int> removeSolved = new List<int>();
+            foreach(var item in inventory)
+            {
+                if (item == null)
+                    continue;
+                if (item.bbKey.Equals("treasureMapItem"))
+                {
+                    TreasureMap map = (TreasureMap)item;
+                    if (map.solved)
+                        removeSolved.Add(inventory.IndexOf(item));
+                    else
+                        BoundingBoxLocations.treasureLocationsList.Add(map);
+                }
+            }
+            foreach (var removeSolvedMap in removeSolved)
+                inventory[removeSolvedMap] = null;
+            
 
             if (showHealthBar)
                 timeShowingHealthBar += gameTime.ElapsedGameTime.Milliseconds;
@@ -291,6 +333,40 @@ namespace Gusto.Models.Animated
                     currColumnFrame = 0;
                 }
             }
+
+            // burying storage
+            int? removeChestIndex = null; 
+            if (canBury && kstate.IsKeyDown(Keys.B))
+            {
+                // remove first chest
+                foreach(var item in inventory)
+                {
+                    if (item == null)
+                        continue;
+                    if (item.placeableVersion != null && item.placeableVersion is IStorage)
+                    {
+                        removeChestIndex = inventory.IndexOf(item);
+                        break;
+                    }
+                }
+
+                // create map
+                if (removeChestIndex != null)
+                {
+                    Storage toBury = (Storage)inventory[(int)removeChestIndex].placeableVersion;
+                    TreasureMapItem mapToAdd = new TreasureMapItem(toBury, teamType, regionKey, location, _content, _graphics);
+                    mapToAdd.digTile = buryTile;
+                    mapToAdd.treasureInRegion = buryTile.regionKey;
+                    mapToAdd.inInventory = false;
+                    mapToAdd.remove = false;
+                    mapToAdd.onGround = true;
+                    ItemUtility.ItemsToUpdate.Add(mapToAdd);
+                    inventory[(int)removeChestIndex] = null;
+                }
+
+            }
+            buryTile = null;
+            canBury = false;
         }
 
         public bool AddInventoryItem(InventoryItem itemToAdd)
@@ -374,6 +450,14 @@ namespace Gusto.Models.Animated
                 sb.Draw(meterAlive, alive, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
                 sb.End();
             }
+        }
+
+        public void DrawCanBury(SpriteBatch sb, Camera camera)
+        {
+            SpriteFont font = _content.Load<SpriteFont>("helperFont");
+            sb.Begin(camera);
+            sb.DrawString(font, "b", new Vector2(GetBoundingBox().X - 20, GetBoundingBox().Y - 50), Color.Black);
+            sb.End();
         }
     }
 }

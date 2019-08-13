@@ -104,6 +104,9 @@ namespace Gusto.Utility
                 case ("ironBar"):
                     item = new IronBar(team, region, location, content, graphics);
                     break;
+                case ("treasureMapItem"):
+                    item = new TreasureMapItem(null, team, region, location, content, graphics);
+                    break;
             }
             item.itemKey = key;
             item.amountStacked = amountStacked;

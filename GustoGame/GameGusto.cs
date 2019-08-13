@@ -55,6 +55,7 @@ namespace Gusto
         WindArrows windArrows;
         Texture2D anchorIcon;
         Texture2D repairIcon;
+        Texture2D treasureXMark;
         Inventory inventoryMenu;
         CraftingMenu craftingMenu;
 
@@ -199,6 +200,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrelItem, "baseBarrelItem", 1.0f, 1.0f);
             Texture2D textureChestItem = Content.Load<Texture2D>("BaseChest");
             LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureChestItem, "baseChestItem", 1.0f, 1.0f);
+            Texture2D textureTreasureMap = Content.Load<Texture2D>("TreasureMap");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTreasureMap, "treasureMapItem", 0.5f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -212,6 +215,7 @@ namespace Gusto
             // static load
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
             repairIcon = Content.Load<Texture2D>("work-hammer-");
+            treasureXMark = Content.Load<Texture2D>("XSpot");
             font = Content.Load<SpriteFont>("helperFont");
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
 
@@ -422,6 +426,14 @@ namespace Gusto
             // draw map
             map.DrawMap(spriteBatchView, gameTime);
 
+            // draw treasure locations if any
+            spriteBatchView.Begin(this.camera);
+            foreach (var map in BoundingBoxLocations.treasureLocationsList)
+            {
+                spriteBatchView.Draw(treasureXMark, map.digTile.location, Color.White);
+            }
+            spriteBatchView.End();
+
             // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
             bool showCraftingMenu = false;
@@ -536,6 +548,9 @@ namespace Gusto
                         pirate.DrawSwimming(spriteBatchView, this.camera);
                     else if (!pirate.onShip)
                         pirate.Draw(spriteBatchView, this.camera);
+
+                    if (pirate.canBury)
+                        pirate.DrawCanBury(spriteBatchView, this.camera);
 
                     if (pirate.inCombat && pirate.currRowFrame != 3)
                         pirate.inHand.Draw(spriteBatchView, this.camera);
