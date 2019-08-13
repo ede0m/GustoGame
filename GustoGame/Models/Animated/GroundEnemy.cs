@@ -69,7 +69,11 @@ namespace Gusto.Models.Animated
             else if (collidedWith.bbKey.Equals("landTile") || collidedWith is IGroundObject)
             {
                 colliding = false;
-                swimming = false;
+                
+                // narrow the collision to just the feet (appears more realistic)
+                Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
+                if (footSpace.Intersects(collidedWith.GetBoundingBox()))
+                    swimming = false;
             }
             else if (collidedWith is IWalks)
             {
@@ -221,6 +225,32 @@ namespace Gusto.Models.Animated
             sb.Draw(_texture, location, targetRectangle, Color.White * dyingTransparency, 0f,
                 new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
             sb.End();
+        }
+
+        public void DrawSwimming(SpriteBatch sb, Camera camera)
+        {
+            Rectangle tRect = new Rectangle(targetRectangle.X, targetRectangle.Y, targetRectangle.Width, targetRectangle.Height);
+            tRect.X = (_texture.Width / nColumns) * currColumnFrame;
+            tRect.Y = (_texture.Height / nRows) * currRowFrame;
+
+            // cut the bottom half of the targetRectangle off to hide the "under water" portion of the body
+            tRect.Height = (_texture.Height / nRows) / 2;
+
+            targetRectangle.X = (_texture.Width / nColumns) * currColumnFrame;
+            targetRectangle.Y = (_texture.Height / nRows) * currRowFrame;
+            targetRectangle.Width = (_texture.Width / nColumns);
+            targetRectangle.Height = tRect.Height;
+
+            SetBoundingBox();
+            sb.Begin(camera);
+            sb.Draw(_texture, location, tRect, Color.White, 0f,
+                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            sb.End();
+        }
+
+        public bool GetSwimming()
+        {
+            return swimming;
         }
     }
 }

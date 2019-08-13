@@ -571,11 +571,15 @@ namespace Gusto
                 else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
                 {
                     GroundEnemy enemy = (GroundEnemy)sprite;
+
+                    if (enemy.swimming && !enemy.onShip)
+                        enemy.DrawSwimming(spriteBatchView, this.camera);
+                    else if (!enemy.onShip)
+                        enemy.Draw(spriteBatchView, this.camera);
+
                     if (enemy.dying)
-                    {
                         enemy.DrawDying(spriteBatchView, this.camera);
-                        continue;
-                    } 
+                    continue;
                 }
 
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))

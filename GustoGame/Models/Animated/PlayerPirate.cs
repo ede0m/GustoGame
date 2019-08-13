@@ -459,5 +459,10 @@ namespace Gusto.Models.Animated
             sb.DrawString(font, "b", new Vector2(GetBoundingBox().X - 20, GetBoundingBox().Y - 50), Color.Black);
             sb.End();
         }
+
+        public bool GetSwimming()
+        {
+            return swimming;
+        }
     }
 }

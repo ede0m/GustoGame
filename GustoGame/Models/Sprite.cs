@@ -203,8 +203,25 @@ namespace Gusto.Models
 
             Vector2 rotateAtBottomOrigin = new Vector2((width / 2), (height / 2) + (GetBoundingBox().Height / spriteScale)); // divide by spritescale here to reverse the scale before sending through draw
 
+            Rectangle tRect = targetRectangle;
+
+            if (this is IWalks)
+            {
+                // for cutting the shadow when swimming
+                IWalks walker = (IWalks)this;
+                if (walker.GetSwimming())
+                {
+                    tRect = new Rectangle(targetRectangle.X, targetRectangle.Y, targetRectangle.Width, targetRectangle.Height);
+                    tRect.X = (_texture.Width / nColumns) * currColumnFrame;
+                    tRect.Y = (_texture.Height / nRows) * currRowFrame;
+
+                    // cut the bottom half of the targetRectangle off to hide the "under water" portion of the body
+                    tRect.Height = (int)((_texture.Height / nRows) / 2.5);
+                }
+            }
+
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, slant * camera.ViewportOffset.InvertAbsolute);
-            spriteBatch.Draw(_texture, location, targetRectangle, Color.Black * shadowTransparency, 0, rotateAtBottomOrigin, spriteScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_texture, location, tRect, Color.Black * shadowTransparency, 0, rotateAtBottomOrigin, spriteScale, SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 
