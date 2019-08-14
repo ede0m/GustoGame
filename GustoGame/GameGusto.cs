@@ -241,7 +241,7 @@ namespace Gusto
             pistol.amountStacked = 1;
             pistol.onGround = true;
             pistolAmmo = new PistolShotItem(TeamType.A, "GustoGame", new Vector2(220, -300), Content, GraphicsDevice);
-            pistolAmmo.amountStacked = 4;
+            pistolAmmo.amountStacked = 14;
             pistolAmmo.onGround = true;
             cannonAmmo = new CannonBallItem(TeamType.A, "GustoGame", new Vector2(200, -300), Content, GraphicsDevice);
             cannonAmmo.amountStacked = 10;
