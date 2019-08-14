@@ -140,6 +140,7 @@ namespace Gusto.Models.Animated
                     emittingLight.scaleSize = emittingLight.baseSize;
 
                 usingItem = true;
+
                 if (nextFrame)
                 {
                     currColumnFrame++;

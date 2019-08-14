@@ -1,5 +1,6 @@
 ﻿using Gusto.AnimatedSprite;
 using Gusto.Models;
+using Gusto.Models.Animated;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace Gusto.Bounding
         };
 
         public static Dictionary<string, List<Sprite>> RegionMap = new Dictionary<string, List<Sprite>>();
+
+        public static List<TreasureMap> treasureLocationsList = new List<TreasureMap>();
 
         public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>();
         public static HashSet<Sprite> GroundObjectLocationList = new HashSet<Sprite>();

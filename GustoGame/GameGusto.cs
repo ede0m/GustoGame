@@ -35,6 +35,7 @@ namespace Gusto
         PiratePlayer piratePlayer;
         BaseTribal baseTribal;
         Pistol pistol;
+        Shovel shovel;
         PistolShotItem pistolAmmo;
         CannonBallItem cannonAmmo;
         BasePlank basePlank;
@@ -54,6 +55,7 @@ namespace Gusto
         WindArrows windArrows;
         Texture2D anchorIcon;
         Texture2D repairIcon;
+        Texture2D treasureXMark;
         Inventory inventoryMenu;
         CraftingMenu craftingMenu;
 
@@ -135,6 +137,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePickaxe, "pickaxe", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShortSword, "shortSword", 1.0f, 1.0f);
+            Texture2D textureShovel = Content.Load<Texture2D>("Shovel");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShovel, "shovel", 1.0f, 1.0f);
             Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
             LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
@@ -163,9 +167,9 @@ namespace Gusto
 
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureOcean1, "oceanTile", 1.0f, 1.0f);
-            Texture2D textureLand1 = Content.Load<Texture2D>("Land1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureLand1, "landTile", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
+            Texture2D textureLand1 = Content.Load<Texture2D>("Land1Holes");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 4, textureLand1, "landTile", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
             LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
@@ -196,6 +200,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureBarrelItem, "baseBarrelItem", 1.0f, 1.0f);
             Texture2D textureChestItem = Content.Load<Texture2D>("BaseChest");
             LoadDynamicBoundingBoxPerFrame(false, 2, 3, textureChestItem, "baseChestItem", 1.0f, 1.0f);
+            Texture2D textureTreasureMap = Content.Load<Texture2D>("TreasureMap");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTreasureMap, "treasureMapItem", 0.5f, 1.0f);
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
@@ -209,6 +215,7 @@ namespace Gusto
             // static load
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
             repairIcon = Content.Load<Texture2D>("work-hammer-");
+            treasureXMark = Content.Load<Texture2D>("XSpot");
             font = Content.Load<SpriteFont>("helperFont");
             windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
 
@@ -222,11 +229,13 @@ namespace Gusto
             furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
             craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 40), Content, GraphicsDevice);
             barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(-20, -160), Content, GraphicsDevice);
-            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(320, -60), Content, GraphicsDevice);
+            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(380, -60), Content, GraphicsDevice);
             chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
             chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
 
-            pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, 130), Content, GraphicsDevice);
+            shovel = new Shovel(TeamType.A, "GustoGame", new Vector2(200, -330), Content, GraphicsDevice);
+            shovel.onGround = true;
+            pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, -430), Content, GraphicsDevice);
             pickaxe.onGround = true;
             pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
@@ -269,6 +278,7 @@ namespace Gusto
             UpdateOrder.Add(barrelOcean);
             UpdateOrder.Add(chestLand);
             UpdateOrder.Add(chestOcean);
+            UpdateOrder.Add(shovel);
 
         }
 
@@ -416,6 +426,14 @@ namespace Gusto
             // draw map
             map.DrawMap(spriteBatchView, gameTime);
 
+            // draw treasure locations if any
+            spriteBatchView.Begin(this.camera);
+            foreach (var map in BoundingBoxLocations.treasureLocationsList)
+            {
+                spriteBatchView.Draw(treasureXMark, map.digTile.location, Color.White);
+            }
+            spriteBatchView.End();
+
             // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
             bool showCraftingMenu = false;
@@ -531,6 +549,9 @@ namespace Gusto
                     else if (!pirate.onShip)
                         pirate.Draw(spriteBatchView, this.camera);
 
+                    if (pirate.canBury)
+                        pirate.DrawCanBury(spriteBatchView, this.camera);
+
                     if (pirate.inCombat && pirate.currRowFrame != 3)
                         pirate.inHand.Draw(spriteBatchView, this.camera);
 
@@ -550,11 +571,15 @@ namespace Gusto
                 else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
                 {
                     GroundEnemy enemy = (GroundEnemy)sprite;
+
+                    if (enemy.swimming && !enemy.onShip)
+                        enemy.DrawSwimming(spriteBatchView, this.camera);
+                    else if (!enemy.onShip)
+                        enemy.Draw(spriteBatchView, this.camera);
+
                     if (enemy.dying)
-                    {
                         enemy.DrawDying(spriteBatchView, this.camera);
-                        continue;
-                    } 
+                    continue;
                 }
 
                 else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))

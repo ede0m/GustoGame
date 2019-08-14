@@ -80,19 +80,19 @@ namespace Gusto.GameMap
                     switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(groundObject, worldLoc, regionName, content, graphics, "o1");
+                            tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o1");
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "o2":
-                            tile = new OceanTile(groundObject, worldLoc, regionName, content, graphics, "o2");
+                            tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o2");
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                         case "l1":
-                            tile = new LandTile(groundObject, worldLoc, regionName, content, graphics, "l1");
+                            tile = new LandTile(index, groundObject, worldLoc, regionName, content, graphics, "l1");
                             BoundingBoxLocations.RegionMap[regionName].Add(tile);
                             break;
                     }
-                    tile.SetTileDesignColumn(RandomEvents.rand.Next(0, tile.nColumns));
+                    tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
 
                     worldLoc.X += tileWidth;
                     map.Add(tile);
@@ -136,8 +136,8 @@ namespace Gusto.GameMap
                     }
                         //collidablePieces.Add(tile);
                     tile.Draw(sb, _cam);
-
                     TilePiece tileP = (TilePiece)tile;
+
                     if (tileP.groundObject != null)
                     {
                         if (!tileP.groundObject.remove)
@@ -150,8 +150,6 @@ namespace Gusto.GameMap
                                 go.UpdateRespawn(gameTime);
                             }
                         }
-
-
                     }
 
                 }

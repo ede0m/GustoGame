@@ -13,7 +13,7 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class OceanTile : TilePiece
     {
-        public OceanTile(Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (groundObj)
+        public OceanTile(int index, Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (index, groundObj, content, graphics)
         {
             Texture2D textureOceanTile = null;
 
@@ -22,7 +22,7 @@ namespace Gusto.AnimatedSprite.GameMap
             else if (key.Equals("o2"))
                 textureOceanTile = content.Load<Texture2D>("Ocean2");
 
-            Asset oceanTileAsset = new Asset(textureOceanTile, null, 4, 1, 1.0f, "oceanTile", region);
+            Asset oceanTileAsset = new Asset(textureOceanTile, null, 1, 4, 1.0f, "oceanTile", region);
             SetSpriteAsset(oceanTileAsset, location);
         }
 

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.AnimatedSprite.InventoryItems
+namespace Gusto.AnimatedSprite
 {
     public class BaseChest : Storage
     {

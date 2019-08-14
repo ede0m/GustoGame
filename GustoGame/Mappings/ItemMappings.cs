@@ -124,10 +124,16 @@ namespace Gusto.Mappings
                             {"percentDrop", 85 }
                         }
                     },
-                     {"ironBar", new Dictionary<string, float>
+                    {"ironBar", new Dictionary<string, float>
                         {
                             {"maxDrop", 4},
                             {"percentDrop", 55}
+                        }
+                    },
+                    {"treasureMapItem", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1},
+                            {"percentDrop", 100}
                         }
                     },
                 }
