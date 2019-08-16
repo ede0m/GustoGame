@@ -31,6 +31,7 @@ namespace Gusto.GameMap
         float maxBlackoutIntensity;
         float minIntensity;
         float currentIntensity;
+        float tempCurrentIntensity;
 
         ContentManager _content;
         GraphicsDevice _graphics;
@@ -46,6 +47,7 @@ namespace Gusto.GameMap
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
+            tempCurrentIntensity = maxBlackoutIntensity;
 
             sunRisePercent = 0.165f; // sunrise happens at 16.5% of day
             sunSetPercent = 0.835f; // sunset happens at 83.5% of day
@@ -112,10 +114,12 @@ namespace Gusto.GameMap
 
             float sign = incrementIntensity ? 1 : -1;
             ambientIntensityChange = sign * intensityDelta / msUntilChange * elapsedMs;
-            currentIntensity += ambientIntensityChange;
+            tempCurrentIntensity += ambientIntensityChange;
 
             if (raining && percentDayComplete > 0.13f && percentDayComplete < .90f)
                 currentIntensity = 9.89f; // rain mask intensity
+            else
+                currentIntensity = tempCurrentIntensity;
 
             // reset day
             if (percentDayComplete > 1.0f)
@@ -125,6 +129,7 @@ namespace Gusto.GameMap
                 percentDayComplete = 0.0f;
                 currentMsOfDay = 0;
                 currentIntensity = maxBlackoutIntensity;
+                tempCurrentIntensity = maxBlackoutIntensity;
             }
 
         }
