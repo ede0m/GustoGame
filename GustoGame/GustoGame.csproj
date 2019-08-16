@@ -86,6 +86,7 @@
     <Compile Include="Bounding\SpatialBounding.cs" />
     <Compile Include="GameMap\DayLight.cs" />
     <Compile Include="GameMap\GameMap.cs" />
+    <Compile Include="GameMap\Weather.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
     <Compile Include="Mappings\ItemMappings.cs" />
     <Compile Include="Mappings\PlayerMovementVectorMappings.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Models\Animated\GroundObject\Rock.cs" />
     <Compile Include="Models\Animated\GroundObject\Tree.cs" />
     <Compile Include="Models\Animated\TreasureMap.cs" />
+    <Compile Include="Models\Animated\Weather\Rain.cs" />
     <Compile Include="Models\Interfaces\IAmmo.cs" />
     <Compile Include="Models\Interfaces\ICraftingObject.cs" />
     <Compile Include="Models\Interfaces\IGrass.cs" />

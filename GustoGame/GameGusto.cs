@@ -64,9 +64,9 @@ namespace Gusto
         RenderTarget2D gameScene;
         RenderTarget2D ambientLight;
         RenderTarget2D lightsTarget;
-        Effect lanternEffect;
 
         DayLight dayLight;
+        Weather weather;
 
         SpatialBounding collision;
         List<Sprite> DrawOrder;
@@ -102,6 +102,7 @@ namespace Gusto
             map = new TileGameMap(this.camera);
 
             dayLight = new DayLight(Content, GraphicsDevice);
+            weather = new Weather(Content, GraphicsDevice);
             lightsTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
@@ -257,7 +258,6 @@ namespace Gusto
             inventoryMenu = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
             craftingMenu = new CraftingMenu(screenCenter, Content, GraphicsDevice, piratePlayer);
 
-
             // fill update order list
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(piratePlayer);
@@ -338,8 +338,11 @@ namespace Gusto
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
             var kstate = Keyboard.GetState();
 
+            // weather
+            weather.Update(kstate, gameTime);
+
             // daylight shader 
-            dayLight.Update(kstate, gameTime, this.camera);
+            dayLight.Update(kstate, gameTime, weather.IsRaining());
 
             // camera follows player
             if (!piratePlayer.onShip)
@@ -594,6 +597,9 @@ namespace Gusto
 
                 sprite.Draw(spriteBatchView, this.camera);
             }
+
+            // draw weather
+            weather.DrawWeather(spriteBatchStatic);
 
             // lighting shader - for ambient day/night light and lanterns
             GraphicsDevice.SetRenderTarget(null);

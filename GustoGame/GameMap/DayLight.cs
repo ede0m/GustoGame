@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.GameMap
 {
-    public class DayLight : ICanUpdate
+    public class DayLight
     {
         float maxShadowTransparency;
         public float shadowTransparency;
@@ -62,7 +62,7 @@ namespace Gusto.GameMap
             ambientLightEff = _content.Load<Effect>("ambientLight");
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime, Camera cam)
+        public void Update(KeyboardState kstate, GameTime gameTime, bool raining)
         {
 
             float elapsedMs = gameTime.ElapsedGameTime.Milliseconds;
@@ -113,6 +113,9 @@ namespace Gusto.GameMap
             float sign = incrementIntensity ? 1 : -1;
             ambientIntensityChange = sign * intensityDelta / msUntilChange * elapsedMs;
             currentIntensity += ambientIntensityChange;
+
+            if (raining && percentDayComplete > 0.13f && percentDayComplete < .90f)
+                currentIntensity = 9.89f; // rain mask intensity
 
             // reset day
             if (percentDayComplete > 1.0f)
