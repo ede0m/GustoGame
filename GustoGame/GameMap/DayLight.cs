@@ -30,6 +30,7 @@ namespace Gusto.GameMap
 
         float maxBlackoutIntensity;
         float overcastIntensity;
+        float overcastAdder; // used to overexpose green in the shader during overcast
         float minIntensity;
         float currentIntensity;
         float tempCurrentIntensity;
@@ -48,6 +49,7 @@ namespace Gusto.GameMap
 
             maxBlackoutIntensity = 50;
             overcastIntensity = 7.5f;
+            overcastAdder = 1f;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
@@ -121,27 +123,41 @@ namespace Gusto.GameMap
             tempCurrentIntensity += ambientIntensityChange;
 
             // rain overcast - we always want to converge to tempCurrentIntensity in 1/10th of the storm time (the time be begin ending the storm)
-            if (percentDayComplete > 0.13f && percentDayComplete < .90f)
+            if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
             {
-                if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
+
+                if (tempCurrentIntensity < overcastIntensity)
                 {
-                    if (currentIntensity < overcastIntensity)
-                        currentIntensity += 0.01f * (state.weatherDuration/10)/2000; // 1/10ths of the weatherduration to get from start->rain or ending->norain, .01f worked well with 1/10th of 20000 hard coded weather duration
-                    else
+                    // used to expose more green during overcast
+                    overcastAdder += 0.01f;
+                    if (overcastAdder > 2)
+                        overcastAdder = 2;
+
+                    currentIntensity += 0.01f * (2000 / (state.weatherDuration / 10)); // 1/10ths of the weatherduration to get from start->rain or ending->norain, .01f worked well with 1/10th of 20000 hard coded weather duration
+
+                    if (currentIntensity > overcastIntensity)
                         currentIntensity = overcastIntensity;
-                }
-                else if (state.rainState == RainState.ENDING)
-                {
-                    if (tempCurrentIntensity < currentIntensity)
-                        currentIntensity -= 0.01f * (state.weatherDuration / 10)/2000;
-                    else
-                        currentIntensity = tempCurrentIntensity;
                 }
                 else
                     currentIntensity = tempCurrentIntensity;
             }
+            else if (state.rainState == RainState.ENDING)
+            {
+                if (tempCurrentIntensity < currentIntensity)
+                    currentIntensity -= 0.01f * (2000 / (state.weatherDuration / 10));
+                else
+                    currentIntensity = tempCurrentIntensity;
+
+                overcastAdder -= 0.01f;
+                if (overcastAdder < 1)
+                    overcastAdder = 1.0f;
+            }
             else
+            {
                 currentIntensity = tempCurrentIntensity;
+                overcastAdder = 1.0f;
+            }
+
 
             // reset day
             if (percentDayComplete > 1.0f)
@@ -162,6 +178,7 @@ namespace Gusto.GameMap
             // ambient light
             sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             ambientLightEff.Parameters["ambient"].SetValue(currentIntensity);
+            ambientLightEff.Parameters["overcast"].SetValue(overcastAdder);
             ambientLightEff.Parameters["percentThroughDay"].SetValue(percentDayComplete);
             ambientLightEff.Parameters["lightMask"].SetValue(lightMaskTarget);
             ExecuteTechnique("ambientLightDayNight");

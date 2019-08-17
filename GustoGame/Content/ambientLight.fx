@@ -23,6 +23,7 @@ struct VertexShaderOutput
 
 float ambient = 1.0f;
 float percentThroughDay = 0.0f;
+float overcast = 1.0f;
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
@@ -34,7 +35,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// lighting intensity is gradient of pixel position
 	float Intensity = 1 + (1  - input.TextureCoordinates.y) * 1.05;
 	outputColor.r = outputColor.r / ambient * Intensity;
-	outputColor.g = outputColor.g / ambient * Intensity;
+	outputColor.g = outputColor.g / ambient * Intensity * overcast;
 	outputColor.b = outputColor.b / ambient * Intensity;
 
 	// sun set/rise blending  
