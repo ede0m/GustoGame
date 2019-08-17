@@ -16,12 +16,9 @@ namespace Gusto.GameMap
 {
     public class Weather
     {
-        float msOfWeather;
         float msCurrWeather;
+        WeatherState state;
 
-        List<RainDrop> rain;
-        bool raining;
-        int rainIntensity;
         float msToAddRainDrop;
         float msSinceDropAdded;
         float msToRemoveRainDrop;
@@ -38,27 +35,29 @@ namespace Gusto.GameMap
             _content = content;
             _graphics = graphics;
 
-            rain = new List<RainDrop>();
+            state = new WeatherState();
+
             msToAddRainDrop = 25;
+            msToRemoveRainDrop = 25;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime)
         {
             msCurrWeather += gameTime.ElapsedGameTime.Milliseconds;
 
-            if (msCurrWeather >= msOfWeather && !raining) // and other weather patterns?
+            if (msCurrWeather >= state.weatherDuration && state.rainState == RainState.NOT) // and other weather patterns?
             {
-                msOfWeather = RandomEvents.rand.Next(GameOptions.GameDayLengthMs / 10, GameOptions.GameDayLengthMs * 2); // weather can last between 1/10th of a day and 3 days
-                msOfWeather = 30000; 
+                state.weatherDuration = RandomEvents.rand.Next(GameOptions.GameDayLengthMs / 10, GameOptions.GameDayLengthMs * 2); // weather can last between 1/10th of a day and 3 days
+                state.weatherDuration = RandomEvents.rand.Next(10000, 40000); //TEMPORARY!#!@#
                 msCurrWeather = 0;
                
                 // RAIN chance
                 int randRain = RandomEvents.rand.Next(0, 100);
                 if (randRain <= 50) // 20% chance of rain
                 {
-                    raining = true;
-                    rain.Clear();
-                    rainIntensity = RandomEvents.rand.Next(100, 500);
+                    state.rainState = RainState.STARTING;
+                    state.rain.Clear();
+                    state.rainIntensity = RandomEvents.rand.Next(100, 500);
                 }
 
                 // TODO: more weather patterns
@@ -69,46 +68,53 @@ namespace Gusto.GameMap
                 // continue with current weather
 
                 // RAIN
-                if (raining)
+                if (state.rainState != RainState.NOT)
                 {
                     // rain starts gradually
                     msSinceDropAdded += gameTime.ElapsedGameTime.Milliseconds;
                     msSinceDropRemoved += gameTime.ElapsedGameTime.Milliseconds;
-                    if (rain.Count < rainIntensity && msSinceDropAdded > msToAddRainDrop)
+                    if (state.rain.Count < state.rainIntensity && msSinceDropAdded > msToAddRainDrop && state.rainState == RainState.STARTING)
                     {
-                        rain.Add(new RainDrop(_content, _graphics));
+                        state.rain.Add(new RainDrop(_content, _graphics));
                         msSinceDropAdded = 0;
                     }
+                    else if (state.rain.Count() == state.rainIntensity)
+                        state.rainState = RainState.RAINING;
 
-                    foreach (var drop in rain)
+                    // rain starts receding gradually in the back 10th of the weatherEvent
+                    if (msCurrWeather + (state.weatherDuration / 10) > state.weatherDuration && state.rain.Count > 0 && msSinceDropRemoved > msToRemoveRainDrop) 
+                    {
+                        state.rainState = RainState.ENDING;
+                        state.rain.RemoveAt(state.rain.Count - 1);
+                        msSinceDropRemoved = 0;
+                    }
+                    else if (msCurrWeather >= state.weatherDuration && state.rain.Count == 0)
+                        state.rainState = RainState.NOT;
+
+                    foreach (var drop in state.rain)
                         drop.Update(kstate, gameTime);
 
-                    if (msCurrWeather + (msOfWeather / 10) > msOfWeather && rain.Count > 0 && msSinceDropRemoved > msToRemoveRainDrop)
-                    {
-                        rain.RemoveAt(rain.Count-1);
-                        msSinceDropRemoved = 0; // really means removed here
-                    }
-                    else if (msCurrWeather >= msOfWeather && rain.Count == 0)
-                        raining = false;
                 }
             }
+
+            state.msThroughWeather = msCurrWeather;
         }
 
         public void DrawWeather(SpriteBatch sb)
         {
 
 
-            if (raining)
+            if (state.rainState != RainState.NOT)
             {
                 // more than just rain here..
-                foreach (var drop in rain)
+                foreach (var drop in state.rain)
                     drop.Draw(sb, null);
             }
         }
 
-        public bool IsRaining()
+        public WeatherState GetWeatherState()
         {
-            return raining;
+            return state;
         }
     }
 }

@@ -43,6 +43,8 @@ namespace Gusto.GameMap
             currentMsOfDay = 0;
             dayLengthMs = GameOptions.GameDayLengthMs; // how long the day takes
 
+            // Note - when intensity is higher, the screen is darker. MinIntensity of 1 happens at peak day. We move currentIntensity down to one by half day and back up to maxBlackout through the end of the day. 
+
             maxBlackoutIntensity = 50;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
@@ -64,7 +66,7 @@ namespace Gusto.GameMap
             ambientLightEff = _content.Load<Effect>("ambientLight");
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime, bool raining)
+        public void Update(KeyboardState kstate, GameTime gameTime, WeatherState state)
         {
 
             float elapsedMs = gameTime.ElapsedGameTime.Milliseconds;
@@ -116,8 +118,26 @@ namespace Gusto.GameMap
             ambientIntensityChange = sign * intensityDelta / msUntilChange * elapsedMs;
             tempCurrentIntensity += ambientIntensityChange;
 
-            if (raining && percentDayComplete > 0.13f && percentDayComplete < .90f)
-                currentIntensity = 9.89f; // rain mask intensity
+            // rain overcast - we always want to converge to tempCurrentIntensity in 1/10th of the storm time (the time be begin ending the storm)
+            if (percentDayComplete > 0.13f && percentDayComplete < .90f)
+            {
+                if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
+                {
+                    if (currentIntensity < 8.5f)
+                        currentIntensity += 0.01f * (state.weatherDuration/10)/2000; // 1/10ths of the weatherduration to get from start->rain or ending->norain, .01f worked well with 1/10th of 20000 hard coded weather duration
+                    else
+                        currentIntensity = 8.5f;
+                }
+                else if (state.rainState == RainState.ENDING)
+                {
+                    if (tempCurrentIntensity < currentIntensity)
+                        currentIntensity -= 0.015f * (state.weatherDuration / 10)/2000;
+                    else
+                        currentIntensity = tempCurrentIntensity;
+                }
+                else
+                    currentIntensity = tempCurrentIntensity;
+            }
             else
                 currentIntensity = tempCurrentIntensity;
 

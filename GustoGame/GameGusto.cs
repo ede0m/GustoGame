@@ -342,7 +342,7 @@ namespace Gusto
             weather.Update(kstate, gameTime);
 
             // daylight shader 
-            dayLight.Update(kstate, gameTime, weather.IsRaining());
+            dayLight.Update(kstate, gameTime, weather.GetWeatherState());
 
             // camera follows player
             if (!piratePlayer.onShip)
