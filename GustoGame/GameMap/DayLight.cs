@@ -29,6 +29,7 @@ namespace Gusto.GameMap
         int sunRiseSetIntensity;
 
         float maxBlackoutIntensity;
+        float overcastIntensity;
         float minIntensity;
         float currentIntensity;
         float tempCurrentIntensity;
@@ -46,6 +47,7 @@ namespace Gusto.GameMap
             // Note - when intensity is higher, the screen is darker. MinIntensity of 1 happens at peak day. We move currentIntensity down to one by half day and back up to maxBlackout through the end of the day. 
 
             maxBlackoutIntensity = 50;
+            overcastIntensity = 7.5f;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
@@ -123,15 +125,15 @@ namespace Gusto.GameMap
             {
                 if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
                 {
-                    if (currentIntensity < 8.5f)
+                    if (currentIntensity < overcastIntensity)
                         currentIntensity += 0.01f * (state.weatherDuration/10)/2000; // 1/10ths of the weatherduration to get from start->rain or ending->norain, .01f worked well with 1/10th of 20000 hard coded weather duration
                     else
-                        currentIntensity = 8.5f;
+                        currentIntensity = overcastIntensity;
                 }
                 else if (state.rainState == RainState.ENDING)
                 {
                     if (tempCurrentIntensity < currentIntensity)
-                        currentIntensity -= 0.015f * (state.weatherDuration / 10)/2000;
+                        currentIntensity -= 0.01f * (state.weatherDuration / 10)/2000;
                     else
                         currentIntensity = tempCurrentIntensity;
                 }

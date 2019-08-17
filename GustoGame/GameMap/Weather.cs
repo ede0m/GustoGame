@@ -38,7 +38,7 @@ namespace Gusto.GameMap
             state = new WeatherState();
 
             msToAddRainDrop = 25;
-            msToRemoveRainDrop = 25;
+            msToRemoveRainDrop = 20;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime)
