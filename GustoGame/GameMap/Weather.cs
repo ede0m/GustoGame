@@ -48,7 +48,7 @@ namespace Gusto.GameMap
             if (msCurrWeather >= state.weatherDuration && state.rainState == RainState.NOT) // and other weather patterns?
             {
                 state.weatherDuration = RandomEvents.rand.Next(GameOptions.GameDayLengthMs / 10, GameOptions.GameDayLengthMs * 2); // weather can last between 1/10th of a day and 3 days
-                state.weatherDuration = RandomEvents.rand.Next(10000, 40000); //TEMPORARY!#!@#
+                //state.weatherDuration = RandomEvents.rand.Next(10000, 40000); //TEMPORARY!#!@#
                 msCurrWeather = 0;
                
                 // RAIN chance

@@ -78,6 +78,7 @@ namespace Gusto.GameMap
             percentDayComplete = currentMsOfDay / dayLengthMs;
 
             // fade in/out shadows
+
             if (percentDayComplete > 0.05f && percentDayComplete < 0.85f)
                 shadowTransparency += (gameTime.ElapsedGameTime.Milliseconds / (dayLengthMs * 0.1f)) * maxShadowTransparency;
             if (shadowTransparency > maxShadowTransparency)
@@ -125,26 +126,25 @@ namespace Gusto.GameMap
             // rain overcast - we always want to converge to tempCurrentIntensity in 1/10th of the storm time (the time be begin ending the storm)
             if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
             {
-
                 if (tempCurrentIntensity < overcastIntensity)
                 {
-                    // used to expose more green during overcast
-                    overcastAdder += 0.01f;
-                    if (overcastAdder > 2)
-                        overcastAdder = 2;
-
-                    currentIntensity += 0.01f * (2000 / (state.weatherDuration / 10)); // 1/10ths of the weatherduration to get from start->rain or ending->norain, .01f worked well with 1/10th of 20000 hard coded weather duration
+                    currentIntensity += 0.01f;
 
                     if (currentIntensity > overcastIntensity)
                         currentIntensity = overcastIntensity;
                 }
                 else
                     currentIntensity = tempCurrentIntensity;
+                // used to expose more green during overcast
+                overcastAdder += 0.01f;
+                if (overcastAdder > 2)
+                    overcastAdder = 2;
+
             }
             else if (state.rainState == RainState.ENDING)
             {
                 if (tempCurrentIntensity < currentIntensity)
-                    currentIntensity -= 0.01f * (2000 / (state.weatherDuration / 10));
+                    currentIntensity -= 0.05f;
                 else
                     currentIntensity = tempCurrentIntensity;
 

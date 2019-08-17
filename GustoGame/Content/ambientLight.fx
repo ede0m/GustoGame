@@ -41,7 +41,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// sun set/rise blending  
 	float gval = (1 - input.TextureCoordinates.y); // replace 1 with .39 to lock to 39 percent of screen (this is how it was before)
 	float exposeRed = (1 + gval * 8); // overexpose red
-	float exposeGreen = (1 + gval * 2); // some extra green
+	float exposeGreen = (1 + gval * 2 * overcast); // some extra green
 	float exposeBlue = (1 + gval * 4); // some extra blue 
 	
 	float quarterDayPercent = (percentThroughDay/0.25f);
