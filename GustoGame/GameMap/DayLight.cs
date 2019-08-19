@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.GameMap
 {
-    public class DayLight : ICanUpdate
+    public class DayLight
     {
         float maxShadowTransparency;
         public float shadowTransparency;
@@ -29,8 +29,11 @@ namespace Gusto.GameMap
         int sunRiseSetIntensity;
 
         float maxBlackoutIntensity;
+        float overcastIntensity;
+        float overcastAdder; // used to overexpose green in the shader during overcast
         float minIntensity;
         float currentIntensity;
+        float tempCurrentIntensity;
 
         ContentManager _content;
         GraphicsDevice _graphics;
@@ -42,10 +45,15 @@ namespace Gusto.GameMap
             currentMsOfDay = 0;
             dayLengthMs = GameOptions.GameDayLengthMs; // how long the day takes
 
+            // Note - when intensity is higher, the screen is darker. MinIntensity of 1 happens at peak day. We move currentIntensity down to one by half day and back up to maxBlackout through the end of the day. 
+
             maxBlackoutIntensity = 50;
+            overcastIntensity = 7.5f;
+            overcastAdder = 1f;
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
+            tempCurrentIntensity = maxBlackoutIntensity;
 
             sunRisePercent = 0.165f; // sunrise happens at 16.5% of day
             sunSetPercent = 0.835f; // sunset happens at 83.5% of day
@@ -62,7 +70,7 @@ namespace Gusto.GameMap
             ambientLightEff = _content.Load<Effect>("ambientLight");
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime, Camera cam)
+        public void Update(KeyboardState kstate, GameTime gameTime, WeatherState state)
         {
 
             float elapsedMs = gameTime.ElapsedGameTime.Milliseconds;
@@ -70,6 +78,7 @@ namespace Gusto.GameMap
             percentDayComplete = currentMsOfDay / dayLengthMs;
 
             // fade in/out shadows
+
             if (percentDayComplete > 0.05f && percentDayComplete < 0.85f)
                 shadowTransparency += (gameTime.ElapsedGameTime.Milliseconds / (dayLengthMs * 0.1f)) * maxShadowTransparency;
             if (shadowTransparency > maxShadowTransparency)
@@ -112,7 +121,43 @@ namespace Gusto.GameMap
 
             float sign = incrementIntensity ? 1 : -1;
             ambientIntensityChange = sign * intensityDelta / msUntilChange * elapsedMs;
-            currentIntensity += ambientIntensityChange;
+            tempCurrentIntensity += ambientIntensityChange;
+
+            // rain overcast - we always want to converge to tempCurrentIntensity in 1/10th of the storm time (the time be begin ending the storm)
+            if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
+            {
+                if (tempCurrentIntensity < overcastIntensity)
+                {
+                    currentIntensity += 0.01f;
+
+                    if (currentIntensity > overcastIntensity)
+                        currentIntensity = overcastIntensity;
+                }
+                else
+                    currentIntensity = tempCurrentIntensity;
+                // used to expose more green during overcast
+                overcastAdder += 0.01f;
+                if (overcastAdder > 2)
+                    overcastAdder = 2;
+
+            }
+            else if (state.rainState == RainState.ENDING)
+            {
+                if (tempCurrentIntensity < currentIntensity)
+                    currentIntensity -= 0.05f;
+                else
+                    currentIntensity = tempCurrentIntensity;
+
+                overcastAdder -= 0.01f;
+                if (overcastAdder < 1)
+                    overcastAdder = 1.0f;
+            }
+            else
+            {
+                currentIntensity = tempCurrentIntensity;
+                overcastAdder = 1.0f;
+            }
+
 
             // reset day
             if (percentDayComplete > 1.0f)
@@ -122,6 +167,7 @@ namespace Gusto.GameMap
                 percentDayComplete = 0.0f;
                 currentMsOfDay = 0;
                 currentIntensity = maxBlackoutIntensity;
+                tempCurrentIntensity = maxBlackoutIntensity;
             }
 
         }
@@ -132,6 +178,7 @@ namespace Gusto.GameMap
             // ambient light
             sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             ambientLightEff.Parameters["ambient"].SetValue(currentIntensity);
+            ambientLightEff.Parameters["overcast"].SetValue(overcastAdder);
             ambientLightEff.Parameters["percentThroughDay"].SetValue(percentDayComplete);
             ambientLightEff.Parameters["lightMask"].SetValue(lightMaskTarget);
             ExecuteTechnique("ambientLightDayNight");
