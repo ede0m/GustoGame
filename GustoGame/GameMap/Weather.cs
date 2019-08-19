@@ -1,4 +1,5 @@
 ﻿using Comora;
+using Gusto.GameMap.lightning;
 using Gusto.Models.Animated.Weather;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
@@ -23,6 +24,8 @@ namespace Gusto.GameMap
         float msSinceDropAdded;
         float msToRemoveRainDrop;
         float msSinceDropRemoved;
+        float msDrawingLightning;
+        float msLightningTime;
 
         // List of different weather sprites??
 
@@ -39,6 +42,7 @@ namespace Gusto.GameMap
 
             msToAddRainDrop = 25;
             msToRemoveRainDrop = 15;
+            msLightningTime = 200;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime)
@@ -53,11 +57,17 @@ namespace Gusto.GameMap
                
                 // RAIN chance
                 int randRain = RandomEvents.rand.Next(0, 100);
-                if (randRain <= 50) // 20% chance of rain
+                if (randRain <= 80) // 20% chance of rain
                 {
                     state.rainState = RainState.STARTING;
                     state.rain.Clear();
                     state.rainIntensity = RandomEvents.rand.Next(100, 500);
+
+                    // Lightning with rain?
+                    int randLightning = RandomEvents.rand.Next(1, 100);
+                    if (randLightning <= 90)
+                        state.lightning = true;
+
                 }
 
                 // TODO: more weather patterns
@@ -79,12 +89,31 @@ namespace Gusto.GameMap
                         msSinceDropAdded = 0;
                     }
                     else if (state.rain.Count() == state.rainIntensity)
+                    {
                         state.rainState = RainState.RAINING;
+
+                        // random lightning strike
+                        if (state.lightning)
+                        {
+                            if (state.lightningBolt == null || state.lightningBolt.IsComplete)
+                            {
+                                int randomLightning = RandomEvents.rand.Next(1, 1000);
+                                if (randomLightning < 15) // this value could scale intensity
+                                    state.lightningBolt = new LightningBolt(_content);
+                                else
+                                    state.lightningBolt = null;
+                            }
+                            else
+                                state.lightningBolt.Update();
+                        }
+                    }
 
                     // rain starts receding gradually in the back 10th of the weatherEvent
                     if (msCurrWeather + (state.weatherDuration / 10) > state.weatherDuration && state.rain.Count > 0 && msSinceDropRemoved > msToRemoveRainDrop) 
                     {
                         state.rainState = RainState.ENDING;
+                        state.lightning = false;
+                        state.lightningBolt = null;
                         state.rain.RemoveAt(state.rain.Count - 1);
                         msSinceDropRemoved = 0;
                     }
@@ -109,6 +138,17 @@ namespace Gusto.GameMap
                 // more than just rain here..
                 foreach (var drop in state.rain)
                     drop.Draw(sb, null);
+            }
+        }
+
+        // sepearated lightning becase we want it to be drawn after ambient light shader, when the rest is drawn before it
+        public void DrawLightning(SpriteBatch sb)
+        {
+            if (state.lightningBolt != null)
+            {
+                sb.Begin(SpriteSortMode.Texture, BlendState.Additive);
+                state.lightningBolt.Draw(sb);
+                sb.End();
             }
         }
 

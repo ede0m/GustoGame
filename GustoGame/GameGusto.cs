@@ -19,6 +19,7 @@ using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using Gusto.Models.Menus;
+using Gusto.GameMap.lightning;
 
 namespace Gusto
 {
@@ -403,8 +404,6 @@ namespace Gusto
                 tempUpdateOrder.Add(obj);
             UpdateOrder = tempUpdateOrder;
 
-            //ItemUtility.ItemsToUpdate.Clear();
-
             this.camera.Update(gameTime);
             base.Update(gameTime);
         }
@@ -605,6 +604,10 @@ namespace Gusto
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
             dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
+
+            // lightning is drawn after ambient light
+            if (weather.GetWeatherState().lightning)
+                weather.DrawLightning(spriteBatchStatic);
 
             // draw static and menu sprites
             windArrows.Draw(spriteBatchStatic, null);
