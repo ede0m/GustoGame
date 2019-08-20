@@ -31,6 +31,7 @@ namespace Gusto.GameMap.lightning
             bool right = false;
             int startPosX = 0;
             int startPosY = 0;
+            int strikePosX = 0;
             int xory = RandomEvents.rand.Next(0, 10);
             int leftOrRight = RandomEvents.rand.Next(0, 10);
             if (xory < 5)
@@ -40,16 +41,25 @@ namespace Gusto.GameMap.lightning
                 if (leftOrRight < 5)
                     right = true;
                 if (right)
+                {
                     startPosX = GameOptions.PrefferedBackBufferWidth;
+                    strikePosX = RandomEvents.rand.Next((GameOptions.PrefferedBackBufferWidth - GameOptions.PrefferedBackBufferWidth/2), GameOptions.PrefferedBackBufferWidth);
+                }
+                else
+                {
+                    startPosX = 0;
+                    strikePosX = RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferWidth/2);
+                }
                 startPosY = RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferHeight / 3);
             }
             else
             {
                 startPosY = 0;
                 startPosX = RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferWidth);
+                strikePosX = RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferWidth);
             }
             Vector2 startingPos = new Vector2(startPosX, startPosY);
-            Vector2 strikePos = new Vector2(RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferWidth), RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferHeight));
+            Vector2 strikePos = new Vector2(strikePosX, RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferHeight));
 
             End = strikePos;
             direction = Vector2.Normalize(strikePos - startingPos);
