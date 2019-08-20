@@ -223,8 +223,9 @@ namespace Gusto
 
 
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
-            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
-            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
+            //baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(-100, -500), windArrows, Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(0, -300), Content, GraphicsDevice);
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
@@ -462,6 +463,7 @@ namespace Gusto
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+            int i = 0;
             foreach (var sprite in DrawOrder)
             {
 
@@ -593,6 +595,9 @@ namespace Gusto
                         shot.Draw(spriteBatchView, this.camera);
                     continue;
                 }
+
+                if (sprite.GetType() == typeof(Gusto.Models.Menus.Inventory) || sprite.GetType() == typeof(Gusto.Models.Menus.CraftingMenu))
+                    continue; // we handle this after everthing else
 
                 sprite.Draw(spriteBatchView, this.camera);
             }

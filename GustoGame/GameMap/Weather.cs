@@ -52,12 +52,11 @@ namespace Gusto.GameMap
             if (msCurrWeather >= state.weatherDuration && state.rainState == RainState.NOT) // and other weather patterns?
             {
                 state.weatherDuration = RandomEvents.rand.Next(GameOptions.GameDayLengthMs / 10, GameOptions.GameDayLengthMs * 2); // weather can last between 1/10th of a day and 3 days
-                //state.weatherDuration = RandomEvents.rand.Next(10000, 40000); //TEMPORARY!#!@#
                 msCurrWeather = 0;
                
                 // RAIN chance
                 int randRain = RandomEvents.rand.Next(0, 100);
-                if (randRain <= 80) // 20% chance of rain
+                if (randRain <= 20) // 20% chance of rain
                 {
                     state.rainState = RainState.STARTING;
                     state.rain.Clear();
@@ -65,7 +64,7 @@ namespace Gusto.GameMap
 
                     // Lightning with rain?
                     int randLightning = RandomEvents.rand.Next(1, 100);
-                    if (randLightning <= 90)
+                    if (randLightning <= 50)
                         state.lightning = true;
 
                 }

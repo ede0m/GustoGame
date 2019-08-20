@@ -238,7 +238,7 @@ namespace Gusto.Models.Animated
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            health = 40; //UNLIMITED HEALTH
+            //health = 40; //UNLIMITED HEALTH
             
             // turning
             if (timeSinceLastTurn > millisecondsPerTurn && playerAboard)
