@@ -13,6 +13,8 @@ namespace Gusto.GameMap.lightning
     public class LightningBolt
     {
         public List<LightningSegment> Segments = new List<LightningSegment>();
+        public Vector2 Start { get { return Segments[0].A; } }
+        public Vector2 End { get { return Segments.Last().B; } }
 
         public float Alpha { get; set; }
         public float FadeOutRate { get; set; }
@@ -22,42 +24,16 @@ namespace Gusto.GameMap.lightning
 
         public bool IsComplete { get { return Alpha <= 0; } }
 
-        public LightningBolt(ContentManager content) : this(new Color(0.9f, 0.8f, 1f), content)
+        public LightningBolt(Vector2 source, Vector2 dest, ContentManager content) : this(source, dest, new Color(0.9f, 0.8f, 1f), content)
         {
             _content = content;
 
         }
 
-        public LightningBolt(Color color, ContentManager content)
+        public LightningBolt(Vector2 source, Vector2 dest, Color color, ContentManager content)
         {
-            // random start and strike pos
-            bool sideStrike = false;
-            bool right = false;
-            int startPosX = 0;
-            int startPosY = 0;
-            int xory = RandomEvents.rand.Next(0, 10);
-            int leftOrRight = RandomEvents.rand.Next(0, 10);
-            if (xory < 5)
-                sideStrike = true;
-            if (sideStrike)
-            {
-                if (leftOrRight < 5)
-                    right = true;
-                if (right)
-                    startPosX = GameOptions.PrefferedBackBufferWidth;
-                startPosY = RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferHeight / 3);
-            }
-            else
-            {
-                startPosY = 0;
-                startPosX = RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferWidth);
-            }
-            Vector2 startingPos = new Vector2(startPosX, startPosY);
-            Vector2 strikePos = new Vector2(RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferWidth), RandomEvents.rand.Next(0, GameOptions.PrefferedBackBufferHeight));
-            // end
 
-
-            Segments = CreateBolt(startingPos, strikePos, 1, content);
+            Segments = CreateBolt(source, dest, 1.5f, content);
 
             Tint = color;
             Alpha = 1f;
@@ -78,6 +54,23 @@ namespace Gusto.GameMap.lightning
         public virtual void Update()
         {
             Alpha -= FadeOutRate;
+        }
+
+        // Returns the point where the bolt is at a given fraction of the way through the bolt. Passing
+        // zero will return the start of the bolt, and passing 1 will return the end.
+        public Vector2 GetPoint(float position)
+        {
+            var start = Start;
+            float length = Vector2.Distance(start, End);
+            Vector2 dir = (End - start) / length;
+            position *= length;
+
+            var line = Segments.Find(x => Vector2.Dot(x.B - start, dir) >= position);
+            float lineStartPos = Vector2.Dot(line.A - start, dir);
+            float lineEndPos = Vector2.Dot(line.B - start, dir);
+            float linePos = (position - lineStartPos) / (lineEndPos - lineStartPos);
+
+            return Vector2.Lerp(line.A, line.B, linePos);
         }
 
         protected static List<LightningSegment> CreateBolt(Vector2 source, Vector2 dest, float thickness, ContentManager content)

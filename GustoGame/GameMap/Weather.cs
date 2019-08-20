@@ -99,7 +99,7 @@ namespace Gusto.GameMap
                             {
                                 int randomLightning = RandomEvents.rand.Next(1, 1000);
                                 if (randomLightning < 15) // this value could scale intensity
-                                    state.lightningBolt = new LightningBolt(_content);
+                                    state.lightningBolt = new BranchLightning(_content);
                                 else
                                     state.lightningBolt = null;
                             }

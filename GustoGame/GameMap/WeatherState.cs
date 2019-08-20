@@ -17,7 +17,7 @@ namespace Gusto.GameMap
         public RainState rainState { get; set; }
         public int rainIntensity { get; set; }
         public bool lightning { get; set; }
-        public LightningBolt lightningBolt { get; set; }
+        public BranchLightning lightningBolt { get; set; }
 
         public WeatherState()
         {
