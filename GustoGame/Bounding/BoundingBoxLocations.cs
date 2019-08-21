@@ -1,4 +1,5 @@
 ﻿using Gusto.AnimatedSprite;
+using Gusto.GameMap;
 using Gusto.Models;
 using Gusto.Models.Animated;
 using Microsoft.Xna.Framework;
@@ -19,7 +20,7 @@ namespace Gusto.Bounding
             {TeamType.B, new List<Tuple<int, int>>() }
         };
 
-        public static Dictionary<string, List<Sprite>> RegionMap = new Dictionary<string, List<Sprite>>();
+        public static Dictionary<string, Region> RegionMap = new Dictionary<string, Region>();
 
         public static List<TreasureMap> treasureLocationsList = new List<TreasureMap>();
 

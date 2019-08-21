@@ -207,10 +207,11 @@ namespace Gusto
 
             // Game Map
             map.SetGameMap(Content, GraphicsDevice);
-            List<Sprite> giannaRegionMap = BoundingBoxLocations.RegionMap["Gianna"];
+            BuildRegionTree();
 
             //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP
-            Sprite GiannaRegionTile = giannaRegionMap[RandomEvents.rand.Next(giannaRegionMap.Count)];
+            List<Sprite> giannaLandTiles = BoundingBoxLocations.RegionMap["Gianna"].RegionLandTiles;
+            Sprite GiannaRegionTile = giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)];
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
 
@@ -646,6 +647,56 @@ namespace Gusto
             spriteBatchStatic.DrawString(font, fps, new Vector2(10, 10), Color.Green);
             spriteBatchStatic.End();
             base.Draw(gameTime);
+        }
+
+        // preprocessing to build the region tree
+        private void BuildRegionTree()
+        {
+            // compute the bounds of each region
+            List<Tuple<string, Rectangle>> regionBounds = new List<Tuple<string, Rectangle>>();
+            foreach (var r in BoundingBoxLocations.RegionMap)
+            {
+                float maxX = float.MinValue;
+                float maxY = float.MinValue;
+                float minX = float.MaxValue;
+                float minY = float.MaxValue;
+                List<Sprite> regionTiles = new List<Sprite>();
+                regionTiles.AddRange(r.Value.RegionLandTiles);
+                regionTiles.AddRange(r.Value.RegionOceanTiles);
+                foreach(var l in regionTiles)
+                {
+                    if (l.location.Y > maxY)
+                        maxY = l.location.Y;
+                    if (l.location.X > maxX)
+                        maxX = l.location.X;
+                    if (l.location.Y < minY)
+                        minY = l.location.Y;
+                    if (l.location.X < minX)
+                        minX = l.location.X;
+                }
+                Rectangle bounds = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                // expand the bounds so there is overlap with neighboring regions
+                int expandBy = 100;
+                bounds.X = bounds.X - expandBy;
+                bounds.Y = bounds.Y - expandBy;
+                bounds.Width = bounds.Width + expandBy;
+                bounds.Height = bounds.Height + expandBy;
+                regionBounds.Add(new Tuple<string, Rectangle>(r.Key, bounds));
+            }
+
+            // check neighbors
+            foreach(var r in regionBounds)
+            {
+                string name = r.Item1;
+                Rectangle bounds = r.Item2;
+                foreach(var neighbor in regionBounds)
+                {
+                    if (neighbor == r)
+                        continue;
+                    if (neighbor.Item2.Intersects(bounds))
+                        BoundingBoxLocations.RegionMap[neighbor.Item1].Neighbors.Add(BoundingBoxLocations.RegionMap[name]);
+                }
+            }
         }
 
 
