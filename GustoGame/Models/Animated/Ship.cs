@@ -67,8 +67,10 @@ namespace Gusto.Models.Animated
         public bool aiming;
         public bool anchored;
         public bool playerAboard;
+        bool roaming;
 
         public TeamType teamType;
+        public Sprite randomRoamTile;
         public Sail shipSail { get; set; }
         public WindArrows wind;
         public List<Ammo> Shots;
@@ -420,28 +422,38 @@ namespace Gusto.Models.Animated
             if (timeSinceLastTurn > millisecondsPerTurn)
             {
                 Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
-                if (target == null)
+                if (target != null)
                 {
-                    moving = false;
-                    shipSail.moving = false;
-                    return;
-                }
-                var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
-                if (distanceToTarget <= stopRange || health <= 0)
-                {
-                    moving = false;
-                    shipSail.moving = false;
+                    roaming = false;
+                    var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
+                    if (distanceToTarget <= stopRange || health <= 0)
+                    {
+                        moving = false;
+                        shipSail.moving = false;
+                    }
+                    else
+                    {
+                        moving = true;
+                        shipSail.moving = true;
+                    }
                 }
                 else
                 {
-                    moving = true;
-                    shipSail.moving = true;
+                    // TODO: roaming can get stuck... 
+
+                    if (!roaming)
+                        randomRoamTile = BoundingBoxLocations.RegionMap["Usopp"].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap["Usopp"].RegionOceanTiles.Count)];
+
+                    roaming = true;
+                    target = new Tuple<int, int>((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
+                    if (GetBoundingBox().Intersects(randomRoamTile.GetBoundingBox()))
+                        roaming = false;
+                    
                 }
 
                 // TODO: need some sort of timer to unachor ai ship when it is stuck.
                 //if (anchored)
                 //moving = false;
-
 
 
                 // collision avoidance take 2

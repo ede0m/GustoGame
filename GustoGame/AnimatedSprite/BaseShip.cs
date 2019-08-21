@@ -32,7 +32,7 @@ namespace Gusto.AnimatedSprite
             nSails = 1;
             fullHealth = 40;
             health = fullHealth;
-            shotRange = 700f;
+            shotRange = 600f;
             stopRange = 260f;
             attackRange = 400f;
             maxInventorySlots = 15;
