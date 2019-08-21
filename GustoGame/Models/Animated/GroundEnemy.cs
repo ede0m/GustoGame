@@ -161,7 +161,7 @@ namespace Gusto.Models.Animated
                     }
                     else
                     {
-                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey][RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].Count)];
+                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)];
                         roaming = true;
                     }
                 }

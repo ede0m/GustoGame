@@ -65,7 +65,7 @@ namespace Gusto.GameMap
                     // region
                     string regionName = (string)tileDetails["regionName"];
                     if (!BoundingBoxLocations.RegionMap.ContainsKey(regionName))
-                        BoundingBoxLocations.RegionMap[regionName] = new List<Sprite>();
+                        BoundingBoxLocations.RegionMap[regionName] = new Region(regionName);
 
                     // ground object
                     if ((string)tileDetails["sittingObject"] != "null")
@@ -81,15 +81,15 @@ namespace Gusto.GameMap
                     {
                         case "o1":
                             tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o1");
-                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
+                            BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "o2":
                             tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o2");
-                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
+                            BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "l1":
                             tile = new LandTile(index, groundObject, worldLoc, regionName, content, graphics, "l1");
-                            BoundingBoxLocations.RegionMap[regionName].Add(tile);
+                            BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                     }
                     tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));

@@ -1,5 +1,6 @@
 ﻿using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Bounding;
+using Gusto.GameMap;
 using Gusto.Models;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
@@ -44,11 +45,18 @@ namespace Gusto.AnimatedSprite
                     lootTier = 3;
 
                 // randomly assign tile in region for dig up spot
-                KeyValuePair<string, List<Sprite>> randEntry = BoundingBoxLocations.RegionMap.ElementAt(RandomEvents.rand.Next(0, BoundingBoxLocations.RegionMap.Count));
-                List<Sprite> tilesInRegion = randEntry.Value;
-                treasureInRegion = randEntry.Key;
-                digTile = (TilePiece)tilesInRegion[RandomEvents.rand.Next(tilesInRegion.Count)];
-
+                List<Sprite> landTilesInRegion = null;
+                while (landTilesInRegion == null) // CAUTION@!#@$ this could be infinite on a map that has no land tiles..
+                {
+                    KeyValuePair<string, Region> randEntry = BoundingBoxLocations.RegionMap.ElementAt(RandomEvents.rand.Next(0, BoundingBoxLocations.RegionMap.Count));
+                    treasureInRegion = randEntry.Key;
+                    landTilesInRegion = randEntry.Value.RegionLandTiles;
+                    if (landTilesInRegion.Count == 0)
+                        landTilesInRegion = null;
+                    else
+                        digTile = (TilePiece)landTilesInRegion[RandomEvents.rand.Next(landTilesInRegion.Count)];
+                }
+                
             }
 
             SetSpriteAsset(asset, location);

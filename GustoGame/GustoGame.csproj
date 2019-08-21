@@ -90,6 +90,7 @@
     <Compile Include="GameMap\lightning\LightningBolt.cs" />
     <Compile Include="GameMap\lightning\LightningSegment.cs" />
     <Compile Include="GameMap\RainState.cs" />
+    <Compile Include="GameMap\Region.cs" />
     <Compile Include="GameMap\Weather.cs" />
     <Compile Include="GameMap\WeatherState.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
