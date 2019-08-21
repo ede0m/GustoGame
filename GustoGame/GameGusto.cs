@@ -224,35 +224,35 @@ namespace Gusto
 
 
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
-            //baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
-            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(-100, -500), windArrows, Content, GraphicsDevice);
-            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(0, -300), Content, GraphicsDevice);
+            //baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), windArrows, Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(0, -300), Content, GraphicsDevice);
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
-            tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
-            furnace = new ClayFurnace(TeamType.Player, "GustoGame", new Vector2(180, 140), Content, GraphicsDevice);
-            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoGame", new Vector2(120, 40), Content, GraphicsDevice);
-            barrelLand = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(-20, -160), Content, GraphicsDevice);
-            barrelOcean = new BaseBarrel(TeamType.A, "GustoGame", new Vector2(380, -60), Content, GraphicsDevice);
-            chestLand = new BaseChest(TeamType.A, "GustoGame", new Vector2(100, -120), Content, GraphicsDevice);
-            chestOcean = new BaseChest(TeamType.A, "GustoGame", new Vector2(350, 0), Content, GraphicsDevice);
+            tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), Content, GraphicsDevice);
+            baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+            furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), Content, GraphicsDevice);
+            craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoMap", new Vector2(120, 40), Content, GraphicsDevice);
+            barrelLand = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(-20, -160), Content, GraphicsDevice);
+            barrelOcean = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(380, -60), Content, GraphicsDevice);
+            chestLand = new BaseChest(TeamType.A, "GustoMap", new Vector2(100, -120), Content, GraphicsDevice);
+            chestOcean = new BaseChest(TeamType.A, "GustoMap", new Vector2(350, 0), Content, GraphicsDevice);
 
-            shovel = new Shovel(TeamType.A, "GustoGame", new Vector2(200, -330), Content, GraphicsDevice);
+            shovel = new Shovel(TeamType.A, "GustoMap", new Vector2(200, -330), Content, GraphicsDevice);
             shovel.onGround = true;
-            pickaxe = new Pickaxe(TeamType.Player, "GustoGame", new Vector2(130, -430), Content, GraphicsDevice);
+            pickaxe = new Pickaxe(TeamType.Player, "GustoMap", new Vector2(130, -430), Content, GraphicsDevice);
             pickaxe.onGround = true;
-            pistol = new Pistol(TeamType.A, "GustoGame", new Vector2(250, -300), Content, GraphicsDevice);
+            pistol = new Pistol(TeamType.A, "GustoMap", new Vector2(250, -300), Content, GraphicsDevice);
             pistol.amountStacked = 1;
             pistol.onGround = true;
-            pistolAmmo = new PistolShotItem(TeamType.A, "GustoGame", new Vector2(220, -300), Content, GraphicsDevice);
+            pistolAmmo = new PistolShotItem(TeamType.A, "GustoMap", new Vector2(220, -300), Content, GraphicsDevice);
             pistolAmmo.amountStacked = 14;
             pistolAmmo.onGround = true;
-            cannonAmmo = new CannonBallItem(TeamType.A, "GustoGame", new Vector2(200, -300), Content, GraphicsDevice);
+            cannonAmmo = new CannonBallItem(TeamType.A, "GustoMap", new Vector2(200, -300), Content, GraphicsDevice);
             cannonAmmo.amountStacked = 10;
             cannonAmmo.onGround = true;
-            lantern = new Lantern(TeamType.A, "GustoGame", new Vector2(180, -300), Content, GraphicsDevice);
+            lantern = new Lantern(TeamType.A, "GustoMap", new Vector2(180, -300), Content, GraphicsDevice);
             lantern.onGround = true;
-            basePlank = new BasePlank(TeamType.A, "GustoGame", new Vector2(150, -300), Content, GraphicsDevice);
+            basePlank = new BasePlank(TeamType.A, "GustoMap", new Vector2(150, -300), Content, GraphicsDevice);
             basePlank.onGround = true;
             basePlank.amountStacked = 10;
 
@@ -675,6 +675,7 @@ namespace Gusto
                         minX = l.location.X;
                 }
                 Rectangle bounds = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                r.Value.Bounds = bounds; // set the bounds on the region
                 // expand the bounds so there is overlap with neighboring regions
                 int expandBy = 100;
                 bounds.X = bounds.X - expandBy;
@@ -709,6 +710,12 @@ namespace Gusto
 
             foreach (var spriteA in Collidable)
             {
+                // set the current region
+                foreach (var region in BoundingBoxLocations.RegionMap)
+                {
+                    if (spriteA.regionKey != region.Key && region.Value.Bounds.Intersects(spriteA.GetBoundingBox()))
+                        spriteA.regionKey = region.Key;
+                }
 
                 Polygon polyA = null;
 

@@ -14,6 +14,7 @@ namespace Gusto.GameMap
         public List<Sprite> RegionLandTiles { get; set; }
         public List<Sprite> RegionOceanTiles { get; set; }
         public HashSet<Region> Neighbors { get; set; }
+        public Rectangle Bounds { get; set; }
 
         public Region(string name)
         {

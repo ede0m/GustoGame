@@ -442,7 +442,7 @@ namespace Gusto.Models.Animated
                     // TODO: roaming can get stuck... 
 
                     if (!roaming)
-                        randomRoamTile = BoundingBoxLocations.RegionMap["Usopp"].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap["Usopp"].RegionOceanTiles.Count)];
+                        randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
 
                     roaming = true;
                     target = new Tuple<int, int>((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
