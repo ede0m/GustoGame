@@ -1,4 +1,5 @@
-﻿using Gusto.Models.Animated.Weather;
+﻿using Gusto.GameMap.lightning;
+using Gusto.Models.Animated.Weather;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,14 @@ namespace Gusto.GameMap
         public List<RainDrop> rain { get; set; }
         public RainState rainState { get; set; }
         public int rainIntensity { get; set; }
+        public bool lightning { get; set; }
+        public BranchLightning lightningBolt { get; set; }
 
         public WeatherState()
         {
             rain = new List<RainDrop>();
             rainState = RainState.NOT;
+            lightning = false;
 
         }
 

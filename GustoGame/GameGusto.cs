@@ -19,6 +19,7 @@ using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using Gusto.Models.Menus;
+using Gusto.GameMap.lightning;
 
 namespace Gusto
 {
@@ -222,8 +223,9 @@ namespace Gusto
 
 
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
-            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
-            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(300, -300), Content, GraphicsDevice);
+            //baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
+            baseShip = new BaseShip(TeamType.Player, "GustoGame", new Vector2(-100, -500), windArrows, Content, GraphicsDevice);
+            piratePlayer = new PiratePlayer(TeamType.Player, "GustoGame", new Vector2(0, -300), Content, GraphicsDevice);
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoGame", new Vector2(200, 700), Content, GraphicsDevice);
             baseShipAI = new BaseShip(TeamType.A, "GustoGame", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
@@ -403,8 +405,6 @@ namespace Gusto
                 tempUpdateOrder.Add(obj);
             UpdateOrder = tempUpdateOrder;
 
-            //ItemUtility.ItemsToUpdate.Clear();
-
             this.camera.Update(gameTime);
             base.Update(gameTime);
         }
@@ -463,6 +463,7 @@ namespace Gusto
 
             // sort sprites by y cord asc and draw
             DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+            int i = 0;
             foreach (var sprite in DrawOrder)
             {
 
@@ -595,6 +596,9 @@ namespace Gusto
                     continue;
                 }
 
+                if (sprite.GetType() == typeof(Gusto.Models.Menus.Inventory) || sprite.GetType() == typeof(Gusto.Models.Menus.CraftingMenu))
+                    continue; // we handle this after everthing else
+
                 sprite.Draw(spriteBatchView, this.camera);
             }
 
@@ -605,6 +609,10 @@ namespace Gusto
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.White);
             dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
+
+            // lightning is drawn after ambient light
+            if (weather.GetWeatherState().lightning)
+                weather.DrawLightning(spriteBatchStatic);
 
             // draw static and menu sprites
             windArrows.Draw(spriteBatchStatic, null);

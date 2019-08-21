@@ -199,6 +199,18 @@
 /processorParam:TextureFormat=Color
 /build:Grass1.png
 
+#begin halfCircleLightningSegment.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:halfCircleLightningSegment.png
+
 #begin helperFont.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor
@@ -313,6 +325,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:lightmask3.png
+
+#begin lightningSegment.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:lightningSegment.png
 
 #begin Nails.png
 /importer:TextureImporter
