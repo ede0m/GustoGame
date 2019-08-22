@@ -269,6 +269,11 @@ namespace Gusto
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F4))
                 Exit();
+            if (kstate.IsKeyDown(Keys.F12))
+            {
+                gameState.SaveGameState();
+                Exit();
+            }
 
             // game menu before everything
             if (startingMenu.showMenu)

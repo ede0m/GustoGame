@@ -6,6 +6,7 @@ using Gusto.Models;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
 using Gusto.Models.Menus;
+using Gusto.SaveState;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,7 +14,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,7 +32,6 @@ namespace Gusto
         GraphicsDevice _graphics;
 
         public string gameName;
-        public List<ISaveState> GameObjectSaveStates;
         public HashSet<Sprite> UpdateOrder;
 
         public PiratePlayer player; // only track the player because there are some special focuses around it.. obviously
@@ -42,6 +45,7 @@ namespace Gusto
             player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(0, -300), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
+        // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
         public void CreateNewGame()
         {
 
@@ -103,6 +107,7 @@ namespace Gusto
             ready = true;
         }
 
+        // Runs the in game update for objets that need to save state
         public HashSet<Sprite> Update (KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             List<Sprite> toRemove = new List<Sprite>();
@@ -124,6 +129,39 @@ namespace Gusto
             return UpdateOrder;
         }
 
+        public void SaveGameState()
+        {
+            // Create the save state
+            List<ISaveState> SaveState = new List<ISaveState>();
+            foreach (Sprite sp in UpdateOrder)
+            {
+                if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
+                {
+                    Ship sh = (Ship)sp;
+                    ShipState state = new ShipState();
+                    state.location = sh.location;
+                    state.region = sh.regionKey;
+                    state.objKey = sh.bbKey;
 
+                    List<string> invItemKeys = new List<string>();
+                    List<int> invItemCounts = new List<int>();
+
+                    //state.inventory = sh.inventory;
+                    state.playerAboard = sh.playerAboard;
+                    state.anchored = sh.anchored;
+                    state.health = sh.health;
+                    SaveState.Add(state);
+                }
+            }
+
+            // serialize save to file system
+            string savePath = @"C:\Users\GMON\Desktop\";
+            gameName = "game1";
+            DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>));
+            using (FileStream fs = new FileStream(savePath + "GustoGame_" + gameName.ToString(), FileMode.Create))
+            {
+                s.WriteObject(fs, SaveState);
+            }
+        }
     }
 }
