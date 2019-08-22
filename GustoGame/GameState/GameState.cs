@@ -142,11 +142,7 @@ namespace Gusto
                     state.location = sh.location;
                     state.region = sh.regionKey;
                     state.objKey = sh.bbKey;
-
-                    List<string> invItemKeys = new List<string>();
-                    List<int> invItemCounts = new List<int>();
-
-                    //state.inventory = sh.inventory;
+                    state.inventory = CreateSerializableInventory(sh.inventory);
                     state.playerAboard = sh.playerAboard;
                     state.anchored = sh.anchored;
                     state.health = sh.health;
@@ -163,5 +159,13 @@ namespace Gusto
                 s.WriteObject(fs, SaveState);
             }
         }
+
+        private List<InventoryItemSerialized> CreateSerializableInventory(List<InventoryItem> inv)
+        {
+            // TODO: All the nasty nested logic to create InventoryItemSerialized
+
+            return null;
+        }
+
     }
 }

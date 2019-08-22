@@ -10,8 +10,27 @@ using System.Runtime.Serialization;
 
 namespace Gusto.SaveState
 {
-    [KnownType(typeof(Vector2))]
+    public class InventoryItemSerialized
+    {
+        public string itemKey { get; set; }
+        public int stackedAmount { get; set; }
+        public Dictionary<int, List<InventoryItemSerialized>> storageItems { get; set; } // key is index of storage container in the inventory, value is the inventory of the storage
+        public Dictionary<int, List<TreasureMapSerialized>> treasureMaps { get; set; }
+    }
+
+    public class TreasureMapSerialized
+    {
+        public Vector2 digLocation { get; set; }
+        public string region { get; set; }
+        public List<InventoryItemSerialized> reward { get; set; }
+    }
+
+
     [DataContract]
+    [KnownType(typeof(InventoryItemSerialized))]
+    [KnownType(typeof(TreasureMapSerialized))]
+    [KnownType(typeof(Vector2))]
+    [KnownType(typeof(ShipState))]
     public class ShipState : ISaveState
     {
         [DataMember]
@@ -21,9 +40,7 @@ namespace Gusto.SaveState
         [DataMember]
         public Vector2 location { get; set; }
         [DataMember]
-        public List<string> inventoryKeys { get; set; }
-        [DataMember]
-        public List<string> inventoryCounts { get; set; }
+        public List<InventoryItemSerialized> inventory { get; set; }
         [DataMember]
         public bool anchored { get; set; }
         [DataMember]
