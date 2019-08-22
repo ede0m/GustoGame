@@ -70,7 +70,7 @@ namespace Gusto.GameMap
             ambientLightEff = _content.Load<Effect>("ambientLight");
         }
 
-        public void Update(KeyboardState kstate, GameTime gameTime, WeatherState state)
+        public void Update(KeyboardState kstate, GameTime gameTime)
         {
 
             float elapsedMs = gameTime.ElapsedGameTime.Milliseconds;
@@ -124,7 +124,7 @@ namespace Gusto.GameMap
             tempCurrentIntensity += ambientIntensityChange;
 
             // rain overcast - we always want to converge to tempCurrentIntensity in 1/10th of the storm time (the time be begin ending the storm)
-            if (state.rainState == RainState.STARTING || state.rainState == RainState.RAINING)
+            if (WeatherState.rainState == RainState.STARTING || WeatherState.rainState == RainState.RAINING)
             {
                 if (tempCurrentIntensity < overcastIntensity)
                 {
@@ -141,7 +141,7 @@ namespace Gusto.GameMap
                     overcastAdder = 2;
 
             }
-            else if (state.rainState == RainState.ENDING)
+            else if (WeatherState.rainState == RainState.ENDING)
             {
                 if (tempCurrentIntensity < currentIntensity)
                     currentIntensity -= 0.05f;

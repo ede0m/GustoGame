@@ -93,6 +93,8 @@
     <Compile Include="GameMap\Region.cs" />
     <Compile Include="GameMap\Weather.cs" />
     <Compile Include="GameMap\WeatherState.cs" />
+    <Compile Include="GameState\GameState.cs" />
+    <Compile Include="GameState\SaveState.cs" />
     <Compile Include="Mappings\AttackMapping.cs" />
     <Compile Include="Mappings\ItemMappings.cs" />
     <Compile Include="Mappings\PlayerMovementVectorMappings.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Models\Interfaces\IPlaceable.cs" />
     <Compile Include="Models\Interfaces\IPlank.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
+    <Compile Include="Models\Interfaces\ISaveState.cs" />
     <Compile Include="Models\Interfaces\IShadowCaster.cs" />
     <Compile Include="Models\Interfaces\IStorage.cs" />
     <Compile Include="Models\Interfaces\IWood.cs" />
@@ -132,6 +135,7 @@
     <Compile Include="Models\Interfaces\IWalks.cs" />
     <Compile Include="Models\InventoryItem.cs" />
     <Compile Include="Models\Animated\PlayerPirate.cs" />
+    <Compile Include="Models\Menus\OpenGameMenu.cs" />
     <Compile Include="Models\TilePiece.cs" />
     <Compile Include="Models\Animated\Weapon\Ammo.cs" />
     <Compile Include="Models\Sprite.cs" />

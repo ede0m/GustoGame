@@ -30,8 +30,8 @@ namespace Gusto
     {
 
         // TEMPORARY -- expose the "players and enemies". 
-        BaseShip baseShip;
-        BaseShip baseShipAI;
+        //BaseShip baseShip;
+        //BaseShip baseShipAI;
         BaseTower tower;
         PiratePlayer piratePlayer;
         BaseTribal baseTribal;
@@ -59,6 +59,7 @@ namespace Gusto
         Texture2D treasureXMark;
         Inventory inventoryMenu;
         CraftingMenu craftingMenu;
+        OpenGameMenu startingMenu;
 
         GraphicsDeviceManager graphics;
         FrameCounter _frameCounter;
@@ -69,6 +70,7 @@ namespace Gusto
         DayLight dayLight;
         Weather weather;
 
+        GameState gameState;
         SpatialBounding collision;
         List<Sprite> DrawOrder;
         List<Sprite> Collidable;
@@ -95,6 +97,7 @@ namespace Gusto
         /// </summary>
         protected override void Initialize()
         {
+            gameState = new GameState(Content, GraphicsDevice);
             DrawOrder = new List<Sprite>();
             Collidable = new List<Sprite>();
             UpdateOrder = new HashSet<Sprite>();
@@ -220,16 +223,20 @@ namespace Gusto
             repairIcon = Content.Load<Texture2D>("work-hammer-");
             treasureXMark = Content.Load<Texture2D>("XSpot");
             font = Content.Load<SpriteFont>("helperFont");
-            windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
 
+            windArrows = new WindArrows(new Vector2(1740, 50), Content, GraphicsDevice);
+            WeatherState.wind = windArrows;
 
             // TEMPORARY create Team models and initally place them - this will eventually be set in game config menu
-            //baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(300, -500), windArrows, Content, GraphicsDevice);
-            baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), windArrows, Content, GraphicsDevice);
+
+            //baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), windArrows, Content, GraphicsDevice);
+
             piratePlayer = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(0, -300), Content, GraphicsDevice);
             baseTribal = new BaseTribal(TeamType.B, "Gianna", GiannaRegionTile.location, Content, GraphicsDevice);
             tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), Content, GraphicsDevice);
-            baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+
+            //baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), windArrows, Content, GraphicsDevice);
+
             furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), Content, GraphicsDevice);
             craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoMap", new Vector2(120, 40), Content, GraphicsDevice);
             barrelLand = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(-20, -160), Content, GraphicsDevice);
@@ -256,16 +263,16 @@ namespace Gusto
             basePlank.onGround = true;
             basePlank.amountStacked = 10;
 
-
-            // static init
+            // static init (MENUS)
             inventoryMenu = new Inventory(screenCenter, Content, GraphicsDevice, piratePlayer);
             craftingMenu = new CraftingMenu(screenCenter, Content, GraphicsDevice, piratePlayer);
+            startingMenu = new OpenGameMenu(Content, GraphicsDevice);
 
             // fill update order list
-            UpdateOrder.Add(baseShip);
+            //UpdateOrder.Add(baseShip);
             UpdateOrder.Add(piratePlayer);
             UpdateOrder.Add(baseTribal);
-            UpdateOrder.Add(baseShipAI);
+            //UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(pistol);
             UpdateOrder.Add(pickaxe);
@@ -336,16 +343,28 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-
+            var kstate = Keyboard.GetState();
             List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
-            var kstate = Keyboard.GetState();
+
+            // game menu before everything
+            if (startingMenu.showMenu)
+            {
+                startingMenu.Update(kstate, gameTime);
+                return;
+            }
+            else if (!gameState.ready)
+            {
+                gameState.CreateNewGame();
+                return;
+            }
+
 
             // weather
             weather.Update(kstate, gameTime);
 
             // daylight shader 
-            dayLight.Update(kstate, gameTime, weather.GetWeatherState());
+            dayLight.Update(kstate, gameTime);
 
             // camera follows player
             if (!piratePlayer.onShip)
@@ -416,6 +435,14 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // game menu before everything
+            if (startingMenu.showMenu)
+            {
+                startingMenu.DrawInventory(spriteBatchStatic);
+                return;
+            }
+
+
             // setup lightTarget for spot lights
             GraphicsDevice.SetRenderTarget(lightsTarget);
             GraphicsDevice.Clear(Color.Black);
@@ -612,7 +639,7 @@ namespace Gusto
             dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
 
             // lightning is drawn after ambient light
-            if (weather.GetWeatherState().lightning)
+            if (WeatherState.lightning)
                 weather.DrawLightning(spriteBatchStatic);
 
             // draw static and menu sprites

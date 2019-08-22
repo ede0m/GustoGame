@@ -18,7 +18,7 @@ namespace Gusto.GameMap
     public class Weather
     {
         float msCurrWeather;
-        WeatherState state;
+        //WeatherState state;
 
         float msToAddRainDrop;
         float msSinceDropAdded;
@@ -38,7 +38,10 @@ namespace Gusto.GameMap
             _content = content;
             _graphics = graphics;
 
-            state = new WeatherState();
+
+            WeatherState.rain = new List<RainDrop>();
+            WeatherState.rainState = RainState.NOT;
+            WeatherState.lightning = false;
 
             msToAddRainDrop = 25;
             msToRemoveRainDrop = 15;
@@ -49,23 +52,23 @@ namespace Gusto.GameMap
         {
             msCurrWeather += gameTime.ElapsedGameTime.Milliseconds;
 
-            if (msCurrWeather >= state.weatherDuration && state.rainState == RainState.NOT) // and other weather patterns?
+            if (msCurrWeather >= WeatherState.weatherDuration && WeatherState.rainState == RainState.NOT) // and other weather patterns?
             {
-                state.weatherDuration = RandomEvents.rand.Next(GameOptions.GameDayLengthMs / 10, GameOptions.GameDayLengthMs * 2); // weather can last between 1/10th of a day and 3 days
+                WeatherState.weatherDuration = RandomEvents.rand.Next(GameOptions.GameDayLengthMs / 10, GameOptions.GameDayLengthMs * 2); // weather can last between 1/10th of a day and 3 days
                 msCurrWeather = 0;
                
                 // RAIN chance
                 int randRain = RandomEvents.rand.Next(0, 100);
                 if (randRain <= 20) // 20% chance of rain
                 {
-                    state.rainState = RainState.STARTING;
-                    state.rain.Clear();
-                    state.rainIntensity = RandomEvents.rand.Next(100, 500);
+                    WeatherState.rainState = RainState.STARTING;
+                    WeatherState.rain.Clear();
+                    WeatherState.rainIntensity = RandomEvents.rand.Next(100, 500);
 
                     // Lightning with rain?
                     int randLightning = RandomEvents.rand.Next(1, 100);
                     if (randLightning <= 50)
-                        state.lightning = true;
+                        WeatherState.lightning = true;
 
                 }
 
@@ -77,65 +80,65 @@ namespace Gusto.GameMap
                 // continue with current weather
 
                 // RAIN
-                if (state.rainState != RainState.NOT)
+                if (WeatherState.rainState != RainState.NOT)
                 {
                     // rain starts gradually
                     msSinceDropAdded += gameTime.ElapsedGameTime.Milliseconds;
                     msSinceDropRemoved += gameTime.ElapsedGameTime.Milliseconds;
-                    if (state.rain.Count < state.rainIntensity && msSinceDropAdded > msToAddRainDrop && state.rainState == RainState.STARTING)
+                    if (WeatherState.rain.Count < WeatherState.rainIntensity && msSinceDropAdded > msToAddRainDrop && WeatherState.rainState == RainState.STARTING)
                     {
-                        state.rain.Add(new RainDrop(_content, _graphics));
+                        WeatherState.rain.Add(new RainDrop(_content, _graphics));
                         msSinceDropAdded = 0;
                     }
-                    else if (state.rain.Count() == state.rainIntensity)
+                    else if (WeatherState.rain.Count() == WeatherState.rainIntensity)
                     {
-                        state.rainState = RainState.RAINING;
+                        WeatherState.rainState = RainState.RAINING;
 
                         // random lightning strike
-                        if (state.lightning)
+                        if (WeatherState.lightning)
                         {
-                            if (state.lightningBolt == null || state.lightningBolt.IsComplete)
+                            if (WeatherState.lightningBolt == null || WeatherState.lightningBolt.IsComplete)
                             {
                                 int randomLightning = RandomEvents.rand.Next(1, 1000);
                                 if (randomLightning < 15) // this value could scale intensity
-                                    state.lightningBolt = new BranchLightning(_content);
+                                    WeatherState.lightningBolt = new BranchLightning(_content);
                                 else
-                                    state.lightningBolt = null;
+                                    WeatherState.lightningBolt = null;
                             }
                             else
-                                state.lightningBolt.Update();
+                                WeatherState.lightningBolt.Update();
                         }
                     }
 
                     // rain starts receding gradually in the back 10th of the weatherEvent
-                    if (msCurrWeather + (state.weatherDuration / 10) > state.weatherDuration && state.rain.Count > 0 && msSinceDropRemoved > msToRemoveRainDrop) 
+                    if (msCurrWeather + (WeatherState.weatherDuration / 10) > WeatherState.weatherDuration && WeatherState.rain.Count > 0 && msSinceDropRemoved > msToRemoveRainDrop) 
                     {
-                        state.rainState = RainState.ENDING;
-                        state.lightning = false;
-                        state.lightningBolt = null;
-                        state.rain.RemoveAt(state.rain.Count - 1);
+                        WeatherState.rainState = RainState.ENDING;
+                        WeatherState.lightning = false;
+                        WeatherState.lightningBolt = null;
+                        WeatherState.rain.RemoveAt(WeatherState.rain.Count - 1);
                         msSinceDropRemoved = 0;
                     }
-                    else if (msCurrWeather >= state.weatherDuration && state.rain.Count == 0)
-                        state.rainState = RainState.NOT;
+                    else if (msCurrWeather >= WeatherState.weatherDuration && WeatherState.rain.Count == 0)
+                        WeatherState.rainState = RainState.NOT;
 
-                    foreach (var drop in state.rain)
+                    foreach (var drop in WeatherState.rain)
                         drop.Update(kstate, gameTime);
 
                 }
             }
 
-            state.msThroughWeather = msCurrWeather;
+            WeatherState.msThroughWeather = msCurrWeather;
         }
 
         public void DrawWeather(SpriteBatch sb)
         {
 
 
-            if (state.rainState != RainState.NOT)
+            if (WeatherState.rainState != RainState.NOT)
             {
                 // more than just rain here..
-                foreach (var drop in state.rain)
+                foreach (var drop in WeatherState.rain)
                     drop.Draw(sb, null);
             }
         }
@@ -143,17 +146,13 @@ namespace Gusto.GameMap
         // sepearated lightning becase we want it to be drawn after ambient light shader, when the rest is drawn before it
         public void DrawLightning(SpriteBatch sb)
         {
-            if (state.lightningBolt != null)
+            if (WeatherState.lightningBolt != null)
             {
                 sb.Begin(SpriteSortMode.Texture, BlendState.Additive);
-                state.lightningBolt.Draw(sb);
+                WeatherState.lightningBolt.Draw(sb);
                 sb.End();
             }
         }
 
-        public WeatherState GetWeatherState()
-        {
-            return state;
-        }
     }
 }
