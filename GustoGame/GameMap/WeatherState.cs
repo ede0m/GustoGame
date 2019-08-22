@@ -21,12 +21,5 @@ namespace Gusto.GameMap
         public static bool lightning { get; set; }
         public static BranchLightning lightningBolt { get; set; }
 
-        /*public WeatherState()
-        {
-            rain = new List<RainDrop>();
-            rainState = RainState.NOT;
-            lightning = false;
-        }*/
-
     }
 }

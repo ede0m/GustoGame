@@ -384,6 +384,12 @@ namespace Gusto
             foreach (var item in ItemUtility.ItemsToUpdate)
                 UpdateOrder.Add(item);
 
+            // TEMPORARY@#@!$#@
+            HashSet<Sprite> TEMPTESTUPDATEORDER = gameState.Update(kstate, gameTime, camera);
+
+            foreach (var s in TEMPTESTUPDATEORDER)
+                UpdateOrder.Add(s);
+
             // main update for all non static objects
             foreach (var sp in UpdateOrder)
             {

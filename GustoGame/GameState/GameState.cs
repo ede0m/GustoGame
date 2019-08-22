@@ -45,7 +45,7 @@ namespace Gusto
             ready = true;
         }
 
-        public void Update (KeyboardState kstate, GameTime gameTime, Camera camera)
+        public HashSet<Sprite> Update (KeyboardState kstate, GameTime gameTime, Camera camera)
         {
 
             foreach (Sprite sp in UpdateOrder)
@@ -57,6 +57,8 @@ namespace Gusto
                 ICanUpdate updateSp = (ICanUpdate)sp;
                 updateSp.Update(kstate, gameTime, camera);
             }
+
+            return UpdateOrder;
         }
 
 
