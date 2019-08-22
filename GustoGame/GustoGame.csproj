@@ -124,6 +124,7 @@
     <Compile Include="Models\Interfaces\ISaveState.cs" />
     <Compile Include="Models\Interfaces\IShadowCaster.cs" />
     <Compile Include="Models\Interfaces\IStorage.cs" />
+    <Compile Include="Models\Interfaces\IStorageItem.cs" />
     <Compile Include="Models\Interfaces\IWood.cs" />
     <Compile Include="Models\Light.cs" />
     <Compile Include="Models\Menus\CraftingMenu.cs" />

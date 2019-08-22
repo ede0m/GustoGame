@@ -15,10 +15,10 @@ namespace Gusto.SaveState
         public string itemKey { get; set; }
         public int stackedAmount { get; set; }
         public Dictionary<int, List<InventoryItemSerialized>> storageItems { get; set; } // key is index of storage container in the inventory, value is the inventory of the storage
-        public Dictionary<int, List<TreasureMapSerialized>> treasureMaps { get; set; }
+        public Dictionary<int, TreasureMapItemSerialized> treasureMaps { get; set; }
     }
 
-    public class TreasureMapSerialized
+    public class TreasureMapItemSerialized
     {
         public Vector2 digLocation { get; set; }
         public string region { get; set; }
@@ -28,7 +28,7 @@ namespace Gusto.SaveState
 
     [DataContract]
     [KnownType(typeof(InventoryItemSerialized))]
-    [KnownType(typeof(TreasureMapSerialized))]
+    [KnownType(typeof(TreasureMapItemSerialized))]
     [KnownType(typeof(Vector2))]
     [KnownType(typeof(ShipState))]
     public class ShipState : ISaveState

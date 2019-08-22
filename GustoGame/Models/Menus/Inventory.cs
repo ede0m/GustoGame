@@ -238,27 +238,34 @@ namespace Gusto.Models.Menus
                     // dropping on drag
                     if (dropDragIndex >= 0 && selectDragIndex == i)
                     {
-                        itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
-                        if (invMap[dropDragIndex] != null) // switch spots
+                        // prevent storage items from being put into storage --- recursionnnn
+                        if (invMap[selectDragIndex] is IStorageItem && dropDragIndex > maxInventorySlots && itemsStorage != null)
+                            dropDragIndex = -1;
+                        else
                         {
-                            if (invMap[dropDragIndex].bbKey.Equals(invMap[selectDragIndex].bbKey) && invMap[dropDragIndex].stackable)
+                            itemLoc = slotLocations[dropDragIndex].Location.ToVector2();
+                            if (invMap[dropDragIndex] != null) // switch spots
                             {
-                                // stack items
-                                item.amountStacked += invMap[selectDragIndex].amountStacked;
+                                if (invMap[dropDragIndex].bbKey.Equals(invMap[selectDragIndex].bbKey) && invMap[dropDragIndex].stackable)
+                                {
+                                    // stack items
+                                    item.amountStacked += invMap[selectDragIndex].amountStacked;
+                                    tempInventory[selectDragIndex] = null;
+                                    emptyIndex = selectDragIndex;
+                                }
+                                else
+                                    tempInventory[selectDragIndex] = invMap[dropDragIndex];
+
+                            }
+                            else
+                            {
                                 tempInventory[selectDragIndex] = null;
                                 emptyIndex = selectDragIndex;
                             }
-                            else
-                                tempInventory[selectDragIndex] = invMap[dropDragIndex];
+                            tempInventory[dropDragIndex] = item;
+                            dropDragIndex = -1;
+                        }
 
-                        }
-                        else
-                        {
-                            tempInventory[selectDragIndex] = null;
-                            emptyIndex = selectDragIndex;
-                        }
-                        tempInventory[dropDragIndex] = item;
-                        dropDragIndex = -1;
                     }
 
                     // track sprite scale

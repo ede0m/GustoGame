@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class BaseChestItem : InventoryItem
+    public class BaseChestItem : InventoryItem, IStorageItem // NEED STORAGE ITEM HERE FOR SERIALIZATION
     {
         public BaseChestItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {

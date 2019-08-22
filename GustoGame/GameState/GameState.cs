@@ -162,9 +162,73 @@ namespace Gusto
 
         private List<InventoryItemSerialized> CreateSerializableInventory(List<InventoryItem> inv)
         {
-            // TODO: All the nasty nested logic to create InventoryItemSerialized
+            int index = 0;
+            List<InventoryItemSerialized> ret = Enumerable.Repeat<InventoryItemSerialized>(null, inv.Count()).ToList();
+            foreach (InventoryItem item in inv)
+            {
+                if (item == null)
+                {
+                    ret[index] = null;
+                    continue;
+                }
 
-            return null;
+                InventoryItemSerialized iszd = new InventoryItemSerialized();
+                iszd.itemKey = item.itemKey;
+                iszd.stackedAmount = item.amountStacked;
+
+                // Special cases
+                if (item.itemKey.Equals("treasureMapItem"))
+                {
+                    iszd.treasureMaps = new Dictionary<int, TreasureMapItemSerialized>();
+                    TreasureMapItemSerialized tm = new TreasureMapItemSerialized();
+                    TreasureMap m = (TreasureMap)item;
+                    tm.digLocation = m.digTile.location;
+                    tm.region = m.treasureInRegion;
+                    if (tm.reward != null)
+                        tm.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
+                    iszd.treasureMaps.Add(index, tm);
+                }
+                else if (item is IStorageItem)
+                {
+                    iszd.storageItems = new Dictionary<int, List<InventoryItemSerialized>>();
+                    Storage st = (Storage)item.placeableVersion;
+                    int indexStorage = 0;
+                    List<InventoryItemSerialized> storageInventorySzd = Enumerable.Repeat<InventoryItemSerialized>(null, st.inventory.Count()).ToList();
+                    foreach (InventoryItem stItem in st.inventory)
+                    {
+                        if (stItem == null)
+                        {
+                            storageInventorySzd[index] = null;
+                            continue;
+                        }
+
+                        InventoryItemSerialized stItemSzd = new InventoryItemSerialized();
+                        stItemSzd.itemKey = stItem.itemKey;
+                        stItemSzd.stackedAmount = stItem.amountStacked;
+                        if (stItem.itemKey.Equals("treasureMapItem"))
+                        {
+                            stItemSzd.treasureMaps = new Dictionary<int, TreasureMapItemSerialized>();
+                            TreasureMapItemSerialized tm = new TreasureMapItemSerialized();
+                            TreasureMap m = (TreasureMap)stItem;
+                            tm.digLocation = m.digTile.location;
+                            tm.region = m.treasureInRegion;
+                            if (tm.reward != null)
+                                tm.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
+                            stItemSzd.treasureMaps.Add(index, tm);
+                        }
+                        // do not need to check for more storage here because I have prevented storage from being placed within storage.. TODO
+
+                        storageInventorySzd[indexStorage] = stItemSzd;
+                        indexStorage++;
+                    }
+                    iszd.storageItems.Add(index, storageInventorySzd);
+                }
+
+                ret[index] = iszd;
+                index++;
+            }
+
+            return ret;
         }
 
     }
