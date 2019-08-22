@@ -105,6 +105,8 @@ namespace Gusto
 
         public HashSet<Sprite> Update (KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+            List<Sprite> toRemove = new List<Sprite>();
+
             // camera follows player
             if (!player.onShip)
                 camera.Position = player.location;
@@ -113,13 +115,11 @@ namespace Gusto
 
             foreach (Sprite sp in UpdateOrder)
             {
-                //if (sp.remove)
-                //    toRemove.Add(sp);
-
                 // ICanUpdate is the update for main sprites. Any sub-sprites (items, weapons, sails, etc) that belong to the main sprite are updated within the sprite's personal update method. 
                 ICanUpdate updateSp = (ICanUpdate)sp;
                 updateSp.Update(kstate, gameTime, camera);
             }
+
 
             return UpdateOrder;
         }

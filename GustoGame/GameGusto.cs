@@ -264,7 +264,8 @@ namespace Gusto
         {
             var kstate = Keyboard.GetState();
             List<Sprite> toRemove = new List<Sprite>();
-            HashSet<Sprite> tempUpdateOrder = new HashSet<Sprite>();
+            HashSet<Sprite> groundObjectUpdateOrder = new HashSet<Sprite>();
+            HashSet<Sprite> droppedItemObjectUpdateOrder = new HashSet<Sprite>();
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F4))
                 Exit();
@@ -287,69 +288,63 @@ namespace Gusto
             // daylight shader 
             dayLight.Update(kstate, gameTime);
 
-            // static update (Wind)
+            // static update (Menus)
             windArrows.Update(kstate, gameTime, null);
             int windDirection = windArrows.getWindDirection();
             int windSpeed = windArrows.getWindSpeed();
 
             inventoryMenu.Update(kstate, gameTime, this.camera);
             craftingMenu.Update(kstate, gameTime, this.camera);
-
-            // add any dropped items (and placable items)
-            foreach (var item in ItemUtility.ItemsToUpdate)
-                UpdateOrder.Add(item);
-
-            /*// main update for all non static objects
-            foreach (var sp in UpdateOrder)
-            {
-                if (sp.remove)
-                    toRemove.Add(sp);
-                // ICanUpdate is the update for main sprites. Any sub-sprites (items, weapons, sails, etc) that belong to the main sprite are updated within the sprite's personal update method. 
-                ICanUpdate updateSp = (ICanUpdate)sp; 
-                updateSp.Update(kstate, gameTime, this.camera);
-            }*/
-
             
-            
-            
-            // TEMPORARY@#@!$#@ CAUSES SHIPS TO BE UPDATED TWICE (SUPER FAST)
-            HashSet<Sprite> TEMPTESTUPDATEORDER = gameState.Update(kstate, gameTime, camera);
-            foreach (var s in TEMPTESTUPDATEORDER)
-                UpdateOrder.Add(s);
-
-
-
-
             // clear any "dead" objects from updating
             foreach (var r in toRemove)
                 UpdateOrder.Remove(r);
-
-            // reset collidable and drawOrder with "alive" objects and map pieces that are in view
-            Collidable.Clear();
-            DrawOrder.Clear();
-            foreach (var sp in UpdateOrder)
-            {
-                if (!(sp is IMenuGUI))
-                {
-                    Collidable.Add(sp);
-                    SpatialBounding.SetQuad(sp.GetBase());
-                }
-                DrawOrder.Add(sp);
-            }
 
             // set any visible collidable map pieces for collision
             foreach (var tile in BoundingBoxLocations.LandTileLocationList)
                 SpatialBounding.SetQuad(tile.GetBase());
 
+            // update any gameObjects that need to track state
+            HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);
+
+            // update ground objects (they do not track their state since they are encoded in the map)
+            foreach (var sp in BoundingBoxLocations.GroundObjectLocationList)
+            {
+                ICanUpdate updateSp = (ICanUpdate)sp;
+                updateSp.Update(kstate, gameTime, this.camera);
+                groundObjectUpdateOrder.Add(sp);
+            }
+
+            // add any dropped items (and placable items)
+            foreach (var item in ItemUtility.ItemsToUpdate)
+                droppedItemObjectUpdateOrder.Add(item);
+
+            // merge update orders
+            HashSet<Sprite> fullUpdateOrder = GameStateObjectUpdateOrder;
+            fullUpdateOrder.UnionWith(groundObjectUpdateOrder);
+            fullUpdateOrder.UnionWith(droppedItemObjectUpdateOrder);
+            // remove anything "dead"
+            foreach (var sp in fullUpdateOrder)
+            {
+                if (sp.remove)
+                    toRemove.Add(sp);
+            }
+            foreach (var r in toRemove)
+                fullUpdateOrder.Remove(r);
+
+            // Set draw order and collision from the full update order list
+            Collidable.Clear();
+            DrawOrder.Clear();
+            foreach (var sp in fullUpdateOrder)
+            {
+                Collidable.Add(sp);
+                SpatialBounding.SetQuad(sp.GetBase());
+                DrawOrder.Add(sp);
+            }
+
             // handle collision
             collision.Update(this.camera.Position);
             SpatialCollision();
-
-            // add ground objects to update order
-            tempUpdateOrder = UpdateOrder;
-            foreach (var obj in BoundingBoxLocations.GroundObjectLocationList)
-                tempUpdateOrder.Add(obj);
-            UpdateOrder = tempUpdateOrder;
 
             this.camera.Update(gameTime);
             base.Update(gameTime);
