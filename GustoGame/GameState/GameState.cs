@@ -20,13 +20,15 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Gusto
 {
     public class GameState
     {
 
-        public bool ready; 
+        public bool ready;
+        string savePath;
 
         ContentManager _content;
         GraphicsDevice _graphics;
@@ -38,6 +40,9 @@ namespace Gusto
 
         public GameState(ContentManager c, GraphicsDevice g)
         {
+            savePath = @"C:\Users\GMON\Desktop\";
+            gameName = "game1";
+
             _content = c;
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
@@ -139,6 +144,7 @@ namespace Gusto
                 {
                     Ship sh = (Ship)sp;
                     ShipState state = new ShipState();
+                    state.team = sh.teamType;
                     state.location = sh.location;
                     state.region = sh.regionKey;
                     state.objKey = sh.bbKey;
@@ -151,13 +157,23 @@ namespace Gusto
             }
 
             // serialize save to file system
-            string savePath = @"C:\Users\GMON\Desktop\";
-            gameName = "game1";
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>));
-            using (FileStream fs = new FileStream(savePath + "GustoGame_" + gameName.ToString(), FileMode.Create))
+            using (FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Create))
             {
                 s.WriteObject(fs, SaveState);
             }
+        }
+
+        public void LoadGameState()
+        {
+            
+            DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), new Type[] { typeof(ShipState)});
+            FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
+            XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
+            List<ISaveState> LoadFromState = (List<ISaveState>)s.ReadObject(reader);
+            reader.Close();
+            fs.Close();
+
         }
 
         private List<InventoryItemSerialized> CreateSerializableInventory(List<InventoryItem> inv)

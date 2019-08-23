@@ -281,11 +281,17 @@ namespace Gusto
                 startingMenu.Update(kstate, gameTime);
                 return;
             }
-            else if (!gameState.ready)
+            else if (startingMenu.selected == "new" && !gameState.ready)
             {
                 gameState.CreateNewGame();
                 return;
             }
+            else if (startingMenu.selected == "load" && !gameState.ready)
+            {
+                gameState.LoadGameState();
+                return;
+            }
+
 
             // weather
             weather.Update(kstate, gameTime);

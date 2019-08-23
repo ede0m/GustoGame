@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using Gusto.AnimatedSprite;
 
 namespace Gusto.SaveState
 {
@@ -30,6 +31,7 @@ namespace Gusto.SaveState
     [KnownType(typeof(InventoryItemSerialized))]
     [KnownType(typeof(TreasureMapItemSerialized))]
     [KnownType(typeof(Vector2))]
+    [KnownType(typeof(TeamType))]
     [KnownType(typeof(ShipState))]
     public class ShipState : ISaveState
     {
@@ -39,6 +41,8 @@ namespace Gusto.SaveState
         public string objKey { get; set; }
         [DataMember]
         public Vector2 location { get; set; }
+        [DataMember]
+        public TeamType team { get; set; }
         [DataMember]
         public List<InventoryItemSerialized> inventory { get; set; }
         [DataMember]

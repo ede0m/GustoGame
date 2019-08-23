@@ -20,7 +20,7 @@ namespace Gusto.Models.Menus
         SpriteFont font;
         Texture2D cursor;
         Vector2 cursotLoc;
-        string selected = null;
+        public string selected = null;
 
         // todo: maybe a nice texture to use?
 
@@ -86,16 +86,7 @@ namespace Gusto.Models.Menus
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if (selected == "new")
-                {
-                    // init new game?
-                    showMenu = false;
-                }
-                else if (selected == "load")
-                {
-                    // load game?
-                    showMenu = false;
-                }
+                showMenu = false;
             }
             
         }
