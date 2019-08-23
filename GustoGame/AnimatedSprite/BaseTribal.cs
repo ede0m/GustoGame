@@ -12,7 +12,7 @@ using Gusto.Models.Animated;
 
 namespace Gusto.AnimatedSprite
 {
-    public class BaseTribal : GroundEnemy
+    public class BaseTribal : Npc
     {
         public BaseTribal(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {

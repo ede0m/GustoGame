@@ -532,9 +532,9 @@ namespace Gusto
                         showCraftingMenu = true;
                 }
 
-                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
+                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
                 {
-                    GroundEnemy enemy = (GroundEnemy)sprite;
+                    Npc enemy = (Npc)sprite;
 
                     if (enemy.swimming && !enemy.onShip)
                         enemy.DrawSwimming(spriteBatchView, this.camera);

@@ -106,7 +106,7 @@
     <Compile Include="Models\Animated\Storage.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />
-    <Compile Include="Models\Animated\GroundEnemy.cs" />
+    <Compile Include="Models\Animated\Npc.cs" />
     <Compile Include="Models\Animated\GroundObject\Rock.cs" />
     <Compile Include="Models\Animated\GroundObject\Tree.cs" />
     <Compile Include="Models\Animated\TreasureMap.cs" />

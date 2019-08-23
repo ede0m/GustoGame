@@ -98,9 +98,9 @@ namespace Gusto.Models.Animated
                         playerOnShip = null;
                 }
             }
-            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
+            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
             {
-                GroundEnemy enemy = (GroundEnemy)collidedWith;
+                Npc enemy = (Npc)collidedWith;
                 colliding = false;
                 if (enemy.inCombat)
                 {
