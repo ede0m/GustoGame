@@ -32,6 +32,35 @@ namespace Gusto.SaveState
     [KnownType(typeof(TreasureMapItemSerialized))]
     [KnownType(typeof(Vector2))]
     [KnownType(typeof(TeamType))]
+    [KnownType(typeof(PlayerState))]
+    public class PlayerState : ISaveState
+    {
+        [DataMember]
+        public string region { get; set; }
+        [DataMember]
+        public string objKey { get; set; }
+        [DataMember]
+        public Vector2 location { get; set; }
+        [DataMember]
+        public TeamType team { get; set; }
+        [DataMember]
+        public List<InventoryItemSerialized> inventory { get; set; }
+        [DataMember]
+        public bool onShip { get; set; }
+
+        //[DataMember]
+        // TODO: playerOnShip -- ShipSerialized? Will that work since I need the actual object reference?
+
+        [DataMember]
+        public float health { get; set; }
+    }
+
+
+    [DataContract]
+    [KnownType(typeof(InventoryItemSerialized))]
+    [KnownType(typeof(TreasureMapItemSerialized))]
+    [KnownType(typeof(Vector2))]
+    [KnownType(typeof(TeamType))]
     [KnownType(typeof(ShipState))]
     public class ShipState : ISaveState
     {

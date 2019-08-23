@@ -212,8 +212,10 @@ namespace Gusto.Models.Animated
                     // drop items
                     foreach (var item in inventory)
                     {
-                        // TODO: drop (package up) all items as barrels/chests
+                        if (item == null)
+                            continue;
 
+                        // TODO: drop (package up) all items as barrels/chests
                         if (item.bbKey.Equals("baseBarrelItem"))
                         {
                             BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);

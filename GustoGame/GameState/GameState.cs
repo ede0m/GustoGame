@@ -140,7 +140,21 @@ namespace Gusto
             List<ISaveState> SaveState = new List<ISaveState>();
             foreach (Sprite sp in UpdateOrder)
             {
-                if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
+                if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
+                {
+                    PlayerState state = new PlayerState();
+                    state.team = player.teamType;
+                    state.location = player.location;
+                    state.region = player.regionKey;
+                    state.inventory = CreateSerializableInventory(player.inventory);
+                    state.onShip = player.onShip;
+                    //state.playerOnShip
+                    //state.handHeld
+                    state.health = player.health;
+                    SaveState.Add(state);
+                }
+
+                else if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship sh = (Ship)sp;
                     ShipState state = new ShipState();
@@ -166,8 +180,8 @@ namespace Gusto
 
         public void LoadGameState()
         {
-            
-            DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), new Type[] { typeof(ShipState)});
+            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState) };
+            DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), deserializeTypes);
             FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
             List<ISaveState> LoadFromState = (List<ISaveState>)s.ReadObject(reader);
@@ -181,7 +195,20 @@ namespace Gusto
         {
             foreach (ISaveState objState in LoadFromState)
             {
-                if (objState.GetType() == typeof(ShipState))
+                if (objState.GetType() == typeof(PlayerState))
+                {
+                    PlayerState ps = (PlayerState)objState;
+                    player.location = ps.location;
+                    player.inventory = DeserializeInventory(ps.inventory);
+                    //player.inHand 
+                    //player.playerOnShip
+                    player.onShip = ps.onShip;
+                    player.regionKey = ps.region;
+                    player.health = ps.health;
+                    UpdateOrder.Add(player);
+                }
+
+                else if (objState.GetType() == typeof(ShipState))
                 {
                     ShipState ss = (ShipState)objState;
                     if (ss.objKey.Equals("baseShip"))
@@ -193,14 +220,41 @@ namespace Gusto
                         UpdateOrder.Add(baseShip);
                     }
                 }
+
             }
 
         }
 
         private List<InventoryItem> DeserializeInventory(List<InventoryItemSerialized> inv)
         {
-            // todo!
-            return null;
+            int index = 0;
+            List<InventoryItem> ret = Enumerable.Repeat<InventoryItem>(null, inv.Count()).ToList();
+            foreach (InventoryItemSerialized item in inv)
+            {
+                if (item == null)
+                {
+                    ret[index] = null;
+                    continue;
+                }
+
+                switch(item.itemKey)
+                {
+                    // TODO: ALL THE ITEMS :( 
+
+                    case "islandGrass":
+                        IslandGrass ig = new IslandGrass(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                        ig.amountStacked = item.stackedAmount;
+                        ig.regionKey = "GustoMap";
+                        ig.inInventory = true;
+                        ig.remove = true;
+                        ret[index] = ig;
+                        break;
+                }
+                index++;
+            }
+
+            return ret;
+
         }
 
         private List<InventoryItemSerialized> CreateSerializableInventory(List<InventoryItem> inv)
