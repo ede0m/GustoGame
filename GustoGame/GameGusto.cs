@@ -393,7 +393,7 @@ namespace Gusto
             spriteBatchView.Begin(this.camera);
             foreach (var map in BoundingBoxLocations.treasureLocationsList)
             {
-                spriteBatchView.Draw(treasureXMark, map.digTile.location, Color.White);
+                spriteBatchView.Draw(treasureXMark, map.digTileLoc, Color.White);
             }
             spriteBatchView.End();
 

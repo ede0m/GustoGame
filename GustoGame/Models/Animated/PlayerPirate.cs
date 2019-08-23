@@ -357,7 +357,7 @@ namespace Gusto.Models.Animated
                 {
                     Storage toBury = (Storage)inventory[(int)removeChestIndex].placeableVersion;
                     TreasureMapItem mapToAdd = new TreasureMapItem(toBury, teamType, regionKey, location, _content, _graphics);
-                    mapToAdd.digTile = buryTile;
+                    mapToAdd.digTileLoc = buryTile.location;
                     mapToAdd.treasureInRegion = buryTile.regionKey;
                     mapToAdd.inInventory = false;
                     mapToAdd.remove = false;

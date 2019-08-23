@@ -326,6 +326,23 @@ namespace Gusto
                     continue;
                 }
 
+                // special cases
+                if (item.treasureMaps != null)
+                {
+                    Storage reward = null;
+                    if (item.treasureMaps[index].reward != null)
+                    {
+                        reward = (Storage)DeserializeInventoryItem(item.treasureMaps[index].storageType).placeableVersion;
+                        reward.inventory = DeserializeInventory(item.treasureMaps[index].reward);
+                    }
+                    TreasureMapItem tm = new TreasureMapItem(reward, TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    tm.digTileLoc = item.treasureMaps[index].digLocation;
+                    tm.treasureInRegion = item.treasureMaps[index].treasureInRegion;
+                    ret[index] = (InventoryItem)tm;
+                    index++;
+                    continue;
+                }
+
                 InventoryItem ii = DeserializeInventoryItem(item.itemKey);
                 ii.amountStacked = item.stackedAmount;
                 ii.regionKey = "GustoMap";
@@ -334,12 +351,8 @@ namespace Gusto
 
                 if (item.storageItems != null)
                 {
-                    // TODO: ii will already be a StorageItem, we just need to set the placable versions Storage values
-                }
-                
-                if (item.treasureMaps != null)
-                {
-                    // TODO: deseraialize treasureMapSerialized and init treasureMap here (ii = new TreasureMapItem ...)
+                    Storage store = (Storage)ii.placeableVersion;
+                    store.inventory = DeserializeInventory(item.storageItems[index]);
                 }
 
                 ret[index] = ii;
@@ -390,6 +403,8 @@ namespace Gusto
                     return new Coal(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "ironBar":
                     return new IronBar(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "tribalTokens":
+                    return new TribalTokens(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "ironOre":
                     return new IronOre(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "nails":
@@ -402,6 +417,8 @@ namespace Gusto
                     return new PistolShotItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "shortSword":
                     return new ShortSword(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "shovel":
+                    return new Shovel(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "softWood":
                     return new SoftWood(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "baseChestItem":
@@ -445,13 +462,17 @@ namespace Gusto
                 if (item.itemKey.Equals("treasureMapItem"))
                 {
                     iszd.treasureMaps = new Dictionary<int, TreasureMapItemSerialized>();
-                    TreasureMapItemSerialized tm = new TreasureMapItemSerialized();
+                    TreasureMapItemSerialized tms = new TreasureMapItemSerialized();
                     TreasureMap m = (TreasureMap)item;
-                    tm.digLocation = m.digTile.location;
-                    tm.region = m.treasureInRegion;
-                    if (tm.reward != null)
-                        tm.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
-                    iszd.treasureMaps.Add(index, tm);
+                    tms.digLocation = m.digTileLoc;
+                    tms.treasureInRegion = m.treasureInRegion;
+                    if (m.rewarded != null)
+                    {
+                        tms.storageType = m.storageTierType;
+                        tms.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
+                    }
+                         
+                    iszd.treasureMaps.Add(index, tms);
                 }
                 else if (item is IStorageItem)
                 {
@@ -475,8 +496,8 @@ namespace Gusto
                             stItemSzd.treasureMaps = new Dictionary<int, TreasureMapItemSerialized>();
                             TreasureMapItemSerialized tm = new TreasureMapItemSerialized();
                             TreasureMap m = (TreasureMap)stItem;
-                            tm.digLocation = m.digTile.location;
-                            tm.region = m.treasureInRegion;
+                            tm.digLocation = m.digTileLoc;
+                            tm.treasureInRegion = m.treasureInRegion;
                             if (tm.reward != null)
                                 tm.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
                             stItemSzd.treasureMaps.Add(index, tm);

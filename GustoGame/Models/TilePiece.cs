@@ -75,23 +75,27 @@ namespace Gusto.Models
                             // Check for Treasure! Arrrg
                             foreach (var treasureMap in BoundingBoxLocations.treasureLocationsList)
                             {
-                                if (treasureMap.digTile == this)
+                                Rectangle digLocRect = new Rectangle((int)treasureMap.digTileLoc.X, (int)treasureMap.digTileLoc.Y, GameOptions.tileWidth, GameOptions.tileHeight);
+                                if (digLocRect.Intersects(this.GetBoundingBox()))
                                 {
                                     // the contents of the treasure was set by player
                                     if (treasureMap.rewarded != null)
                                     {
                                         treasureMap.rewarded.remove = false;
-                                        treasureMap.rewarded.location = treasureMap.digTile.location;
+                                        treasureMap.rewarded.location = treasureMap.digTileLoc;
                                         ItemUtility.ItemsToUpdate.Add(treasureMap.rewarded);
                                         treasureMap.solved = true;
                                     }
                                     else
                                     {
                                         // TODO: use the map tier to tier the loot here
-                                        Storage reward = new BaseChest(TeamType.Player, regionKey, location, _content, _graphics);
-                                        reward.remove = false;
-                                        ItemUtility.ItemsToUpdate.Add(reward);
-                                        treasureMap.solved = true;
+                                        if (!treasureMap.solved)
+                                        {
+                                            Storage reward = new BaseChest(TeamType.Player, regionKey, location, _content, _graphics);
+                                            reward.remove = false;
+                                            ItemUtility.ItemsToUpdate.Add(reward);
+                                            treasureMap.solved = true;
+                                        }
                                     }
                                     break;
                                 }

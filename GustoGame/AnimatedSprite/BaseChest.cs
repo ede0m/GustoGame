@@ -18,6 +18,7 @@ namespace Gusto.AnimatedSprite
         {
             nInventorySlots = 5;
             var objKey = "baseChest";
+            storageTierType = "baseChestItem"; // needed for deserialization of burying your own treasure
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 4);
             List<InventoryItem> items = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);

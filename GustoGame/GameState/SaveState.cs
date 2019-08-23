@@ -22,7 +22,8 @@ namespace Gusto.SaveState
     public class TreasureMapItemSerialized
     {
         public Vector2 digLocation { get; set; }
-        public string region { get; set; }
+        public string treasureInRegion { get; set; }
+        public string storageType { get; set; }
         public List<InventoryItemSerialized> reward { get; set; }
     }
 
