@@ -276,6 +276,7 @@ namespace Gusto
                             shipMap.Add(s, ps.playerOnShipId);
                             player.playerOnShip = s;
                             UpdateOrder.Add(s);
+                            //UpdateOrder.Add(s.shipSail);
                         }
                     }
 
@@ -303,6 +304,7 @@ namespace Gusto
                         Ship s = (Ship)DeserializeModel(ss.objKey, ss);
                         shipMap.Add(s, ss.shipId);
                         UpdateOrder.Add(s);
+                        //UpdateOrder.Add(s.shipSail);
                     }
                     
                 }
@@ -348,6 +350,8 @@ namespace Gusto
                     bs.health = ss.health;
                     bs.inventory = DeserializeInventory(ss.inventory);
                     bs.playerAboard = ss.playerAboard;
+                    if (bs.playerAboard)
+                        bs.shipSail.playerAboard = true;
                     return bs;
 
             }

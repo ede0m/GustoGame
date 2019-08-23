@@ -94,6 +94,8 @@ namespace Gusto.Models.Animated
                 {
                     nearShip = true;
                     playerOnShip = (Ship)collidedWith;
+                    if (playerOnShip.sinking)
+                        playerOnShip = null;
                 }
             }
             else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
