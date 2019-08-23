@@ -173,7 +173,34 @@ namespace Gusto
             List<ISaveState> LoadFromState = (List<ISaveState>)s.ReadObject(reader);
             reader.Close();
             fs.Close();
+            InitializeLoadState(LoadFromState);
+            ready = true;
+        }
 
+        private void InitializeLoadState(List<ISaveState> LoadFromState)
+        {
+            foreach (ISaveState objState in LoadFromState)
+            {
+                if (objState.GetType() == typeof(ShipState))
+                {
+                    ShipState ss = (ShipState)objState;
+                    if (ss.objKey.Equals("baseShip"))
+                    {
+                        BaseShip baseShip = new BaseShip(ss.team, ss.region, ss.location, _content, _graphics);
+                        baseShip.health = ss.health;
+                        baseShip.inventory = DeserializeInventory(ss.inventory);
+                        baseShip.playerAboard = ss.playerAboard;
+                        UpdateOrder.Add(baseShip);
+                    }
+                }
+            }
+
+        }
+
+        private List<InventoryItem> DeserializeInventory(List<InventoryItemSerialized> inv)
+        {
+            // todo!
+            return null;
         }
 
         private List<InventoryItemSerialized> CreateSerializableInventory(List<InventoryItem> inv)
