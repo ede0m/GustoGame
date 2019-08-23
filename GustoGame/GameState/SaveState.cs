@@ -48,10 +48,8 @@ namespace Gusto.SaveState
         public List<InventoryItemSerialized> inventory { get; set; }
         [DataMember]
         public bool onShip { get; set; }
-
         [DataMember]
         public Guid playerOnShipId { get; set; }
-
         [DataMember]
         public string inHandItemKey { get; set; }
         [DataMember]
@@ -69,7 +67,6 @@ namespace Gusto.SaveState
     {
         [DataMember]
         public Guid shipId { get; set; } // needed for player.playerOnShip
-
         [DataMember]
         public string region { get; set; }
         [DataMember]

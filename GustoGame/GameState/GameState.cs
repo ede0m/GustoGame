@@ -239,7 +239,7 @@ namespace Gusto
                     PlayerState ps = (PlayerState)objState;
                     player.location = ps.location;
                     player.inventory = DeserializeInventory(ps.inventory);
-                    player.inHand = (HandHeld)DeserializeItem(ps.inHandItemKey);
+                    player.inHand = (HandHeld)DeserializeInventoryItem(ps.inHandItemKey);
 
                     if (ps.playerOnShipId == Guid.Empty)
                         player.playerOnShip = null;
@@ -326,13 +326,23 @@ namespace Gusto
                     continue;
                 }
 
-                InventoryItem ii = DeserializeItem(item.itemKey);
+                InventoryItem ii = DeserializeInventoryItem(item.itemKey);
                 ii.amountStacked = item.stackedAmount;
                 ii.regionKey = "GustoMap";
                 ii.inInventory = true;
                 ii.remove = true;
-                ret[index] = ii;
 
+                if (item.storageItems != null)
+                {
+                    // TODO: ii will already be a StorageItem, we just need to set the placable versions Storage values
+                }
+                
+                if (item.treasureMaps != null)
+                {
+                    // TODO: deseraialize treasureMapSerialized and init treasureMap here (ii = new TreasureMapItem ...)
+                }
+
+                ret[index] = ii;
                 index++;
             }
             return ret;
@@ -358,7 +368,7 @@ namespace Gusto
             return sp;
         }
 
-        private InventoryItem DeserializeItem(string itemKey)
+        private InventoryItem DeserializeInventoryItem(string itemKey)
         {
             InventoryItem item = null;
             switch (itemKey)
@@ -372,8 +382,42 @@ namespace Gusto
                     return new Lantern(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "baseBarrelItem":
                     return new BaseBarrelItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "basePlank":
+                    return new BasePlank(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "cannonBall":
+                    return new CannonBallItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "coal":
+                    return new Coal(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "ironBar":
+                    return new IronBar(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "ironOre":
+                    return new IronOre(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "nails":
+                    return new Nails(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "pickaxe":
+                    return new Pickaxe(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "pistol":
+                    return new Pistol(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "pistolShot":
+                    return new PistolShotItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "shortSword":
+                    return new ShortSword(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "softWood":
+                    return new SoftWood(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "baseChestItem":
-                    return new BaseChestItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    BaseChestItem bci = new BaseChestItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    bci.placeableVersion = new BaseChest(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    return bci;
+                case "anvilItem":
+                    AnvilItem ai = new AnvilItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    ai.placeableVersion = new CraftingAnvil(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    return ai;
+                case "clayFurnaceItem":
+                    ClayFurnaceItem cfi = new ClayFurnaceItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    cfi.placeableVersion = new ClayFurnace(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    return cfi;
+                case "treasureMapItem":
+                    return null; // This is handled in calling method to deserialize some speical detials
 
             }
             return item;
