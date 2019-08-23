@@ -500,7 +500,7 @@ namespace Gusto
                             tm.treasureInRegion = m.treasureInRegion;
                             if (tm.reward != null)
                                 tm.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
-                            stItemSzd.treasureMaps.Add(index, tm);
+                            stItemSzd.treasureMaps.Add(indexStorage, tm);
                         }
                         // do not need to check for more storage here because I have prevented storage from being placed within storage.. TODO
 

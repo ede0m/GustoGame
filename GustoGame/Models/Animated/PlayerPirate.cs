@@ -362,6 +362,7 @@ namespace Gusto.Models.Animated
                     mapToAdd.inInventory = false;
                     mapToAdd.remove = false;
                     mapToAdd.onGround = true;
+                    buryTile.currColumnFrame = 0;
                     ItemUtility.ItemsToUpdate.Add(mapToAdd);
                     inventory[(int)removeChestIndex] = null;
                 }

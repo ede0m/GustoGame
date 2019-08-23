@@ -82,7 +82,7 @@ namespace Gusto.Models
                                     if (treasureMap.rewarded != null)
                                     {
                                         treasureMap.rewarded.remove = false;
-                                        treasureMap.rewarded.location = treasureMap.digTileLoc;
+                                        treasureMap.rewarded.location = new Vector2(treasureMap.digTileLoc.X + RandomEvents.rand.Next(-5, 5), treasureMap.digTileLoc.Y + RandomEvents.rand.Next(-5, 5));
                                         ItemUtility.ItemsToUpdate.Add(treasureMap.rewarded);
                                         treasureMap.solved = true;
                                     }
