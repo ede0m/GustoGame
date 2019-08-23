@@ -8,10 +8,11 @@ namespace Gusto.AnimatedSprite
 {
     public enum TeamType
     {
+        Gusto,
+        GroundObject,
         Player,
         A,
         B,
-        C,
-        GroundObject
+        C
     }
 }

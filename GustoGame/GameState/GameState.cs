@@ -138,6 +138,8 @@ namespace Gusto
         {
             // Create the save state
             List<ISaveState> SaveState = new List<ISaveState>();
+            Dictionary<Ship, Guid> shipMap = new Dictionary<Ship, Guid>();
+
             foreach (Sprite sp in UpdateOrder)
             {
                 if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
@@ -148,8 +150,35 @@ namespace Gusto
                     state.region = player.regionKey;
                     state.inventory = CreateSerializableInventory(player.inventory);
                     state.onShip = player.onShip;
-                    //state.playerOnShip
-                    //state.handHeld
+                    if (player.playerOnShip != null)
+                    {
+                        if (shipMap.ContainsKey(player.playerOnShip))
+                            state.playerOnShipId = shipMap[player.playerOnShip];
+                        else
+                        {
+                            // save the ship that the player was on. 
+                            Ship sh = (Ship)player.playerOnShip;
+                            ShipState shipState = new ShipState();
+                            shipState.team = sh.teamType;
+                            shipState.location = sh.location;
+                            shipState.region = sh.regionKey;
+                            shipState.objKey = sh.bbKey;
+                            shipState.inventory = CreateSerializableInventory(sh.inventory);
+                            shipState.playerAboard = sh.playerAboard;
+                            shipState.anchored = sh.anchored;
+                            shipState.health = sh.health;
+                            // create and save guid for player and ship, track it
+                            Guid shipId = Guid.NewGuid();
+                            state.playerOnShipId = shipId;
+                            shipState.shipId = shipId;
+                            shipMap.Add(sh, shipId);
+                            SaveState.Add(state);
+                        }
+                    }
+                    else
+                        state.playerOnShipId = Guid.Empty;
+
+                    state.inHandItemKey = player.inHand.itemKey;
                     state.health = player.health;
                     SaveState.Add(state);
                 }
@@ -157,17 +186,24 @@ namespace Gusto
                 else if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship sh = (Ship)sp;
-                    ShipState state = new ShipState();
-                    state.team = sh.teamType;
-                    state.location = sh.location;
-                    state.region = sh.regionKey;
-                    state.objKey = sh.bbKey;
-                    state.inventory = CreateSerializableInventory(sh.inventory);
-                    state.playerAboard = sh.playerAboard;
-                    state.anchored = sh.anchored;
-                    state.health = sh.health;
-                    SaveState.Add(state);
+                    if (!shipMap.ContainsKey(sh))
+                    {
+                        ShipState state = new ShipState();
+                        state.team = sh.teamType;
+                        state.location = sh.location;
+                        state.region = sh.regionKey;
+                        state.objKey = sh.bbKey;
+                        state.inventory = CreateSerializableInventory(sh.inventory);
+                        state.playerAboard = sh.playerAboard;
+                        state.anchored = sh.anchored;
+                        state.health = sh.health;
+                        state.shipId = Guid.NewGuid();
+                        shipMap.Add(sh, state.shipId);
+                        SaveState.Add(state);
+                    }
                 }
+
+                // TODO: OTHER STATES (WEATHER, ETC)
             }
 
             // serialize save to file system
@@ -193,6 +229,9 @@ namespace Gusto
 
         private void InitializeLoadState(List<ISaveState> LoadFromState)
         {
+            // TODO: deserialize the ps.onShipId (create if id not tracked yet, otherwise set to ship in tracked dict) kinda the opposite of how it is done in save
+            Dictionary<Ship, Guid> shipMap = new Dictionary<Ship, Guid>();
+
             foreach (ISaveState objState in LoadFromState)
             {
                 if (objState.GetType() == typeof(PlayerState))
@@ -200,8 +239,46 @@ namespace Gusto
                     PlayerState ps = (PlayerState)objState;
                     player.location = ps.location;
                     player.inventory = DeserializeInventory(ps.inventory);
-                    //player.inHand 
-                    //player.playerOnShip
+                    player.inHand = (HandHeld)DeserializeItem(ps.inHandItemKey);
+
+                    if (ps.playerOnShipId == Guid.Empty)
+                        player.playerOnShip = null;
+                    else
+                    {
+                        // check if the ship already exists
+                        foreach (KeyValuePair<Ship, Guid> ship in shipMap)
+                        {
+                            if (ps.playerOnShipId == ship.Value)
+                            {
+                                player.playerOnShip = ship.Key;
+                                break;
+                            }
+                        }
+                        // ship did not already exist so we have to create here
+                        if (player.playerOnShip == null)
+                        {
+                            // we have to loop here again to find the save state.. eh
+                            ISaveState shipSaveStateToFind = null;
+                            foreach (ISaveState ss in LoadFromState)
+                            {
+                                if (objState.GetType() == typeof(ShipState))
+                                {
+                                    ShipState shipSave = (ShipState)objState;
+                                    if (shipSave.shipId == ps.playerOnShipId)
+                                    {
+                                        shipSaveStateToFind = shipSave;
+                                        break;
+                                    }
+                                }
+
+                            }
+                            Ship s = (Ship)DeserializeModel(ps.objKey, shipSaveStateToFind);
+                            shipMap.Add(s, ps.playerOnShipId);
+                            player.playerOnShip = s;
+                            UpdateOrder.Add(s);
+                        }
+                    }
+
                     player.onShip = ps.onShip;
                     player.regionKey = ps.region;
                     player.health = ps.health;
@@ -211,14 +288,23 @@ namespace Gusto
                 else if (objState.GetType() == typeof(ShipState))
                 {
                     ShipState ss = (ShipState)objState;
-                    if (ss.objKey.Equals("baseShip"))
+                    bool shipCreated = false;
+                    // check if the ship already exists
+                    foreach (KeyValuePair<Ship, Guid> ship in shipMap)
                     {
-                        BaseShip baseShip = new BaseShip(ss.team, ss.region, ss.location, _content, _graphics);
-                        baseShip.health = ss.health;
-                        baseShip.inventory = DeserializeInventory(ss.inventory);
-                        baseShip.playerAboard = ss.playerAboard;
-                        UpdateOrder.Add(baseShip);
+                        if (ss.shipId == ship.Value)
+                        {
+                            shipCreated = true;
+                            break;
+                        }
                     }
+                    if (!shipCreated)
+                    {
+                        Ship s = (Ship)DeserializeModel(ss.objKey, ss);
+                        shipMap.Add(s, ss.shipId);
+                        UpdateOrder.Add(s);
+                    }
+                    
                 }
 
             }
@@ -234,26 +320,59 @@ namespace Gusto
                 if (item == null)
                 {
                     ret[index] = null;
+                    index++;
                     continue;
                 }
 
-                switch(item.itemKey)
-                {
-                    // TODO: ALL THE ITEMS :( 
+                InventoryItem ii = DeserializeItem(item.itemKey);
+                ii.amountStacked = item.stackedAmount;
+                ii.regionKey = "GustoMap";
+                ii.inInventory = true;
+                ii.remove = true;
+                ret[index] = ii;
 
-                    case "islandGrass":
-                        IslandGrass ig = new IslandGrass(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
-                        ig.amountStacked = item.stackedAmount;
-                        ig.regionKey = "GustoMap";
-                        ig.inInventory = true;
-                        ig.remove = true;
-                        ret[index] = ig;
-                        break;
-                }
                 index++;
             }
-
             return ret;
+        }
+
+        private Sprite DeserializeModel(string objKey, ISaveState objSave)
+        {
+            Sprite sp = null;
+            switch (objKey)
+            {
+                // TODO: ALL THE Models :( 
+                case "baseShip":
+                    ShipState ss = (ShipState)objSave;
+                    BaseShip bs = new BaseShip(ss.team, ss.region, ss.location, _content, _graphics);
+                    bs.health = ss.health;
+                    bs.inventory = DeserializeInventory(ss.inventory);
+                    bs.playerAboard = ss.playerAboard;
+                    return bs;
+
+            }
+            return sp;
+        }
+
+        private InventoryItem DeserializeItem(string itemKey)
+        {
+            InventoryItem item = null;
+            switch (itemKey)
+            {
+                // TODO: ALL THE ITEMS :( 
+                case "islandGrass":
+                    return new IslandGrass(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "baseSword":
+                    return new BaseSword(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "lantern":
+                    return new Lantern(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "baseBarrelItem":
+                    return new BaseBarrelItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "baseChestItem":
+                    return new BaseChestItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+
+            }
+            return item;
 
         }
 
@@ -266,6 +385,7 @@ namespace Gusto
                 if (item == null)
                 {
                     ret[index] = null;
+                    index++;
                     continue;
                 }
 
