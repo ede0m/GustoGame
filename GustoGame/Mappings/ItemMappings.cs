@@ -102,13 +102,13 @@ namespace Gusto.Mappings
                             {"percentDrop", 50}
                         }
                     },
-                    {"pistolShot", new Dictionary<string, float>
+                    {"pistolShotItem", new Dictionary<string, float>
                         {
                             {"maxDrop", 6},
                             {"percentDrop", 30}
                         }
                     },
-                    {"cannonBall", new Dictionary<string, float>
+                    {"cannonBallItem", new Dictionary<string, float>
                         {
                             {"maxDrop", 3},
                             {"percentDrop", 25}

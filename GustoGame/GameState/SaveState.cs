@@ -114,6 +114,26 @@ namespace Gusto.SaveState
     }
 
     [DataContract]
+    [KnownType(typeof(OnGroundState))]
+    public class OnGroundState : ISaveState
+    {
+        [DataMember]
+        public string region { get; set; }
+        [DataMember]
+        public string objKey { get; set; }
+        [DataMember]
+        public TeamType team { get; set; }
+        [DataMember]
+        public Vector2 location { get; set; }
+        [DataMember]
+        public bool inventoryItem { get; set; }
+        [DataMember]
+        public int amountStacked { get; set; }
+        [DataMember]
+        public List<InventoryItemSerialized> inventory { get; set; }
+    }
+
+    [DataContract]
     [KnownType(typeof(RainState))]
     [KnownType(typeof(WeatherSaveState))]
     public class WeatherSaveState : ISaveState

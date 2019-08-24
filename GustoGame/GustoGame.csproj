@@ -102,7 +102,7 @@
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\Anvil.cs" />
-    <Compile Include="Models\Animated\Barrel.cs" />
+    <Compile Include="Models\Animated\Container.cs" />
     <Compile Include="Models\Animated\Storage.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />
@@ -113,6 +113,7 @@
     <Compile Include="Models\Animated\Weather\Rain.cs" />
     <Compile Include="Models\Interfaces\IAmmo.cs" />
     <Compile Include="Models\Interfaces\ICraftingObject.cs" />
+    <Compile Include="Models\Interfaces\IDrops.cs" />
     <Compile Include="Models\Interfaces\IGrass.cs" />
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
     <Compile Include="Models\Interfaces\ILight.cs" />

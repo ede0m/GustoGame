@@ -86,11 +86,11 @@ namespace Gusto.Utility
                     item = new Nails(team, region, location, content, graphics);
                     amountStacked = 5; 
                     break;
-                case ("cannonBall"):
+                case ("cannonBallItem"):
                     item = new CannonBallItem(team, region, location, content, graphics);
                     amountStacked = 3;
                     break;
-                case ("pistolShot"):
+                case ("pistolShotItem"):
                     item = new PistolShotItem(team, region, location, content, graphics);
                     amountStacked = 5;
                     break;

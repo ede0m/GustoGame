@@ -14,7 +14,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
     {
         public PistolShotItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
-            itemKey = "pistolShot";
+            itemKey = "pistolShotItem";
 
             Texture2D texturePistolShotItem = content.Load<Texture2D>("PistolShot");
             Texture2D texturePistolShotItemBB = null;

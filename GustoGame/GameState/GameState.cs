@@ -91,25 +91,26 @@ namespace Gusto
             basePlank.onGround = true;
             basePlank.amountStacked = 10;
 
+            // Item utility is global and is accessed in main update
+            ItemUtility.ItemsToUpdate.Add(lantern);
+            ItemUtility.ItemsToUpdate.Add(furnace);
+            ItemUtility.ItemsToUpdate.Add(craftingAnvil);
+            ItemUtility.ItemsToUpdate.Add(barrelLand);
+            ItemUtility.ItemsToUpdate.Add(barrelOcean);
+            ItemUtility.ItemsToUpdate.Add(chestLand);
+            ItemUtility.ItemsToUpdate.Add(chestOcean);
+            ItemUtility.ItemsToUpdate.Add(shovel);
+            ItemUtility.ItemsToUpdate.Add(pistol);
+            ItemUtility.ItemsToUpdate.Add(pickaxe);
+            ItemUtility.ItemsToUpdate.Add(pistolAmmo);
+            ItemUtility.ItemsToUpdate.Add(cannonAmmo);
+            ItemUtility.ItemsToUpdate.Add(basePlank);
 
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(player);
             UpdateOrder.Add(baseTribal);
             UpdateOrder.Add(tower);
-            UpdateOrder.Add(lantern);
-            UpdateOrder.Add(furnace);
-            UpdateOrder.Add(craftingAnvil);
-            UpdateOrder.Add(barrelLand);
-            UpdateOrder.Add(barrelOcean);
-            UpdateOrder.Add(chestLand);
-            UpdateOrder.Add(chestOcean);
-            UpdateOrder.Add(shovel);
-            UpdateOrder.Add(pistol);
-            UpdateOrder.Add(pickaxe);
-            UpdateOrder.Add(pistolAmmo);
-            UpdateOrder.Add(cannonAmmo);
-            UpdateOrder.Add(basePlank);
 
             ready = true;
         }
@@ -118,6 +119,7 @@ namespace Gusto
         public HashSet<Sprite> Update (KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             List<Sprite> toRemove = new List<Sprite>();
+            HashSet<Sprite> droppedItemObjectUpdateOrder = new HashSet<Sprite>();
 
             // camera follows player
             if (!player.onShip)
@@ -125,15 +127,31 @@ namespace Gusto
             else
                 camera.Position = player.playerOnShip.location;
 
-            foreach (Sprite sp in UpdateOrder)
+            // add any dropped/onGround items (and placable items)
+            foreach (var item in ItemUtility.ItemsToUpdate)
+                droppedItemObjectUpdateOrder.Add(item);
+
+            HashSet<Sprite> fullOrder = UpdateOrder;
+            fullOrder.UnionWith(droppedItemObjectUpdateOrder);
+
+            foreach (Sprite sp in fullOrder)
             {
+                if (sp.remove)
+                {
+                    toRemove.Add(sp);
+                    ItemUtility.ItemsToUpdate.Remove(sp);
+                }
+
                 // ICanUpdate is the update for main sprites. Any sub-sprites (items, weapons, sails, etc) that belong to the main sprite are updated within the sprite's personal update method. 
                 ICanUpdate updateSp = (ICanUpdate)sp;
                 updateSp.Update(kstate, gameTime, camera);
             }
 
+            // clear any "dead" or picked up objects from updating
+            foreach (var r in toRemove)
+                fullOrder.Remove(r);
 
-            return UpdateOrder;
+            return fullOrder;
         }
 
         public void SaveGameState()
@@ -246,8 +264,36 @@ namespace Gusto
                         SaveState.Add(state);
                     }
                 }
+            }
 
-                // TODO: OTHER STATES (WEATHER, ETC)
+            // All objs on ground
+            foreach (var item in ItemUtility.ItemsToUpdate)
+            {
+                OnGroundState ogs = new OnGroundState();
+                ogs.objKey = item.bbKey;
+                ogs.region = item.regionKey;
+                ogs.team = TeamType.Gusto;
+                ogs.location = item.location;
+                if (item is IInventoryItem)
+                {
+                    ogs.inventoryItem = true;
+                    InventoryItem ii = (InventoryItem)item;
+                    ogs.amountStacked = ii.amountStacked;
+                }
+                else
+                    ogs.inventoryItem = false;
+                if (item is IStorage)
+                {
+                    Storage storage = (Storage)item;
+                    ogs.inventory = CreateSerializableInventory(storage.inventory);
+                }
+                else if (item is IDrops)
+                {
+                    Container cont = (Container)item;
+                    ogs.inventory = CreateSerializableInventory(cont.drops);
+                }
+
+                SaveState.Add(ogs);
             }
 
             // Can do the weather state separately becasue it is not in the updateOrder
@@ -274,7 +320,7 @@ namespace Gusto
 
         public void LoadGameState()
         {
-            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState) };
+            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState), typeof(OnGroundState) };
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), deserializeTypes);
             FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
@@ -344,7 +390,7 @@ namespace Gusto
                     UpdateOrder.Add(player);
                 }
 
-                if (objState.GetType() == typeof(NpcState))
+                else if (objState.GetType() == typeof(NpcState))
                 {
                     NpcState npcs = (NpcState)objState;
                     Npc npc = (Npc)DeserializeModel(npcs.objKey, npcs);
@@ -436,6 +482,27 @@ namespace Gusto
                     for(int i = 0; i < WeatherState.rainIntensity; i++)
                         WeatherState.rain.Add(new RainDrop(_content, _graphics));
                 }
+
+                else if (objState.GetType() == typeof(OnGroundState))
+                {
+                    OnGroundState ogs = (OnGroundState)objState;
+                    Sprite sp = null;
+                    if (ogs.inventoryItem)
+                    {
+                        InventoryItem ii = DeserializeInventoryItem(ogs.objKey);
+                        ii.amountStacked = ogs.amountStacked;
+                        ii.onGround = true;
+                        sp = ii;
+                    }
+                    else
+                    {
+                        sp = DeserializeModel(ogs.objKey, objState);
+                    }
+                    sp.location = ogs.location;
+                    sp.regionKey = ogs.region;
+
+                    ItemUtility.ItemsToUpdate.Add(sp);
+                }
             }
 
         }
@@ -490,12 +557,17 @@ namespace Gusto
 
         private Sprite DeserializeModel(string objKey, ISaveState objSave)
         {
+            // Add base sprite models here, (AnimatedSprite namespace, not Model namespace)
             Sprite sp = null;
+            OnGroundState ogs;
+            ShipState ss;
+            NpcState npcs;
             switch (objKey)
             {
-                // TODO: ALL THE Models :( 
+                // TODO: Should I save fired ammo state?
+                
                 case "baseShip":
-                    ShipState ss = (ShipState)objSave;
+                    ss = (ShipState)objSave;
                     BaseShip bs = new BaseShip(ss.team, ss.region, ss.location, _content, _graphics);
                     bs.health = ss.health;
                     bs.inventory = DeserializeInventory(ss.inventory);
@@ -505,11 +577,33 @@ namespace Gusto
                     return bs;
 
                 case "baseTribal":
-                    NpcState npcs = (NpcState)objSave;
+                    npcs = (NpcState)objSave;
                     BaseTribal bt = new BaseTribal(npcs.team, npcs.region, npcs.location, _content, _graphics);
                     bt.health = npcs.health;
                     bt.inventory = DeserializeInventory(npcs.inventory);
                     return bt;
+
+                case "baseBarrel":
+                    ogs = (OnGroundState)objSave;
+                    BaseBarrel bb = new BaseBarrel(ogs.team, ogs.region, ogs.location, _content, _graphics);
+                    bb.drops = DeserializeInventory(ogs.inventory);
+                    return bb;
+
+                case "baseChest":
+                    ogs = (OnGroundState)objSave;
+                    BaseChest bc = new BaseChest(ogs.team, ogs.region, ogs.location, _content, _graphics);
+                    bc.inventory = DeserializeInventory(ogs.inventory);
+                    return bc;
+
+                case "clayFurnace":
+                    ogs = (OnGroundState)objSave;
+                    ClayFurnace cf = new ClayFurnace(ogs.team, ogs.region, ogs.location, _content, _graphics);
+                    return cf;
+
+                case "craftingAnvil":
+                    ogs = (OnGroundState)objSave;
+                    CraftingAnvil ca = new CraftingAnvil(ogs.team, ogs.region, ogs.location, _content, _graphics);
+                    return ca;
 
             }
             return sp;
@@ -531,7 +625,7 @@ namespace Gusto
                     return new BaseBarrelItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "basePlank":
                     return new BasePlank(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
-                case "cannonBall":
+                case "cannonBallItem":
                     return new CannonBallItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "coal":
                     return new Coal(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
@@ -547,7 +641,7 @@ namespace Gusto
                     return new Pickaxe(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "pistol":
                     return new Pistol(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
-                case "pistolShot":
+                case "pistolShotItem":
                     return new PistolShotItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "shortSword":
                     return new ShortSword(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
@@ -618,7 +712,8 @@ namespace Gusto
                     {
                         if (stItem == null)
                         {
-                            storageInventorySzd[index] = null;
+                            storageInventorySzd[indexStorage] = null;
+                            indexStorage++;
                             continue;
                         }
 

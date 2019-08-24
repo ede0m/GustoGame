@@ -263,9 +263,7 @@ namespace Gusto
         protected override void Update(GameTime gameTime)
         {
             var kstate = Keyboard.GetState();
-            List<Sprite> toRemove = new List<Sprite>();
             HashSet<Sprite> groundObjectUpdateOrder = new HashSet<Sprite>();
-            HashSet<Sprite> droppedItemObjectUpdateOrder = new HashSet<Sprite>();
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.F4))
                 Exit();
@@ -306,10 +304,7 @@ namespace Gusto
 
             inventoryMenu.Update(kstate, gameTime, this.camera);
             craftingMenu.Update(kstate, gameTime, this.camera);
-            
-            // clear any "dead" objects from updating
-            foreach (var r in toRemove)
-                UpdateOrder.Remove(r);
+           
 
             // set any visible collidable map pieces for collision
             foreach (var tile in BoundingBoxLocations.LandTileLocationList)
@@ -326,22 +321,9 @@ namespace Gusto
                 groundObjectUpdateOrder.Add(sp);
             }
 
-            // add any dropped items (and placable items)
-            foreach (var item in ItemUtility.ItemsToUpdate)
-                droppedItemObjectUpdateOrder.Add(item);
-
             // merge update orders
             HashSet<Sprite> fullUpdateOrder = GameStateObjectUpdateOrder;
             fullUpdateOrder.UnionWith(groundObjectUpdateOrder);
-            fullUpdateOrder.UnionWith(droppedItemObjectUpdateOrder);
-            // remove anything "dead"
-            foreach (var sp in fullUpdateOrder)
-            {
-                if (sp.remove)
-                    toRemove.Add(sp);
-            }
-            foreach (var r in toRemove)
-                fullUpdateOrder.Remove(r);
 
             // Set draw order and collision from the full update order list
             Collidable.Clear();
