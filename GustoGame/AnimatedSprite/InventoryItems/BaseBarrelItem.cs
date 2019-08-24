@@ -16,7 +16,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
     {
         public BaseBarrelItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
-            var itemKey = "baseBarrelItem";
+            itemKey = "baseBarrelItem";
 
             Texture2D texture = content.Load<Texture2D>("Barrel");
             Texture2D textureBB = null;

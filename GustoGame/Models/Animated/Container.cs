@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Barrel : Sprite, ICanUpdate
+    public class Container : Sprite, ICanUpdate, IDrops
     {
         public bool inWater;
         public int nHitsToDestroy;
@@ -30,7 +30,7 @@ namespace Gusto.Models.Animated
 
         public List<InventoryItem> drops;
 
-        public Barrel(TeamType type, string region, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public Container(TeamType type, string region, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             msPerFrame = 250;
             msAnimate = 200;

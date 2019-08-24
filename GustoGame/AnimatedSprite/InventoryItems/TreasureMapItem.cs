@@ -31,18 +31,19 @@ namespace Gusto.AnimatedSprite
             if (reward != null)
             {
                 rewarded = reward;
+                storageTierType = reward.storageTierType;
             }
             else
             {
-                lootTier = 0;
+                storageTierType = "baseChestItem";
                 // random tier of loot
-                int rand = RandomEvents.rand.Next(0, 100);
+                /*int rand = RandomEvents.rand.Next(0, 100);
                 if (rand > 40 && rand < 70)
-                    lootTier = 1;
+                    storageTierType = "seaManChestItem";
                 if (rand > 70 && rand < 90)
                     lootTier = 2;
                 if (rand > 90)
-                    lootTier = 3;
+                    lootTier = 3;*/
 
                 // randomly assign tile in region for dig up spot
                 List<Sprite> landTilesInRegion = null;
@@ -54,7 +55,7 @@ namespace Gusto.AnimatedSprite
                     if (landTilesInRegion.Count == 0)
                         landTilesInRegion = null;
                     else
-                        digTile = (TilePiece)landTilesInRegion[RandomEvents.rand.Next(landTilesInRegion.Count)];
+                        digTileLoc = landTilesInRegion[RandomEvents.rand.Next(landTilesInRegion.Count)].location;
                 }
                 
             }

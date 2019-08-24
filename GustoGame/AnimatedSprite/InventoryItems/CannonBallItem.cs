@@ -14,7 +14,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
     {
         public CannonBallItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
-            itemKey = "cannonBall";
+            itemKey = "cannonBallItem";
 
             Texture2D textureCannonBallItem = content.Load<Texture2D>("CannonBall");
             Texture2D textureCannonBallItemBB = null;

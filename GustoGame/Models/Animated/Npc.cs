@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class GroundEnemy : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
+    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -50,7 +50,7 @@ namespace Gusto.Models.Animated
         ContentManager _content;
         GraphicsDevice _graphics;
 
-        public GroundEnemy(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public Npc(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             teamType = type;
             _content = content;

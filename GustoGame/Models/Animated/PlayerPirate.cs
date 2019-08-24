@@ -23,6 +23,7 @@ namespace Gusto.Models.Animated
         public float timeSinceLastWalkFrame;
         public float timeSinceSwordSwing;
         public float timeSinceExitShipStart;
+        public float timeSincePressedBury;
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         public float millisecondsCombatSwing;
@@ -94,11 +95,13 @@ namespace Gusto.Models.Animated
                 {
                     nearShip = true;
                     playerOnShip = (Ship)collidedWith;
+                    if (playerOnShip.sinking)
+                        playerOnShip = null;
                 }
             }
-            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.GroundEnemy))
+            else if (collidedWith.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
             {
-                GroundEnemy enemy = (GroundEnemy)collidedWith;
+                Npc enemy = (Npc)collidedWith;
                 colliding = false;
                 if (enemy.inCombat)
                 {
@@ -338,32 +341,37 @@ namespace Gusto.Models.Animated
             int? removeChestIndex = null; 
             if (canBury && kstate.IsKeyDown(Keys.B))
             {
-                // remove first chest
-                foreach(var item in inventory)
+                timeSincePressedBury += gameTime.ElapsedGameTime.Milliseconds;
+                if (timeSincePressedBury > 1000)
                 {
-                    if (item == null)
-                        continue;
-                    if (item.placeableVersion != null && item.placeableVersion is IStorage)
+                    // remove first chest
+                    foreach (var item in inventory)
                     {
-                        removeChestIndex = inventory.IndexOf(item);
-                        break;
+                        if (item == null)
+                            continue;
+                        if (item.placeableVersion != null && item.placeableVersion is IStorage)
+                        {
+                            removeChestIndex = inventory.IndexOf(item);
+                            break;
+                        }
                     }
-                }
 
-                // create map
-                if (removeChestIndex != null)
-                {
-                    Storage toBury = (Storage)inventory[(int)removeChestIndex].placeableVersion;
-                    TreasureMapItem mapToAdd = new TreasureMapItem(toBury, teamType, regionKey, location, _content, _graphics);
-                    mapToAdd.digTile = buryTile;
-                    mapToAdd.treasureInRegion = buryTile.regionKey;
-                    mapToAdd.inInventory = false;
-                    mapToAdd.remove = false;
-                    mapToAdd.onGround = true;
-                    ItemUtility.ItemsToUpdate.Add(mapToAdd);
-                    inventory[(int)removeChestIndex] = null;
+                    // create map
+                    if (removeChestIndex != null)
+                    {
+                        Storage toBury = (Storage)inventory[(int)removeChestIndex].placeableVersion;
+                        TreasureMapItem mapToAdd = new TreasureMapItem(toBury, teamType, regionKey, location, _content, _graphics);
+                        mapToAdd.digTileLoc = buryTile.location;
+                        mapToAdd.treasureInRegion = buryTile.regionKey;
+                        mapToAdd.inInventory = false;
+                        mapToAdd.remove = false;
+                        mapToAdd.onGround = true;
+                        buryTile.currColumnFrame = 0;
+                        ItemUtility.ItemsToUpdate.Add(mapToAdd);
+                        inventory[(int)removeChestIndex] = null;
+                    }
+                    timeSincePressedBury = 0;
                 }
-
             }
             buryTile = null;
             canBury = false;

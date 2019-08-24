@@ -21,6 +21,7 @@ namespace Gusto.Models.Animated
         public int nInventorySlots;
         public bool canOpenStorage;
         public bool storageOpen;
+        public string storageTierType;
 
         int nTimesHit;
         int hitsToPickUp;

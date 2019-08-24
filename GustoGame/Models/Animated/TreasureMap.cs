@@ -15,8 +15,8 @@ namespace Gusto.Models.Animated
     public class TreasureMap : InventoryItem
     {
         public string treasureInRegion;
-        public TilePiece digTile;
-        public int lootTier;
+        public Vector2 digTileLoc;
+        public string storageTierType;
         public Storage rewarded;
         public bool solved;
 

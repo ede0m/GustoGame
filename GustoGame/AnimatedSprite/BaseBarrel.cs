@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class BaseBarrel : Barrel
+    public class BaseBarrel : Container
     {
         public BaseBarrel(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, region, content, graphics)
         {

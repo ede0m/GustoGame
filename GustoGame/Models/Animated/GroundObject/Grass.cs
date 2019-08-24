@@ -44,7 +44,7 @@ namespace Gusto.Models.Animated
             team = t;
             _content = content;
             _graphics = graphics;
-            msAnimate = 500;
+            msAnimate = 1000;
             msNow = msAnimate;
 
             drops = new List<InventoryItem>();

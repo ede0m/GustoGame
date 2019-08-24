@@ -72,17 +72,15 @@ namespace Gusto.Models.Animated
         public TeamType teamType;
         public Sprite randomRoamTile;
         public Sail shipSail { get; set; }
-        public WindArrows wind;
         public List<Ammo> Shots;
         public List<InventoryItem> inventory;
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
-        public Ship(TeamType type, WindArrows w, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             Shots = new List<Ammo>();
             inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
-            wind = w;
             teamType = type;
             _content = content;
             _graphics = graphics;
@@ -177,8 +175,8 @@ namespace Gusto.Models.Animated
                 timeSinceLastExpClean = 0;
             }
 
-            int windDir = wind.getWindDirection();
-            int windSp = wind.getWindSpeed();
+            int windDir = WeatherState.wind.getWindDirection();
+            int windSp = WeatherState.wind.getWindSpeed();
 
             if (moving)
             {
@@ -214,8 +212,10 @@ namespace Gusto.Models.Animated
                     // drop items
                     foreach (var item in inventory)
                     {
-                        // TODO: drop (package up) all items as barrels/chests
+                        if (item == null)
+                            continue;
 
+                        // TODO: drop (package up) all items as barrels/chests
                         if (item.bbKey.Equals("baseBarrelItem"))
                         {
                             BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);
