@@ -185,6 +185,48 @@ namespace Gusto
                     SaveState.Add(state);
                 }
 
+                else if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
+                {
+                    Npc npc = (Npc)sp;
+                    NpcState state = new NpcState();
+                    state.team = npc.teamType;
+                    state.location = npc.location;
+                    state.objKey = npc.bbKey;
+                    state.region = npc.regionKey;
+                    state.inventory = CreateSerializableInventory(npc.inventory);
+                    state.onShip = npc.onShip;
+                    if (npc.playerOnShip != null)
+                    {
+                        if (shipMap.ContainsKey(npc.playerOnShip))
+                            state.playerOnShipId = shipMap[npc.playerOnShip];
+                        else
+                        {
+                            // save the ship that the player was on. 
+                            Ship sh = (Ship)npc.playerOnShip;
+                            ShipState shipState = new ShipState();
+                            shipState.team = sh.teamType;
+                            shipState.location = sh.location;
+                            shipState.region = sh.regionKey;
+                            shipState.objKey = sh.bbKey;
+                            shipState.inventory = CreateSerializableInventory(sh.inventory);
+                            shipState.playerAboard = sh.playerAboard;
+                            shipState.anchored = sh.anchored;
+                            shipState.health = sh.health;
+                            // create and save guid for player and ship, track it
+                            Guid shipId = Guid.NewGuid();
+                            state.playerOnShipId = shipId;
+                            shipState.shipId = shipId;
+                            shipMap.Add(sh, shipId);
+                            SaveState.Add(state);
+                        }
+                    }
+                    else
+                        state.playerOnShipId = Guid.Empty;
+
+                    state.health = npc.health;
+                    SaveState.Add(state);
+                }
+
                 else if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship sh = (Ship)sp;
@@ -232,7 +274,7 @@ namespace Gusto
 
         public void LoadGameState()
         {
-            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState) };
+            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState) };
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), deserializeTypes);
             FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
@@ -275,11 +317,12 @@ namespace Gusto
                         {
                             // we have to loop here again to find the save state.. eh
                             ISaveState shipSaveStateToFind = null;
+                            ShipState shipSave = null;
                             foreach (ISaveState ss in LoadFromState)
                             {
                                 if (objState.GetType() == typeof(ShipState))
                                 {
-                                    ShipState shipSave = (ShipState)objState;
+                                    shipSave = (ShipState)objState;
                                     if (shipSave.shipId == ps.playerOnShipId)
                                     {
                                         shipSaveStateToFind = shipSave;
@@ -288,7 +331,7 @@ namespace Gusto
                                 }
 
                             }
-                            Ship s = (Ship)DeserializeModel(ps.objKey, shipSaveStateToFind);
+                            Ship s = (Ship)DeserializeModel(shipSave.objKey, shipSaveStateToFind);
                             shipMap.Add(s, ps.playerOnShipId);
                             player.playerOnShip = s;
                             UpdateOrder.Add(s);
@@ -299,6 +342,58 @@ namespace Gusto
                     player.regionKey = ps.region;
                     player.health = ps.health;
                     UpdateOrder.Add(player);
+                }
+
+                if (objState.GetType() == typeof(NpcState))
+                {
+                    NpcState npcs = (NpcState)objState;
+                    Npc npc = (Npc)DeserializeModel(npcs.objKey, npcs);
+                    npc.location = npcs.location;
+                    npc.inventory = DeserializeInventory(npcs.inventory);
+
+                    if (npcs.playerOnShipId == Guid.Empty)
+                        npc.playerOnShip = null;
+                    else
+                    {
+                        // check if the ship already exists
+                        foreach (KeyValuePair<Ship, Guid> ship in shipMap)
+                        {
+                            if (npcs.playerOnShipId == ship.Value)
+                            {
+                                npc.playerOnShip = ship.Key;
+                                break;
+                            }
+                        }
+                        // ship did not already exist so we have to create here
+                        if (npc.playerOnShip == null)
+                        {
+                            // we have to loop here again to find the save state.. eh
+                            ISaveState shipSaveStateToFind = null;
+                            ShipState shipSave = null;
+                            foreach (ISaveState ss in LoadFromState)
+                            {
+                                if (objState.GetType() == typeof(ShipState))
+                                {
+                                    shipSave = (ShipState)objState;
+                                    if (shipSave.shipId == npcs.playerOnShipId)
+                                    {
+                                        shipSaveStateToFind = shipSave;
+                                        break;
+                                    }
+                                }
+
+                            }
+                            Ship s = (Ship)DeserializeModel(shipSave.objKey, shipSaveStateToFind);
+                            shipMap.Add(s, npcs.playerOnShipId);
+                            npc.playerOnShip = s;
+                            UpdateOrder.Add(s);
+                        }
+                    }
+
+                    npc.onShip = npcs.onShip;
+                    npc.regionKey = npcs.region;
+                    npc.health = npcs.health;
+                    UpdateOrder.Add(npc);
                 }
 
                 else if (objState.GetType() == typeof(ShipState))
@@ -408,6 +503,13 @@ namespace Gusto
                     if (bs.playerAboard)
                         bs.shipSail.playerAboard = true;
                     return bs;
+
+                case "baseTribal":
+                    NpcState npcs = (NpcState)objSave;
+                    BaseTribal bt = new BaseTribal(npcs.team, npcs.region, npcs.location, _content, _graphics);
+                    bt.health = npcs.health;
+                    bt.inventory = DeserializeInventory(npcs.inventory);
+                    return bt;
 
             }
             return sp;
