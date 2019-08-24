@@ -412,11 +412,11 @@ namespace Gusto
             {
                 if (sprite is IShadowCaster)
                 {
-                    sprite.DrawShadow(spriteBatchView, camera, dayLight.sunAngleX, dayLight.shadowTransparency);
+                    sprite.DrawShadow(spriteBatchView, camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
                     if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                     {
                         Ship ship = (Ship)sprite;
-                        ship.shipSail.DrawShadow(spriteBatchView, this.camera, dayLight.sunAngleX, dayLight.shadowTransparency);
+                        ship.shipSail.DrawShadow(spriteBatchView, this.camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
                     }
                 }
             }

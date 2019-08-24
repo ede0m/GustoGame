@@ -11,15 +11,18 @@ namespace Gusto.GameMap
 {
     public static class WeatherState
     {
+        public static float currentMsOfDay { get; set; }
+        public static float currentLightIntensity { get; set; }
+        public static float sunAngleX { get; set; }
+        public static float shadowTransparency { get; set; }
+        public static int totalDays { get; set; }
         public static float weatherDuration { get; set; }
         public static float msThroughWeather { get; set; }
-
         public static List<RainDrop> rain { get; set; }
         public static RainState rainState { get; set; }
         public static WindArrows wind { get; set; } // this is a static sprite
         public static int rainIntensity { get; set; }
         public static bool lightning { get; set; }
         public static BranchLightning lightningBolt { get; set; }
-
     }
 }

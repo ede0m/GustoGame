@@ -2,8 +2,10 @@
 using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Bounding;
+using Gusto.GameMap;
 using Gusto.Models;
 using Gusto.Models.Animated;
+using Gusto.Models.Animated.Weather;
 using Gusto.Models.Interfaces;
 using Gusto.Models.Menus;
 using Gusto.SaveState;
@@ -206,6 +208,20 @@ namespace Gusto
                 // TODO: OTHER STATES (WEATHER, ETC)
             }
 
+            // Can do the weather state separately becasue it is not in the updateOrder
+            WeatherSaveState wss = new WeatherSaveState();
+            wss.currentMsOfDay = WeatherState.currentMsOfDay;
+            wss.currentLightIntensity = WeatherState.currentLightIntensity;
+            wss.sunAngleX = WeatherState.sunAngleX;
+            wss.shadowTransparency = WeatherState.shadowTransparency;
+            wss.nDays = WeatherState.totalDays;
+            wss.weatherDuration = WeatherState.weatherDuration;
+            wss.msThroughWeather = WeatherState.msThroughWeather;
+            wss.rainState = WeatherState.rainState;
+            wss.rainIntensity = WeatherState.rainIntensity;
+            wss.lightning = WeatherState.lightning;
+            SaveState.Add(wss);
+
             // serialize save to file system
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>));
             using (FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Create))
@@ -216,7 +232,7 @@ namespace Gusto
 
         public void LoadGameState()
         {
-            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState) };
+            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState) };
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), deserializeTypes);
             FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
@@ -276,7 +292,6 @@ namespace Gusto
                             shipMap.Add(s, ps.playerOnShipId);
                             player.playerOnShip = s;
                             UpdateOrder.Add(s);
-                            //UpdateOrder.Add(s.shipSail);
                         }
                     }
 
@@ -304,11 +319,28 @@ namespace Gusto
                         Ship s = (Ship)DeserializeModel(ss.objKey, ss);
                         shipMap.Add(s, ss.shipId);
                         UpdateOrder.Add(s);
-                        //UpdateOrder.Add(s.shipSail);
                     }
-                    
+
                 }
 
+                else if (objState.GetType() == typeof(WeatherSaveState))
+                {
+                    WeatherSaveState wss = (WeatherSaveState)objState;
+                    WeatherState.currentLightIntensity = wss.currentLightIntensity;
+                    WeatherState.currentMsOfDay = wss.currentMsOfDay;
+                    WeatherState.sunAngleX = wss.sunAngleX;
+                    WeatherState.shadowTransparency = wss.shadowTransparency;
+                    WeatherState.totalDays = wss.nDays;
+                    WeatherState.weatherDuration = wss.weatherDuration;
+                    WeatherState.msThroughWeather = wss.msThroughWeather;
+                    WeatherState.rainState = wss.rainState;
+                    WeatherState.rainIntensity = wss.rainIntensity;
+                    WeatherState.lightning = wss.lightning;
+
+                    // set the rain
+                    for(int i = 0; i < WeatherState.rainIntensity; i++)
+                        WeatherState.rain.Add(new RainDrop(_content, _graphics));
+                }
             }
 
         }

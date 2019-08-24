@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using Gusto.AnimatedSprite;
+using Gusto.GameMap;
 
 namespace Gusto.SaveState
 {
@@ -86,8 +87,32 @@ namespace Gusto.SaveState
         public float health { get; set; }
     }
 
+    [DataContract]
+    [KnownType(typeof(RainState))]
+    [KnownType(typeof(WeatherSaveState))]
+    public class WeatherSaveState : ISaveState
+    {
+        [DataMember]
+        public float currentMsOfDay;
+        [DataMember]
+        public float currentLightIntensity { get; set; }
+        [DataMember]
+        public float sunAngleX { get; set; }
+        [DataMember]
+        public float shadowTransparency { get; set; }
+        [DataMember]
+        public int nDays;
+        [DataMember]
+        public float weatherDuration { get; set; }
+        [DataMember]
+        public float msThroughWeather { get; set; }
+        [DataMember]
+        public RainState rainState { get; set; }
+        [DataMember]
+        public int rainIntensity { get; set; }
+        [DataMember]
+        public bool lightning { get; set; }
+    }
+
     // ... TODO: more states - weather, stuffInBoundingBoxLocations?(treasuremaps), etc
-    
-
-
 }

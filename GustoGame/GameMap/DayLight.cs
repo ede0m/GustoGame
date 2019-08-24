@@ -15,9 +15,7 @@ namespace Gusto.GameMap
     public class DayLight
     {
         float maxShadowTransparency;
-        public float shadowTransparency;
-        float sunAngleXStart; 
-        public float sunAngleX; 
+        float sunAngleXStart;
 
         float currentMsOfDay;
         float dayLengthMs;
@@ -33,7 +31,6 @@ namespace Gusto.GameMap
         float overcastAdder; // used to overexpose green in the shader during overcast
         float minIntensity;
         float currentIntensity;
-        float tempCurrentIntensity;
 
         ContentManager _content;
         GraphicsDevice _graphics;
@@ -42,6 +39,9 @@ namespace Gusto.GameMap
 
         public DayLight(ContentManager content, GraphicsDevice graphics)
         {
+            WeatherState.totalDays = 0;
+            WeatherState.currentMsOfDay = 0;
+
             currentMsOfDay = 0;
             dayLengthMs = GameOptions.GameDayLengthMs; // how long the day takes
 
@@ -53,14 +53,14 @@ namespace Gusto.GameMap
             minIntensity = 1;
             sunRiseSetIntensity = 2; // intensity of ambient light at sunrise and sunset
             currentIntensity = maxBlackoutIntensity;
-            tempCurrentIntensity = maxBlackoutIntensity;
+            WeatherState.currentLightIntensity = maxBlackoutIntensity;
 
             sunRisePercent = 0.165f; // sunrise happens at 16.5% of day
             sunSetPercent = 0.835f; // sunset happens at 83.5% of day
             halfDayPercent = 0.5f;
 
             sunAngleXStart = 40; // angle for casting shadows. (-60 to 60) should take up sun time
-            sunAngleX = sunAngleXStart;
+            WeatherState.sunAngleX = sunAngleXStart;
             maxShadowTransparency = 0.15f;
 
             _content = content;
@@ -74,22 +74,22 @@ namespace Gusto.GameMap
         {
 
             float elapsedMs = gameTime.ElapsedGameTime.Milliseconds;
-            currentMsOfDay += elapsedMs;
-            percentDayComplete = currentMsOfDay / dayLengthMs;
+            WeatherState.currentMsOfDay += elapsedMs;
+            percentDayComplete = WeatherState.currentMsOfDay / dayLengthMs;
 
             // fade in/out shadows
 
             if (percentDayComplete > 0.05f && percentDayComplete < 0.85f)
-                shadowTransparency += (gameTime.ElapsedGameTime.Milliseconds / (dayLengthMs * 0.1f)) * maxShadowTransparency;
-            if (shadowTransparency > maxShadowTransparency)
-                shadowTransparency = maxShadowTransparency;
+                WeatherState.shadowTransparency += (gameTime.ElapsedGameTime.Milliseconds / (dayLengthMs * 0.1f)) * maxShadowTransparency;
+            if (WeatherState.shadowTransparency > maxShadowTransparency)
+                WeatherState.shadowTransparency = maxShadowTransparency;
             if (percentDayComplete > 0.83)
-               shadowTransparency -= (gameTime.ElapsedGameTime.Milliseconds / (dayLengthMs * 0.1f)) * maxShadowTransparency;
+                WeatherState.shadowTransparency -= (gameTime.ElapsedGameTime.Milliseconds / (dayLengthMs * 0.1f)) * maxShadowTransparency;
 
             // don't surpass max angle for sun
-            sunAngleX -= (gameTime.ElapsedGameTime.Milliseconds / dayLengthMs) * sunAngleXStart * 2; 
-            if (sunAngleX < -1 * sunAngleXStart)
-                sunAngleX = -1 * sunAngleXStart;
+            WeatherState.sunAngleX -= (gameTime.ElapsedGameTime.Milliseconds / dayLengthMs) * sunAngleXStart * 2; 
+            if (WeatherState.sunAngleX < -1 * sunAngleXStart)
+                WeatherState.sunAngleX = -1 * sunAngleXStart;
 
             float ambientIntensityChange = 0;
             float intensityDelta = 0;
@@ -121,12 +121,12 @@ namespace Gusto.GameMap
 
             float sign = incrementIntensity ? 1 : -1;
             ambientIntensityChange = sign * intensityDelta / msUntilChange * elapsedMs;
-            tempCurrentIntensity += ambientIntensityChange;
+            WeatherState.currentLightIntensity += ambientIntensityChange;
 
-            // rain overcast - we always want to converge to tempCurrentIntensity in 1/10th of the storm time (the time be begin ending the storm)
+            // rain overcast - we always want to converge to WeatherState.currentLightIntensity in 1/10th of the storm time (the time be begin ending the storm)
             if (WeatherState.rainState == RainState.STARTING || WeatherState.rainState == RainState.RAINING)
             {
-                if (tempCurrentIntensity < overcastIntensity)
+                if (WeatherState.currentLightIntensity < overcastIntensity)
                 {
                     currentIntensity += 0.01f;
 
@@ -134,7 +134,7 @@ namespace Gusto.GameMap
                         currentIntensity = overcastIntensity;
                 }
                 else
-                    currentIntensity = tempCurrentIntensity;
+                    currentIntensity = WeatherState.currentLightIntensity;
                 // used to expose more green during overcast
                 overcastAdder += 0.01f;
                 if (overcastAdder > 2)
@@ -143,10 +143,10 @@ namespace Gusto.GameMap
             }
             else if (WeatherState.rainState == RainState.ENDING)
             {
-                if (tempCurrentIntensity < currentIntensity)
+                if (WeatherState.currentLightIntensity < currentIntensity)
                     currentIntensity -= 0.05f;
                 else
-                    currentIntensity = tempCurrentIntensity;
+                    currentIntensity = WeatherState.currentLightIntensity;
 
                 overcastAdder -= 0.01f;
                 if (overcastAdder < 1)
@@ -154,20 +154,20 @@ namespace Gusto.GameMap
             }
             else
             {
-                currentIntensity = tempCurrentIntensity;
+                currentIntensity = WeatherState.currentLightIntensity;
                 overcastAdder = 1.0f;
             }
-
 
             // reset day
             if (percentDayComplete > 1.0f)
             {
-                sunAngleX = sunAngleXStart;
-                shadowTransparency = 0;
+                WeatherState.totalDays++;
+                WeatherState.sunAngleX = sunAngleXStart;
+                WeatherState.shadowTransparency = 0;
                 percentDayComplete = 0.0f;
-                currentMsOfDay = 0;
+                WeatherState.currentMsOfDay = 0;
                 currentIntensity = maxBlackoutIntensity;
-                tempCurrentIntensity = maxBlackoutIntensity;
+                WeatherState.currentLightIntensity = maxBlackoutIntensity;
             }
 
         }

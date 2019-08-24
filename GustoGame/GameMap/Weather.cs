@@ -59,7 +59,7 @@ namespace Gusto.GameMap
                
                 // RAIN chance
                 int randRain = RandomEvents.rand.Next(0, 100);
-                if (randRain <= 20) // 20% chance of rain
+                if (randRain <= 80) // 20% chance of rain
                 {
                     WeatherState.rainState = RainState.STARTING;
                     WeatherState.rain.Clear();
