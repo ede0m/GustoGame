@@ -318,8 +318,6 @@ namespace Gusto.Models.Animated
                 location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
             }
 
-            // TODO!! NEED TO FIGURE OUT HOW TO HANDLE PLAYER LOCATION WHEN IN SHIP INTERIOR (AND ANY INTERIOR REALLY)
-
             else if (moving && !inCombat)
             {
                 // walking animation

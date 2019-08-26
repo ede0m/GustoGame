@@ -192,6 +192,11 @@ namespace Gusto.Models.Animated
                 location.Y += currentShipSpeedY;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
+            else
+            {
+                currentShipSpeedX = 0;
+                currentShipSpeedY = 0;
+            }
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
             int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
             int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;

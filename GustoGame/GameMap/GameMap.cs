@@ -122,43 +122,25 @@ namespace Gusto.GameMap
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
-            BoundingBoxLocations.LandTileLocationList.Clear();
-            BoundingBoxLocations.GroundObjectLocationList.Clear();
+            //BoundingBoxLocations.LandTileLocationList.Clear();
+            //BoundingBoxLocations.GroundObjectLocationList.Clear();
             //collidablePieces.Clear();
             foreach (var tile in map)
             {
                 var loc = tile.location;
                 if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
-                {
-                    if (tile.bbKey.Equals("landTile"))
-                    {
-                        BoundingBoxLocations.LandTileLocationList.Add(tile);
-                    }
-                        //collidablePieces.Add(tile);
                     tile.Draw(sb, _cam);
-                    TilePiece tileP = (TilePiece)tile;
-
-                    if (tileP.groundObject != null)
-                    {
-                        if (!tileP.groundObject.remove)
-                            BoundingBoxLocations.GroundObjectLocationList.Add(tileP.groundObject);
-                        else
-                        {
-                            if (tileP.groundObject is IGroundObject)
-                            {
-                                IGroundObject go = (IGroundObject)tileP.groundObject;
-                                go.UpdateRespawn(gameTime);
-                            }
-                        }
-                    }
-
-                }
             }
         }
 
         public void LoadMapData(JObject data)
         {
             _mapData = data;
+        }
+
+        public List<Sprite> GetMap()
+        {
+            return map;
         }
     }
 }

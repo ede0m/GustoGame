@@ -312,7 +312,42 @@ namespace Gusto
 
             inventoryMenu.Update(kstate, gameTime, this.camera);
             craftingMenu.Update(kstate, gameTime, this.camera);
-           
+
+            // set any visible collidable map pieces for collision - update LandTileLocList and GroundObjLocList
+            BoundingBoxLocations.LandTileLocationList.Clear();
+            BoundingBoxLocations.GroundObjectLocationList.Clear();
+            Vector2 minCorner = new Vector2(camera.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
+            Vector2 maxCorner = new Vector2(camera.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
+            foreach (var tile in map.GetMap())
+            {
+                TilePiece tp = (TilePiece)tile;
+                var loc = tp.location;
+                if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
+                {
+                    
+                    if (tp.bbKey.Equals("landTile"))
+                    {
+                        BoundingBoxLocations.LandTileLocationList.Add(tile);
+                        SpatialBounding.SetQuad(tile.GetBase());
+                    }
+
+                    // handle ground objects (and respawn)
+                    if (tp.groundObject != null)
+                    {
+                        if (!tp.groundObject.remove)
+                            BoundingBoxLocations.GroundObjectLocationList.Add(tp.groundObject);
+                        else
+                        {
+                            if (tp.groundObject is IGroundObject)
+                            {
+                                IGroundObject go = (IGroundObject)tp.groundObject;
+                                go.UpdateRespawn(gameTime);
+                            }
+                        }
+                    }
+                }
+
+            }
 
             // set any visible collidable map pieces for collision
             foreach (var tile in BoundingBoxLocations.LandTileLocationList)
