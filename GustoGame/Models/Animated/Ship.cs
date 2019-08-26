@@ -48,6 +48,8 @@ namespace Gusto.Models.Animated
         private Texture2D meterFull;
         private Texture2D meterProg;
 
+        public float currentShipSpeedX;
+        public float currentShipSpeedY;
         public float shotRange;
         public float attackRange;
         public float stopRange;
@@ -67,6 +69,7 @@ namespace Gusto.Models.Animated
         public bool aiming;
         public bool anchored;
         public bool playerAboard;
+        public bool playerInInterior;
         bool roaming;
 
         public TeamType teamType;
@@ -183,8 +186,10 @@ namespace Gusto.Models.Animated
             {
                 // map frame to vector movement
                 Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                location.X += (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored;
-                location.Y += (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored;
+                currentShipSpeedX = (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored;
+                currentShipSpeedY = (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored;
+                location.X += currentShipSpeedX;
+                location.Y += currentShipSpeedY;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
@@ -193,9 +198,10 @@ namespace Gusto.Models.Animated
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
 
+            // ship sail update
             shipSail.Update(kstate, gameTime, windDir, windSp);
-            SpatialBounding.SetQuad(GetBase());
 
+            SpatialBounding.SetQuad(GetBase());
             // sinking
             if (health <= 0)
             {
@@ -244,7 +250,7 @@ namespace Gusto.Models.Animated
             //health = 40; //UNLIMITED HEALTH
             
             // turning
-            if (timeSinceLastTurn > millisecondsPerTurn && playerAboard)
+            if (timeSinceLastTurn > millisecondsPerTurn && playerAboard && !playerInInterior)
             {
                 if (!kstate.IsKeyDown(Keys.LeftShift))
                 {

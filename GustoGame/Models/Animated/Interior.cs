@@ -22,6 +22,7 @@ namespace Gusto.Models.Animated
 
         private JObject _interiorMapData;
         private List<TilePiece> interiorMap;
+        public bool playerInInterior;
 
         private int width;
         private int height;
@@ -113,7 +114,7 @@ namespace Gusto.Models.Animated
         public void Draw(SpriteBatch sb, Camera cam)
         {
 
-            // Draw the tileset (see gamemap.drawmap)
+            // Draw the tileset
             Vector2 minCorner = new Vector2(cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
 
@@ -130,11 +131,11 @@ namespace Gusto.Models.Animated
                         continue;
                     }
                     tile.location = drawPoint;
-                    //var loc = tile.location;
-                    //if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
-                    //{
+                    var loc = tile.location;
+                    if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
+                    {
                         tile.Draw(sb, cam);
-                    //}
+                    }
                     drawPoint.X += GameOptions.tileWidth * 2;
                 }
                 drawPoint.Y += GameOptions.tileHeight * 2;

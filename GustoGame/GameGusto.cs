@@ -372,13 +372,13 @@ namespace Gusto
             BoundingBoxLocations.LightLocationList.Clear(); // clear after we have drawn the light mask
 
             // trackers for statically drawn sprites as we move through draw order
-            bool showInventoryMenu = false;
             bool showCraftingMenu = false;
             bool showStorageMenu = false;
-            bool playerOnShip = false;
-            Ship playerShip = null;
-            List<InventoryItem> invItemsPlayer = null;
+            Ship playerShip = gameState.player.playerOnShip;
+            List<InventoryItem> invItemsPlayer = gameState.player.inventory;
             List<InventoryItem> invItemsShip = null;
+            if (gameState.player.onShip)
+                invItemsShip = gameState.player.playerOnShip.inventory;
             Storage invStorage = null;
 
             // draw the interior view if in interior
@@ -387,6 +387,7 @@ namespace Gusto
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.Black);
                 gameState.player.playerInInterior.Draw(spriteBatchView, this.camera);
+                DrawPlayer();
             }
             // not in interior so draw the game scene
             else
@@ -486,41 +487,7 @@ namespace Gusto
 
                     else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                     {
-                        PlayerPirate pirate = (PlayerPirate)sprite;
-                        invItemsPlayer = pirate.inventory;
-
-                        if (pirate.showInventory)
-                        {
-                            showInventoryMenu = true;
-                            if (pirate.onShip)
-                                invItemsShip = pirate.playerOnShip.inventory;
-                        }
-
-                        if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
-                            pirate.inHand.Draw(spriteBatchView, this.camera);
-                        if (pirate.nearShip)
-                            pirate.DrawEnterShip(spriteBatchView, this.camera);
-                        else if (pirate.onShip)
-                        {
-                            pirate.DrawOnShip(spriteBatchView, this.camera);
-                            playerShip = pirate.playerOnShip;
-                            playerOnShip = true;
-                        }
-
-                        if (pirate.swimming && !pirate.onShip)
-                            pirate.DrawSwimming(spriteBatchView, this.camera);
-                        else if (!pirate.onShip)
-                            pirate.Draw(spriteBatchView, this.camera);
-
-                        if (pirate.canBury)
-                            pirate.DrawCanBury(spriteBatchView, this.camera);
-
-                        if (pirate.inCombat && pirate.currRowFrame != 3)
-                            pirate.inHand.Draw(spriteBatchView, this.camera);
-
-                        foreach (var shot in pirate.inHand.Shots)
-                            shot.Draw(spriteBatchView, this.camera);
-
+                        DrawPlayer();
                         continue;
                     }
 
@@ -578,7 +545,7 @@ namespace Gusto
 
             // draw static and menu sprites
             windArrows.Draw(spriteBatchStatic, null);
-            if (showInventoryMenu)
+            if (gameState.player.showInventory)
             {
                 inventoryMenu.Draw(spriteBatchStatic, null);
                 inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, null);
@@ -594,7 +561,7 @@ namespace Gusto
                 inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, invStorage);
             }
             
-            if (playerOnShip)
+            if (gameState.player.onShip)
             {
                 playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
                 playerShip.DrawRepairHammer(spriteBatchStatic, new Vector2(1600, 30), repairIcon);
@@ -608,6 +575,33 @@ namespace Gusto
             spriteBatchStatic.DrawString(font, fps, new Vector2(10, 10), Color.Green);
             spriteBatchStatic.End();
             base.Draw(gameTime);
+        }
+
+        public void DrawPlayer()
+        {
+            PiratePlayer pirate = gameState.player;
+
+            if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
+                pirate.inHand.Draw(spriteBatchView, this.camera);
+            if (pirate.nearShip)
+                pirate.DrawEnterShip(spriteBatchView, this.camera);
+            else if (pirate.onShip)
+                pirate.DrawOnShip(spriteBatchView, this.camera);
+
+
+            if (pirate.swimming && !pirate.onShip)
+                pirate.DrawSwimming(spriteBatchView, this.camera);
+            else if (!pirate.onShip)
+                pirate.Draw(spriteBatchView, this.camera);
+
+            if (pirate.canBury)
+                pirate.DrawCanBury(spriteBatchView, this.camera);
+
+            if (pirate.inCombat && pirate.currRowFrame != 3)
+                pirate.inHand.Draw(spriteBatchView, this.camera);
+
+            foreach (var shot in pirate.inHand.Shots)
+                shot.Draw(spriteBatchView, this.camera);
         }
 
         // preprocessing to build the region tree

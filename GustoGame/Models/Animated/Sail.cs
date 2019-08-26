@@ -29,6 +29,7 @@ namespace Gusto.Models.Animated
         public int sailPositionInRespectToShip { get; set; }
         public bool sailDirectlyInWind { get; set; }
         public bool playerAboard { get; set; }
+        public bool playerInInterior { get; set; }
 
         private int windWindowMin;
         private int windWindowMax;
@@ -121,7 +122,7 @@ namespace Gusto.Models.Animated
         private void PlayerUpdate(KeyboardState kstate)
         {
             
-            if (playerAboard)
+            if (playerAboard && !playerInInterior)
             {
                 // sail turning
                 if (kstate.IsKeyDown(Keys.LeftShift))

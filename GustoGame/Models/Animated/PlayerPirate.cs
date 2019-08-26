@@ -187,7 +187,7 @@ namespace Gusto.Models.Animated
                         showInventory = true;
                 }
 
-                if (!onShip)
+                if (!onShip || playerInInterior != null)
                 {
                     moving = true;
                     // player direction
@@ -233,10 +233,10 @@ namespace Gusto.Models.Animated
             }
 
             // combat 
-            if (!onShip)
+            if (!onShip || playerInInterior != null)
                 inHand.Update(kstate, gameTime, camera);
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip && !showInventory)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && (!onShip || playerInInterior != null) && !showInventory)
             {
                 inCombat = true;
                 inHand.inCombat = true;
@@ -298,6 +298,7 @@ namespace Gusto.Models.Animated
                 if (timeSinceExitShipStart > 2000)
                 {
                     onShip = false;
+                    playerInInterior = null;
                     playerOnShip.playerAboard = false;
                     playerOnShip.shipSail.playerAboard = false;
                     location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X - playerOnShip.GetBoundingBox().Width/2 - 20;
@@ -311,11 +312,14 @@ namespace Gusto.Models.Animated
             }
             nearShip = false;
 
-            if (onShip)
+            if (onShip && playerInInterior == null)
             {
                 location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X;
                 location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
             }
+
+            // TODO!! NEED TO FIGURE OUT HOW TO HANDLE PLAYER LOCATION WHEN IN SHIP INTERIOR (AND ANY INTERIOR REALLY)
+
             else if (moving && !inCombat)
             {
                 // walking animation
@@ -337,6 +341,13 @@ namespace Gusto.Models.Animated
                 {
                     currColumnFrame = 0;
                 }
+            }
+
+            // can walk in the interior of the ship while it moves
+            if (onShip && playerInInterior != null)
+            {
+                location.X += playerOnShip.currentShipSpeedX;
+                location.Y += playerOnShip.currentShipSpeedY;
             }
 
             // burying storage
@@ -385,13 +396,23 @@ namespace Gusto.Models.Animated
                 if (msToggleInterior > 1000)
                 {
 
-                    // exit interior view toggle
-                    if (onShip && playerInInterior != null)
+                    if (playerInInterior != null)
+                    {
                         playerInInterior = null;
-                    // the onShip interior
-                    else if (onShip && playerOnShip != null)
-                        playerInInterior = playerOnShip.shipInterior;
-
+                        playerOnShip.playerInInterior = false;
+                        playerOnShip.shipSail.playerInInterior = false;
+                    }
+                    else
+                    {
+                        // enter an interior
+                        if (onShip)  // the interior of the ship the player is in
+                        {
+                            playerInInterior = playerOnShip.shipInterior;
+                            playerOnShip.playerInInterior = true;
+                            playerOnShip.shipSail.playerInInterior = true;
+                        }
+                        // Other interiors?
+                    }
                     msToggleInterior = 0;
                 }
             }
@@ -456,8 +477,16 @@ namespace Gusto.Models.Animated
 
             SetBoundingBox();
             sb.Begin(camera);
-            sb.Draw(_texture, location, targetRectangle, Color.White * 0.0f, 0f,
-                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            if (playerInInterior == null)
+            {
+                sb.Draw(_texture, location, targetRectangle, Color.White * 0.0f, 0f,
+                    new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                sb.Draw(_texture, location, targetRectangle, Color.White, 0f,
+                    new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            }
             sb.End();
         }
 
