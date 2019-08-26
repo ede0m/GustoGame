@@ -24,6 +24,10 @@ namespace Gusto.Models
         public int tileKey;
 
         public Sprite groundObject; // any tree, rock, etc asset we want to set to this tile.
+        public bool wallPiece;
+        
+
+        // for digging in a tile
         bool shoveled;
         bool fill;
 

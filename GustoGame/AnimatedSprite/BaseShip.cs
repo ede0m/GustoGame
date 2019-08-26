@@ -58,6 +58,9 @@ namespace Gusto.AnimatedSprite
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(team, region, location, content, graphics);
             shipSail.millisecondsPerFrame = 500; // match turn speed for sail
+
+            shipInterior = new Interior("baseShip", this, content, graphics);
+
             SetSpriteAsset(baseShipAsset, location);
         }
     }

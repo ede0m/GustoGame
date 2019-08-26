@@ -154,6 +154,14 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1Holes");
             LoadDynamicBoundingBoxPerFrame(false, 4, 4, textureLand1, "landTile", 1.0f, 1.0f);
+            Texture2D textureShipDeck1 = Content.Load<Texture2D>("ShipDeck");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipDeck1, "shipDeckTile", 1.0f, 1.0f);
+            Texture2D textureShipDeck1Wall = Content.Load<Texture2D>("ShipDeckWall");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipDeck1Wall, "shipDeckTileWall", 1.0f, 1.0f);
+            Texture2D textureShipInterior1 = Content.Load<Texture2D>("ShipInterior");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipInterior1, "shipInteriorTile", 1.0f, 1.0f);
+            Texture2D textureShipInterior1Wall = Content.Load<Texture2D>("ShipInteriorWall");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipDeck1Wall, "shipInteriorTileWall", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
             LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
@@ -356,28 +364,12 @@ namespace Gusto
                 return;
             }
 
-
             // setup lightTarget for spot lights
             GraphicsDevice.SetRenderTarget(lightsTarget);
             GraphicsDevice.Clear(Color.Black);
             foreach (var light in BoundingBoxLocations.LightLocationList)
                 light.Draw(spriteBatchView, this.camera);
             BoundingBoxLocations.LightLocationList.Clear(); // clear after we have drawn the light mask
-
-            // set up gamescene draw
-            GraphicsDevice.SetRenderTarget(gameScene);
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // draw map
-            map.DrawMap(spriteBatchView, gameTime);
-
-            // draw treasure locations if any
-            spriteBatchView.Begin(this.camera);
-            foreach (var map in BoundingBoxLocations.treasureLocationsList)
-            {
-                spriteBatchView.Draw(treasureXMark, map.digTileLoc, Color.White);
-            }
-            spriteBatchView.End();
 
             // trackers for statically drawn sprites as we move through draw order
             bool showInventoryMenu = false;
@@ -389,168 +381,196 @@ namespace Gusto
             List<InventoryItem> invItemsShip = null;
             Storage invStorage = null;
 
-            // draw shadows
-            foreach (var sprite in DrawOrder)
+            // draw the interior view if in interior
+            if (gameState.player.playerInInterior != null)
             {
-                if (sprite is IShadowCaster)
+                GraphicsDevice.SetRenderTarget(null);
+                GraphicsDevice.Clear(Color.Black);
+                gameState.player.playerInInterior.Draw(spriteBatchView, this.camera);
+            }
+            // not in interior so draw the game scene
+            else
+            {
+                // set up gamescene draw
+                GraphicsDevice.SetRenderTarget(gameScene);
+                GraphicsDevice.Clear(Color.CornflowerBlue);
+
+                // draw map
+                map.DrawMap(spriteBatchView, gameTime);
+
+                // draw treasure locations if any
+                spriteBatchView.Begin(this.camera);
+                foreach (var map in BoundingBoxLocations.treasureLocationsList)
                 {
-                    sprite.DrawShadow(spriteBatchView, camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
+                    spriteBatchView.Draw(treasureXMark, map.digTileLoc, Color.White);
+                }
+                spriteBatchView.End();
+
+                // draw shadows
+                foreach (var sprite in DrawOrder)
+                {
+                    if (sprite is IShadowCaster)
+                    {
+                        sprite.DrawShadow(spriteBatchView, camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
+                        if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
+                        {
+                            Ship ship = (Ship)sprite;
+                            ship.shipSail.DrawShadow(spriteBatchView, this.camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
+                        }
+                    }
+                }
+
+                // sort sprites by y cord asc and draw
+                DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+                int i = 0;
+                foreach (var sprite in DrawOrder)
+                {
+
+                    if (sprite is IVulnerable)
+                    {
+                        IVulnerable v = (IVulnerable)sprite;
+                        v.DrawHealthBar(spriteBatchView, camera);
+                    }
+
+                    if (sprite is IInventoryItem)
+                    {
+                        InventoryItem item = (InventoryItem)sprite;
+                        if (!item.inInventory)
+                            item.DrawPickUp(spriteBatchView, camera);
+                    }
+
+                    if (sprite is ICraftingObject)
+                    {
+                        ICraftingObject craftObj = (ICraftingObject)sprite;
+                        craftObj.DrawCanCraft(spriteBatchView, camera);
+                    }
+
+                    if (sprite is IPlaceable)
+                    {
+                        IPlaceable placeObj = (IPlaceable)sprite;
+                        placeObj.DrawCanPickUp(spriteBatchView, camera);
+                    }
+
+                    if (sprite is IStorage)
+                    {
+                        Storage storage = (Storage)sprite;
+                        storage.DrawOpenStorage(spriteBatchView, camera);
+                        if (storage.storageOpen)
+                        {
+                            showStorageMenu = true;
+                            invStorage = storage;
+                        }
+                    }
+
                     if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                     {
                         Ship ship = (Ship)sprite;
-                        ship.shipSail.DrawShadow(spriteBatchView, this.camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
+
+                        if (ship.sinking)
+                        {
+                            ship.DrawSinking(spriteBatchView, this.camera);
+                            ship.shipSail.DrawSinking(spriteBatchView, this.camera);
+                        }
+                        else
+                        {
+                            // Draw a ships sail before a ship
+                            ship.Draw(spriteBatchView, this.camera);
+                            ship.shipSail.Draw(spriteBatchView, this.camera);
+                            foreach (var shot in ship.Shots)
+                                shot.Draw(spriteBatchView, this.camera);
+                            if (ship.aiming)
+                                ship.DrawAimLine(spriteBatchView, this.camera);
+                        }
+                        continue;
                     }
-                }
-            }
 
-            // sort sprites by y cord asc and draw
-            DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
-            int i = 0;
-            foreach (var sprite in DrawOrder)
-            {
-
-                if (sprite is IVulnerable)
-                {
-                    IVulnerable v = (IVulnerable) sprite;
-                    v.DrawHealthBar(spriteBatchView, camera);
-                }
-
-                if (sprite is IInventoryItem)
-                {
-                    InventoryItem item = (InventoryItem)sprite;
-                    if (!item.inInventory)
-                        item.DrawPickUp(spriteBatchView, camera);
-                }
-
-                if (sprite is ICraftingObject)
-                {
-                    ICraftingObject craftObj = (ICraftingObject)sprite;
-                    craftObj.DrawCanCraft(spriteBatchView, camera);
-                }
-
-                if (sprite is IPlaceable)
-                {
-                    IPlaceable placeObj = (IPlaceable)sprite;
-                    placeObj.DrawCanPickUp(spriteBatchView, camera);
-                }
-
-                if (sprite is IStorage)
-                {
-                    Storage storage = (Storage)sprite;
-                    storage.DrawOpenStorage(spriteBatchView, camera);
-                    if (storage.storageOpen)
+                    else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                     {
-                        showStorageMenu = true;
-                        invStorage = storage;
-                    }
-                }
+                        PlayerPirate pirate = (PlayerPirate)sprite;
+                        invItemsPlayer = pirate.inventory;
 
-                if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
-                {
-                    Ship ship = (Ship) sprite;
+                        if (pirate.showInventory)
+                        {
+                            showInventoryMenu = true;
+                            if (pirate.onShip)
+                                invItemsShip = pirate.playerOnShip.inventory;
+                        }
 
-                    if (ship.sinking)
-                    {
-                        ship.DrawSinking(spriteBatchView, this.camera);
-                        ship.shipSail.DrawSinking(spriteBatchView, this.camera);
-                    }
-                    else
-                    {
-                        // Draw a ships sail before a ship
-                        ship.Draw(spriteBatchView, this.camera);
-                        ship.shipSail.Draw(spriteBatchView, this.camera);
-                        foreach (var shot in ship.Shots)
+                        if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
+                            pirate.inHand.Draw(spriteBatchView, this.camera);
+                        if (pirate.nearShip)
+                            pirate.DrawEnterShip(spriteBatchView, this.camera);
+                        else if (pirate.onShip)
+                        {
+                            pirate.DrawOnShip(spriteBatchView, this.camera);
+                            playerShip = pirate.playerOnShip;
+                            playerOnShip = true;
+                        }
+
+                        if (pirate.swimming && !pirate.onShip)
+                            pirate.DrawSwimming(spriteBatchView, this.camera);
+                        else if (!pirate.onShip)
+                            pirate.Draw(spriteBatchView, this.camera);
+
+                        if (pirate.canBury)
+                            pirate.DrawCanBury(spriteBatchView, this.camera);
+
+                        if (pirate.inCombat && pirate.currRowFrame != 3)
+                            pirate.inHand.Draw(spriteBatchView, this.camera);
+
+                        foreach (var shot in pirate.inHand.Shots)
                             shot.Draw(spriteBatchView, this.camera);
-                        if (ship.aiming)
-                            ship.DrawAimLine(spriteBatchView, this.camera);
+
+                        continue;
                     }
-                    continue;
-                }
 
-                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
-                {
-                    PlayerPirate pirate = (PlayerPirate)sprite;
-                    invItemsPlayer = pirate.inventory;
-
-                    if (pirate.showInventory)
+                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Anvil))
                     {
-                        showInventoryMenu = true;
-                        if (pirate.onShip)
-                            invItemsShip = pirate.playerOnShip.inventory;
+                        Anvil anvil = (Anvil)sprite;
+                        if (anvil.drawCraftingMenu)
+                            showCraftingMenu = true;
                     }
 
-                    if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
-                        pirate.inHand.Draw(spriteBatchView, this.camera);
-                    if (pirate.nearShip)
-                        pirate.DrawEnterShip(spriteBatchView, this.camera);
-                    else if (pirate.onShip)
+                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
                     {
-                        pirate.DrawOnShip(spriteBatchView, this.camera);
-                        playerShip = pirate.playerOnShip;
-                        playerOnShip = true;
+                        Npc enemy = (Npc)sprite;
+
+                        if (enemy.swimming && !enemy.onShip)
+                            enemy.DrawSwimming(spriteBatchView, this.camera);
+                        else if (!enemy.onShip)
+                            enemy.Draw(spriteBatchView, this.camera);
+
+                        if (enemy.dying)
+                            enemy.DrawDying(spriteBatchView, this.camera);
+                        continue;
                     }
 
-                    if (pirate.swimming && !pirate.onShip)
-                        pirate.DrawSwimming(spriteBatchView, this.camera);
-                    else if (!pirate.onShip)
-                        pirate.Draw(spriteBatchView, this.camera);
+                    else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
+                    {
+                        Tower tower = (Tower)sprite;
+                        sprite.Draw(spriteBatchView, this.camera);
+                        // draw any shots this tower has in motion
+                        foreach (var shot in tower.Shots)
+                            shot.Draw(spriteBatchView, this.camera);
+                        continue;
+                    }
 
-                    if (pirate.canBury)
-                        pirate.DrawCanBury(spriteBatchView, this.camera);
+                    if (sprite.GetType() == typeof(Gusto.Models.Menus.Inventory) || sprite.GetType() == typeof(Gusto.Models.Menus.CraftingMenu))
+                        continue; // we handle this after everthing else
 
-                    if (pirate.inCombat && pirate.currRowFrame != 3)
-                        pirate.inHand.Draw(spriteBatchView, this.camera);
-
-                    foreach (var shot in pirate.inHand.Shots)
-                        shot.Draw(spriteBatchView, this.camera);
-
-                    continue;
-                }
-
-                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Anvil))
-                {
-                    Anvil anvil = (Anvil)sprite;
-                    if (anvil.drawCraftingMenu)
-                        showCraftingMenu = true;
-                }
-
-                else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
-                {
-                    Npc enemy = (Npc)sprite;
-
-                    if (enemy.swimming && !enemy.onShip)
-                        enemy.DrawSwimming(spriteBatchView, this.camera);
-                    else if (!enemy.onShip)
-                        enemy.Draw(spriteBatchView, this.camera);
-
-                    if (enemy.dying)
-                        enemy.DrawDying(spriteBatchView, this.camera);
-                    continue;
-                }
-
-                else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.BaseTower))
-                {
-                    Tower tower = (Tower) sprite;
                     sprite.Draw(spriteBatchView, this.camera);
-                    // draw any shots this tower has in motion
-                    foreach (var shot in tower.Shots)
-                        shot.Draw(spriteBatchView, this.camera);
-                    continue;
                 }
 
-                if (sprite.GetType() == typeof(Gusto.Models.Menus.Inventory) || sprite.GetType() == typeof(Gusto.Models.Menus.CraftingMenu))
-                    continue; // we handle this after everthing else
+                // draw weather
+                weather.DrawWeather(spriteBatchStatic);
 
-                sprite.Draw(spriteBatchView, this.camera);
+                // lighting shader - for ambient day/night light and lanterns
+                GraphicsDevice.SetRenderTarget(null);
+                GraphicsDevice.Clear(Color.White);
+                dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
             }
 
-            // draw weather
-            weather.DrawWeather(spriteBatchStatic);
-
-            // lighting shader - for ambient day/night light and lanterns
-            GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.White);
-            dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
+            
 
             // lightning is drawn after ambient light
             if (WeatherState.lightning)

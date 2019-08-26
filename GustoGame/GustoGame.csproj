@@ -50,6 +50,10 @@
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\ClayFurnace.cs" />
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Interior\ShipDeckTile.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Interior\ShipDeckTileWall.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Interior\ShipInteriorTile.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Interior\ShipInteriorTileWall.cs" />
     <Compile Include="AnimatedSprite\GameMap\Rock1.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\AnvilItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseBarrelItem.cs" />
@@ -103,6 +107,7 @@
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\Anvil.cs" />
     <Compile Include="Models\Animated\Container.cs" />
+    <Compile Include="Models\Animated\Interior.cs" />
     <Compile Include="Models\Animated\Storage.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />

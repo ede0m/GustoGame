@@ -27,6 +27,7 @@ namespace Gusto.Models.Animated
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         public float millisecondsCombatSwing;
+        float msToggleInterior;
 
         public float health;
         public float fullHealth;
@@ -43,6 +44,7 @@ namespace Gusto.Models.Animated
         public List<InventoryItem> inventory;
         public int maxInventorySlots;
         public Ship playerOnShip;
+        public Interior playerInInterior;
         public HandHeld inHand;
         public TeamType teamType;
 
@@ -375,6 +377,24 @@ namespace Gusto.Models.Animated
             }
             buryTile = null;
             canBury = false;
+
+            // entering/toggling interior
+            if (kstate.IsKeyDown(Keys.I)) // TODO and near entrance!
+            {
+                msToggleInterior += gameTime.ElapsedGameTime.Milliseconds;
+                if (msToggleInterior > 1000)
+                {
+
+                    // exit interior view toggle
+                    if (onShip && playerInInterior != null)
+                        playerInInterior = null;
+                    // the onShip interior
+                    else if (onShip && playerOnShip != null)
+                        playerInInterior = playerOnShip.shipInterior;
+
+                    msToggleInterior = 0;
+                }
+            }
         }
 
         public bool AddInventoryItem(InventoryItem itemToAdd)

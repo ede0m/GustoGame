@@ -74,6 +74,7 @@ namespace Gusto.Models.Animated
         public Sail shipSail { get; set; }
         public List<Ammo> Shots;
         public List<InventoryItem> inventory;
+        public Interior shipInterior;
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
@@ -403,6 +404,7 @@ namespace Gusto.Models.Animated
                         ammoLoaded = null;  
                 }
             }
+
 
             if (colliding || anchored || !playerAboard || health <= 0)
             {

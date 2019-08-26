@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+	<script type="text/javascript" src="mapdata.js"></script>
+
+</head>
+<body>
+	<div class="container" id="wrap">
+	<h2>MAP DESIGNER</h2>
+	  
+		<div class="row">
+		  <div id="select">
+			  
+		  	  <div class="row">
+  				  <div class="col-sm-5">
+				  	  viewport width:<br>
+					  <input type="number" name="width" value="1856" id="width">
+					  <br>
+					  viewport height:<br>
+					  <input type="number" name="height" value="1024" id="height">
+					  <br>
+					  multX:<br>
+					  <input type="number" name="multX" value="1" id="multX">
+					  <br>
+					  multY:<br>
+					  <input type="number" name="multY" value="1" id="multY">
+					  <br>
+					  tileSize:<br>
+					  <input type="number" name="tileSize" value="32" id="tileSize">
+					  <br><br>	
+					  <input type="submit" value="init" id="init">
+			  	  </div>
+				  <div class="col-sm-5">
+
+					  fileName:<br>
+					  <input type="text" value="Interior.json" id="filename">
+					  <br><br>
+					  <input type="submit" value="export-json" id="exportjson">
+					  <br><br>
+					  <input type="submit" value="load mapdata file" id="loadjson">
+				  </div>
+		  	  </div>
+
+		  </div>
+
+		  <div id="statDisplay">
+		  	<div class="row"><label>NTiles:&nbsp;&nbsp;</label><p id=nTiles></p></div>
+		  	<div class="row"><label>Rows:&nbsp;&nbsp;</label><p id=rows></p></div>
+		  	<div class="row"><label>Cols:&nbsp;&nbsp;</label><p id=cols></p></div>
+		  </div>
+
+		  <div id="groundObjectSelect">
+		  	<div id="nullGroundObject"class="groundObject" style="background: black; color: white"><p>null</p></div>
+		  	<div id="entrance" class="groundObject" style="background: grey"><p>enter</p></div>
+			<div id="chest1" class="groundObject" style="background: brown"><p>chest1</p></div>
+			<div id="fire1" class="groundObject" style="background: red"><p>fire1</p></div>
+		  </div>
+
+		  <div id="terrainSelect">
+		  	<div>
+			  	<div id="sd1" class="terrain" style="background: #cfa34c; border-style: solid;"><p>sd1</p></div>
+			  	<div id="sd1w" class="terrain" style="background: #cfa34c; border-style: solid;"><p>sd1w</p></div> 
+			  	<div id="si1" class="terrain" style="background: brown"><p>si1</p></div>
+			  	<div id="si1w" class="terrain" style="background: brown"><p>si1w</p></div>
+		  	</div>
+		  	<br><br>
+
+		  </div>
+		</div>
+	
+	</div>
+
+	<div class="container" id="mapWrap">
+		<div id="map"></div>
+	</div>
+
+	<script
+  		src="https://code.jquery.com/jquery-3.4.1.min.js"
+  		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  		crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="map.js"></script>
+</body>
+</html>
