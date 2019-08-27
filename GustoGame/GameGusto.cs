@@ -154,14 +154,14 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1Holes");
             LoadDynamicBoundingBoxPerFrame(false, 4, 4, textureLand1, "landTile", 1.0f, 1.0f);
-            Texture2D textureShipDeck1 = Content.Load<Texture2D>("ShipDeck");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipDeck1, "shipDeckTile", 1.0f, 1.0f);
-            Texture2D textureShipDeck1Wall = Content.Load<Texture2D>("ShipDeckWall");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipDeck1Wall, "shipDeckTileWall", 1.0f, 1.0f);
+            //Texture2D textureShipDeck1 = Content.Load<Texture2D>("ShipDeck");
+            //LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipDeck1, "interiorTile", 1.0f, 1.0f);
+            //Texture2D textureShipDeck1Wall = Content.Load<Texture2D>("ShipDeckWall");
+            //LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipDeck1Wall, "interiorTileWall", 1.0f, 1.0f);
             Texture2D textureShipInterior1 = Content.Load<Texture2D>("ShipInterior");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipInterior1, "shipInteriorTile", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipInterior1, "interiorTile", 1.0f, 1.0f);
             Texture2D textureShipInterior1Wall = Content.Load<Texture2D>("ShipInteriorWall");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipDeck1Wall, "shipInteriorTileWall", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipInterior1Wall, "interiorTileWall", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
             LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
@@ -313,7 +313,7 @@ namespace Gusto
             inventoryMenu.Update(kstate, gameTime, this.camera);
             craftingMenu.Update(kstate, gameTime, this.camera);
 
-            // set any visible collidable map pieces for collision - update LandTileLocList and GroundObjLocList
+            // set any viewport visible(and not visible when in interior) collidable map pieces for collision - update LandTileLocList and GroundObjLocList
             BoundingBoxLocations.LandTileLocationList.Clear();
             BoundingBoxLocations.GroundObjectLocationList.Clear();
             Vector2 minCorner = new Vector2(camera.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
@@ -346,12 +346,18 @@ namespace Gusto
                         }
                     }
                 }
-
             }
 
-            // set any visible collidable map pieces for collision
-            //foreach (var tile in BoundingBoxLocations.LandTileLocationList)
-            //    SpatialBounding.SetQuad(tile.GetBase());
+            BoundingBoxLocations.InteriorTileList.Clear();
+            // set interior tiles for collision
+            if (gameState.player.playerInInterior != null)
+            {
+                foreach(var tile in gameState.player.playerInInterior.interiorTiles)
+                {
+                    BoundingBoxLocations.InteriorTileList.Add(tile);
+                    SpatialBounding.SetQuad(tile.GetBase());
+                }
+            }
 
             // update any gameObjects that need to track state
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);

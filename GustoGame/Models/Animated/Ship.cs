@@ -272,7 +272,7 @@ namespace Gusto.Models.Animated
             }
 
             // anchoring toggle
-            if (kstate.IsKeyDown(Keys.S) && playerAboard)
+            if (kstate.IsKeyDown(Keys.S) && playerAboard && !playerInInterior)
             {
                 if (anchored)
                 {

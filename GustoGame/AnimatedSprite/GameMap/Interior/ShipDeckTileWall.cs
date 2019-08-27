@@ -17,7 +17,7 @@ namespace Gusto.AnimatedSprite.GameMap
         public ShipDeckTileWall(int index, Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base(index, groundObj, content, graphics)
         {
             Texture2D textureTile = content.Load<Texture2D>("ShipDeckWall");
-            Asset tileAsset = new Asset(textureTile, null, 4, 1, 1.0f, "shipDeckTileWall", region);
+            Asset tileAsset = new Asset(textureTile, null, 4, 1, 1.0f, "interiorTileWall", region);
             SetSpriteAsset(tileAsset, location);
             wallPiece = true;
         }

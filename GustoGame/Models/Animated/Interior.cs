@@ -22,6 +22,8 @@ namespace Gusto.Models.Animated
 
         private JObject _interiorMapData;
         private List<TilePiece> interiorMap;
+
+        public HashSet<TilePiece> interiorTiles;
         public bool playerInInterior;
 
         private int width;
@@ -35,6 +37,7 @@ namespace Gusto.Models.Animated
         {
             interiorKey = ik;
             interiorMap = new List<TilePiece>();
+            interiorTiles = new HashSet<TilePiece>();
             interiorForObj = interiorFor;
             // load the interiorMap tileset
             _interiorMapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\" + interiorKey + "Interior.json"));
@@ -74,7 +77,10 @@ namespace Gusto.Models.Animated
                     }
 
                     if (tile != null)
+                    {
                         tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
+                        interiorTiles.Add(tile);
+                    }
 
                     interiorMap.Add(tile);
                     index++;
@@ -132,6 +138,8 @@ namespace Gusto.Models.Animated
                     }
                     tile.location = drawPoint;
                     var loc = tile.location;
+
+                    // draw if in viewporit
                     if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
                     {
                         tile.Draw(sb, cam);

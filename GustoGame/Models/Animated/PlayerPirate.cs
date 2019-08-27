@@ -65,11 +65,12 @@ namespace Gusto.Models.Animated
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
+            Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
+
             if (collidedWith.bbKey.Equals("landTile"))
             {
                 colliding = false;
                 // narrow the collision to just the feet (appears more realistic)
-                Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height/3);
                 if (footSpace.Intersects(collidedWith.GetBoundingBox()))
                     swimming = false;
 
@@ -90,6 +91,19 @@ namespace Gusto.Models.Animated
                     }
                 }
             }
+
+            else if (collidedWith.bbKey.Equals("interiorTile"))
+            {
+                colliding = false;
+            }
+
+            else if (collidedWith.bbKey.Equals("interiorTileWall"))
+            {
+                if (footSpace.Intersects(collidedWith.GetBoundingBox()))
+                    colliding = true;
+            }
+
+
             else if (collidedWith is IShip)
             {
                 colliding = false;

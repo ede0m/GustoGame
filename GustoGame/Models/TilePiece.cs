@@ -3,6 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Bounding;
 using Gusto.Models.Animated;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
-    public class TilePiece : Sprite
+    public class TilePiece : Sprite, ITilePiece
     {
 
         GraphicsDevice _graphics;
