@@ -350,8 +350,8 @@ namespace Gusto
             }
 
             // set any visible collidable map pieces for collision
-            foreach (var tile in BoundingBoxLocations.LandTileLocationList)
-                SpatialBounding.SetQuad(tile.GetBase());
+            //foreach (var tile in BoundingBoxLocations.LandTileLocationList)
+            //    SpatialBounding.SetQuad(tile.GetBase());
 
             // update any gameObjects that need to track state
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);

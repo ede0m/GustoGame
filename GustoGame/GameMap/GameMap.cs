@@ -122,9 +122,6 @@ namespace Gusto.GameMap
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
-            //BoundingBoxLocations.LandTileLocationList.Clear();
-            //BoundingBoxLocations.GroundObjectLocationList.Clear();
-            //collidablePieces.Clear();
             foreach (var tile in map)
             {
                 var loc = tile.location;

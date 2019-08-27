@@ -346,6 +346,7 @@ namespace Gusto.Models.Animated
             {
                 location.X += playerOnShip.currentShipSpeedX;
                 location.Y += playerOnShip.currentShipSpeedY;
+                playerOnShip.SetBoundingBox();
             }
 
             // burying storage
