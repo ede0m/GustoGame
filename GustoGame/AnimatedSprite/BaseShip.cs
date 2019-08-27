@@ -35,7 +35,7 @@ namespace Gusto.AnimatedSprite
             shotRange = 600f;
             stopRange = 260f;
             attackRange = 400f;
-            maxInventorySlots = 15;
+            maxInventorySlots = 5;
 
             string objKey = "baseShip";
 
@@ -50,10 +50,10 @@ namespace Gusto.AnimatedSprite
             if (team != TeamType.Player)
             {
                 List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);
-                inventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
+                actionInventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
             }
             else
-                inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+                actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
 
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(team, region, location, content, graphics);

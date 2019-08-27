@@ -75,7 +75,7 @@ namespace Gusto.Models.Animated
         public Sprite randomRoamTile;
         public Sail shipSail { get; set; }
         public List<Ammo> Shots;
-        public List<InventoryItem> inventory;
+        public List<InventoryItem> actionInventory;
         public Interior shipInterior;
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
@@ -83,7 +83,7 @@ namespace Gusto.Models.Animated
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             Shots = new List<Ammo>();
-            inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+            actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             teamType = type;
             _content = content;
             _graphics = graphics;
@@ -222,7 +222,7 @@ namespace Gusto.Models.Animated
                     remove = true;
 
                     // drop items
-                    foreach (var item in inventory)
+                    foreach (var item in actionInventory)
                     {
                         if (item == null)
                             continue;
@@ -245,7 +245,7 @@ namespace Gusto.Models.Animated
                             ItemUtility.ItemsToUpdate.Add(c);
                         }
                     }
-                    inventory.Clear();
+                    actionInventory.Clear();
                 }
             }
         }
@@ -313,9 +313,9 @@ namespace Gusto.Models.Animated
 
                 int? plankIndex = null;
                 // find plank 
-                for (int i = 0; i < inventory.Count(); i++)
+                for (int i = 0; i < actionInventory.Count(); i++)
                 {
-                    var item = inventory[i];
+                    var item = actionInventory[i];
                     if (item != null && item is IPlank && item.amountStacked > 0)
                     {
                         plankIndex = i;
@@ -330,7 +330,7 @@ namespace Gusto.Models.Animated
 
                     if (percentNotRepaired <= 0 && plankIndex != null)
                     {
-                        var item = inventory[(int)plankIndex];
+                        var item = actionInventory[(int)plankIndex];
                         health += item.restorePoints;
                         timeSinceStartRepairing = 0;
 
@@ -391,9 +391,9 @@ namespace Gusto.Models.Animated
                 // loading ammo
                 if (ammoLoaded == null)
                 {
-                    for (int i = 0; i < inventory.Count(); i++)
+                    for (int i = 0; i < actionInventory.Count(); i++)
                     {
-                        var item = inventory[i];
+                        var item = actionInventory[i];
                         if (item != null && item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.CannonBallItem)) // TODO: refactor to support multiple cannon types? Maybe have ship have weaponSelected like inHand
                         {
                             if (item.amountStacked > 0)

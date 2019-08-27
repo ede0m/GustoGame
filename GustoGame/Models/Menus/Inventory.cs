@@ -348,7 +348,7 @@ namespace Gusto.Models.Menus
             // set any inventory movements
             inventoryOfPlayer.inventory = tempPlayerInv;
             if (openShipInventory && itemsShip != null)
-                inventoryOfPlayer.playerOnShip.inventory = tempShipInv;
+                inventoryOfPlayer.playerOnShip.actionInventory = tempShipInv;
             // storage movements
             if (itemsStorage != null)
                 storage.inventory = tempStorageInv;
@@ -436,8 +436,8 @@ namespace Gusto.Models.Menus
                             {
                                 if (openShipInventory)
                                 {
-                                    item = inventoryOfPlayer.playerOnShip.inventory[selectedIndex - maxInventorySlots];
-                                    inv = inventoryOfPlayer.playerOnShip.inventory;
+                                    item = inventoryOfPlayer.playerOnShip.actionInventory[selectedIndex - maxInventorySlots];
+                                    inv = inventoryOfPlayer.playerOnShip.actionInventory;
                                 }
 
                                 else

@@ -189,7 +189,7 @@ namespace Gusto
                             shipState.location = sh.location;
                             shipState.region = sh.regionKey;
                             shipState.objKey = sh.bbKey;
-                            shipState.inventory = CreateSerializableInventory(sh.inventory);
+                            shipState.inventory = CreateSerializableInventory(sh.actionInventory);
                             shipState.playerAboard = sh.playerAboard;
                             shipState.anchored = sh.anchored;
                             shipState.health = sh.health;
@@ -232,7 +232,7 @@ namespace Gusto
                             shipState.location = sh.location;
                             shipState.region = sh.regionKey;
                             shipState.objKey = sh.bbKey;
-                            shipState.inventory = CreateSerializableInventory(sh.inventory);
+                            shipState.inventory = CreateSerializableInventory(sh.actionInventory);
                             shipState.playerAboard = sh.playerAboard;
                             shipState.anchored = sh.anchored;
                             shipState.health = sh.health;
@@ -261,7 +261,7 @@ namespace Gusto
                         state.location = sh.location;
                         state.region = sh.regionKey;
                         state.objKey = sh.bbKey;
-                        state.inventory = CreateSerializableInventory(sh.inventory);
+                        state.inventory = CreateSerializableInventory(sh.actionInventory);
                         state.playerAboard = sh.playerAboard;
                         state.anchored = sh.anchored;
                         state.health = sh.health;
@@ -576,7 +576,7 @@ namespace Gusto
                     ss = (ShipState)objSave;
                     BaseShip bs = new BaseShip(ss.team, ss.region, ss.location, _content, _graphics);
                     bs.health = ss.health;
-                    bs.inventory = DeserializeInventory(ss.inventory);
+                    bs.actionInventory = DeserializeInventory(ss.inventory);
                     bs.playerAboard = ss.playerAboard;
                     if (bs.playerAboard)
                         bs.shipSail.playerAboard = true;

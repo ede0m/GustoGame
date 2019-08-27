@@ -426,9 +426,9 @@ namespace Gusto
             bool showStorageMenu = false;
             Ship playerShip = gameState.player.playerOnShip;
             List<InventoryItem> invItemsPlayer = gameState.player.inventory;
-            List<InventoryItem> invItemsShip = (gameState.player.playerOnShip == null) ? null : gameState.player.playerOnShip.inventory;
+            List<InventoryItem> invItemsShip = (gameState.player.playerOnShip == null) ? null : gameState.player.playerOnShip.actionInventory;
             if (gameState.player.onShip)
-                invItemsShip = gameState.player.playerOnShip.inventory;
+                invItemsShip = gameState.player.playerOnShip.actionInventory;
             Storage invStorage = null;
 
             // draw the interior view if in interior
