@@ -358,8 +358,8 @@ namespace Gusto.Models.Animated
             // can walk in the interior of the ship while it moves
             if (onShip && playerInInterior != null)
             {
-                location.X += playerOnShip.currentShipSpeedX;
-                location.Y += playerOnShip.currentShipSpeedY;
+                location.X += playerOnShip.currentShipSpeed.X;
+                location.Y += playerOnShip.currentShipSpeed.Y;
                 playerOnShip.SetBoundingBox();
             }
 

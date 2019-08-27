@@ -48,8 +48,7 @@ namespace Gusto.Models.Animated
         private Texture2D meterFull;
         private Texture2D meterProg;
 
-        public float currentShipSpeedX;
-        public float currentShipSpeedY;
+        public Vector2 currentShipSpeed;
         public float shotRange;
         public float attackRange;
         public float stopRange;
@@ -186,17 +185,18 @@ namespace Gusto.Models.Animated
             {
                 // map frame to vector movement
                 Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                currentShipSpeedX = (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored;
-                currentShipSpeedY = (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored;
-                location.X += currentShipSpeedX;
-                location.Y += currentShipSpeedY;
+                currentShipSpeed = new Vector2((ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored,
+                    (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored);
+                location.X += currentShipSpeed.X;
+                location.Y += currentShipSpeed.Y;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
             else
             {
-                currentShipSpeedX = 0;
-                currentShipSpeedY = 0;
+                currentShipSpeed = Vector2.Zero;
             }
+            shipInterior.speed = currentShipSpeed;
+
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
             int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
             int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;

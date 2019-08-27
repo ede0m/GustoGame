@@ -458,7 +458,12 @@ namespace Gusto.Models.Menus
                                     placeableItem.remove = false;
                                     placeableItem.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + RandomEvents.rand.Next(-10, 10);
                                     placeableItem.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + RandomEvents.rand.Next(-10, 10);
-                                    ItemUtility.ItemsToUpdate.Add(placeableItem);
+                                    // add to world
+                                    if (inventoryOfPlayer.playerInInterior == null)
+                                        ItemUtility.ItemsToUpdate.Add(placeableItem);
+                                    // add to interior
+                                    else
+                                        inventoryOfPlayer.playerInInterior.interiorObjects.Add(placeableItem);
                                 }
                                 else
                                 {
@@ -467,7 +472,12 @@ namespace Gusto.Models.Menus
                                     item.remove = false;
                                     item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + RandomEvents.rand.Next(-10, 10);
                                     item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + RandomEvents.rand.Next(-10, 10);
-                                    ItemUtility.ItemsToUpdate.Add(item);
+                                    // add to world
+                                    if (inventoryOfPlayer.playerInInterior == null)
+                                        ItemUtility.ItemsToUpdate.Add(item);
+                                    // add to interior
+                                    else
+                                        inventoryOfPlayer.playerInInterior.interiorObjects.Add(item);
                                 }
 
                                 if (selectedIndex < maxInventorySlots)

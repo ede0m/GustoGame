@@ -313,6 +313,9 @@ namespace Gusto
             inventoryMenu.Update(kstate, gameTime, this.camera);
             craftingMenu.Update(kstate, gameTime, this.camera);
 
+            Collidable.Clear();
+            DrawOrder.Clear();
+
             // set any viewport visible(and not visible when in interior) collidable map pieces for collision - update LandTileLocList and GroundObjLocList
             BoundingBoxLocations.LandTileLocationList.Clear();
             BoundingBoxLocations.GroundObjectLocationList.Clear();
@@ -349,13 +352,21 @@ namespace Gusto
             }
 
             BoundingBoxLocations.InteriorTileList.Clear();
-            // set interior tiles for collision
+            // set interior for collision for the interior that the player is in
             if (gameState.player.playerInInterior != null)
             {
+                // tiles
                 foreach(var tile in gameState.player.playerInInterior.interiorTiles)
                 {
                     BoundingBoxLocations.InteriorTileList.Add(tile);
                     SpatialBounding.SetQuad(tile.GetBase());
+                }
+
+                // TODO: update the interior objects for collision (only do this when player is in there)
+                foreach (var obj in gameState.player.playerInInterior.interiorObjects)
+                {
+                    SpatialBounding.SetQuad(obj.GetBase());
+                    Collidable.Add(obj);
                 }
             }
 
@@ -375,8 +386,6 @@ namespace Gusto
             fullUpdateOrder.UnionWith(groundObjectUpdateOrder);
 
             // Set draw order and collision from the full update order list
-            Collidable.Clear();
-            DrawOrder.Clear();
             foreach (var sp in fullUpdateOrder)
             {
                 Collidable.Add(sp);
@@ -417,7 +426,7 @@ namespace Gusto
             bool showStorageMenu = false;
             Ship playerShip = gameState.player.playerOnShip;
             List<InventoryItem> invItemsPlayer = gameState.player.inventory;
-            List<InventoryItem> invItemsShip = null;
+            List<InventoryItem> invItemsShip = (gameState.player.playerOnShip == null) ? null : gameState.player.playerOnShip.inventory;
             if (gameState.player.onShip)
                 invItemsShip = gameState.player.playerOnShip.inventory;
             Storage invStorage = null;
@@ -428,6 +437,9 @@ namespace Gusto
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.Black);
                 gameState.player.playerInInterior.Draw(spriteBatchView, this.camera);
+                showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
+                showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
+                invStorage = gameState.player.playerInInterior.invStorage;
                 DrawPlayer();
             }
             // not in interior so draw the game scene
@@ -586,6 +598,16 @@ namespace Gusto
 
             // draw static and menu sprites
             windArrows.Draw(spriteBatchStatic, null);
+
+            if (gameState.player.onShip)
+            {
+                playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
+                playerShip.DrawRepairHammer(spriteBatchStatic, new Vector2(1600, 30), repairIcon);
+
+                if (gameState.player.playerInInterior != null)
+                    invItemsShip = null;
+            }
+
             if (gameState.player.showInventory)
             {
                 inventoryMenu.Draw(spriteBatchStatic, null);
@@ -601,13 +623,7 @@ namespace Gusto
                 inventoryMenu.Draw(spriteBatchStatic, null);
                 inventoryMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, invItemsShip, invStorage);
             }
-            
-            if (gameState.player.onShip)
-            {
-                playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
-                playerShip.DrawRepairHammer(spriteBatchStatic, new Vector2(1600, 30), repairIcon);
-            }
-
+           
             // fps
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _frameCounter.Update(deltaTime);

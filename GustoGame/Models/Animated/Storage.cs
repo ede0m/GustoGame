@@ -49,7 +49,7 @@ namespace Gusto.Models.Animated
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.bbKey.Equals("landTile"))
+            if (collidedWith.bbKey.Equals("landTile") || collidedWith.bbKey.Equals("interiorTile"))
             {
                 inWater = false;
             }

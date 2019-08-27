@@ -122,12 +122,12 @@ namespace Gusto
             HashSet<Sprite> droppedItemObjectUpdateOrder = new HashSet<Sprite>();
 
             // camera follows player
-            if (!player.onShip)
+            if (!player.onShip || player.playerInInterior != null)
                 camera.Position = player.location;
             else
                 camera.Position = player.playerOnShip.location;
 
-            // add any dropped/onGround items (and placable items)
+            // add any dropped/onGround items in the world (and placable items)
             foreach (var item in ItemUtility.ItemsToUpdate)
                 droppedItemObjectUpdateOrder.Add(item);
 
@@ -145,6 +145,12 @@ namespace Gusto
                 // ICanUpdate is the update for main sprites. Any sub-sprites (items, weapons, sails, etc) that belong to the main sprite are updated within the sprite's personal update method. 
                 ICanUpdate updateSp = (ICanUpdate)sp;
                 updateSp.Update(kstate, gameTime, camera);
+            }
+
+            // keep updates running for anything(non player) in an interior 
+            foreach (Interior inside in BoundingBoxLocations.interiorMap.Values)
+            {
+                inside.Update(kstate, gameTime, camera);
             }
 
             // clear any "dead" or picked up objects from updating

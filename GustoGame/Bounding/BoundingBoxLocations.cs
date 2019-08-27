@@ -24,6 +24,7 @@ namespace Gusto.Bounding
 
         public static List<TreasureMap> treasureLocationsList = new List<TreasureMap>();
 
+        public static Dictionary<Guid, Interior> interiorMap = new Dictionary<Guid, Interior>();
         public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>(); // TODO: update to TilePiece
         public static HashSet<TilePiece> InteriorTileList = new HashSet<TilePiece>();
         public static HashSet<Sprite> GroundObjectLocationList = new HashSet<Sprite>();

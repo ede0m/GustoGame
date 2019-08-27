@@ -1,9 +1,12 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite.GameMap;
+using Gusto.Bounding;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,8 +20,12 @@ namespace Gusto.Models.Animated
     public class Interior
     {
 
-        public string interiorKey;
-        public HashSet<Sprite> interiorObjects; // anything placed or drop in this interior (Similar to ItemUtility.ItemsToUpdate except that is for world view)
+        public Guid interiorId;
+        public string interiorTypeKey;
+        private int width;
+        private int height;
+        private int cols;
+        private int rows;
 
         private JObject _interiorMapData;
         private List<TilePiece> interiorMap;
@@ -26,21 +33,27 @@ namespace Gusto.Models.Animated
         public HashSet<TilePiece> interiorTiles;
         public bool playerInInterior;
 
-        private int width;
-        private int height;
-        private int cols;
-        private int rows;
+        public Vector2 speed; // needed for moving interiors like ships
+
+        public HashSet<Sprite> interiorObjects; // anything placed or drop in this interior (Similar to ItemUtility.ItemsToUpdate except that is for world view)
+
+        // the following three are used by the calling draw method to do menus
+        public Storage invStorage;
+        public bool showStorageMenu;
+        public bool showCraftingMenu;
 
         Sprite interiorForObj;
 
-        public Interior(string ik, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
+        public Interior(string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
         {
-            interiorKey = ik;
+            interiorId = Guid.NewGuid();
+            interiorTypeKey = itk;
             interiorMap = new List<TilePiece>();
             interiorTiles = new HashSet<TilePiece>();
+            interiorObjects = new HashSet<Sprite>();
             interiorForObj = interiorFor;
             // load the interiorMap tileset
-            _interiorMapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\" + interiorKey + "Interior.json"));
+            _interiorMapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\" + interiorTypeKey + "Interior.json"));
 
             // set the interior map
             int multX = (int)_interiorMapData["multX"];
@@ -115,7 +128,34 @@ namespace Gusto.Models.Animated
 
                 index2++;
             }
+
+            BoundingBoxLocations.interiorMap.Add(interiorId, this);
         }
+
+        public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
+        {
+            HashSet<Sprite> toRemove = new HashSet<Sprite>();
+            foreach (var obj in interiorObjects)
+            {
+                if (obj.remove)
+                    toRemove.Add(obj);
+
+                // match speed of interior (for ships)
+                obj.location.X += speed.X;
+                obj.location.Y += speed.Y;
+
+                if (obj is ICanUpdate)
+                {
+                    ICanUpdate updateSp = (ICanUpdate)obj;
+                    updateSp.Update(kstate, gameTime, camera);
+                }
+
+            }
+
+            foreach (var remove in toRemove)
+                interiorObjects.Remove(remove);
+        }
+
 
         public void Draw(SpriteBatch sb, Camera cam)
         {
@@ -149,6 +189,50 @@ namespace Gusto.Models.Animated
                 drawPoint.Y += GameOptions.tileHeight * 2;
                 drawPoint.X = startDrawPoint.X;
             }
+
+            // Draw any items
+            foreach (var obj in interiorObjects)
+            {
+                obj.Draw(sb, cam);
+                if (obj is IInventoryItem)
+                {
+                    InventoryItem item = (InventoryItem)obj;
+                    if (!item.inInventory)
+                        item.DrawPickUp(sb, cam);
+                }
+
+                if (obj is IPlaceable)
+                {
+                    IPlaceable placeObj = (IPlaceable)obj;
+                    placeObj.DrawCanPickUp(sb, cam);
+                }
+
+                if (obj is IStorage)
+                {
+                    Storage storage = (Storage)obj;
+                    storage.DrawOpenStorage(sb, cam);
+                    if (storage.storageOpen)
+                    {
+                        showStorageMenu = true;
+                        invStorage = storage;
+                    }
+                    else
+                    {
+                        showStorageMenu = false;
+                        invStorage = null;
+                    }
+                }
+
+                else if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Anvil))
+                {
+                    Anvil anvil = (Anvil)obj;
+                    if (anvil.drawCraftingMenu)
+                        showCraftingMenu = true;
+                    else
+                        showCraftingMenu = false;
+                }
+            }
+
         }
 
     }
