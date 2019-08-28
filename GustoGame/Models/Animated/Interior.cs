@@ -259,6 +259,7 @@ namespace Gusto.Models.Animated
                         showCraftingMenu = false;
                 }
             }
+
             tilesSet = true;
 
         }

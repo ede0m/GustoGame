@@ -147,6 +147,8 @@ namespace Gusto.Models.Animated
                 Tuple<int, int> target = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox());
                 if (target != null)
                 {
+                    // IN COMBAT
+
                     if (!inCombat)
                         currColumnFrame = 7;
                     inCombat = true;
@@ -158,7 +160,24 @@ namespace Gusto.Models.Animated
                 else
                 {
                     inCombat = false;
-                    if (roaming)
+
+                    // if we want to move to attack within a range
+                    if (playerOnShip != null && playerOnShip.shipInterior != null)
+                    {
+                        // attack any player within a large range in the ship
+                        target = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 10, GetBoundingBox());
+                        if (target != null)
+                        {
+                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(new Vector2(target.Item1, target.Item2), location);
+                            currRowFrame = frames.Item1;
+                            directionalFrame = frames.Item2;
+                            moving = true;
+                        }
+                        else
+                            moving = false;
+                    }
+
+                    else if (roaming && playerOnShip == null) // region only rn
                     {
                         moving = true;
                         // go towards random tile
@@ -176,7 +195,9 @@ namespace Gusto.Models.Animated
                     else
                     {
                         if (playerOnShip != null && playerOnShip.shipInterior != null)
-                            randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); // interior tile roaming
+                        {
+                            // TODO: roaming not working here.. randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); // interior tile roaming
+                        }
                         else
                             randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
                         roaming = true;
@@ -200,18 +221,20 @@ namespace Gusto.Models.Animated
                 location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
             }
             else
-            {
-                if (timeSinceSwordSwing > millisecondsCombatSwing && !dying)
+            {   if (inCombat)
                 {
-                    currColumnFrame++;
-                    if (currColumnFrame >= nColumns)
+                    if (timeSinceSwordSwing > millisecondsCombatSwing && !dying)
                     {
-                        inCombat = false;
-                        currColumnFrame = 7;
+                        currColumnFrame++;
+                        if (currColumnFrame >= nColumns)
+                        {
+                            inCombat = false;
+                            currColumnFrame = 7;
+                        }
+                        timeSinceSwordSwing = 0;
                     }
-                    timeSinceSwordSwing = 0;
+                    timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
                 }
-                timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
             }
         }
 

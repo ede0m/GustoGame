@@ -112,13 +112,29 @@ namespace Gusto.Utility
                 {
                     if ((target.X - location.X) > 0)
                     {
-                        currRowFrame = 3; // upper right
-                        currDirectionalFrame = 7;
+                        if (target.Y > location.Y)
+                        {
+                            currRowFrame = 0; // lower right
+                            currDirectionalFrame = 5;
+                        }
+                        else
+                        {
+                            currRowFrame = 3; // upper right
+                            currDirectionalFrame = 7;
+                        }
                     }
                     else
                     {
-                        currRowFrame = 0; // lower left
-                        currDirectionalFrame = 3;
+                        if (target.Y < location.Y)
+                        {
+                            currRowFrame = 3; // upper left
+                            currDirectionalFrame = 1;
+                        }
+                        else
+                        {
+                            currRowFrame = 0; // lower left
+                            currDirectionalFrame = 3;
+                        }
                     }
                 }
                 else if (slope < 0.4 && slope > 0)
@@ -154,13 +170,29 @@ namespace Gusto.Utility
                 {
                     if ((target.X - location.X) > 0)
                     {
-                        currRowFrame = 0; // lower right
-                        currDirectionalFrame = 5;
+                        if (target.Y < location.Y)
+                        {
+                            currRowFrame = 3; // upper right
+                            currDirectionalFrame = 7;
+                        }
+                        else
+                        {
+                            currRowFrame = 0; // lower right
+                            currDirectionalFrame = 5;
+                        }
                     }
                     else
                     {
-                        currRowFrame = 3; // upper left
-                        currDirectionalFrame = 1;
+                        if (target.Y > location.Y)
+                        {
+                            currRowFrame = 0; // lower left
+                            currDirectionalFrame = 3;
+                        }
+                        else
+                        {
+                            currRowFrame = 3; // upper left
+                            currDirectionalFrame = 1;
+                        }
                     }
                 }
                 else if (slope > -0.4 && slope < 0)
