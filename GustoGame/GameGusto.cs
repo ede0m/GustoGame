@@ -355,7 +355,7 @@ namespace Gusto
             // set interior for collision for the interior that the player is in
             if (gameState.player.playerInInterior != null)
             {
-                // tiles
+                // interior tiles for collision
                 foreach(var tile in gameState.player.playerInInterior.interiorTiles)
                 {
                     BoundingBoxLocations.InteriorTileList.Add(tile);
@@ -388,9 +388,22 @@ namespace Gusto
             // Set draw order and collision from the full update order list
             foreach (var sp in fullUpdateOrder)
             {
-                Collidable.Add(sp);
-                SpatialBounding.SetQuad(sp.GetBase());
-                DrawOrder.Add(sp);
+                if (gameState.player.playerInInterior != null)
+                {
+                    // only add ships and land tiles when to collision when interior is being viewed
+                    if (sp is IShip || sp is ITilePiece || sp is IPlayer)
+                    {
+                        Collidable.Add(sp);
+                        SpatialBounding.SetQuad(sp.GetBase());
+                    }
+                }
+                else
+                {
+                    Collidable.Add(sp);
+                    SpatialBounding.SetQuad(sp.GetBase());
+                    DrawOrder.Add(sp);
+                }
+
             }
 
             // handle collision

@@ -118,7 +118,7 @@
     <Compile Include="Models\Animated\Weather\Rain.cs" />
     <Compile Include="Models\Interfaces\IAmmo.cs" />
     <Compile Include="Models\Interfaces\ICraftingObject.cs" />
-    <Compile Include="Models\Interfaces\IDrops.cs" />
+    <Compile Include="Models\Interfaces\IContainer.cs" />
     <Compile Include="Models\Interfaces\IGrass.cs" />
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
     <Compile Include="Models\Interfaces\ILight.cs" />
@@ -126,6 +126,7 @@
     <Compile Include="Models\Interfaces\IOre.cs" />
     <Compile Include="Models\Interfaces\IPlaceable.cs" />
     <Compile Include="Models\Interfaces\IPlank.cs" />
+    <Compile Include="Models\Interfaces\IPlayer.cs" />
     <Compile Include="Models\Interfaces\IRanged.cs" />
     <Compile Include="Models\Interfaces\ISaveState.cs" />
     <Compile Include="Models\Interfaces\IShadowCaster.cs" />

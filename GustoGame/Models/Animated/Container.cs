@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Container : Sprite, ICanUpdate, IDrops
+    public class Container : Sprite, ICanUpdate, IContainer
     {
         public bool inWater;
         public int nHitsToDestroy;

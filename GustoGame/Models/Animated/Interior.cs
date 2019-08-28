@@ -186,6 +186,7 @@ namespace Gusto.Models.Animated
 
             Vector2 startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
             Vector2 drawPoint = startDrawPoint;
+            interiorTiles.Clear();
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
@@ -198,6 +199,8 @@ namespace Gusto.Models.Animated
                     }
                     tile.location = drawPoint;
                     var loc = tile.location;
+                    tile.location += speed;
+                    interiorTiles.Add(tile);
 
                     // draw if in viewporit
                     if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
@@ -217,6 +220,7 @@ namespace Gusto.Models.Animated
                     obj.location = RandomInteriorTile().location;
 
                 obj.Draw(sb, cam);
+
                 if (obj is IInventoryItem)
                 {
                     InventoryItem item = (InventoryItem)obj;

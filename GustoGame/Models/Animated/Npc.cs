@@ -66,23 +66,32 @@ namespace Gusto.Models.Animated
                 showHealthBar = true;
                 health -= handHeld.damage;
             }
-            else if (collidedWith.bbKey.Equals("landTile") || collidedWith is IGroundObject)
+            else if (collidedWith.bbKey.Equals("landTile") || collidedWith.bbKey.Equals("interiorTile") || collidedWith is IGroundObject)
             {
                 colliding = false;
-                
+
                 // narrow the collision to just the feet (appears more realistic)
                 Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
                 if (footSpace.Intersects(collidedWith.GetBoundingBox()))
                     swimming = false;
             }
-            else if (collidedWith is IWalks)
+
+            else if (collidedWith.bbKey.Equals("interiorTileWall"))
+            {
+                colliding = false;
+                // set new interior roam tile when hitting a wall
+                //if (playerOnShip != null && playerOnShip.shipInterior != null)
+                //    randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); 
+            }
+
+            else if (collidedWith is IWalks || collidedWith is IShip || collidedWith is IPlaceable || collidedWith is IInventoryItem)
             {
                 colliding = false;
             }
             else if (collidedWith is IAmmo)
             {
                 showHealthBar = true;
-                Ammo ball = (Ammo)collidedWith;
+                Ammo ball = (Ammo)collidedWith;   // TODO: bug NPC gets hit here by its own ships cannonballs
                 if (!ball.exploded)
                     health -= ball.groundDamage;
                 return;
@@ -156,12 +165,20 @@ namespace Gusto.Models.Animated
                         Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
                         currRowFrame = frames.Item1;
                         directionalFrame = frames.Item2;
+
+                        // FIND a better way to get this value - can't have references
+                        //if (playerOnShip != null && playerOnShip.shipInterior != null)
+                        //    randomRegionRoamTile = playerOnShip.shipInterior.interiorTiles.ToList()[playerOnShip.shipInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
+
                         if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
                             roaming = false;
                     }
                     else
                     {
-                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)];
+                        if (playerOnShip != null && playerOnShip.shipInterior != null)
+                            randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); // interior tile roaming
+                        else
+                            randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
                         roaming = true;
                     }
                 }

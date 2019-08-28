@@ -116,8 +116,10 @@ namespace Gusto
             barrelInShipA.inInteriorId = baseShipAI.shipInterior.interiorId; // need to do this for containers
             BaseChest chestInShipA = new BaseChest(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
             BaseTribal baseTribalInShip = new BaseTribal(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
+            baseTribalInShip.playerOnShip = baseShipAI;
             baseShipAI.shipInterior.interiorObjects.Add(barrelInShipA);
             baseShipAI.shipInterior.interiorObjects.Add(chestInShipA);
+            baseShipAI.shipInterior.interiorObjects.Add(baseTribalInShip);
 
 
             ready = true;
@@ -301,7 +303,7 @@ namespace Gusto
                     Storage storage = (Storage)item;
                     ogs.inventory = CreateSerializableInventory(storage.inventory);
                 }
-                else if (item is IDrops)
+                else if (item is IContainer)
                 {
                     Container cont = (Container)item;
                     ogs.inventory = CreateSerializableInventory(cont.drops);

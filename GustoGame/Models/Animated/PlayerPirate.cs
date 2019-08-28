@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class PlayerPirate : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
+    public class PlayerPirate : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, IPlayer
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
