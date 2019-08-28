@@ -42,6 +42,7 @@ namespace Gusto.Models.Animated
         public bool onShip;
         public bool inCombat;
         public bool roaming;
+        public bool defense;
         public List<InventoryItem> inventory;
         public Ship playerOnShip;
         public Sprite randomRegionRoamTile;
@@ -92,7 +93,7 @@ namespace Gusto.Models.Animated
             {
                 showHealthBar = true;
                 Ammo ball = (Ammo)collidedWith;   // TODO: bug NPC gets hit here by its own ships cannonballs
-                if (!ball.exploded)
+                if (!ball.exploded && ball.teamType != teamType)
                     health -= ball.groundDamage;
                 return;
             }
@@ -171,13 +172,13 @@ namespace Gusto.Models.Animated
                             Tuple<int, int> frames = AIUtility.SetAIGroundMovement(new Vector2(target.Item1, target.Item2), location);
                             currRowFrame = frames.Item1;
                             directionalFrame = frames.Item2;
-                            moving = true;
+                            defense = true;
                         }
                         else
-                            moving = false;
+                            defense = false;
                     }
 
-                    else if (roaming && playerOnShip == null) // region only rn
+                    if (roaming && !defense) // region only rn
                     {
                         moving = true;
                         // go towards random tile
@@ -186,17 +187,17 @@ namespace Gusto.Models.Animated
                         directionalFrame = frames.Item2;
 
                         // FIND a better way to get this value - can't have references
-                        //if (playerOnShip != null && playerOnShip.shipInterior != null)
-                        //    randomRegionRoamTile = playerOnShip.shipInterior.interiorTiles.ToList()[playerOnShip.shipInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
+                        if (playerOnShip != null && playerOnShip.shipInterior != null)
+                            randomRegionRoamTile = playerOnShip.shipInterior.interiorTiles.ToList()[playerOnShip.shipInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
 
                         if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
                             roaming = false;
                     }
-                    else
+                    else if (!defense)
                     {
                         if (playerOnShip != null && playerOnShip.shipInterior != null)
                         {
-                            // TODO: roaming not working here.. randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); // interior tile roaming
+                            randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); // interior tile roaming
                         }
                         else
                             randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
