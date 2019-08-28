@@ -304,6 +304,12 @@ namespace Gusto.Models.Animated
                 onShip = true;
                 playerOnShip.playerAboard = true;
                 playerOnShip.shipSail.playerAboard = true;
+
+                // can't control non player ships (until taken over)
+                if (playerOnShip.teamType != TeamType.Player)
+                {
+                    playerInInterior = playerOnShip.shipInterior;
+                }
             }
             // exit ship
             else if (kstate.IsKeyDown(Keys.X) && onShip)
