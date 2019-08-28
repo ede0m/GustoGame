@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Bounding;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -28,17 +29,21 @@ namespace Gusto.Models.Animated
         float msNow;
         float msAnimate;
 
+        public Guid inInteriorId;
+
         public List<InventoryItem> drops;
 
         public Container(TeamType type, string region, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             msPerFrame = 250;
             msAnimate = 200;
+
+            inInteriorId = Guid.Empty;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.bbKey.Equals("landTile"))
+            if (collidedWith.bbKey.Equals("landTile") || collidedWith.bbKey.Equals("interiorTile"))
             {
                 inWater = false;
             }
@@ -82,7 +87,11 @@ namespace Gusto.Models.Animated
                         item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
                         item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
                         item.onGround = true;
-                        ItemUtility.ItemsToUpdate.Add(item);
+
+                        if (inInteriorId != Guid.Empty) // add drops to interior
+                            BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                        else // add drops to world
+                            ItemUtility.ItemsToUpdate.Add(item);
                     }
                     drops.Clear();
                     remove = true;

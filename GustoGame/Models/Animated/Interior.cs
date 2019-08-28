@@ -31,11 +31,13 @@ namespace Gusto.Models.Animated
         private List<TilePiece> interiorMap;
 
         public HashSet<TilePiece> interiorTiles;
+        bool tilesSet;
         public bool playerInInterior;
 
         public Vector2 speed; // needed for moving interiors like ships
 
-        public HashSet<Sprite> interiorObjects; // anything placed or drop in this interior (Similar to ItemUtility.ItemsToUpdate except that is for world view)
+        public HashSet<Sprite> interiorObjects; // anything placed or drop in this interior (Similar to ItemUtility.ItemsToUpdate except that is for world view) The state of the interiror
+        public HashSet<Sprite> interiorObjectsToAdd; // anything that needs to be added to this interior (can't just add in the sprite's update because it modifies collection while lookping through)
 
         // the following three are used by the calling draw method to do menus
         public Storage invStorage;
@@ -50,7 +52,9 @@ namespace Gusto.Models.Animated
             interiorTypeKey = itk;
             interiorMap = new List<TilePiece>();
             interiorTiles = new HashSet<TilePiece>();
+
             interiorObjects = new HashSet<Sprite>();
+            interiorObjectsToAdd = new HashSet<Sprite>();
             interiorForObj = interiorFor;
             // load the interiorMap tileset
             _interiorMapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\" + interiorTypeKey + "Interior.json"));
@@ -64,6 +68,9 @@ namespace Gusto.Models.Animated
             cols = width / (GameOptions.tileWidth * 2);
             rows = height / (GameOptions.tileHeight * 2);
 
+            Vector2 startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
+            Vector2 drawPoint = startDrawPoint;
+
             int index = 0;
             for (int i = 0; i < rows; i++)
             {
@@ -72,20 +79,22 @@ namespace Gusto.Models.Animated
                     TilePiece tile = null;
                     JObject tileDetails = _interiorMapData["data"][index.ToString()].Value<JObject>();
 
+                    //Vector2 loc = drawPoint;
+
                     // set interiorPiece piece
                     switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "sd1":
-                            tile = new ShipDeckTile(index, null, Vector2.Zero, "GameGusto", content, graphics, "shipDeckTile");
+                            tile = new ShipDeckTile(index, null, drawPoint, "GameGusto", content, graphics, "shipDeckTile");
                             break;
                         case "sd1w":
-                            tile = new ShipDeckTileWall(index, null, Vector2.Zero, "GameGusto", content, graphics, "shipDeckTileWall");
+                            tile = new ShipDeckTileWall(index, null, drawPoint, "GameGusto", content, graphics, "shipDeckTileWall");
                             break;
                         case "si1":
-                            tile = new ShipInteriorTile(index, null, Vector2.Zero, "GameGusto", content, graphics, "shipInteriorTile");
+                            tile = new ShipInteriorTile(index, null, drawPoint, "GameGusto", content, graphics, "shipInteriorTile");
                             break;
                         case "si1w":
-                            tile = new ShipInteriorTileWall(index, null, Vector2.Zero, "GameGusto", content, graphics, "shipInteriorTileWall");
+                            tile = new ShipInteriorTileWall(index, null, drawPoint, "GameGusto", content, graphics, "shipInteriorTileWall");
                             break;
                     }
 
@@ -95,9 +104,13 @@ namespace Gusto.Models.Animated
                         interiorTiles.Add(tile);
                     }
 
+                    //drawPoint.X += GameOptions.tileWidth * 2;
+
                     interiorMap.Add(tile);
                     index++;
                 }
+                //drawPoint.Y += GameOptions.tileHeight * 2;
+                //drawPoint.X = startDrawPoint.X;
             }
 
             // Go through again to set all columns to correct frame for walls
@@ -135,8 +148,15 @@ namespace Gusto.Models.Animated
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             HashSet<Sprite> toRemove = new HashSet<Sprite>();
+
+            // add any dropped objects to the interior
+            foreach (var dropped in interiorObjectsToAdd)
+                interiorObjects.Add(dropped);
+            interiorObjectsToAdd.Clear();
+
             foreach (var obj in interiorObjects)
             {
+
                 if (obj.remove)
                     toRemove.Add(obj);
 
@@ -193,6 +213,9 @@ namespace Gusto.Models.Animated
             // Draw any items
             foreach (var obj in interiorObjects)
             {
+                if (!tilesSet)
+                    obj.location = RandomInteriorTile().location;
+
                 obj.Draw(sb, cam);
                 if (obj is IInventoryItem)
                 {
@@ -232,7 +255,19 @@ namespace Gusto.Models.Animated
                         showCraftingMenu = false;
                 }
             }
+            tilesSet = true;
 
+        }
+
+        public TilePiece RandomInteriorTile()
+        {
+            // don't include wall pieces
+            TilePiece t = interiorTiles.ElementAt(RandomEvents.rand.Next(interiorTiles.Count));
+            while (t.wallPiece == true)
+            {
+                t = interiorTiles.ElementAt(RandomEvents.rand.Next(interiorTiles.Count));
+            }
+            return t;
         }
 
     }
