@@ -10,6 +10,7 @@ using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using System.Linq;
 using Gusto.Utility;
+using Gusto.Models.Interfaces;
 
 namespace Gusto.AnimatedSprite
 {
@@ -47,19 +48,36 @@ namespace Gusto.AnimatedSprite
             Asset baseShipAsset = new Asset(textureBaseShip, textureBaseShipBB, 1, 8, 0.6f, objKey, region);
 
             // inventory
+            List<Sprite> interiorObjs = null;
             if (team != TeamType.Player)
             {
-                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);
-                actionInventory = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
+                List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 5);
+                interiorObjs = ItemUtility.CreateInteriorItems(itemDrops, team, region, location, content, graphics);
             }
-            else
-                actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+
+            actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
 
             // TEMPORARY -- hardcode basesail to baseship (later on we want base ship to start without a sail)
             shipSail = new BaseSail(team, region, location, content, graphics);
             shipSail.millisecondsPerFrame = 500; // match turn speed for sail
 
             shipInterior = new Interior("baseShip", this, content, graphics);
+
+            // set the random drops as interior objects
+            if (interiorObjs != null)
+            {
+                foreach (var obj in interiorObjs)
+                {
+                    shipInterior.interiorObjects.Add(obj);
+                    
+                    // need to do this for containers so they drop items within ship
+                    if (obj is IContainer)
+                    {
+                        Container c = (Container)obj;
+                        c.inInteriorId = shipInterior.interiorId;
+                    }
+                }
+            }
 
             SetSpriteAsset(baseShipAsset, location);
         }

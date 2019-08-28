@@ -111,14 +111,8 @@ namespace Gusto
             UpdateOrder.Add(tower);
 
             // interior set
-
-            BaseBarrel barrelInShipA = new BaseBarrel(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
-            barrelInShipA.inInteriorId = baseShipAI.shipInterior.interiorId; // need to do this for containers
-            BaseChest chestInShipA = new BaseChest(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
             BaseTribal baseTribalInShip = new BaseTribal(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
             baseTribalInShip.playerOnShip = baseShipAI;
-            baseShipAI.shipInterior.interiorObjects.Add(barrelInShipA);
-            baseShipAI.shipInterior.interiorObjects.Add(chestInShipA);
             baseShipAI.shipInterior.interiorObjects.Add(baseTribalInShip);
 
 

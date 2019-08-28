@@ -620,6 +620,8 @@ namespace Gusto
                 if (gameState.player.playerInInterior != null)
                     invItemsShip = null;
             }
+            else
+                invItemsShip = null;
 
             if (gameState.player.showInventory)
             {
@@ -650,6 +652,9 @@ namespace Gusto
         public void DrawPlayer()
         {
             PiratePlayer pirate = gameState.player;
+            
+            // wont draw if pirate not hurt
+            pirate.DrawHealthBar(spriteBatchView, camera);
 
             if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
                 pirate.inHand.Draw(spriteBatchView, this.camera);

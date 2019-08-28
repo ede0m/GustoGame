@@ -298,7 +298,7 @@ namespace Gusto.Models.Animated
             inHand.SetBoundingBox();
 
             // hop on ship
-            if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && timeSinceExitShipStart < 2000)
+            if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && playerOnShip != null && timeSinceExitShipStart < 2000)
             {
                 location = playerOnShip.GetBoundingBox().Center.ToVector2();
                 onShip = true;

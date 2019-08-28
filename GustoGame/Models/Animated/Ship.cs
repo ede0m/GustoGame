@@ -221,31 +221,17 @@ namespace Gusto.Models.Animated
                 {
                     remove = true;
 
-                    // drop items
-                    foreach (var item in actionInventory)
+                    // drop items from interior (can also include actionInv someday)
+                    foreach (var obj in shipInterior.interiorObjects)
                     {
-                        if (item == null)
-                            continue;
-
-                        // TODO: drop (package up) all items as barrels/chests
-                        if (item.bbKey.Equals("baseBarrelItem"))
+                        if (obj is IStorage || obj is IContainer)
                         {
-                            BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);
-                            // scatter items
-                            b.location.X = location.X + RandomEvents.rand.Next(-40, 40);
-                            b.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
-                            ItemUtility.ItemsToUpdate.Add(b);
-                        }
-                        else if (item.bbKey.Equals("baseChestItem"))
-                        {
-                            BaseChest c = new BaseChest(teamType, regionKey, location, _content, _graphics);
-                            // scatter items
-                            c.location.X = location.X + RandomEvents.rand.Next(-40, 40);
-                            c.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
-                            ItemUtility.ItemsToUpdate.Add(c);
+                            obj.location.X = location.X + RandomEvents.rand.Next(-40, 40);
+                            obj.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
+                            ItemUtility.ItemsToUpdate.Add(obj);
                         }
                     }
-                    actionInventory.Clear();
+                    shipInterior.interiorObjects.Clear();
                 }
             }
         }

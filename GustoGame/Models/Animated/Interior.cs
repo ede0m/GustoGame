@@ -221,6 +221,12 @@ namespace Gusto.Models.Animated
 
                 obj.Draw(sb, cam);
 
+                if (obj is IVulnerable)
+                {
+                    IVulnerable v = (IVulnerable)obj;
+                    v.DrawHealthBar(sb, cam);
+                }
+
                 if (obj is IInventoryItem)
                 {
                     InventoryItem item = (InventoryItem)obj;

@@ -32,16 +32,16 @@ namespace Gusto.Mappings
             },
             { "baseShip", new Dictionary<string, Dictionary<string, float>>
                 {
-                    {"baseBarrelItem", new Dictionary<string, float>
+                    {"baseBarrel", new Dictionary<string, float>
                         {
                             {"maxDrop", 4 },
                             {"percentDrop", 50 }
                         }
                     },
-                    {"baseChestItem", new Dictionary<string, float>
+                    {"baseChest", new Dictionary<string, float>
                         {
-                            {"maxDrop", 1 },
-                            {"percentDrop", 25 }
+                            {"maxDrop", 2 },
+                            {"percentDrop", 45 }
                         }
                     },
                 }
