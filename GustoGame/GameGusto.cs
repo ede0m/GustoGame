@@ -559,10 +559,10 @@ namespace Gusto
                         continue;
                     }
 
-                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Anvil))
+                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.CraftingObject))
                     {
-                        Anvil anvil = (Anvil)sprite;
-                        if (anvil.drawCraftingMenu)
+                        CraftingObject craft = (CraftingObject)sprite;
+                        if (craft.drawCraftingMenu)
                             showCraftingMenu = true;
                     }
 

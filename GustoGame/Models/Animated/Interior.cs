@@ -262,10 +262,11 @@ namespace Gusto.Models.Animated
                     }
                 }
 
-                else if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Anvil))
+                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.CraftingObject))
                 {
-                    Anvil anvil = (Anvil)obj;
-                    if (anvil.drawCraftingMenu)
+                    CraftingObject craft = (CraftingObject)obj;
+                    craft.DrawCanCraft(sb, cam);
+                    if (craft.drawCraftingMenu)
                         showCraftingMenu = true;
                     else
                         showCraftingMenu = false;
