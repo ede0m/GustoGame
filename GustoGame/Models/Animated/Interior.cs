@@ -45,11 +45,12 @@ namespace Gusto.Models.Animated
         public bool showStorageMenu;
         public bool showCraftingMenu;
 
-        Sprite interiorForObj;
+        public Vector2 startDrawPoint;
 
-        public Interior(string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
+        public Sprite interiorForObj;
+
+        public Interior(Guid iid, string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
         {
-            interiorId = Guid.NewGuid();
             interiorTypeKey = itk;
             interiorMap = new List<TilePiece>();
             interiorTiles = new HashSet<TilePiece>();
@@ -69,7 +70,11 @@ namespace Gusto.Models.Animated
             cols = width / (GameOptions.tileWidth * 2);
             rows = height / (GameOptions.tileHeight * 2);
 
-            Vector2 startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
+            if (interiorForObj != null)
+                startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
+            else
+                startDrawPoint = Vector2.Zero;
+
             Vector2 drawPoint = startDrawPoint;
 
             int index = 0;
@@ -139,7 +144,13 @@ namespace Gusto.Models.Animated
                 index2++;
             }
 
-            BoundingBoxLocations.interiorMap.Add(interiorId, this);
+            if (iid == Guid.Empty)
+            {
+                interiorId = Guid.NewGuid();
+                BoundingBoxLocations.interiorMap.Add(interiorId, this);
+            }
+            else
+                interiorId = iid;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
@@ -181,7 +192,7 @@ namespace Gusto.Models.Animated
             Vector2 minCorner = new Vector2(cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
 
-            Vector2 startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
+            startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
             Vector2 drawPoint = startDrawPoint;
             interiorTiles.Clear();
             for (int i = 0; i < rows; i++)
@@ -286,6 +297,17 @@ namespace Gusto.Models.Animated
                 t = interiorTiles.ElementAt(RandomEvents.rand.Next(interiorTiles.Count));
             }
             return t;
+        }
+
+        public Guid GetInteriorForId()
+        {
+            if (interiorForObj is IHasInterior)
+            {
+                IHasInterior obj = (IHasInterior)interiorForObj;
+                return obj.GetInteriorForId();
+            }
+            else
+                return Guid.Empty;
         }
 
     }

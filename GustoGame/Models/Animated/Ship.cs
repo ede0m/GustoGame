@@ -19,10 +19,12 @@ using Gusto.AnimatedSprite.InventoryItems;
 
 namespace Gusto.Models.Animated
 {
-    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster
+    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster, IHasInterior
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
+
+        Guid shipId;
 
         public float timeSinceLastShot;
         public float timeSinceStartAnchor;
@@ -92,6 +94,8 @@ namespace Gusto.Models.Animated
             percentNotAnchored = 1;
             meterFull = new Texture2D(_graphics, 1, 1);
             meterProg = new Texture2D(_graphics, 1, 1);
+
+            shipId = Guid.NewGuid();
 
             timeShowingHealthBar = 0;
         }
@@ -687,6 +691,16 @@ namespace Gusto.Models.Animated
                 shipSail.sailPositionInRespectToShip = nRows - 1;
             else if (shipSail.sailPositionInRespectToShip == nRows)
                 shipSail.sailPositionInRespectToShip = 0;
+        }
+
+        public Guid GetInteriorForId()
+        {
+            return shipId;
+        }
+
+        public void SetInteriorForId(Guid id)
+        {
+            shipId = id;
         }
     }
 }

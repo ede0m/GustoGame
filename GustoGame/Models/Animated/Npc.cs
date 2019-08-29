@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
+    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, INPC
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -44,7 +44,7 @@ namespace Gusto.Models.Animated
         public bool roaming;
         public bool defense;
         public List<InventoryItem> inventory;
-        public Ship playerOnShip;
+        public Interior npcInInterior;
         public Sprite randomRegionRoamTile;
         public TeamType teamType;
 
@@ -79,10 +79,7 @@ namespace Gusto.Models.Animated
 
             else if (collidedWith.bbKey.Equals("interiorTileWall"))
             {
-                colliding = false;
-                // set new interior roam tile when hitting a wall
-                //if (playerOnShip != null && playerOnShip.shipInterior != null)
-                //    randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); 
+                colliding = false; 
             }
 
             else if (collidedWith is IWalks || collidedWith is IShip || collidedWith is IPlaceable || collidedWith is IInventoryItem)
@@ -163,7 +160,7 @@ namespace Gusto.Models.Animated
                     inCombat = false;
 
                     // if we want to move to attack within a range
-                    if (playerOnShip != null && playerOnShip.shipInterior != null)
+                    if (npcInInterior != null)
                     {
                         // attack any player within a large range in the ship
                         target = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 10, GetBoundingBox());
@@ -187,17 +184,17 @@ namespace Gusto.Models.Animated
                         directionalFrame = frames.Item2;
 
                         // FIND a better way to get this value - can't have references
-                        if (playerOnShip != null && playerOnShip.shipInterior != null)
-                            randomRegionRoamTile = playerOnShip.shipInterior.interiorTiles.ToList()[playerOnShip.shipInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
+                        if (npcInInterior != null)
+                            randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
 
                         if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
                             roaming = false;
                     }
                     else if (!defense)
                     {
-                        if (playerOnShip != null && playerOnShip.shipInterior != null)
+                        if (npcInInterior != null)
                         {
-                            randomRegionRoamTile = playerOnShip.shipInterior.RandomInteriorTile(); // interior tile roaming
+                            randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
                         }
                         else
                             randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming

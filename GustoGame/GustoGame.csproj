@@ -114,6 +114,7 @@
     <Compile Include="Models\Animated\Npc.cs" />
     <Compile Include="Models\Animated\GroundObject\Rock.cs" />
     <Compile Include="Models\Animated\GroundObject\Tree.cs" />
+    <Compile Include="Models\Animated\Structure.cs" />
     <Compile Include="Models\Animated\TreasureMap.cs" />
     <Compile Include="Models\Animated\Weather\Rain.cs" />
     <Compile Include="Models\Interfaces\IAmmo.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Models\Interfaces\IContainer.cs" />
     <Compile Include="Models\Interfaces\IGrass.cs" />
     <Compile Include="Models\Interfaces\IGroundObject.cs" />
+    <Compile Include="Models\Interfaces\IHasInterior.cs" />
     <Compile Include="Models\Interfaces\IInteriorTile.cs" />
     <Compile Include="Models\Interfaces\ILight.cs" />
     <Compile Include="Models\Interfaces\IMenuGUI.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="Models\Interfaces\IShadowCaster.cs" />
     <Compile Include="Models\Interfaces\IStorage.cs" />
     <Compile Include="Models\Interfaces\IStorageItem.cs" />
+    <Compile Include="Models\Interfaces\IStructure.cs" />
     <Compile Include="Models\Interfaces\ITilePiece.cs" />
     <Compile Include="Models\Interfaces\IWood.cs" />
     <Compile Include="Models\Light.cs" />

@@ -112,7 +112,7 @@ namespace Gusto
 
             // interior set
             BaseTribal baseTribalInShip = new BaseTribal(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
-            baseTribalInShip.playerOnShip = baseShipAI;
+            baseTribalInShip.npcInInterior = baseShipAI.shipInterior;
             baseShipAI.shipInterior.interiorObjects.Add(baseTribalInShip);
 
 
@@ -168,45 +168,40 @@ namespace Gusto
         {
             // Create the save state
             List<ISaveState> SaveState = new List<ISaveState>();
-            Dictionary<Ship, Guid> shipMap = new Dictionary<Ship, Guid>();
+            Dictionary<Interior, Guid> interiorMap = new Dictionary<Interior, Guid>();
 
+
+            // save all interior states
+            foreach (var interior in BoundingBoxLocations.interiorMap)
+            {
+                InteriorState its = SerializeInterior(interior.Value);
+                interiorMap.Add(interior.Value, interior.Key);
+                SaveState.Add(its);
+            }
+
+            // save the world state
             foreach (Sprite sp in UpdateOrder)
             {
+
+                // PLAYER
                 if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
                 {
                     PlayerState state = new PlayerState();
                     state.team = player.teamType;
                     state.location = player.location;
                     state.region = player.regionKey;
-                    state.inventory = CreateSerializableInventory(player.inventory);
+                    state.inventory = SerializeInventory(player.inventory);
                     state.onShip = player.onShip;
-                    if (player.playerOnShip != null)
+                    // set the player in their interior if they save while on ship
+                    if (player.onShip)
+                        player.playerInInterior = player.playerOnShip.shipInterior;
+
+                    if (player.playerInInterior != null)
                     {
-                        if (shipMap.ContainsKey(player.playerOnShip))
-                            state.playerOnShipId = shipMap[player.playerOnShip];
-                        else
-                        {
-                            // save the ship that the player was on. 
-                            Ship sh = (Ship)player.playerOnShip;
-                            ShipState shipState = new ShipState();
-                            shipState.team = sh.teamType;
-                            shipState.location = sh.location;
-                            shipState.region = sh.regionKey;
-                            shipState.objKey = sh.bbKey;
-                            shipState.inventory = CreateSerializableInventory(sh.actionInventory);
-                            shipState.playerAboard = sh.playerAboard;
-                            shipState.anchored = sh.anchored;
-                            shipState.health = sh.health;
-                            // create and save guid for player and ship, track it
-                            Guid shipId = Guid.NewGuid();
-                            state.playerOnShipId = shipId;
-                            shipState.shipId = shipId;
-                            shipMap.Add(sh, shipId);
-                            SaveState.Add(state);
-                        }
+                        state.playerInInteriorId = interiorMap[player.playerInInterior]; // interiorMap should be full since we ran interiors before this
                     }
                     else
-                        state.playerOnShipId = Guid.Empty;
+                        state.playerInInteriorId = Guid.Empty;
 
                     state.inHandItemKey = player.inHand.itemKey;
                     state.health = player.health;
@@ -221,36 +216,10 @@ namespace Gusto
                     state.location = npc.location;
                     state.objKey = npc.bbKey;
                     state.region = npc.regionKey;
-                    state.inventory = CreateSerializableInventory(npc.inventory);
+                    state.inventory = SerializeInventory(npc.inventory);
                     state.onShip = npc.onShip;
-                    if (npc.playerOnShip != null)
-                    {
-                        if (shipMap.ContainsKey(npc.playerOnShip))
-                            state.playerOnShipId = shipMap[npc.playerOnShip];
-                        else
-                        {
-                            // save the ship that the player was on. 
-                            Ship sh = (Ship)npc.playerOnShip;
-                            ShipState shipState = new ShipState();
-                            shipState.team = sh.teamType;
-                            shipState.location = sh.location;
-                            shipState.region = sh.regionKey;
-                            shipState.objKey = sh.bbKey;
-                            shipState.inventory = CreateSerializableInventory(sh.actionInventory);
-                            shipState.playerAboard = sh.playerAboard;
-                            shipState.anchored = sh.anchored;
-                            shipState.health = sh.health;
-                            // create and save guid for player and ship, track it
-                            Guid shipId = Guid.NewGuid();
-                            state.playerOnShipId = shipId;
-                            shipState.shipId = shipId;
-                            shipMap.Add(sh, shipId);
-                            SaveState.Add(state);
-                        }
-                    }
-                    else
-                        state.playerOnShipId = Guid.Empty;
 
+                    state.npcInInteriorId = Guid.Empty;
                     state.health = npc.health;
                     SaveState.Add(state);
                 }
@@ -258,21 +227,17 @@ namespace Gusto
                 else if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship sh = (Ship)sp;
-                    if (!shipMap.ContainsKey(sh))
-                    {
-                        ShipState state = new ShipState();
-                        state.team = sh.teamType;
-                        state.location = sh.location;
-                        state.region = sh.regionKey;
-                        state.objKey = sh.bbKey;
-                        state.inventory = CreateSerializableInventory(sh.actionInventory);
-                        state.playerAboard = sh.playerAboard;
-                        state.anchored = sh.anchored;
-                        state.health = sh.health;
-                        state.shipId = Guid.NewGuid();
-                        shipMap.Add(sh, state.shipId);
-                        SaveState.Add(state);
-                    }
+                    ShipState state = new ShipState();
+                    state.team = sh.teamType;
+                    state.location = sh.location;
+                    state.region = sh.regionKey;
+                    state.objKey = sh.bbKey;
+                    state.actionInventory = SerializeInventory(sh.actionInventory);
+                    state.playerAboard = sh.playerAboard;
+                    state.anchored = sh.anchored;
+                    state.health = sh.health;
+                    state.shipId = sh.GetInteriorForId();
+                    SaveState.Add(state);
                 }
             }
 
@@ -295,12 +260,12 @@ namespace Gusto
                 if (item is IStorage)
                 {
                     Storage storage = (Storage)item;
-                    ogs.inventory = CreateSerializableInventory(storage.inventory);
+                    ogs.inventory = SerializeInventory(storage.inventory);
                 }
                 else if (item is IContainer)
                 {
                     Container cont = (Container)item;
-                    ogs.inventory = CreateSerializableInventory(cont.drops);
+                    ogs.inventory = SerializeInventory(cont.drops);
                 }
 
                 SaveState.Add(ogs);
@@ -320,6 +285,8 @@ namespace Gusto
             wss.lightning = WeatherState.lightning;
             SaveState.Add(wss);
 
+
+
             // serialize save to file system
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>));
             using (FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Create))
@@ -330,7 +297,7 @@ namespace Gusto
 
         public void LoadGameState()
         {
-            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState), typeof(OnGroundState) };
+            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState), typeof(OnGroundState), typeof(InteriorState)  };
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), deserializeTypes);
             FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
@@ -343,11 +310,19 @@ namespace Gusto
 
         private void InitializeLoadState(List<ISaveState> LoadFromState)
         {
-            // TODO: deserialize the ps.onShipId (create if id not tracked yet, otherwise set to ship in tracked dict) kinda the opposite of how it is done in save
-            Dictionary<Ship, Guid> shipMap = new Dictionary<Ship, Guid>();
+            Dictionary<Guid, Interior> interiorForObjMap = new Dictionary<Guid, Interior>(); // key is the interiorObjFor and val is the interior that belongs to this obj
 
             foreach (ISaveState objState in LoadFromState)
             {
+                // Interiors are deserialized first since they were serialized first
+                if (objState.GetType() == typeof(InteriorState))
+                {
+                    InteriorState its = (InteriorState)objState;
+                    Interior i = DeserializeInterior(its);
+                    interiorForObjMap.Add(its.interiorForId, i);
+                    BoundingBoxLocations.interiorMap.Add(i.interiorId, i);
+                }
+
                 if (objState.GetType() == typeof(PlayerState))
                 {
                     PlayerState ps = (PlayerState)objState;
@@ -355,42 +330,18 @@ namespace Gusto
                     player.inventory = DeserializeInventory(ps.inventory);
                     player.inHand = (HandHeld)DeserializeInventoryItem(ps.inHandItemKey);
 
-                    if (ps.playerOnShipId == Guid.Empty)
+                    if (ps.playerInInteriorId == Guid.Empty)
                         player.playerOnShip = null;
                     else
                     {
-                        // check if the ship already exists
-                        foreach (KeyValuePair<Ship, Guid> ship in shipMap)
+                        // check if the interior already exists
+                        foreach (KeyValuePair<Guid, Interior> interior in BoundingBoxLocations.interiorMap)
                         {
-                            if (ps.playerOnShipId == ship.Value)
+                            if (ps.playerInInteriorId == interior.Key)
                             {
-                                player.playerOnShip = ship.Key;
+                                player.playerInInterior = interior.Value;
                                 break;
                             }
-                        }
-                        // ship did not already exist so we have to create here
-                        if (player.playerOnShip == null)
-                        {
-                            // we have to loop here again to find the save state.. eh
-                            ISaveState shipSaveStateToFind = null;
-                            ShipState shipSave = null;
-                            foreach (ISaveState ss in LoadFromState)
-                            {
-                                if (objState.GetType() == typeof(ShipState))
-                                {
-                                    shipSave = (ShipState)objState;
-                                    if (shipSave.shipId == ps.playerOnShipId)
-                                    {
-                                        shipSaveStateToFind = shipSave;
-                                        break;
-                                    }
-                                }
-
-                            }
-                            Ship s = (Ship)DeserializeModel(shipSave.objKey, shipSaveStateToFind);
-                            shipMap.Add(s, ps.playerOnShipId);
-                            player.playerOnShip = s;
-                            UpdateOrder.Add(s);
                         }
                     }
 
@@ -407,42 +358,20 @@ namespace Gusto
                     npc.location = npcs.location;
                     npc.inventory = DeserializeInventory(npcs.inventory);
 
-                    if (npcs.playerOnShipId == Guid.Empty)
-                        npc.playerOnShip = null;
+                    if (npcs.npcInInteriorId == Guid.Empty)
+                        npc.npcInInterior = null;
                     else
                     {
-                        // check if the ship already exists
-                        foreach (KeyValuePair<Ship, Guid> ship in shipMap)
+                        // THIS SHOULD NEVER RUN BECAUSE NPCS THAT ARE IN INTERIORS ARE DESERIALIZED ELSEWHERE
+
+                        // check if the interior already exists
+                        foreach (KeyValuePair<Guid, Interior> interior in BoundingBoxLocations.interiorMap)
                         {
-                            if (npcs.playerOnShipId == ship.Value)
+                            if (npcs.npcInInteriorId == interior.Key)
                             {
-                                npc.playerOnShip = ship.Key;
+                                npc.npcInInterior = interior.Value;
                                 break;
                             }
-                        }
-                        // ship did not already exist so we have to create here
-                        if (npc.playerOnShip == null)
-                        {
-                            // we have to loop here again to find the save state.. eh
-                            ISaveState shipSaveStateToFind = null;
-                            ShipState shipSave = null;
-                            foreach (ISaveState ss in LoadFromState)
-                            {
-                                if (objState.GetType() == typeof(ShipState))
-                                {
-                                    shipSave = (ShipState)objState;
-                                    if (shipSave.shipId == npcs.playerOnShipId)
-                                    {
-                                        shipSaveStateToFind = shipSave;
-                                        break;
-                                    }
-                                }
-
-                            }
-                            Ship s = (Ship)DeserializeModel(shipSave.objKey, shipSaveStateToFind);
-                            shipMap.Add(s, npcs.playerOnShipId);
-                            npc.playerOnShip = s;
-                            UpdateOrder.Add(s);
                         }
                     }
 
@@ -455,23 +384,8 @@ namespace Gusto
                 else if (objState.GetType() == typeof(ShipState))
                 {
                     ShipState ss = (ShipState)objState;
-                    bool shipCreated = false;
-                    // check if the ship already exists
-                    foreach (KeyValuePair<Ship, Guid> ship in shipMap)
-                    {
-                        if (ss.shipId == ship.Value)
-                        {
-                            shipCreated = true;
-                            break;
-                        }
-                    }
-                    if (!shipCreated)
-                    {
-                        Ship s = (Ship)DeserializeModel(ss.objKey, ss);
-                        shipMap.Add(s, ss.shipId);
-                        UpdateOrder.Add(s);
-                    }
-
+                    Ship s = (Ship)DeserializeModel(ss.objKey, ss);
+                    UpdateOrder.Add(s);
                 }
 
                 else if (objState.GetType() == typeof(WeatherSaveState))
@@ -515,54 +429,29 @@ namespace Gusto
                 }
             }
 
-        }
-
-        private List<InventoryItem> DeserializeInventory(List<InventoryItemSerialized> inv)
-        {
-            int index = 0;
-            List<InventoryItem> ret = Enumerable.Repeat<InventoryItem>(null, inv.Count()).ToList();
-            foreach (InventoryItemSerialized item in inv)
+            // go through newly created world state and set any interiors for the object that owns that interior
+            foreach(Sprite sp in UpdateOrder)
             {
-                if (item == null)
+                if (sp is IHasInterior)
                 {
-                    ret[index] = null;
-                    index++;
-                    continue;
-                }
+                    IHasInterior hasInterior = (IHasInterior)sp;
+                    Guid interiorForId = hasInterior.GetInteriorForId();
 
-                // special cases
-                if (item.treasureMaps != null)
-                {
-                    Storage reward = null;
-                    if (item.treasureMaps[index].reward != null)
+                    if (sp is IShip)
                     {
-                        reward = (Storage)DeserializeInventoryItem(item.treasureMaps[index].storageType).placeableVersion;
-                        reward.inventory = DeserializeInventory(item.treasureMaps[index].reward);
+                        Ship sh = (Ship)sp;
+                        sh.shipInterior = interiorForObjMap[interiorForId];
                     }
-                    TreasureMapItem tm = new TreasureMapItem(reward, TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
-                    tm.digTileLoc = item.treasureMaps[index].digLocation;
-                    tm.treasureInRegion = item.treasureMaps[index].treasureInRegion;
-                    ret[index] = (InventoryItem)tm;
-                    index++;
-                    continue;
+                    else if (sp is IStructure)
+                    {
+                        Structure st = (Structure)sp;
+                        //st.structureInterior = interiorForObjMap[interiorForId];
+                    }
+
+                    interiorForObjMap[interiorForId].interiorForObj = sp;
                 }
-
-                InventoryItem ii = DeserializeInventoryItem(item.itemKey);
-                ii.amountStacked = item.stackedAmount;
-                ii.regionKey = "GustoMap";
-                ii.inInventory = true;
-                ii.remove = true;
-
-                if (item.storageItems != null)
-                {
-                    Storage store = (Storage)ii.placeableVersion;
-                    store.inventory = DeserializeInventory(item.storageItems[index]);
-                }
-
-                ret[index] = ii;
-                index++;
             }
-            return ret;
+
         }
 
         private Sprite DeserializeModel(string objKey, ISaveState objSave)
@@ -580,8 +469,10 @@ namespace Gusto
                     ss = (ShipState)objSave;
                     BaseShip bs = new BaseShip(ss.team, ss.region, ss.location, _content, _graphics);
                     bs.health = ss.health;
-                    bs.actionInventory = DeserializeInventory(ss.inventory);
+                    bs.actionInventory = DeserializeInventory(ss.actionInventory);
+                    //bs.shipInterior = DeserializeInterior(ss.interiorState); we do this after models are created
                     bs.playerAboard = ss.playerAboard;
+                    bs.SetInteriorForId(ss.shipId);
                     if (bs.playerAboard)
                         bs.shipSail.playerAboard = true;
                     return bs;
@@ -679,7 +570,159 @@ namespace Gusto
 
         }
 
-        private List<InventoryItemSerialized> CreateSerializableInventory(List<InventoryItem> inv)
+        private Interior DeserializeInterior(InteriorState interiorSaveState)
+        {
+            // deserialize the entire interior and its objects
+            Interior i = new Interior(interiorSaveState.interiorId, interiorSaveState.interiorTypeKey, null, _content, _graphics); // interiorForObj will be set after everything else has been deserialized
+            i.startDrawPoint = interiorSaveState.location;
+            i.interiorObjects = DeserializeInteriorObjects(interiorSaveState.interiorObjs, i);
+            return i;
+        }
+
+
+        private HashSet<Sprite> DeserializeInteriorObjects(List<InteriorObjectSerialized> interiorObjsSaved, Interior interior)
+        {
+            HashSet<Sprite> ret = new HashSet<Sprite>();
+            foreach(InteriorObjectSerialized objSave in interiorObjsSaved)
+            {
+                Sprite sp = null;
+                if (objSave.groundObj)
+                {
+                    OnGroundState ogs = (OnGroundState)objSave.saveState;
+                    sp = DeserializeModel(ogs.objKey, objSave.saveState);
+                    sp.location = ogs.location;
+                    sp.regionKey = ogs.region;
+                }
+                else if (objSave.npcObj)
+                {
+                    NpcState npcs = (NpcState)objSave.saveState;
+                    Npc npc = (Npc)DeserializeModel(npcs.objKey, npcs);
+                    npc.location = npcs.location;
+                    npc.inventory = DeserializeInventory(npcs.inventory);
+                    npc.regionKey = npcs.region;
+                    npc.onShip = npcs.onShip;
+                    npc.health = npcs.health;
+                    npc.npcInInterior = interior;
+                    sp = npc;
+                }
+                ret.Add(sp);
+            }
+            return ret;
+        }
+
+        private List<InventoryItem> DeserializeInventory(List<InventoryItemSerialized> inv)
+        {
+            int index = 0;
+            List<InventoryItem> ret = Enumerable.Repeat<InventoryItem>(null, inv.Count()).ToList();
+            foreach (InventoryItemSerialized item in inv)
+            {
+                if (item == null)
+                {
+                    ret[index] = null;
+                    index++;
+                    continue;
+                }
+
+                // special cases
+                if (item.treasureMaps != null)
+                {
+                    Storage reward = null;
+                    if (item.treasureMaps[index].reward != null)
+                    {
+                        reward = (Storage)DeserializeInventoryItem(item.treasureMaps[index].storageType).placeableVersion;
+                        reward.inventory = DeserializeInventory(item.treasureMaps[index].reward);
+                    }
+                    TreasureMapItem tm = new TreasureMapItem(reward, TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                    tm.digTileLoc = item.treasureMaps[index].digLocation;
+                    tm.treasureInRegion = item.treasureMaps[index].treasureInRegion;
+                    ret[index] = (InventoryItem)tm;
+                    index++;
+                    continue;
+                }
+
+                InventoryItem ii = DeserializeInventoryItem(item.itemKey);
+                ii.amountStacked = item.stackedAmount;
+                ii.regionKey = "GustoMap";
+                ii.inInventory = true;
+                ii.remove = true;
+
+                if (item.storageItems != null)
+                {
+                    Storage store = (Storage)ii.placeableVersion;
+                    store.inventory = DeserializeInventory(item.storageItems[index]);
+                }
+
+                ret[index] = ii;
+                index++;
+            }
+            return ret;
+        }
+
+
+        private InteriorState SerializeInterior(Interior interior)
+        {
+            InteriorState ins = new InteriorState();
+            ins.interiorId = interior.interiorId;
+            ins.interiorForId = interior.GetInteriorForId();
+            ins.location = interior.startDrawPoint;
+            ins.interiorTypeKey = interior.interiorTypeKey;
+            ins.interiorObjs = SerializeInteriorObjects(interior.interiorObjects.ToList(), interior.interiorId);
+            return ins;
+        }
+
+        private List<InteriorObjectSerialized> SerializeInteriorObjects(List<Sprite> interiorObjs, Guid interiorId)
+        {
+            List<InteriorObjectSerialized> ret = new List<InteriorObjectSerialized>();
+            foreach (Sprite obj in interiorObjs)
+            {
+                InteriorObjectSerialized ios = new InteriorObjectSerialized();
+                if (obj is IPlayer)
+                    continue; // don't save player as part of interior state, player is done seperatly
+
+                if (obj is INPC)
+                {
+                    NpcState state = new NpcState();
+                    Npc npc = (Npc)obj;
+                    state.team = npc.teamType;
+                    state.location = npc.location;
+                    state.objKey = npc.bbKey;
+                    state.region = npc.regionKey;
+                    state.inventory = SerializeInventory(npc.inventory);
+                    state.onShip = npc.onShip;
+                    state.health = npc.health;
+                    state.npcInInteriorId = interiorId;
+
+                    ios.npcObj = true;
+                    ios.saveState = state;
+                    ret.Add(ios);
+                }
+                else
+                {
+                    OnGroundState ogs = new OnGroundState();
+                    ogs.objKey = obj.bbKey;
+                    ogs.region = obj.regionKey;
+                    ogs.team = TeamType.Gusto;
+                    ogs.location = obj.location;
+
+                    if (obj is IStorage)
+                    {
+                        Storage storage = (Storage)obj;
+                        ogs.inventory = SerializeInventory(storage.inventory);
+                    }
+                    else if (obj is IContainer)
+                    {
+                        Container cont = (Container)obj;
+                        ogs.inventory = SerializeInventory(cont.drops);
+                    }
+                    ios.groundObj = true;
+                    ios.saveState = ogs;
+                    ret.Add(ios);
+                }
+            }
+            return ret;
+        }
+
+        private List<InventoryItemSerialized> SerializeInventory(List<InventoryItem> inv)
         {
             int index = 0;
             List<InventoryItemSerialized> ret = Enumerable.Repeat<InventoryItemSerialized>(null, inv.Count()).ToList();
@@ -707,7 +750,7 @@ namespace Gusto
                     if (m.rewarded != null)
                     {
                         tms.storageType = m.storageTierType;
-                        tms.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
+                        tms.reward = SerializeInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
                     }
                          
                     iszd.treasureMaps.Add(index, tms);
@@ -738,7 +781,7 @@ namespace Gusto
                             tm.digLocation = m.digTileLoc;
                             tm.treasureInRegion = m.treasureInRegion;
                             if (tm.reward != null)
-                                tm.reward = CreateSerializableInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
+                                tm.reward = SerializeInventory(m.rewarded.inventory); // risk of infite loop recusion, but only if you bury treasure maps in storage that you have a map for. It shouuuuld reach a base case.. lol
                             stItemSzd.treasureMaps.Add(indexStorage, tm);
                         }
                         // do not need to check for more storage here because I have prevented storage from being placed within storage.. TODO
