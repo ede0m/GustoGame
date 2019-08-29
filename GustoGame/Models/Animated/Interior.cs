@@ -1,4 +1,5 @@
 ﻿using Comora;
+using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.GameMap;
 using Gusto.Bounding;
 using Gusto.Models.Interfaces;
@@ -104,13 +105,9 @@ namespace Gusto.Models.Animated
                         interiorTiles.Add(tile);
                     }
 
-                    //drawPoint.X += GameOptions.tileWidth * 2;
-
                     interiorMap.Add(tile);
                     index++;
                 }
-                //drawPoint.Y += GameOptions.tileHeight * 2;
-                //drawPoint.X = startDrawPoint.X;
             }
 
             // Go through again to set all columns to correct frame for walls
@@ -164,7 +161,7 @@ namespace Gusto.Models.Animated
                 obj.location.X += speed.X;
                 obj.location.Y += speed.Y;
 
-                if (obj is ICanUpdate)
+                if (obj is ICanUpdate && !(obj is IPlayer)) // let gamestate update the player
                 {
                     ICanUpdate updateSp = (ICanUpdate)obj;
                     updateSp.Update(kstate, gameTime, camera);
@@ -213,11 +210,20 @@ namespace Gusto.Models.Animated
                 drawPoint.X = startDrawPoint.X;
             }
 
+            List<Sprite> drawOrder = interiorObjects.ToList();
+            drawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
             // Draw any items
-            foreach (var obj in interiorObjects)
+            foreach (var obj in drawOrder)
             {
-                if (!tilesSet)
+                if (!tilesSet && !(obj is IPlayer))
                     obj.location = RandomInteriorTile().location;
+
+                // special draw for player
+                if (obj is IPlayer)
+                {
+                    DrawUtility.DrawPlayer(sb, cam, (PiratePlayer)obj);
+                    continue;
+                }
 
                 obj.Draw(sb, cam);
 

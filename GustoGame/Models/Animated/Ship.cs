@@ -402,7 +402,6 @@ namespace Gusto.Models.Animated
                 }
             }
 
-
             if (colliding || anchored || !playerAboard || health <= 0)
             {
                 moving = false;

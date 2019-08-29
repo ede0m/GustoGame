@@ -393,6 +393,7 @@ namespace Gusto
                     // only add ships and land tiles when to collision when interior is being viewed
                     if (sp is IShip || sp is ITilePiece || sp is IPlayer)
                     {
+                        sp.SetBoundingBox();
                         Collidable.Add(sp);
                         SpatialBounding.SetQuad(sp.GetBase());
                     }
@@ -449,11 +450,12 @@ namespace Gusto
             {
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.Black);
+                gameState.player.playerInInterior.interiorObjects.Add(gameState.player);
                 gameState.player.playerInInterior.Draw(spriteBatchView, this.camera);
+
                 showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
                 showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
                 invStorage = gameState.player.playerInInterior.invStorage;
-                DrawPlayer();
             }
             // not in interior so draw the game scene
             else
@@ -553,7 +555,7 @@ namespace Gusto
 
                     else if (sprite.GetType() == typeof(Gusto.AnimatedSprite.PiratePlayer))
                     {
-                        DrawPlayer();
+                        DrawUtility.DrawPlayer(spriteBatchView, this.camera, gameState.player);
                         continue;
                     }
 
@@ -603,8 +605,6 @@ namespace Gusto
                 dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
             }
 
-            
-
             // lightning is drawn after ambient light
             if (WeatherState.lightning)
                 weather.DrawLightning(spriteBatchStatic);
@@ -647,36 +647,6 @@ namespace Gusto
             spriteBatchStatic.DrawString(font, fps, new Vector2(10, 10), Color.Green);
             spriteBatchStatic.End();
             base.Draw(gameTime);
-        }
-
-        public void DrawPlayer()
-        {
-            PiratePlayer pirate = gameState.player;
-            
-            // wont draw if pirate not hurt
-            pirate.DrawHealthBar(spriteBatchView, camera);
-
-            if (pirate.inCombat && pirate.currRowFrame == 3) // draw sword before pirate when moving up
-                pirate.inHand.Draw(spriteBatchView, this.camera);
-            if (pirate.nearShip)
-                pirate.DrawEnterShip(spriteBatchView, this.camera);
-            else if (pirate.onShip)
-                pirate.DrawOnShip(spriteBatchView, this.camera);
-
-
-            if (pirate.swimming && !pirate.onShip)
-                pirate.DrawSwimming(spriteBatchView, this.camera);
-            else if (!pirate.onShip)
-                pirate.Draw(spriteBatchView, this.camera);
-
-            if (pirate.canBury)
-                pirate.DrawCanBury(spriteBatchView, this.camera);
-
-            if (pirate.inCombat && pirate.currRowFrame != 3)
-                pirate.inHand.Draw(spriteBatchView, this.camera);
-
-            foreach (var shot in pirate.inHand.Shots)
-                shot.Draw(spriteBatchView, this.camera);
         }
 
         // preprocessing to build the region tree

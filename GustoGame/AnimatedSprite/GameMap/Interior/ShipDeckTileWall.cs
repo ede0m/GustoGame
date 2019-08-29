@@ -9,10 +9,11 @@ using System.Diagnostics;
 using Gusto.Models;
 using Gusto.Bounds;
 using Gusto.AnimatedSprite;
+using Gusto.Models.Interfaces;
 
 namespace Gusto.AnimatedSprite.GameMap
 {
-    public class ShipDeckTileWall : TilePiece
+    public class ShipDeckTileWall : TilePiece, IInteriorTile
     {
         public ShipDeckTileWall(int index, Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base(index, groundObj, content, graphics)
         {

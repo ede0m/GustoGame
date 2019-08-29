@@ -22,6 +22,11 @@ namespace Gusto.Bounding
                 // a ship doesn't collide with its any ship's sails
                 if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Sail))
                     return false;
+
+                // ship doesn't collide with interior tiles
+                if (b is IInteriorTile)
+                    return false;
+
                 // ship doesn't collide with its own cannon balls
                 if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo)) {
                     Ammo ball = (Ammo)b;
