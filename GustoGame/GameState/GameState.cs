@@ -62,7 +62,13 @@ namespace Gusto
             var screenCenter = new Vector2(_graphics.Viewport.Bounds.Width / 2, _graphics.Viewport.Bounds.Height / 2);
 
             BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), _content, _graphics);
+            baseShip.shipInterior.interiorId = Guid.NewGuid();
+            BoundingBoxLocations.interiorMap.Add(baseShip.shipInterior.interiorId, baseShip.shipInterior);
+
             BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), _content, _graphics);
+            baseShipAI.shipInterior.interiorId = Guid.NewGuid();
+            BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
+
             BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", GiannaRegionTile.location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), _content, _graphics);
             ClayFurnace furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), _content, _graphics);
@@ -114,7 +120,6 @@ namespace Gusto
             BaseTribal baseTribalInShip = new BaseTribal(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
             baseTribalInShip.npcInInterior = baseShipAI.shipInterior;
             baseShipAI.shipInterior.interiorObjects.Add(baseTribalInShip);
-
 
             ready = true;
         }
@@ -169,7 +174,6 @@ namespace Gusto
             // Create the save state
             List<ISaveState> SaveState = new List<ISaveState>();
             Dictionary<Interior, Guid> interiorMap = new Dictionary<Interior, Guid>();
-
 
             // save all interior states
             foreach (var interior in BoundingBoxLocations.interiorMap)
@@ -331,7 +335,10 @@ namespace Gusto
                     player.inHand = (HandHeld)DeserializeInventoryItem(ps.inHandItemKey);
 
                     if (ps.playerInInteriorId == Guid.Empty)
+                    {
                         player.playerOnShip = null;
+                        player.playerInInterior = null;
+                    }
                     else
                     {
                         // check if the interior already exists
@@ -451,6 +458,10 @@ namespace Gusto
                     interiorForObjMap[interiorForId].interiorForObj = sp;
                 }
             }
+
+            // set player's current ship, the interior will be the ships interior
+            if (player.onShip)
+                player.playerOnShip = (Ship)BoundingBoxLocations.interiorMap[player.playerInInterior.interiorId].interiorForObj;
 
         }
 
@@ -573,7 +584,8 @@ namespace Gusto
         private Interior DeserializeInterior(InteriorState interiorSaveState)
         {
             // deserialize the entire interior and its objects
-            Interior i = new Interior(interiorSaveState.interiorId, interiorSaveState.interiorTypeKey, null, _content, _graphics); // interiorForObj will be set after everything else has been deserialized
+            Interior i = new Interior(interiorSaveState.interiorTypeKey, null, _content, _graphics); // interiorForObj will be set after everything else has been deserialized
+            i.interiorId = interiorSaveState.interiorId;
             i.startDrawPoint = interiorSaveState.location;
             i.interiorObjects = DeserializeInteriorObjects(interiorSaveState.interiorObjs, i);
             return i;

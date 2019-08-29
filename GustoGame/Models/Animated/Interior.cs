@@ -49,7 +49,7 @@ namespace Gusto.Models.Animated
 
         public Sprite interiorForObj;
 
-        public Interior(Guid iid, string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
+        public Interior(string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
         {
             interiorTypeKey = itk;
             interiorMap = new List<TilePiece>();
@@ -144,13 +144,6 @@ namespace Gusto.Models.Animated
                 index2++;
             }
 
-            if (iid == Guid.Empty)
-            {
-                interiorId = Guid.NewGuid();
-                BoundingBoxLocations.interiorMap.Add(interiorId, this);
-            }
-            else
-                interiorId = iid;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)

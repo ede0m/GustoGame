@@ -61,7 +61,7 @@ namespace Gusto.AnimatedSprite
             shipSail = new BaseSail(team, region, location, content, graphics);
             shipSail.millisecondsPerFrame = 500; // match turn speed for sail
 
-            shipInterior = new Interior(Guid.Empty, "baseShip", this, content, graphics);
+            shipInterior = new Interior("baseShip", this, content, graphics);
 
             // set the random drops as interior objects
             if (interiorObjs != null)
