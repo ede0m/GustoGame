@@ -107,7 +107,7 @@
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\CraftingObject.cs" />
     <Compile Include="Models\Animated\Container.cs" />
-    <Compile Include="Models\Animated\Interior.cs" />
+    <Compile Include="Models\Interior.cs" />
     <Compile Include="Models\Animated\Storage.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />
     <Compile Include="Models\Animated\GroundObject\Grass.cs" />

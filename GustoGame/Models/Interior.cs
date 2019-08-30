@@ -2,6 +2,7 @@
 using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.GameMap;
 using Gusto.Bounding;
+using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -16,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.Models.Animated
+namespace Gusto.Models
 {
     public class Interior
     {
@@ -220,6 +221,7 @@ namespace Gusto.Models.Animated
             // Draw any items
             foreach (var obj in drawOrder)
             {
+                // npcs always have random loc set when entering interior, other objects are randomly set initially, unless coming from a save
                 if ((!tilesSet && !(obj is IPlayer) && !interiorWasLoaded) || (obj is INPC && !showingInterior))
                     obj.location = RandomInteriorTile().location;
 

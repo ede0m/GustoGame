@@ -301,7 +301,6 @@ namespace Gusto
 
             // weather
             weather.Update(kstate, gameTime);
-
             // daylight shader 
             dayLight.Update(kstate, gameTime);
 
@@ -462,7 +461,7 @@ namespace Gusto
             {
                 // set up gamescene draw
                 GraphicsDevice.SetRenderTarget(gameScene);
-                GraphicsDevice.Clear(Color.CornflowerBlue);
+                GraphicsDevice.Clear(Color.WhiteSmoke);
 
                 // draw map
                 map.DrawMap(spriteBatchView, gameTime);

@@ -81,10 +81,12 @@ namespace Gusto.GameMap
                     {
                         case "o1":
                             tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o1");
+                            tile.transparency = 0.6f;
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "o2":
                             tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o2");
+                            tile.transparency = 0.6f;
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "l1":
