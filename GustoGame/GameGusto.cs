@@ -461,7 +461,7 @@ namespace Gusto
             {
                 // set up gamescene draw
                 GraphicsDevice.SetRenderTarget(gameScene);
-                GraphicsDevice.Clear(Color.WhiteSmoke);
+                GraphicsDevice.Clear(Color.PeachPuff);
 
                 // draw map
                 map.DrawMap(spriteBatchView, gameTime);
