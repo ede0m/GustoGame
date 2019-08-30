@@ -320,6 +320,7 @@ namespace Gusto.Models.Animated
                     onShip = false;
                     if (playerInInterior != null)
                     {
+                        playerInInterior.showingInterior = false;
                         playerInInterior.interiorObjects.Remove(this);
                         playerInInterior = null;
                     }
@@ -363,14 +364,6 @@ namespace Gusto.Models.Animated
                 {
                     currColumnFrame = 0;
                 }
-            }
-
-            // can walk in the interior of the ship while it moves
-            if (onShip && playerInInterior != null)
-            {
-                //location.X += playerOnShip.currentShipSpeed.X;
-                //location.Y += playerOnShip.currentShipSpeed.Y;
-                //playerOnShip.SetBoundingBox();
             }
 
             // burying storage
@@ -421,6 +414,7 @@ namespace Gusto.Models.Animated
 
                     if (playerInInterior != null)
                     {
+                        playerInInterior.showingInterior = false;
                         playerInInterior = null;
                         playerOnShip.playerInInterior = false;
                         playerOnShip.shipSail.playerInInterior = false;
