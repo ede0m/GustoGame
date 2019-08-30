@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class Anvil : Sprite, ICanUpdate, IPlaceable, ICraftingObject
+    public class CraftingObject : Sprite, ICanUpdate, IPlaceable, ICraftingObject
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -35,7 +35,7 @@ namespace Gusto.Models.Animated
         PiratePlayer playerNearItem;
         public TeamType teamType;
 
-        public Anvil(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public CraftingObject(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             _content = content;
             _graphics = graphics;

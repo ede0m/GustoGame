@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
+    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, INPC
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -42,8 +42,9 @@ namespace Gusto.Models.Animated
         public bool onShip;
         public bool inCombat;
         public bool roaming;
+        public bool defense;
         public List<InventoryItem> inventory;
-        public Ship playerOnShip;
+        public Interior npcInInterior;
         public Sprite randomRegionRoamTile;
         public TeamType teamType;
 
@@ -66,24 +67,30 @@ namespace Gusto.Models.Animated
                 showHealthBar = true;
                 health -= handHeld.damage;
             }
-            else if (collidedWith.bbKey.Equals("landTile") || collidedWith is IGroundObject)
+            else if (collidedWith.bbKey.Equals("landTile") || collidedWith.bbKey.Equals("interiorTile") || collidedWith is IGroundObject)
             {
                 colliding = false;
-                
+
                 // narrow the collision to just the feet (appears more realistic)
                 Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
                 if (footSpace.Intersects(collidedWith.GetBoundingBox()))
                     swimming = false;
             }
-            else if (collidedWith is IWalks)
+
+            else if (collidedWith.bbKey.Equals("interiorTileWall"))
+            {
+                colliding = false; 
+            }
+
+            else if (collidedWith is IWalks || collidedWith is IShip || collidedWith is IPlaceable || collidedWith is IInventoryItem)
             {
                 colliding = false;
             }
             else if (collidedWith is IAmmo)
             {
                 showHealthBar = true;
-                Ammo ball = (Ammo)collidedWith;
-                if (!ball.exploded)
+                Ammo ball = (Ammo)collidedWith;   // TODO: bug NPC gets hit here by its own ships cannonballs
+                if (!ball.exploded && ball.teamType != teamType)
                     health -= ball.groundDamage;
                 return;
             }
@@ -113,7 +120,11 @@ namespace Gusto.Models.Animated
                     item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
                     item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
                     item.onGround = true;
-                    ItemUtility.ItemsToUpdate.Add(item);
+
+                    if (inInteriorId != Guid.Empty) // add drops to interior
+                        BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                    else // add drops to world
+                        ItemUtility.ItemsToUpdate.Add(item);
                 }
                 inventory.Clear();
 
@@ -138,6 +149,8 @@ namespace Gusto.Models.Animated
                 Tuple<int, int> target = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox());
                 if (target != null)
                 {
+                    // IN COMBAT
+
                     if (!inCombat)
                         currColumnFrame = 7;
                     inCombat = true;
@@ -149,19 +162,46 @@ namespace Gusto.Models.Animated
                 else
                 {
                     inCombat = false;
-                    if (roaming)
+
+                    // if we want to move to attack within a range
+                    if (npcInInterior != null)
+                    {
+                        // attack any player within a large range in the ship
+                        target = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 10, GetBoundingBox());
+                        if (target != null)
+                        {
+                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(new Vector2(target.Item1, target.Item2), location);
+                            currRowFrame = frames.Item1;
+                            directionalFrame = frames.Item2;
+                            defense = true;
+                        }
+                        else
+                            defense = false;
+                    }
+
+                    if (roaming && !defense) // region only rn
                     {
                         moving = true;
                         // go towards random tile
                         Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
                         currRowFrame = frames.Item1;
                         directionalFrame = frames.Item2;
+
+                        // FIND a better way to get this value - can't have references
+                        if (npcInInterior != null)
+                            randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
+
                         if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
                             roaming = false;
                     }
-                    else
+                    else if (!defense)
                     {
-                        randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)];
+                        if (npcInInterior != null)
+                        {
+                            randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
+                        }
+                        else
+                            randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
                         roaming = true;
                     }
                 }
@@ -183,18 +223,20 @@ namespace Gusto.Models.Animated
                 location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
             }
             else
-            {
-                if (timeSinceSwordSwing > millisecondsCombatSwing && !dying)
+            {   if (inCombat)
                 {
-                    currColumnFrame++;
-                    if (currColumnFrame >= nColumns)
+                    if (timeSinceSwordSwing > millisecondsCombatSwing && !dying)
                     {
-                        inCombat = false;
-                        currColumnFrame = 7;
+                        currColumnFrame++;
+                        if (currColumnFrame >= nColumns)
+                        {
+                            inCombat = false;
+                            currColumnFrame = 7;
+                        }
+                        timeSinceSwordSwing = 0;
                     }
-                    timeSinceSwordSwing = 0;
+                    timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
                 }
-                timeSinceSwordSwing += gameTime.ElapsedGameTime.Milliseconds;
             }
         }
 

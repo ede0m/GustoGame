@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Interfaces
 {
-    public interface IDrops
+    public interface IInteriorTile
     {
     }
 }

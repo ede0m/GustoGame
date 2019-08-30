@@ -20,6 +20,13 @@ namespace Gusto.SaveState
         public Dictionary<int, TreasureMapItemSerialized> treasureMaps { get; set; }
     }
 
+    public class InteriorObjectSerialized
+    {
+        public ISaveState saveState { get; set; }
+        public bool groundObj { get; set; }
+        public bool npcObj { get; set; }
+    }
+
     public class TreasureMapItemSerialized
     {
         public Vector2 digLocation { get; set; }
@@ -27,6 +34,7 @@ namespace Gusto.SaveState
         public string storageType { get; set; }
         public List<InventoryItemSerialized> reward { get; set; }
     }
+
 
 
     [DataContract]
@@ -51,7 +59,7 @@ namespace Gusto.SaveState
         [DataMember]
         public bool onShip { get; set; }
         [DataMember]
-        public Guid playerOnShipId { get; set; }
+        public Guid playerInInteriorId { get; set; }
         [DataMember]
         public string inHandItemKey { get; set; }
         [DataMember]
@@ -79,7 +87,7 @@ namespace Gusto.SaveState
         [DataMember]
         public bool onShip { get; set; }
         [DataMember]
-        public Guid playerOnShipId { get; set; }
+        public Guid npcInInteriorId { get; set; }
         [DataMember]
         public float health { get; set; }
     }
@@ -90,11 +98,10 @@ namespace Gusto.SaveState
     [KnownType(typeof(TreasureMapItemSerialized))]
     [KnownType(typeof(Vector2))]
     [KnownType(typeof(TeamType))]
+    [KnownType(typeof(InteriorState))]
     [KnownType(typeof(ShipState))]
     public class ShipState : ISaveState
     {
-        [DataMember]
-        public Guid shipId { get; set; } // needed for player.playerOnShip
         [DataMember]
         public string region { get; set; }
         [DataMember]
@@ -104,7 +111,15 @@ namespace Gusto.SaveState
         [DataMember]
         public TeamType team { get; set; }
         [DataMember]
-        public List<InventoryItemSerialized> inventory { get; set; }
+        public List<InventoryItemSerialized> actionInventory { get; set; }
+
+        // TODO:
+        [DataMember]
+        public InteriorState interiorState { get; set; }
+
+        [DataMember]
+        public Guid shipId;
+
         [DataMember]
         public bool anchored { get; set; }
         [DataMember]
@@ -134,6 +149,22 @@ namespace Gusto.SaveState
     }
 
     [DataContract]
+    [KnownType(typeof(InteriorState))]
+    public class InteriorState : ISaveState
+    {
+        [DataMember]
+        public Guid interiorId { get; set; }
+        [DataMember]
+        public Guid interiorForId { get; set; }
+        [DataMember]
+        public string interiorTypeKey { get; set; }
+        [DataMember]
+        public Vector2 location { get; set; }
+        [DataMember]
+        public List<InteriorObjectSerialized> interiorObjs { get; set; }
+    }
+
+    [DataContract]
     [KnownType(typeof(RainState))]
     [KnownType(typeof(WeatherSaveState))]
     public class WeatherSaveState : ISaveState
@@ -160,5 +191,4 @@ namespace Gusto.SaveState
         public bool lightning { get; set; }
     }
 
-    // ... TODO: more states - weather, stuffInBoundingBoxLocations?(treasuremaps), etc
 }

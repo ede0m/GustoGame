@@ -64,7 +64,6 @@ namespace Gusto.Models
                     inInventory = true;
                     onGround = false;
                     teamType = playerNearItem.teamType;
-                    ItemUtility.ItemsToUpdate.Remove(this);
                 }
             }
 

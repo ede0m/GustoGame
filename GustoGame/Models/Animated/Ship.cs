@@ -19,10 +19,12 @@ using Gusto.AnimatedSprite.InventoryItems;
 
 namespace Gusto.Models.Animated
 {
-    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster
+    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster, IHasInterior
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
+
+        Guid shipId;
 
         public float timeSinceLastShot;
         public float timeSinceStartAnchor;
@@ -48,6 +50,7 @@ namespace Gusto.Models.Animated
         private Texture2D meterFull;
         private Texture2D meterProg;
 
+        public Vector2 currentShipSpeed;
         public float shotRange;
         public float attackRange;
         public float stopRange;
@@ -67,20 +70,22 @@ namespace Gusto.Models.Animated
         public bool aiming;
         public bool anchored;
         public bool playerAboard;
+        public bool playerInInterior;
         bool roaming;
 
         public TeamType teamType;
         public Sprite randomRoamTile;
         public Sail shipSail { get; set; }
         public List<Ammo> Shots;
-        public List<InventoryItem> inventory;
+        public List<InventoryItem> actionInventory;
+        public Interior shipInterior;
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             Shots = new List<Ammo>();
-            inventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
+            actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             teamType = type;
             _content = content;
             _graphics = graphics;
@@ -89,6 +94,8 @@ namespace Gusto.Models.Animated
             percentNotAnchored = 1;
             meterFull = new Texture2D(_graphics, 1, 1);
             meterProg = new Texture2D(_graphics, 1, 1);
+
+            shipId = Guid.NewGuid();
 
             timeShowingHealthBar = 0;
         }
@@ -118,6 +125,7 @@ namespace Gusto.Models.Animated
             if (collidedWith.bbKey.Equals("landTile"))
             {
                 colliding = false;
+                hittingLand = true;
                 if (!anchored)
                 {
                     showHealthBar = true;
@@ -182,19 +190,28 @@ namespace Gusto.Models.Animated
             {
                 // map frame to vector movement
                 Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
-                location.X += (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored;
-                location.Y += (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored;
+                currentShipSpeed = new Vector2((ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored,
+                    (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored);
+                location.X += currentShipSpeed.X;
+                location.Y += currentShipSpeed.Y;
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
+            else
+            {
+                currentShipSpeed = Vector2.Zero;
+            }
+            shipInterior.speed = currentShipSpeed;
+
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
             int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
             int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
 
+            // ship sail update
             shipSail.Update(kstate, gameTime, windDir, windSp);
-            SpatialBounding.SetQuad(GetBase());
 
+            SpatialBounding.SetQuad(GetBase());
             // sinking
             if (health <= 0)
             {
@@ -209,31 +226,18 @@ namespace Gusto.Models.Animated
                 {
                     remove = true;
 
-                    // drop items
-                    foreach (var item in inventory)
+                    // drop items from interior (can also include actionInv someday)
+                    foreach (var obj in shipInterior.interiorObjects)
                     {
-                        if (item == null)
-                            continue;
-
-                        // TODO: drop (package up) all items as barrels/chests
-                        if (item.bbKey.Equals("baseBarrelItem"))
+                        if (obj is IStorage || obj is IContainer)
                         {
-                            BaseBarrel b = new BaseBarrel(teamType, regionKey, location, _content, _graphics);
-                            // scatter items
-                            b.location.X = location.X + RandomEvents.rand.Next(-40, 40);
-                            b.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
-                            ItemUtility.ItemsToUpdate.Add(b);
-                        }
-                        else if (item.bbKey.Equals("baseChestItem"))
-                        {
-                            BaseChest c = new BaseChest(teamType, regionKey, location, _content, _graphics);
-                            // scatter items
-                            c.location.X = location.X + RandomEvents.rand.Next(-40, 40);
-                            c.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
-                            ItemUtility.ItemsToUpdate.Add(c);
+                            obj.location.X = location.X + RandomEvents.rand.Next(-40, 40);
+                            obj.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
+                            obj.inInteriorId = Guid.Empty;
+                            ItemUtility.ItemsToUpdate.Add(obj);
                         }
                     }
-                    inventory.Clear();
+                    shipInterior.interiorObjects.Clear();
                 }
             }
         }
@@ -243,7 +247,7 @@ namespace Gusto.Models.Animated
             //health = 40; //UNLIMITED HEALTH
             
             // turning
-            if (timeSinceLastTurn > millisecondsPerTurn && playerAboard)
+            if (timeSinceLastTurn > millisecondsPerTurn && playerAboard && !playerInInterior)
             {
                 if (!kstate.IsKeyDown(Keys.LeftShift))
                 {
@@ -260,7 +264,7 @@ namespace Gusto.Models.Animated
             }
 
             // anchoring toggle
-            if (kstate.IsKeyDown(Keys.S) && playerAboard)
+            if (kstate.IsKeyDown(Keys.S) && playerAboard && !playerInInterior)
             {
                 if (anchored)
                 {
@@ -270,6 +274,10 @@ namespace Gusto.Models.Animated
                     {
                         anchored = false;
                         timeSinceStartAnchor = 0;
+
+                        // give the player a break and move them a little bit when they are hitting land (to get out of jams)
+                        location.X += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 * 25;
+                        location.Y += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 * 25;
                     }
                 }
                 else
@@ -301,9 +309,9 @@ namespace Gusto.Models.Animated
 
                 int? plankIndex = null;
                 // find plank 
-                for (int i = 0; i < inventory.Count(); i++)
+                for (int i = 0; i < actionInventory.Count(); i++)
                 {
-                    var item = inventory[i];
+                    var item = actionInventory[i];
                     if (item != null && item is IPlank && item.amountStacked > 0)
                     {
                         plankIndex = i;
@@ -318,7 +326,7 @@ namespace Gusto.Models.Animated
 
                     if (percentNotRepaired <= 0 && plankIndex != null)
                     {
-                        var item = inventory[(int)plankIndex];
+                        var item = actionInventory[(int)plankIndex];
                         health += item.restorePoints;
                         timeSinceStartRepairing = 0;
 
@@ -379,9 +387,9 @@ namespace Gusto.Models.Animated
                 // loading ammo
                 if (ammoLoaded == null)
                 {
-                    for (int i = 0; i < inventory.Count(); i++)
+                    for (int i = 0; i < actionInventory.Count(); i++)
                     {
-                        var item = inventory[i];
+                        var item = actionInventory[i];
                         if (item != null && item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.CannonBallItem)) // TODO: refactor to support multiple cannon types? Maybe have ship have weaponSelected like inHand
                         {
                             if (item.amountStacked > 0)
@@ -689,6 +697,16 @@ namespace Gusto.Models.Animated
                 shipSail.sailPositionInRespectToShip = nRows - 1;
             else if (shipSail.sailPositionInRespectToShip == nRows)
                 shipSail.sailPositionInRespectToShip = 0;
+        }
+
+        public Guid GetInteriorForId()
+        {
+            return shipId;
+        }
+
+        public void SetInteriorForId(Guid id)
+        {
+            shipId = id;
         }
     }
 }

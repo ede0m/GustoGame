@@ -348,7 +348,7 @@ namespace Gusto.Models.Menus
             // set any inventory movements
             inventoryOfPlayer.inventory = tempPlayerInv;
             if (openShipInventory && itemsShip != null)
-                inventoryOfPlayer.playerOnShip.inventory = tempShipInv;
+                inventoryOfPlayer.playerOnShip.actionInventory = tempShipInv;
             // storage movements
             if (itemsStorage != null)
                 storage.inventory = tempStorageInv;
@@ -436,8 +436,8 @@ namespace Gusto.Models.Menus
                             {
                                 if (openShipInventory)
                                 {
-                                    item = inventoryOfPlayer.playerOnShip.inventory[selectedIndex - maxInventorySlots];
-                                    inv = inventoryOfPlayer.playerOnShip.inventory;
+                                    item = inventoryOfPlayer.playerOnShip.actionInventory[selectedIndex - maxInventorySlots];
+                                    inv = inventoryOfPlayer.playerOnShip.actionInventory;
                                 }
 
                                 else
@@ -458,7 +458,12 @@ namespace Gusto.Models.Menus
                                     placeableItem.remove = false;
                                     placeableItem.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + RandomEvents.rand.Next(-10, 10);
                                     placeableItem.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + RandomEvents.rand.Next(-10, 10);
-                                    ItemUtility.ItemsToUpdate.Add(placeableItem);
+                                    // add to world
+                                    if (inventoryOfPlayer.playerInInterior == null)
+                                        ItemUtility.ItemsToUpdate.Add(placeableItem);
+                                    // add to interior
+                                    else
+                                        inventoryOfPlayer.playerInInterior.interiorObjects.Add(placeableItem);
                                 }
                                 else
                                 {
@@ -467,7 +472,12 @@ namespace Gusto.Models.Menus
                                     item.remove = false;
                                     item.location.X = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().X + RandomEvents.rand.Next(-10, 10);
                                     item.location.Y = inventoryOfPlayer.GetBoundingBox().Location.ToVector2().Y + RandomEvents.rand.Next(-10, 10);
-                                    ItemUtility.ItemsToUpdate.Add(item);
+                                    // add to world
+                                    if (inventoryOfPlayer.playerInInterior == null)
+                                        ItemUtility.ItemsToUpdate.Add(item);
+                                    // add to interior
+                                    else
+                                        inventoryOfPlayer.playerInInterior.interiorObjects.Add(item);
                                 }
 
                                 if (selectedIndex < maxInventorySlots)

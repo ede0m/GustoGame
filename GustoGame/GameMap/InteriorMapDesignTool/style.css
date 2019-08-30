@@ -1,0 +1,103 @@
+:root {
+    --nrows: 0;
+    --ncols: 0;
+    --tileX: 0;
+    --tileY: 0;
+
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+}
+
+#map {
+	width: 6000px;
+	height: 2000px;
+	line-height: 0;
+	display: grid;
+  	padding: 10px;
+  	grid-column-gap: 0px;
+  	grid-row-gap: 0px;
+  	grid-template-columns: repeat(var(--ncols), var(--tileX));
+  	grid-template-rows: repeat(var(--nrows), var(--tileY));
+}
+
+#mapWrap {
+	overflow: auto;
+}
+
+#regionList {
+	height: 250px;
+	padding-bottom: 50px;
+	overflow-y: scroll;
+}
+
+#wrap {
+	width: 1400px;
+	height: 600px;
+}
+
+#wrap h2 {
+	text-align: center;
+	padding-bottom: 50px;
+}
+
+#select { 
+	width: 420px; 
+	height: 350px; 
+	display: inline-block; 
+}
+
+#statDisplay {
+	top: 0;
+	width: 200px; 
+	height: 350px; 
+	padding-right: 30px;
+	display: inline-block; 
+}
+
+#terrainSelect {
+	float: right;
+	height: 300px;
+	width: 220px;
+	top: 0;
+}
+
+#groundObjectSelect {
+	width: 300px;
+	height: 350px;
+	padding-right: 50px;
+}
+
+.terrain {
+	width: 50px;
+	height: 50px;
+	padding: 10px;
+	display: inline-block;
+}
+
+.groundObject {
+	width: 50px;
+	height: 50px;
+	padding: 10px;
+	display: inline-block;
+}
+
+/*.tile {
+	padding: 0px;
+	margin: 0px;
+	display: inline-block;
+	background-color: blue;
+}*/
+
+.grid-container {
+  display: grid;
+  padding: 10px;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+.tile {
+  background-color: #5773B2;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}

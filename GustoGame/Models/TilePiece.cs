@@ -3,6 +3,7 @@ using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Bounding;
 using Gusto.Models.Animated;
+using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models
 {
-    public class TilePiece : Sprite
+    public class TilePiece : Sprite, ITilePiece
     {
 
         GraphicsDevice _graphics;
@@ -24,6 +25,10 @@ namespace Gusto.Models
         public int tileKey;
 
         public Sprite groundObject; // any tree, rock, etc asset we want to set to this tile.
+        public bool wallPiece;
+        
+
+        // for digging in a tile
         bool shoveled;
         bool fill;
 

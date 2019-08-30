@@ -243,8 +243,8 @@ namespace Gusto.Models.Menus
 
                                     }
 
-                                    // create item and add to players inv
-                                    itemCreated = ItemUtility.CreateItem(item.bbKey, inventoryOfPlayer.teamType, inventoryOfPlayer.regionKey, item.location, _content, _graphics);
+                                    // create inv item and add to players inv
+                                    itemCreated = ItemUtility.CreateInventoryItem(item.bbKey, inventoryOfPlayer.teamType, inventoryOfPlayer.regionKey, item.location, _content, _graphics);
                                     if (inventoryOfPlayer.AddInventoryItem(itemCreated))
                                     {
                                         itemCreated.inInventory = true;

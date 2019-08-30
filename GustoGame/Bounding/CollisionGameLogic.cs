@@ -16,12 +16,27 @@ namespace Gusto.Bounding
 
         public static bool CheckCollidable(Sprite a, Sprite b)
         {
+
+            if (a.inInteriorId != Guid.Empty)
+            {
+                if (b.inInteriorId == Guid.Empty)
+                    return false;
+
+                if (b.inInteriorId != a.inInteriorId)
+                    return false;
+            }
+
             if (a.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
             {
                 Ship ship = (Ship)a;
                 // a ship doesn't collide with its any ship's sails
                 if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Sail))
                     return false;
+
+                // ship doesn't collide with interior tiles
+                if (b is IInteriorTile)
+                    return false;
+
                 // ship doesn't collide with its own cannon balls
                 if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo)) {
                     Ammo ball = (Ammo)b;

@@ -68,6 +68,7 @@ namespace Gusto.Models.Animated
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
 
+            SetBoundingBox();
             SpatialBounding.SetQuad(GetBase());
         }
 

@@ -29,11 +29,12 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 {
 
 	float4 constant = 1.2f;
+	float constantReducer = 0.75f;
 	float4 pixelColor = tex2D(s0, input.TextureCoordinates);
 	float4 outputColor = pixelColor;
 
 	// lighting intensity is gradient of pixel position
-	float Intensity = 1 + (1  - input.TextureCoordinates.y) * 1.05;
+	float Intensity = 1 + (1  - input.TextureCoordinates.y) * 0.85f;
 	outputColor.r = outputColor.r / ambient * Intensity;
 	outputColor.g = outputColor.g / ambient * Intensity * overcast;
 	outputColor.b = outputColor.b / ambient * Intensity;
@@ -41,20 +42,20 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// sun set/rise blending  
 	float gval = (1 - input.TextureCoordinates.y); // replace 1 with .39 to lock to 39 percent of screen (this is how it was before)
 	float exposeRed = (1 + gval * 8); // overexpose red
-	float exposeGreen = (1 + gval * 2 * overcast); // some extra green
+	float exposeGreen = (1 + gval * 3 * overcast); // some extra green
 	float exposeBlue = (1 + gval * 4); // some extra blue 
 	
 	float quarterDayPercent = (percentThroughDay/0.25f);
-	float redAdder = max(1, (exposeRed * quarterDayPercent)); // be at full exposure at 25% of day gone
-	float greenAdder = max(1, (exposeGreen * quarterDayPercent)); // be at full exposure at 25% of day gone
-	float blueAdder = max(1, (exposeBlue * quarterDayPercent)); // be at full exposure at 25% of day gone
+	float redAdder = max(1, (exposeRed * 1.5f * quarterDayPercent * (constantReducer/2))); // be at full exposure at 25% of day gone
+	float greenAdder = max(1, (exposeGreen * quarterDayPercent * (constantReducer/2))); // be at full exposure at 25% of day gone
+	float blueAdder = max(1, (exposeBlue * quarterDayPercent * (constantReducer/2))); // be at full exposure at 25% of day gone
 
 	// begin reducing adders
 	if (percentThroughDay >= 0.25f ) {
 		float gradientVal1 = (1-(percentThroughDay - 0.25f)/0.25f);
-		redAdder = max(1, (exposeRed * gradientVal1));
-		greenAdder = max(1, (exposeGreen * gradientVal1));
-		blueAdder = max(1, (exposeGreen * gradientVal1));
+		redAdder = max(1, (exposeRed * 1.3f * gradientVal1 * (constantReducer/2)));
+		greenAdder = max(1, (exposeGreen * gradientVal1 * (constantReducer/2)));
+		blueAdder = max(1, (exposeGreen * gradientVal1 * (constantReducer/2)));
 	}
 		
 	//mid day
@@ -67,18 +68,18 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 	// add adders back for sunset
 	if (percentThroughDay >= 0.75f) {
 		float gradientVal2 = ((percentThroughDay - 0.75f)/0.10f);
-		redAdder = max(1, (exposeRed * gradientVal2));
-		greenAdder = max(1, (exposeGreen * gradientVal2));
-		blueAdder = max(1, (exposeBlue * gradientVal2));
+		redAdder = max(1, (exposeRed * gradientVal2 * 1.7f * (constantReducer/2))); // extra yellow
+		greenAdder = max(1, (exposeGreen * gradientVal2 * 1.7f * (constantReducer/2))); // extra yellow
+		blueAdder = max(1, (exposeBlue * gradientVal2 * (constantReducer/2)));
 	}
 		
 	// begin reducing adders
 	if (percentThroughDay >= 0.85f) {
 			
 		float gradientVal3 = (1-(percentThroughDay - 0.85f)/0.15f);
-		redAdder = max(1, (exposeRed * gradientVal3));
-		greenAdder = max(1, (exposeGreen * gradientVal3));
-		blueAdder = max(1, (exposeBlue * gradientVal3));
+		redAdder = max(1, (exposeRed * gradientVal3  * 1.7f * (constantReducer/2))); // extra yellow
+		greenAdder = max(1, (exposeGreen * gradientVal3  * 1.7f * (constantReducer/2))); // extra yellow
+		blueAdder = max(1, (exposeBlue * gradientVal3 * (constantReducer/2)));
 	}
 
 	outputColor.r = outputColor.r * redAdder;

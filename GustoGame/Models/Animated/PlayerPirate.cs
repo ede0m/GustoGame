@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class PlayerPirate : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster
+    public class PlayerPirate : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, IPlayer
     {
         public float timeSinceLastTurnFrame;
         public float timeSinceLastWalkFrame;
@@ -27,6 +27,7 @@ namespace Gusto.Models.Animated
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         public float millisecondsCombatSwing;
+        float msToggleInterior;
 
         public float health;
         public float fullHealth;
@@ -43,6 +44,7 @@ namespace Gusto.Models.Animated
         public List<InventoryItem> inventory;
         public int maxInventorySlots;
         public Ship playerOnShip;
+        public Interior playerInInterior;
         public HandHeld inHand;
         public TeamType teamType;
 
@@ -63,11 +65,12 @@ namespace Gusto.Models.Animated
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
+            Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
+
             if (collidedWith.bbKey.Equals("landTile"))
             {
                 colliding = false;
                 // narrow the collision to just the feet (appears more realistic)
-                Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height/3);
                 if (footSpace.Intersects(collidedWith.GetBoundingBox()))
                     swimming = false;
 
@@ -88,6 +91,19 @@ namespace Gusto.Models.Animated
                     }
                 }
             }
+
+            else if (collidedWith.bbKey.Equals("interiorTile"))
+            {
+                colliding = false;
+            }
+
+            else if (collidedWith.bbKey.Equals("interiorTileWall"))
+            {
+                if (footSpace.Intersects(collidedWith.GetBoundingBox()))
+                    colliding = true;
+            }
+
+
             else if (collidedWith is IShip)
             {
                 colliding = false;
@@ -185,7 +201,7 @@ namespace Gusto.Models.Animated
                         showInventory = true;
                 }
 
-                if (!onShip)
+                if (!onShip || playerInInterior != null)
                 {
                     moving = true;
                     // player direction
@@ -231,10 +247,16 @@ namespace Gusto.Models.Animated
             }
 
             // combat 
-            if (!onShip)
+            if (!onShip || playerInInterior != null)
+            {
                 inHand.Update(kstate, gameTime, camera);
+                if (playerInInterior != null)
+                    inHand.inInteriorId = playerInInterior.interiorId;
+                else
+                    inHand.inInteriorId = Guid.Empty;
+            }
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !onShip && !showInventory)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && (!onShip || playerInInterior != null) && !showInventory)
             {
                 inCombat = true;
                 inHand.inCombat = true;
@@ -282,12 +304,18 @@ namespace Gusto.Models.Animated
             inHand.SetBoundingBox();
 
             // hop on ship
-            if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && timeSinceExitShipStart < 2000)
+            if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && playerOnShip != null && timeSinceExitShipStart < 2000)
             {
                 location = playerOnShip.GetBoundingBox().Center.ToVector2();
                 onShip = true;
                 playerOnShip.playerAboard = true;
                 playerOnShip.shipSail.playerAboard = true;
+
+                // can't control non player ships (until taken over)
+                if (playerOnShip.teamType != TeamType.Player)
+                {
+                    playerInInterior = playerOnShip.shipInterior;
+                }
             }
             // exit ship
             else if (kstate.IsKeyDown(Keys.X) && onShip)
@@ -296,6 +324,13 @@ namespace Gusto.Models.Animated
                 if (timeSinceExitShipStart > 2000)
                 {
                     onShip = false;
+                    if (playerInInterior != null)
+                    {
+                        playerInInterior.showingInterior = false;
+                        playerInInterior.interiorObjects.Remove(this);
+                        playerInInterior = null;
+                        inInteriorId = Guid.Empty;
+                    }
                     playerOnShip.playerAboard = false;
                     playerOnShip.shipSail.playerAboard = false;
                     location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X - playerOnShip.GetBoundingBox().Width/2 - 20;
@@ -309,11 +344,21 @@ namespace Gusto.Models.Animated
             }
             nearShip = false;
 
-            if (onShip)
+            // player moves with ship when controlling
+            if (onShip && playerInInterior == null)
             {
                 location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X;
                 location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
             }
+
+            if (playerOnShip != null && playerOnShip.sinking)
+            {
+                onShip = false;
+                playerInInterior = null;
+                playerOnShip = null;
+                inInteriorId = Guid.Empty;
+            }
+
             else if (moving && !inCombat)
             {
                 // walking animation
@@ -375,6 +420,35 @@ namespace Gusto.Models.Animated
             }
             buryTile = null;
             canBury = false;
+
+            // entering/toggling interior
+            if (kstate.IsKeyDown(Keys.I)) // TODO and near entrance!
+            {
+                msToggleInterior += gameTime.ElapsedGameTime.Milliseconds;
+                if (msToggleInterior > 1000)
+                {
+
+                    if (playerInInterior != null)
+                    {
+                        playerInInterior.showingInterior = false;
+                        playerInInterior = null;
+                        playerOnShip.playerInInterior = false;
+                        playerOnShip.shipSail.playerInInterior = false;
+                    }
+                    else
+                    {
+                        // enter an interior
+                        if (onShip)  // the interior of the ship the player is in
+                        {
+                            playerInInterior = playerOnShip.shipInterior;
+                            playerOnShip.playerInInterior = true;
+                            playerOnShip.shipSail.playerInInterior = true;
+                        }
+                        // Other interiors?
+                    }
+                    msToggleInterior = 0;
+                }
+            }
         }
 
         public bool AddInventoryItem(InventoryItem itemToAdd)
@@ -436,8 +510,16 @@ namespace Gusto.Models.Animated
 
             SetBoundingBox();
             sb.Begin(camera);
-            sb.Draw(_texture, location, targetRectangle, Color.White * 0.0f, 0f,
-                new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            if (playerInInterior == null)
+            {
+                sb.Draw(_texture, location, targetRectangle, Color.White * 0.0f, 0f,
+                    new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                sb.Draw(_texture, location, targetRectangle, Color.White, 0f,
+                    new Vector2((_texture.Width / nColumns) / 2, (_texture.Height / nRows) / 2), spriteScale, SpriteEffects.None, 0f);
+            }
             sb.End();
         }
 

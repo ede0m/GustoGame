@@ -33,7 +33,7 @@ namespace Gusto.Utility
 
                 string key = item.Item1;
                 int amountDropped = item.Item2;
-                InventoryItem itm = CreateItem(key, team, region, location, content, graphics);
+                InventoryItem itm = CreateInventoryItem(key, team, region, location, content, graphics);
                 if (itm != null)
                 {
                     returnItems.Add(itm);
@@ -47,8 +47,26 @@ namespace Gusto.Utility
             return returnItems;
         }
 
+        public static List<Sprite> CreateInteriorItems(List<Tuple<string, int>> itemDrops, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+        {
+            List<Sprite> returnItems = new List<Sprite>();
+            int index = 0;
+            foreach (var item in itemDrops)
+            {
+                string key = item.Item1;
+                int amountDropped = item.Item2;
+                Sprite itm = CreateItem(key, team, region, location, content, graphics);
+                if (itm != null)
+                {
+                    returnItems.Add(itm);
+                }
+                index++;
+            }
+            return returnItems;
+        }
 
-        public static InventoryItem CreateItem(string key, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+
+        public static InventoryItem CreateInventoryItem(string key, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
         {
             InventoryItem item = null;
             int amountStacked = 1;
@@ -82,6 +100,10 @@ namespace Gusto.Utility
                     item = new AnvilItem(team, region, location, content, graphics);
                     item.placeableVersion = new CraftingAnvil(team, region, location, content, graphics);
                     break;
+                case ("baseChestItem"):
+                    item = new BaseChestItem(team, region, location, content, graphics);
+                    item.placeableVersion = new BaseChest(team, region, location, content, graphics);
+                    break;
                 case ("nails"):
                     item = new Nails(team, region, location, content, graphics);
                     amountStacked = 5; 
@@ -94,13 +116,6 @@ namespace Gusto.Utility
                     item = new PistolShotItem(team, region, location, content, graphics);
                     amountStacked = 5;
                     break;
-                case ("baseBarrelItem"):
-                    item = new BaseBarrelItem(team, region, location, content, graphics);
-                    break;
-                case ("baseChestItem"):
-                    item = new BaseChestItem(team, region, location, content, graphics);
-                    item.placeableVersion = new BaseChest(team, region, location, content, graphics);
-                    break;
                 case ("ironBar"):
                     item = new IronBar(team, region, location, content, graphics);
                     break;
@@ -110,6 +125,21 @@ namespace Gusto.Utility
             }
             item.itemKey = key;
             item.amountStacked = amountStacked;
+            return item;
+        }
+
+        public static Sprite CreateItem(string key, TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics)
+        {
+            Sprite item = null;
+            switch (key)
+            {
+                case ("baseBarrel"):
+                    item = new BaseBarrel(team, region, location, content, graphics);
+                    break;
+                case ("baseChest"):
+                    item = new BaseChest(team, region, location, content, graphics);
+                    break;
+            }
             return item;
         }
     }
