@@ -14,18 +14,18 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class Furnace : Sprite, ICanUpdate, IPlaceable, ICraftingObject
+    public class CookingObject : Sprite, ICanUpdate, IPlaceable, ICraftingObject
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        string oreType;
+        string recipe;
         public bool canCraft;
-        public bool smelting;
+        public bool cooking;
         float msPerFrame;
         float msThisFrame;
-        float msToSmelt; 
-        float msSmelting;
+        float msToCook;
+        float msCooking;
 
         public Light emittingLight;
         int nTimesHit;
@@ -37,14 +37,14 @@ namespace Gusto.Models.Animated
         PiratePlayer playerNearItem;
         public TeamType teamType;
 
-        public Furnace(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public CookingObject(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             _content = content;
             _graphics = graphics;
 
             teamType = type;
             msPickupTimer = 5000;
-            msToSmelt = 10000;
+            msToCook = 10000;
             msPerFrame = 200;
             hitsToPickUp = 10;
 
@@ -59,25 +59,19 @@ namespace Gusto.Models.Animated
                 // check inventory to see if we have required materials
                 int nWood = 0;
                 int nGrass = 0;
-                int nCoal = 0;
-                int nOre = 0;
                 foreach (var item in playerNearItem.inventory)
                 {
-                    if (item is IWood )
+                    if (item is IWood)
                         nWood = item.amountStacked;
-                    if (item is IGrass) 
+                    if (item is IGrass)
                         nGrass = item.amountStacked;
-                    if (item is IOre)
-                    {
-                        if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal))
-                            nCoal = item.amountStacked;
-                        else
-                            nOre = item.amountStacked;
-                    }
+                    
+                    // TODO: CHECK FOR INGREDIENTS TODO
+
                 }
 
                 canCraft = true; // TEMP!
-                if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 7) // 2 wood, 2 grass, 1 coal, 8 ore required
+                if (nWood > 1 && nGrass > 1) // 2 wood, 2 grass, (and a recipie)
                     canCraft = true;
             }
 
@@ -96,8 +90,8 @@ namespace Gusto.Models.Animated
                 if (nTimesHit >= hitsToPickUp)
                     canPickUp = true;
             }
-        }        
-        
+        }
+
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
@@ -105,13 +99,11 @@ namespace Gusto.Models.Animated
             {
                 // TODO: animate
 
-                bool hasCoal = false;
-                bool hasOre = false;
                 bool hasGrass = false;
                 bool hasWood = false;
 
                 // Remove items from inv TODO: for now this just takes the first ore, grass, wood etc in inventory
-                if (!smelting)
+                if (!cooking)
                 {
                     foreach (var item in playerNearItem.inventory)
                     {
@@ -123,27 +115,20 @@ namespace Gusto.Models.Animated
                         {
                             item.amountStacked -= 2;
                         }
-                        if (item is IOre)
-                        {
-                            if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal) && !hasCoal)
-                                item.amountStacked -= 1;
-                            else if (!hasOre)
-                            {
-                                oreType = CheckOreType(item.GetType());
-                                item.amountStacked -= 8;
-                            }
-                        }
+                        
+                        // TODO: checkForRecipe() - checks inventory for recipie
+
                     }
-                    smelting = true;
+                    cooking = true;
                 }
-                    
+
             }
 
-            if (smelting)
+            if (cooking)
             {
                 emittingLight.lit = true;
-                // smelting so animate and being timer
-                msSmelting += gameTime.ElapsedGameTime.Milliseconds;
+                // cooking so animate and being timer
+                msCooking += gameTime.ElapsedGameTime.Milliseconds;
                 msThisFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (msThisFrame > msPerFrame)
                 {
@@ -154,18 +139,16 @@ namespace Gusto.Models.Animated
                 }
             }
 
-            // create and drop item when done smelting
-            if (msSmelting > msToSmelt)
+            // create and drop item when done cooking
+            if (msCooking > msToCook)
             {
-                if (oreType != null)
+                if (recipe != null)
                 {
                     InventoryItem bar = null;
                     Vector2 dropLoc = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
-                    switch (oreType)
+                    switch (recipe)
                     {
-                        case "iron":
-                            bar = new IronBar(teamType, regionKey, dropLoc, _content, _graphics);
-                            break;
+                        //TODO
                     }
                     bar.onGround = true;
                     bar.amountStacked = 1;
@@ -173,9 +156,9 @@ namespace Gusto.Models.Animated
                 }
 
                 // reset
-                smelting = false;
-                msSmelting = 0;
-                oreType = null;
+                cooking = false;
+                msCooking = 0;
+                recipe = null;
                 currColumnFrame = 0;
                 emittingLight.lit = false;
             }

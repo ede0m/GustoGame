@@ -139,6 +139,18 @@
 /processorParam:TextureFormat=Color
 /build:BaseSword.png
 
+#begin CampFire.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CampFire.png
+
 #begin CannonBall.png
 /importer:TextureImporter
 /processor:TextureProcessor

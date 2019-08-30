@@ -76,6 +76,7 @@ namespace Gusto
             BaseBarrel barrelLand = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(-20, -160), _content, _graphics);
             BaseBarrel barrelOcean = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(380, -90), _content, _graphics);
             BaseChest chestLand = new BaseChest(TeamType.A, "GustoMap", new Vector2(100, -120), _content, _graphics);
+            CampFire campfire = new CampFire(TeamType.A, "GustoMap", new Vector2(70, -350), _content, _graphics);
 
             Shovel shovel = new Shovel(TeamType.A, "GustoMap", new Vector2(200, -330), _content, _graphics);
             shovel.onGround = true;
@@ -109,6 +110,7 @@ namespace Gusto
             ItemUtility.ItemsToUpdate.Add(pistolAmmo);
             ItemUtility.ItemsToUpdate.Add(cannonAmmo);
             ItemUtility.ItemsToUpdate.Add(basePlank);
+            ItemUtility.ItemsToUpdate.Add(campfire);
 
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(baseShipAI);
