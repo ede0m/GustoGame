@@ -588,6 +588,7 @@ namespace Gusto
             i.interiorId = interiorSaveState.interiorId;
             i.startDrawPoint = interiorSaveState.location;
             i.interiorObjects = DeserializeInteriorObjects(interiorSaveState.interiorObjs, i);
+            i.interiorWasLoaded = true;
             return i;
         }
 

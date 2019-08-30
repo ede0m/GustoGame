@@ -34,6 +34,7 @@ namespace Gusto.Models.Animated
         public HashSet<TilePiece> interiorTiles;
         bool tilesSet;
         public bool playerInInterior;
+        public bool interiorWasLoaded;
 
         public Vector2 speed; // needed for moving interiors like ships
 
@@ -219,7 +220,7 @@ namespace Gusto.Models.Animated
             // Draw any items
             foreach (var obj in drawOrder)
             {
-                if (!tilesSet && !(obj is IPlayer))
+                if (!tilesSet && !(obj is IPlayer) && !interiorWasLoaded)
                     obj.location = RandomInteriorTile().location;
 
                 // special draw for player
