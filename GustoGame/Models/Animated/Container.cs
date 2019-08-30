@@ -29,8 +29,6 @@ namespace Gusto.Models.Animated
         float msNow;
         float msAnimate;
 
-        public Guid inInteriorId;
-
         public List<InventoryItem> drops;
 
         public Container(TeamType type, string region, ContentManager content, GraphicsDevice graphics) : base(graphics)

@@ -120,7 +120,11 @@ namespace Gusto.Models.Animated
                     item.location.X = location.X + RandomEvents.rand.Next(-10, 10);
                     item.location.Y = location.Y + RandomEvents.rand.Next(-10, 10);
                     item.onGround = true;
-                    ItemUtility.ItemsToUpdate.Add(item);
+
+                    if (inInteriorId != Guid.Empty) // add drops to interior
+                        BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                    else // add drops to world
+                        ItemUtility.ItemsToUpdate.Add(item);
                 }
                 inventory.Clear();
 

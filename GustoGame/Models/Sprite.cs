@@ -35,10 +35,13 @@ namespace Gusto.Models
         public bool colliding { get; set; }
         public bool remove;
 
+        public Guid inInteriorId { get; set; }
+
         public Sprite(GraphicsDevice graphics)
         {
             _graphics = graphics;
             transparency = 1;
+            inInteriorId = Guid.Empty;
         }
 
         public void SetSpriteAsset(Asset asset, Vector2 startingLoc)
@@ -56,6 +59,7 @@ namespace Gusto.Models
             regionKey = asset.RegionKey;
             moving = true;
             remove = false;
+            inInteriorId = Guid.Empty;
 
             int width = _texture.Width / nColumns;
             int height = _texture.Height / nRows;

@@ -248,7 +248,13 @@ namespace Gusto.Models.Animated
 
             // combat 
             if (!onShip || playerInInterior != null)
+            {
                 inHand.Update(kstate, gameTime, camera);
+                if (playerInInterior != null)
+                    inHand.inInteriorId = playerInInterior.interiorId;
+                else
+                    inHand.inInteriorId = Guid.Empty;
+            }
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && (!onShip || playerInInterior != null) && !showInventory)
             {
@@ -323,6 +329,7 @@ namespace Gusto.Models.Animated
                         playerInInterior.showingInterior = false;
                         playerInInterior.interiorObjects.Remove(this);
                         playerInInterior = null;
+                        inInteriorId = Guid.Empty;
                     }
                     playerOnShip.playerAboard = false;
                     playerOnShip.shipSail.playerAboard = false;
@@ -337,10 +344,19 @@ namespace Gusto.Models.Animated
             }
             nearShip = false;
 
+            // player moves with ship when controlling
             if (onShip && playerInInterior == null)
             {
                 location.X = playerOnShip.GetBoundingBox().Center.ToVector2().X;
                 location.Y = playerOnShip.GetBoundingBox().Center.ToVector2().Y;
+            }
+
+            if (playerOnShip != null && playerOnShip.sinking)
+            {
+                onShip = false;
+                playerInInterior = null;
+                playerOnShip = null;
+                inInteriorId = Guid.Empty;
             }
 
             else if (moving && !inCombat)

@@ -125,6 +125,7 @@ namespace Gusto.Models.Animated
             if (collidedWith.bbKey.Equals("landTile"))
             {
                 colliding = false;
+                hittingLand = true;
                 if (!anchored)
                 {
                     showHealthBar = true;
@@ -232,6 +233,7 @@ namespace Gusto.Models.Animated
                         {
                             obj.location.X = location.X + RandomEvents.rand.Next(-40, 40);
                             obj.location.Y = location.Y + RandomEvents.rand.Next(-40, 40);
+                            obj.inInteriorId = Guid.Empty;
                             ItemUtility.ItemsToUpdate.Add(obj);
                         }
                     }
@@ -272,6 +274,10 @@ namespace Gusto.Models.Animated
                     {
                         anchored = false;
                         timeSinceStartAnchor = 0;
+
+                        // give the player a break and move them a little bit when they are hitting land (to get out of jams)
+                        location.X += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 * 25;
+                        location.Y += ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 * 25;
                     }
                 }
                 else

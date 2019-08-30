@@ -16,6 +16,16 @@ namespace Gusto.Bounding
 
         public static bool CheckCollidable(Sprite a, Sprite b)
         {
+
+            if (a.inInteriorId != Guid.Empty)
+            {
+                if (b.inInteriorId == Guid.Empty)
+                    return false;
+
+                if (b.inInteriorId != a.inInteriorId)
+                    return false;
+            }
+
             if (a.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
             {
                 Ship ship = (Ship)a;

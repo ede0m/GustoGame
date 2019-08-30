@@ -159,6 +159,7 @@ namespace Gusto.Models
 
             foreach (var obj in interiorObjects)
             {
+                obj.inInteriorId = interiorId;
 
                 if (obj.remove)
                     toRemove.Add(obj);
@@ -176,7 +177,10 @@ namespace Gusto.Models
             }
 
             foreach (var remove in toRemove)
+            {
+                remove.inInteriorId = Guid.Empty;
                 interiorObjects.Remove(remove);
+            }
         }
 
 
@@ -203,6 +207,7 @@ namespace Gusto.Models
                     tile.location = drawPoint;
                     var loc = tile.location;
                     tile.location += speed;
+                    tile.inInteriorId = interiorId; // TODO: need to move setting of InteriorId to constructor, but this screws up serialization
                     interiorTiles.Add(tile);
 
                     // draw if in viewporit
