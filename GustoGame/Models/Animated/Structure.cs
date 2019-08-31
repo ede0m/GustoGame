@@ -21,12 +21,15 @@ namespace Gusto.Models.Animated
         bool nearStructure;
 
         Guid structureId;
+        public TeamType teamType;
         public Interior structureInterior;
 
         public Structure(TeamType t, ContentManager c, GraphicsDevice g) : base(g)
         {
             _content = c;
             _graphics = g;
+
+            teamType = t;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)

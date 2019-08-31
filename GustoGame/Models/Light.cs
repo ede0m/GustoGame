@@ -55,7 +55,7 @@ namespace Gusto.Models
         {
             location = loc;
 
-            // toggle light
+            // toggle light -- Maybe move this to handheld
             if (kstate.IsKeyDown(Keys.T))
             {
                 msButtonHit += gametime.ElapsedGameTime.Milliseconds;

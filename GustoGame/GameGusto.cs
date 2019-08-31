@@ -151,7 +151,7 @@ namespace Gusto
             Texture2D textureCraftingAnvil = Content.Load<Texture2D>("Anvil");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCraftingAnvil, "craftingAnvil", 0.5f, 1.0f);
             Texture2D textureCampFire = Content.Load<Texture2D>("CampFire");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureCampFire, "campFire", 0.2f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureCampFire, "campFire", 0.3f, 1.0f);
 
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
