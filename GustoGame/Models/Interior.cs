@@ -55,8 +55,10 @@ namespace Gusto.Models
 
         public Vector2 startDrawPoint;
 
-        public Interior(string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
+        public Interior( string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
         {
+            //interiorId = interId;
+
             _graphics = graphics;
             _content = content;
 
@@ -234,6 +236,10 @@ namespace Gusto.Models
                     tile.location += speed;
                     tile.inInteriorId = interiorId; // TODO: need to move setting of InteriorId to constructor, but this screws up serialization
                     interiorTiles.Add(tile);
+
+                    // ground obj loc location
+                    if (tile.groundObject != null)
+                        tile.groundObject.location = loc;
 
                     // draw if in viewporit
                     if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))

@@ -60,7 +60,7 @@ namespace Gusto.Utility
                 {
                     ILight l = (ILight)obj;
                     Light lt = l.GetEmittingLight();
-                    if (l != null && lt.lit)
+                    if (l != null && lt != null && lt.lit)
                         lt.Draw(sb, cam);
                 }
             }

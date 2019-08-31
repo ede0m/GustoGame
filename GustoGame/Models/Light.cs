@@ -22,7 +22,6 @@ namespace Gusto.Models
         Vector2 location;
 
         public bool lit;
-        float msButtonHit;
 
         public Light(ContentManager content, GraphicsDevice graphics, float size, Color c)
         {
