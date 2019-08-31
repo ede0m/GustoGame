@@ -23,6 +23,7 @@ namespace Gusto.Bounding
         public static Dictionary<string, Region> RegionMap = new Dictionary<string, Region>();
         public static Dictionary<Guid, Interior> interiorMap = new Dictionary<Guid, Interior>(); // map of all the interiors in the game
 
+        public static List<TilePiece> TilesInView = new List<TilePiece>();
         public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>(); // TODO: update to TilePiece
         public static HashSet<TilePiece> InteriorTileList = new HashSet<TilePiece>(); // Tiles for the interior that the player is in
         public static HashSet<Sprite> GroundObjectLocationList = new HashSet<Sprite>(); // World ground objects

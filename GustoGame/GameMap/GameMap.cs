@@ -27,8 +27,7 @@ namespace Gusto.GameMap
         private int _cols;
         private int _rows;
 
-        private List<Sprite> map;
-        private List<Sprite> collidablePieces;
+        private List<TilePiece> map;
         private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
         private JObject _mapData;
 
@@ -46,8 +45,7 @@ namespace Gusto.GameMap
             startMapPoint = new Vector2(0 - (_width/2), 0 - (_height/2));
 
             _cam = camera;
-            map = new List<Sprite>();
-            collidablePieces = new List<Sprite>();
+            map = new List<TilePiece>();
         }
 
         public void SetGameMap(ContentManager content, GraphicsDevice graphics)
@@ -58,7 +56,7 @@ namespace Gusto.GameMap
             {
                 for (int j = 0; j < _cols; j++)
                 {
-                    Sprite tile = null;
+                    TilePiece tile = null;
                     Sprite groundObject = null;
                     JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
 
@@ -124,11 +122,9 @@ namespace Gusto.GameMap
 
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
-            foreach (var tile in map)
+            foreach (var tile in BoundingBoxLocations.TilesInView)
             {
-                var loc = tile.location;
-                if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
-                    tile.Draw(sb, _cam);
+                tile.Draw(sb, _cam);
             }
         }
 
@@ -137,7 +133,7 @@ namespace Gusto.GameMap
             _mapData = data;
         }
 
-        public List<Sprite> GetMap()
+        public List<TilePiece> GetMap()
         {
             return map;
         }
