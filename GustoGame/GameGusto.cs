@@ -18,8 +18,7 @@ using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
-using Gusto.Models.Menus;
-using Gusto.GameMap.lightning;
+using System.Linq;
 
 namespace Gusto
 {
@@ -43,7 +42,8 @@ namespace Gusto
 
         GraphicsDeviceManager graphics;
         FrameCounter _frameCounter;
-        RenderTarget2D gameScene;
+        RenderTarget2D worldScene;
+        RenderTarget2D interiorScene;
         RenderTarget2D ambientLight;
         RenderTarget2D lightsTarget;
 
@@ -88,7 +88,8 @@ namespace Gusto
             weather = new Weather(Content, GraphicsDevice);
             lightsTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            worldScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            interiorScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
 
@@ -424,20 +425,6 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // game menu before everything
-            if (startingMenu.showMenu)
-            {
-                startingMenu.DrawInventory(spriteBatchStatic);
-                return;
-            }
-
-            // setup lightTarget for spot lights
-            GraphicsDevice.SetRenderTarget(lightsTarget);
-            GraphicsDevice.Clear(Color.Black);
-            foreach (var light in BoundingBoxLocations.LightLocationList)
-                light.Draw(spriteBatchView, this.camera);
-            BoundingBoxLocations.LightLocationList.Clear(); // clear after we have drawn the light mask
-
             // trackers for statically drawn sprites as we move through draw order
             bool showCraftingMenu = false;
             bool showStorageMenu = false;
@@ -448,13 +435,29 @@ namespace Gusto
                 invItemsShip = gameState.player.playerOnShip.actionInventory;
             Storage invStorage = null;
 
+
+            // game menu before everything
+            if (startingMenu.showMenu)
+            {
+                startingMenu.DrawInventory(spriteBatchStatic);
+                return;
+            }
+
             // draw the interior view if in interior
             if (gameState.player.playerInInterior != null)
             {
-                GraphicsDevice.SetRenderTarget(null);
-                GraphicsDevice.Clear(Color.Black);
                 gameState.player.playerInInterior.interiorObjects.Add(gameState.player);
-                gameState.player.playerInInterior.Draw(spriteBatchView, this.camera);
+
+                GraphicsDevice.SetRenderTarget(lightsTarget);
+                GraphicsDevice.Clear(Color.Black);
+                DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, gameState.player.playerInInterior.interiorObjects.ToList());
+
+                gameState.player.playerInInterior.Draw(spriteBatchView, this.camera, interiorScene);
+
+                // lighting shader - for ambient day/night light and lanterns
+                GraphicsDevice.SetRenderTarget(null);
+                GraphicsDevice.Clear(Color.White);
+                dayLight.Draw(spriteBatchStatic, interiorScene, lightsTarget);
 
                 showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
                 showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
@@ -463,8 +466,13 @@ namespace Gusto
             // not in interior so draw the game scene
             else
             {
+                // setup lightTarget for spot lights
+                GraphicsDevice.SetRenderTarget(lightsTarget);
+                GraphicsDevice.Clear(Color.Black);
+                DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, DrawOrder);
+
                 // set up gamescene draw
-                GraphicsDevice.SetRenderTarget(gameScene);
+                GraphicsDevice.SetRenderTarget(worldScene);
                 GraphicsDevice.Clear(Color.PeachPuff);
 
                 // draw map
@@ -611,7 +619,7 @@ namespace Gusto
                 // lighting shader - for ambient day/night light and lanterns
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.White);
-                dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
+                dayLight.Draw(spriteBatchStatic, worldScene, lightsTarget);
             }
 
             // lightning is drawn after ambient light

@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class Furnace : Sprite, ICanUpdate, IPlaceable, ICraftingObject
+    public class Furnace : Sprite, ICanUpdate, IPlaceable, ICraftingObject, ILight
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -251,5 +251,9 @@ namespace Gusto.Models.Animated
 
         }
 
+        public Light GetEmittingLight()
+        {
+            return emittingLight;
+        }
     }
 }

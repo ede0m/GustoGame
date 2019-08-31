@@ -8,5 +8,6 @@ namespace Gusto.Models.Interfaces
 {
     public interface ILight
     {
+        Light GetEmittingLight();
     }
 }

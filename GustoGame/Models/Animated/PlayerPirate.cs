@@ -444,12 +444,13 @@ namespace Gusto.Models.Animated
                             playerInInterior = playerOnShip.shipInterior;
                             playerOnShip.playerInInterior = true;
                             playerOnShip.shipSail.playerInInterior = true;
+                            inInteriorId = playerInInterior.interiorId;
                         }
                         else if (playerNearStructure != null)
                         {
                             playerInInterior = playerNearStructure.structureInterior;
+                            inInteriorId = playerInInterior.interiorId;
                         }
-                        inInteriorId = playerInInterior.interiorId;
                     }
                     msToggleInterior = 0;
                 }

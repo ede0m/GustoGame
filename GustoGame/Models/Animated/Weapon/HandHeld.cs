@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class HandHeld : InventoryItem, IWeapon, IHandHeld
+    public class HandHeld : InventoryItem, IWeapon, IHandHeld, ILight
     {
         public int timeSinceLastFrame;
         public float timeSinceLastShot;
@@ -22,6 +22,7 @@ namespace Gusto.Models.Animated
         public int millisecondsPerFrame; // turning speed
         public float millisecondsNewShot;
         public int millisecondsExplosionLasts;
+        public float msToggleButtonHit;
         public bool nextFrame;
 
         public float damage;
@@ -68,6 +69,17 @@ namespace Gusto.Models.Animated
             // lighting items
             if (emittingLight != null)
             {
+                // toggle light
+                if (kstate.IsKeyDown(Keys.T))
+                {
+                    msToggleButtonHit += gameTime.ElapsedGameTime.Milliseconds;
+                    if (msToggleButtonHit > 500) // toggle time 500ms
+                    {
+                        emittingLight.lit = !emittingLight.lit;
+                        msToggleButtonHit = 0;
+                    }
+                }
+
                 emittingLight.Update(kstate, gameTime, GetBoundingBox().Center.ToVector2());
             }
 
@@ -251,6 +263,11 @@ namespace Gusto.Models.Animated
         public void LoadAmmo(InventoryItem item)
         {
             ammoLoaded = item;
+        }
+
+        public Light GetEmittingLight()
+        {
+            return emittingLight;
         }
     }
 }

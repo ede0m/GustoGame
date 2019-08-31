@@ -22,8 +22,13 @@ namespace Gusto.Models
     public class Interior
     {
 
+        GraphicsDevice _graphics;
+        ContentManager _content;
+
         public Guid interiorId;
         public string interiorTypeKey;
+        public Sprite interiorForObj;
+
         private int width;
         private int height;
         private int cols;
@@ -50,10 +55,11 @@ namespace Gusto.Models
 
         public Vector2 startDrawPoint;
 
-        public Sprite interiorForObj;
-
         public Interior(string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
         {
+            _graphics = graphics;
+            _content = content;
+
             interiorTypeKey = itk;
             interiorMap = new List<TilePiece>();
             interiorTiles = new HashSet<TilePiece>();
@@ -172,17 +178,6 @@ namespace Gusto.Models
                 interiorObjects.Add(dropped);
             interiorObjectsToAdd.Clear();
 
-            // ground objs (encoded)
-            /*foreach(var gObj in interiorGroundObjects)
-            {
-                if (gObj is ICanUpdate)
-                {
-                    ICanUpdate updateSp = (ICanUpdate)gObj;
-                    updateSp.Update(kstate, gameTime, camera);
-                }
-            }*/
-
-            // dynamic objects
             foreach (var obj in interiorObjects)
             {
                 obj.inInteriorId = interiorId;
@@ -210,12 +205,16 @@ namespace Gusto.Models
         }
 
 
-        public void Draw(SpriteBatch sb, Camera cam)
+        public void Draw(SpriteBatch sb, Camera cam, RenderTarget2D interiorScene)
         {
 
             // Draw the tileset
             Vector2 minCorner = new Vector2(cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
+
+            // setup drawing for interior on backbuffer
+            _graphics.SetRenderTarget(interiorScene);
+            _graphics.Clear(Color.Black);
 
             startDrawPoint = new Vector2(interiorForObj.location.X - (width / 2), interiorForObj.location.Y - (height / 2));
             Vector2 drawPoint = startDrawPoint;
