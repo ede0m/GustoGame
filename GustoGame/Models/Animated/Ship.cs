@@ -211,7 +211,8 @@ namespace Gusto.Models.Animated
             // ship sail update
             shipSail.Update(kstate, gameTime, windDir, windSp);
 
-            SpatialBounding.SetQuad(GetBase());
+            //SpatialBounding.SetQuad(GetBase());
+            
             // sinking
             if (health <= 0)
             {
