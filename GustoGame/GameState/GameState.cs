@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(430, 000), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(430, -400), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
@@ -68,6 +68,10 @@ namespace Gusto
             BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), _content, _graphics);
             baseShipAI.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
+
+            TeePee teePee = new TeePee(TeamType.A, "Gianna", new Vector2(340, -850), _content, _graphics);
+            teePee.structureInterior.interiorId = Guid.NewGuid();
+            BoundingBoxLocations.interiorMap.Add(teePee.structureInterior.interiorId, teePee.structureInterior);
 
             BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", GiannaRegionTile.location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), _content, _graphics);
@@ -117,6 +121,7 @@ namespace Gusto
             UpdateOrder.Add(player);
             UpdateOrder.Add(baseTribalLand);
             UpdateOrder.Add(tower);
+            UpdateOrder.Add(teePee);
 
             // interior set
             BaseTribal baseTribalInShip = new BaseTribal(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
@@ -513,6 +518,11 @@ namespace Gusto
                     ogs = (OnGroundState)objSave;
                     ClayFurnace cf = new ClayFurnace(ogs.team, ogs.region, ogs.location, _content, _graphics);
                     return cf;
+
+                case "campFire":
+                    ogs = (OnGroundState)objSave;
+                    CampFire caf = new CampFire(ogs.team, ogs.region, ogs.location, _content, _graphics);
+                    return caf;
 
                 case "craftingAnvil":
                     ogs = (OnGroundState)objSave;

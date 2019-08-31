@@ -44,6 +44,7 @@ namespace Gusto.Models.Animated
         public List<InventoryItem> inventory;
         public int maxInventorySlots;
         public Ship playerOnShip;
+        public Structure playerNearStructure;
         public Interior playerInInterior;
         public HandHeld inHand;
         public TeamType teamType;
@@ -95,6 +96,7 @@ namespace Gusto.Models.Animated
             else if (collidedWith.bbKey.Equals("interiorTile"))
             {
                 colliding = false;
+                swimming = false;
             }
 
             else if (collidedWith.bbKey.Equals("interiorTileWall"))
@@ -125,9 +127,14 @@ namespace Gusto.Models.Animated
                     health -= enemy.damage;
                 }
             }
-            else if (collidedWith is IWalks)
+            else if (collidedWith is IWalks || collidedWith is IGroundObject || collidedWith is IPlaceable)
             {
                 colliding = false;
+            }
+            else if (collidedWith is IStructure)
+            {
+                colliding = false;
+                playerNearStructure = (Structure)collidedWith;
             }
             else if (collidedWith is IAmmo)
             {
@@ -135,17 +142,6 @@ namespace Gusto.Models.Animated
                 showHealthBar = true;
                 if (!ball.exploded)
                     health -= ball.groundDamage;
-                return;
-            }
-            else if (collidedWith is IGroundObject)
-            {
-                colliding = false;
-                return;
-            }
-            else if (collidedWith is IPlaceable)
-            {
-                // Todo: Do I want to collide with these objects?
-                colliding = false;
                 return;
             }
 
@@ -427,13 +423,18 @@ namespace Gusto.Models.Animated
                 msToggleInterior += gameTime.ElapsedGameTime.Milliseconds;
                 if (msToggleInterior > 1000)
                 {
-
                     if (playerInInterior != null)
                     {
                         playerInInterior.showingInterior = false;
+                        playerInInterior.interiorObjects.Remove(this);
+                        inInteriorId = Guid.Empty;
                         playerInInterior = null;
-                        playerOnShip.playerInInterior = false;
-                        playerOnShip.shipSail.playerInInterior = false;
+
+                        if (playerOnShip != null)
+                        {
+                            playerOnShip.playerInInterior = false;
+                            playerOnShip.shipSail.playerInInterior = false;
+                        }
                     }
                     else
                     {
@@ -444,11 +445,16 @@ namespace Gusto.Models.Animated
                             playerOnShip.playerInInterior = true;
                             playerOnShip.shipSail.playerInInterior = true;
                         }
-                        // Other interiors?
+                        else if (playerNearStructure != null)
+                        {
+                            playerInInterior = playerNearStructure.structureInterior;
+                        }
+                        inInteriorId = playerInInterior.interiorId;
                     }
                     msToggleInterior = 0;
                 }
             }
+            playerNearStructure = null;
         }
 
         public bool AddInventoryItem(InventoryItem itemToAdd)

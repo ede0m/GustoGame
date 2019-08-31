@@ -30,6 +30,12 @@ namespace Gusto.Mappings
                     }
                 }
             },
+            { "teePee", new Dictionary<string, Dictionary<string, float>>
+                {
+
+                }
+            },
+
             { "baseShip", new Dictionary<string, Dictionary<string, float>>
                 {
                     {"baseBarrel", new Dictionary<string, float>

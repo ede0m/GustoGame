@@ -51,6 +51,8 @@
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\ClayFurnace.cs" />
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Interior\CanvasTileWall.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Interior\DirtTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\Interior\ShipDeckTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\Interior\ShipDeckTileWall.cs" />
     <Compile Include="AnimatedSprite\GameMap\Interior\ShipInteriorTile.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\ShortSword.cs" />
     <Compile Include="AnimatedSprite\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
+    <Compile Include="AnimatedSprite\TeePee.cs" />
     <Compile Include="Bounding\BoundingBoxLocations.cs" />
     <Compile Include="Bounding\CollisionGameLogic.cs" />
     <Compile Include="Bounding\Line.cs" />

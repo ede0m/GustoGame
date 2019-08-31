@@ -82,7 +82,7 @@ namespace Gusto.Models.Animated
                 colliding = false; 
             }
 
-            else if (collidedWith is IWalks || collidedWith is IShip || collidedWith is IPlaceable || collidedWith is IInventoryItem)
+            else if (collidedWith is IWalks || collidedWith is IShip || collidedWith is IPlaceable || collidedWith is IInventoryItem || collidedWith is IStructure)
             {
                 colliding = false;
             }

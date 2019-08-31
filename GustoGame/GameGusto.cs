@@ -109,6 +109,8 @@ namespace Gusto
             // PREPROCESSING Bounding Sprites
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
+            Texture2D textureTeePee = Content.Load<Texture2D>("TeePee");
+            LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.14f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
             LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
@@ -165,7 +167,7 @@ namespace Gusto
             Texture2D textureShipInterior1Wall = Content.Load<Texture2D>("ShipInteriorWall");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipInterior1Wall, "interiorTileWall", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
-            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.6f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSoftWood, "softWood", 0.5f, 1.0f);
             Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");
@@ -519,6 +521,12 @@ namespace Gusto
                     {
                         IPlaceable placeObj = (IPlaceable)sprite;
                         placeObj.DrawCanPickUp(spriteBatchView, camera);
+                    }
+
+                    if (sprite is IStructure)
+                    {
+                        IStructure structure = (IStructure)sprite;
+                        structure.DrawNearInterior(spriteBatchView, camera);
                     }
 
                     if (sprite is IStorage)

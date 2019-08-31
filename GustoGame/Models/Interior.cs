@@ -104,6 +104,12 @@ namespace Gusto.Models
                         case "si1w":
                             tile = new ShipInteriorTileWall(index, null, drawPoint, "GameGusto", content, graphics, "shipInteriorTileWall");
                             break;
+                        case "d1":
+                            tile = new DirtTile(index, null, drawPoint, "GameGusto", content, graphics, "dirtTile");
+                            break;
+                        case "cvs1w":
+                            tile = new CanvasTileWall(index, null, drawPoint, "GameGusto", content, graphics, "canvasTileWall");
+                            break;
                     }
 
                     if (tile != null)
