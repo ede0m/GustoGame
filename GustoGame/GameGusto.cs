@@ -329,8 +329,6 @@ namespace Gusto
 
             foreach (var tp in map.GetMap())
             {
-                //TilePiece tp = (TilePiece)tile;
-                //var loc = tp.location;
                 if ((tp.location.X >= minCorner.X && tp.location.X <= maxCorner.X) && (tp.location.Y >= minCorner.Y && tp.location.Y <= maxCorner.Y))
                 {
                     BoundingBoxLocations.TilesInView.Add(tp);
