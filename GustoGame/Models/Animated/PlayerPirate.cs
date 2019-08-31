@@ -43,8 +43,11 @@ namespace Gusto.Models.Animated
         public bool showInventory;
         public List<InventoryItem> inventory;
         public int maxInventorySlots;
+
         public Ship playerOnShip;
         public Structure playerNearStructure;
+        Vector2 entranceLoc;
+
         public Interior playerInInterior;
         public HandHeld inHand;
         public TeamType teamType;
@@ -299,6 +302,7 @@ namespace Gusto.Models.Animated
             inHand.location = location;
             inHand.SetBoundingBox();
 
+
             // hop on ship
             if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && playerOnShip != null && timeSinceExitShipStart < 2000)
             {
@@ -418,7 +422,7 @@ namespace Gusto.Models.Animated
             canBury = false;
 
             // entering/toggling interior
-            if (kstate.IsKeyDown(Keys.I)) // TODO and near entrance!
+            if (kstate.IsKeyDown(Keys.I))
             {
                 msToggleInterior += gameTime.ElapsedGameTime.Milliseconds;
                 if (msToggleInterior > 1000)
@@ -429,6 +433,8 @@ namespace Gusto.Models.Animated
                         playerInInterior.interiorObjects.Remove(this);
                         inInteriorId = Guid.Empty;
                         playerInInterior = null;
+
+                        location = entranceLoc; // player exits where they entered
 
                         if (playerOnShip != null)
                         {
@@ -448,6 +454,7 @@ namespace Gusto.Models.Animated
                         }
                         else if (playerNearStructure != null)
                         {
+                            entranceLoc = location;
                             playerInInterior = playerNearStructure.structureInterior;
                             inInteriorId = playerInInterior.interiorId;
                         }

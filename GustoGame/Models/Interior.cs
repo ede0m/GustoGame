@@ -55,9 +55,11 @@ namespace Gusto.Models
 
         public Vector2 startDrawPoint;
 
-        public Interior( string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
+        public Interior(string itk, Sprite interiorFor, ContentManager content, GraphicsDevice graphics)
         {
-            //interiorId = interId;
+            /*interiorWasLoaded = loadState;
+            if (!interiorWasLoaded)
+                interiorId = Guid.NewGuid();*/
 
             _graphics = graphics;
             _content = content;
@@ -131,6 +133,7 @@ namespace Gusto.Models
 
                     if (tile != null)
                     {
+                        //tile.inInteriorId = interiorId;
                         tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
                         interiorTiles.Add(tile);
                     }
