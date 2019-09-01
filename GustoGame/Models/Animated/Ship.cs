@@ -211,7 +211,8 @@ namespace Gusto.Models.Animated
             // ship sail update
             shipSail.Update(kstate, gameTime, windDir, windSp);
 
-            SpatialBounding.SetQuad(GetBase());
+            //SpatialBounding.SetQuad(GetBase());
+            
             // sinking
             if (health <= 0)
             {
@@ -244,7 +245,7 @@ namespace Gusto.Models.Animated
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            //health = 40; //UNLIMITED HEALTH
+            health = 40; //UNLIMITED HEALTH
             
             // turning
             if (timeSinceLastTurn > millisecondsPerTurn && playerAboard && !playerInInterior)

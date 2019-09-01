@@ -23,9 +23,6 @@ namespace Gusto.Models
 
         public bool lit;
 
-        float toggleMs = 500;
-        float msButtonHit;
-
         public Light(ContentManager content, GraphicsDevice graphics, float size, Color c)
         {
             _graphics = graphics;
@@ -54,20 +51,6 @@ namespace Gusto.Models
         public void Update(KeyboardState kstate, GameTime gametime, Vector2 loc)
         {
             location = loc;
-
-            // toggle light
-            if (kstate.IsKeyDown(Keys.T))
-            {
-                msButtonHit += gametime.ElapsedGameTime.Milliseconds;
-                if (msButtonHit > toggleMs)
-                {
-                    lit = !lit;
-                    msButtonHit = 0;
-                }
-            }
-
-            if (lit)
-                BoundingBoxLocations.LightLocationList.Add(this);
         }
     }
 }

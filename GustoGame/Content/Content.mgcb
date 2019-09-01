@@ -163,6 +163,18 @@
 /processorParam:TextureFormat=Color
 /build:CannonBall.png
 
+#begin CanvasInteriorWall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:CanvasInteriorWall.png
+
 #begin coal.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -186,6 +198,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:DecomposedBaseSail.png
+
+#begin DirtInterior.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:DirtInterior.png
 
 #begin Furnace.png
 /importer:TextureImporter
@@ -601,6 +625,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:softwoodpile.png
+
+#begin TeePee.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TeePee.png
 
 #begin tower.png
 /importer:TextureImporter

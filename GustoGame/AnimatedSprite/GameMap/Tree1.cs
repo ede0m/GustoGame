@@ -28,7 +28,7 @@ namespace Gusto.AnimatedSprite.GameMap
             Texture2D textureTree1BB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureTree1BB = new Texture2D(graphics, textureTree1.Width, textureTree1.Height);
-            Asset tree1Asset = new Asset(textureTree1, textureTree1BB, 6, 2, 0.4f, objKey, region);
+            Asset tree1Asset = new Asset(textureTree1, textureTree1BB, 6, 2, 0.6f, objKey, region);
             SetSpriteAsset(tree1Asset, location);
         }
     }

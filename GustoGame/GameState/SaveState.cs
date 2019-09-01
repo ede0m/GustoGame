@@ -112,14 +112,10 @@ namespace Gusto.SaveState
         public TeamType team { get; set; }
         [DataMember]
         public List<InventoryItemSerialized> actionInventory { get; set; }
-
-        // TODO:
         [DataMember]
         public InteriorState interiorState { get; set; }
-
         [DataMember]
         public Guid shipId;
-
         [DataMember]
         public bool anchored { get; set; }
         [DataMember]
@@ -127,6 +123,30 @@ namespace Gusto.SaveState
         [DataMember]
         public float health { get; set; }
     }
+
+    [DataContract]
+    [KnownType(typeof(InventoryItemSerialized))]
+    [KnownType(typeof(TreasureMapItemSerialized))]
+    [KnownType(typeof(Vector2))]
+    [KnownType(typeof(TeamType))]
+    [KnownType(typeof(InteriorState))]
+    [KnownType(typeof(StructureState))]
+    public class StructureState : ISaveState
+    {
+        [DataMember]
+        public string region { get; set; }
+        [DataMember]
+        public string objKey { get; set; }
+        [DataMember]
+        public Vector2 location { get; set; }
+        [DataMember]
+        public TeamType team { get; set; }
+        [DataMember]
+        public InteriorState interiorState { get; set; }
+        [DataMember]
+        public Guid structureId;
+    }
+
 
     [DataContract]
     [KnownType(typeof(OnGroundState))]

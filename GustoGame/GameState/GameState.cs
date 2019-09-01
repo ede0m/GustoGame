@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(430, 000), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(430, -400), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
@@ -68,6 +68,10 @@ namespace Gusto
             BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), _content, _graphics);
             baseShipAI.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
+
+            TeePee teePee = new TeePee(TeamType.A, "Gianna", new Vector2(340, -850), _content, _graphics);
+            teePee.structureInterior.interiorId = Guid.NewGuid();
+            BoundingBoxLocations.interiorMap.Add(teePee.structureInterior.interiorId, teePee.structureInterior);
 
             BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", GiannaRegionTile.location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), _content, _graphics);
@@ -117,6 +121,7 @@ namespace Gusto
             UpdateOrder.Add(player);
             UpdateOrder.Add(baseTribalLand);
             UpdateOrder.Add(tower);
+            UpdateOrder.Add(teePee);
 
             // interior set
             BaseTribal baseTribalInShip = new BaseTribal(TeamType.A, "GustoMap", Vector2.Zero, _content, _graphics);
@@ -245,6 +250,18 @@ namespace Gusto
                     state.shipId = sh.GetInteriorForId();
                     SaveState.Add(state);
                 }
+
+                else if (sp.GetType().BaseType == typeof(Gusto.Models.Animated.Structure))
+                {
+                    Structure st = (Structure)sp;
+                    StructureState state = new StructureState();
+                    state.team = st.teamType;
+                    state.location = st.location;
+                    state.region = st.regionKey;
+                    state.objKey = st.bbKey;
+                    state.structureId = st.GetInteriorForId();
+                    SaveState.Add(state);
+                }
             }
 
             // All objs on ground
@@ -303,7 +320,7 @@ namespace Gusto
 
         public void LoadGameState()
         {
-            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState), typeof(OnGroundState), typeof(InteriorState)  };
+            Type[] deserializeTypes = new Type[] { typeof(ShipState), typeof(PlayerState), typeof(WeatherSaveState), typeof(NpcState), typeof(OnGroundState), typeof(InteriorState), typeof(StructureState)  };
             DataContractSerializer s = new DataContractSerializer(typeof(List<ISaveState>), deserializeTypes);
             FileStream fs = new FileStream(savePath + "GustoGame_" + gameName, FileMode.Open);
             XmlDictionaryReader reader = XmlDictionaryReader.CreateTextReader(fs, new XmlDictionaryReaderQuotas());
@@ -397,6 +414,13 @@ namespace Gusto
                     UpdateOrder.Add(s);
                 }
 
+                else if (objState.GetType() == typeof(StructureState))
+                {
+                    StructureState ss = (StructureState)objState;
+                    Structure s = (Structure)DeserializeModel(ss.objKey, ss);
+                    UpdateOrder.Add(s);
+                }
+
                 else if (objState.GetType() == typeof(WeatherSaveState))
                 {
                     WeatherSaveState wss = (WeatherSaveState)objState;
@@ -454,7 +478,7 @@ namespace Gusto
                     else if (sp is IStructure)
                     {
                         Structure st = (Structure)sp;
-                        //st.structureInterior = interiorForObjMap[interiorForId];
+                        st.structureInterior = interiorForObjMap[interiorForId];
                     }
 
                     interiorForObjMap[interiorForId].interiorForObj = sp;
@@ -474,6 +498,7 @@ namespace Gusto
             OnGroundState ogs;
             ShipState ss;
             NpcState npcs;
+            StructureState sts;
             switch (objKey)
             {
                 // TODO: Should I save fired ammo state?
@@ -497,6 +522,11 @@ namespace Gusto
                     bt.inventory = DeserializeInventory(npcs.inventory);
                     return bt;
 
+                case "teePee":
+                    sts = (StructureState)objSave;
+                    TeePee tp = new TeePee(sts.team, sts.region, sts.location, _content, _graphics);
+                    return tp;
+
                 case "baseBarrel":
                     ogs = (OnGroundState)objSave;
                     BaseBarrel bb = new BaseBarrel(ogs.team, ogs.region, ogs.location, _content, _graphics);
@@ -513,6 +543,11 @@ namespace Gusto
                     ogs = (OnGroundState)objSave;
                     ClayFurnace cf = new ClayFurnace(ogs.team, ogs.region, ogs.location, _content, _graphics);
                     return cf;
+
+                case "campFire":
+                    ogs = (OnGroundState)objSave;
+                    CampFire caf = new CampFire(ogs.team, ogs.region, ogs.location, _content, _graphics);
+                    return caf;
 
                 case "craftingAnvil":
                     ogs = (OnGroundState)objSave;

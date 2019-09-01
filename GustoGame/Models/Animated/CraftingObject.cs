@@ -43,7 +43,6 @@ namespace Gusto.Models.Animated
             teamType = type;
             msPickupTimer = 5000;
             hitsToPickUp = 10;
-
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)

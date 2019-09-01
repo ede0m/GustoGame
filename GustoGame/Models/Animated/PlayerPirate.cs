@@ -43,7 +43,11 @@ namespace Gusto.Models.Animated
         public bool showInventory;
         public List<InventoryItem> inventory;
         public int maxInventorySlots;
+
         public Ship playerOnShip;
+        public Structure playerNearStructure;
+        Vector2 entranceLoc;
+
         public Interior playerInInterior;
         public HandHeld inHand;
         public TeamType teamType;
@@ -95,6 +99,7 @@ namespace Gusto.Models.Animated
             else if (collidedWith.bbKey.Equals("interiorTile"))
             {
                 colliding = false;
+                swimming = false;
             }
 
             else if (collidedWith.bbKey.Equals("interiorTileWall"))
@@ -125,9 +130,14 @@ namespace Gusto.Models.Animated
                     health -= enemy.damage;
                 }
             }
-            else if (collidedWith is IWalks)
+            else if (collidedWith is IWalks || collidedWith is IGroundObject || collidedWith is IPlaceable)
             {
                 colliding = false;
+            }
+            else if (collidedWith is IStructure)
+            {
+                colliding = false;
+                playerNearStructure = (Structure)collidedWith;
             }
             else if (collidedWith is IAmmo)
             {
@@ -135,17 +145,6 @@ namespace Gusto.Models.Animated
                 showHealthBar = true;
                 if (!ball.exploded)
                     health -= ball.groundDamage;
-                return;
-            }
-            else if (collidedWith is IGroundObject)
-            {
-                colliding = false;
-                return;
-            }
-            else if (collidedWith is IPlaceable)
-            {
-                // Todo: Do I want to collide with these objects?
-                colliding = false;
                 return;
             }
 
@@ -303,6 +302,7 @@ namespace Gusto.Models.Animated
             inHand.location = location;
             inHand.SetBoundingBox();
 
+
             // hop on ship
             if (nearShip && kstate.IsKeyDown(Keys.X) && !onShip && playerOnShip != null && timeSinceExitShipStart < 2000)
             {
@@ -422,18 +422,25 @@ namespace Gusto.Models.Animated
             canBury = false;
 
             // entering/toggling interior
-            if (kstate.IsKeyDown(Keys.I)) // TODO and near entrance!
+            if (kstate.IsKeyDown(Keys.I))
             {
                 msToggleInterior += gameTime.ElapsedGameTime.Milliseconds;
                 if (msToggleInterior > 1000)
                 {
-
                     if (playerInInterior != null)
                     {
                         playerInInterior.showingInterior = false;
+                        playerInInterior.interiorObjects.Remove(this);
+                        inInteriorId = Guid.Empty;
                         playerInInterior = null;
-                        playerOnShip.playerInInterior = false;
-                        playerOnShip.shipSail.playerInInterior = false;
+
+                        location = entranceLoc; // player exits where they entered
+
+                        if (playerOnShip != null)
+                        {
+                            playerOnShip.playerInInterior = false;
+                            playerOnShip.shipSail.playerInInterior = false;
+                        }
                     }
                     else
                     {
@@ -443,12 +450,19 @@ namespace Gusto.Models.Animated
                             playerInInterior = playerOnShip.shipInterior;
                             playerOnShip.playerInInterior = true;
                             playerOnShip.shipSail.playerInInterior = true;
+                            inInteriorId = playerInInterior.interiorId;
                         }
-                        // Other interiors?
+                        else if (playerNearStructure != null)
+                        {
+                            entranceLoc = location;
+                            playerInInterior = playerNearStructure.structureInterior;
+                            inInteriorId = playerInInterior.interiorId;
+                        }
                     }
                     msToggleInterior = 0;
                 }
             }
+            playerNearStructure = null;
         }
 
         public bool AddInventoryItem(InventoryItem itemToAdd)

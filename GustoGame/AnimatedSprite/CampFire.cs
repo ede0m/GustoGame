@@ -1,5 +1,6 @@
 ﻿using Gusto.Models;
 using Gusto.Models.Animated;
+using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,7 +21,7 @@ namespace Gusto.AnimatedSprite
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBB = new Texture2D(graphics, texture.Width, texture.Height);
-            Asset asset = new Asset(texture, textureBB, 6, 1, 0.2f, "campFire", region);
+            Asset asset = new Asset(texture, textureBB, 6, 1, 0.3f, "campFire", region);
 
             Light lanternLight = new Light(content, graphics, 1.0f, Color.OrangeRed);
             emittingLight = lanternLight;

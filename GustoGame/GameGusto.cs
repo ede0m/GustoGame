@@ -18,8 +18,7 @@ using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
-using Gusto.Models.Menus;
-using Gusto.GameMap.lightning;
+using System.Linq;
 
 namespace Gusto
 {
@@ -43,7 +42,8 @@ namespace Gusto
 
         GraphicsDeviceManager graphics;
         FrameCounter _frameCounter;
-        RenderTarget2D gameScene;
+        RenderTarget2D worldScene;
+        RenderTarget2D interiorScene;
         RenderTarget2D ambientLight;
         RenderTarget2D lightsTarget;
 
@@ -88,7 +88,8 @@ namespace Gusto
             weather = new Weather(Content, GraphicsDevice);
             lightsTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             ambientLight = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            gameScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            worldScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            interiorScene = new RenderTarget2D(GraphicsDevice, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             base.Initialize();
         }
 
@@ -109,6 +110,8 @@ namespace Gusto
             // PREPROCESSING Bounding Sprites
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
+            Texture2D textureTeePee = Content.Load<Texture2D>("TeePee");
+            LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.14f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
             LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
@@ -149,7 +152,7 @@ namespace Gusto
             Texture2D textureCraftingAnvil = Content.Load<Texture2D>("Anvil");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCraftingAnvil, "craftingAnvil", 0.5f, 1.0f);
             Texture2D textureCampFire = Content.Load<Texture2D>("CampFire");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureCampFire, "campFire", 0.2f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureCampFire, "campFire", 0.3f, 1.0f);
 
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
@@ -165,7 +168,7 @@ namespace Gusto
             Texture2D textureShipInterior1Wall = Content.Load<Texture2D>("ShipInteriorWall");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipInterior1Wall, "interiorTileWall", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
-            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.4f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.6f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSoftWood, "softWood", 0.5f, 1.0f);
             Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");
@@ -320,19 +323,20 @@ namespace Gusto
             // set any viewport visible(and not visible when in interior) collidable map pieces for collision - update LandTileLocList and GroundObjLocList
             BoundingBoxLocations.LandTileLocationList.Clear();
             BoundingBoxLocations.GroundObjectLocationList.Clear();
+            BoundingBoxLocations.TilesInView.Clear();
             Vector2 minCorner = new Vector2(camera.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(camera.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
-            foreach (var tile in map.GetMap())
+
+            foreach (var tp in map.GetMap())
             {
-                TilePiece tp = (TilePiece)tile;
-                var loc = tp.location;
-                if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
+                if ((tp.location.X >= minCorner.X && tp.location.X <= maxCorner.X) && (tp.location.Y >= minCorner.Y && tp.location.Y <= maxCorner.Y))
                 {
-                    
+                    BoundingBoxLocations.TilesInView.Add(tp);
+
                     if (tp.bbKey.Equals("landTile"))
                     {
-                        BoundingBoxLocations.LandTileLocationList.Add(tile);
-                        SpatialBounding.SetQuad(tile.GetBase());
+                        BoundingBoxLocations.LandTileLocationList.Add(tp);
+                        SpatialBounding.SetQuad(tp.GetBase());
                     }
 
                     // handle ground objects (and respawn)
@@ -422,20 +426,6 @@ namespace Gusto
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // game menu before everything
-            if (startingMenu.showMenu)
-            {
-                startingMenu.DrawInventory(spriteBatchStatic);
-                return;
-            }
-
-            // setup lightTarget for spot lights
-            GraphicsDevice.SetRenderTarget(lightsTarget);
-            GraphicsDevice.Clear(Color.Black);
-            foreach (var light in BoundingBoxLocations.LightLocationList)
-                light.Draw(spriteBatchView, this.camera);
-            BoundingBoxLocations.LightLocationList.Clear(); // clear after we have drawn the light mask
-
             // trackers for statically drawn sprites as we move through draw order
             bool showCraftingMenu = false;
             bool showStorageMenu = false;
@@ -446,13 +436,29 @@ namespace Gusto
                 invItemsShip = gameState.player.playerOnShip.actionInventory;
             Storage invStorage = null;
 
+
+            // game menu before everything
+            if (startingMenu.showMenu)
+            {
+                startingMenu.DrawInventory(spriteBatchStatic);
+                return;
+            }
+
             // draw the interior view if in interior
             if (gameState.player.playerInInterior != null)
             {
-                GraphicsDevice.SetRenderTarget(null);
-                GraphicsDevice.Clear(Color.Black);
                 gameState.player.playerInInterior.interiorObjects.Add(gameState.player);
-                gameState.player.playerInInterior.Draw(spriteBatchView, this.camera);
+
+                GraphicsDevice.SetRenderTarget(lightsTarget);
+                GraphicsDevice.Clear(Color.Black);
+                DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, gameState.player.playerInInterior.interiorObjects.ToList());
+
+                gameState.player.playerInInterior.Draw(spriteBatchView, this.camera, interiorScene);
+
+                // lighting shader - for ambient day/night light and lanterns
+                GraphicsDevice.SetRenderTarget(null);
+                GraphicsDevice.Clear(Color.White);
+                dayLight.Draw(spriteBatchStatic, interiorScene, lightsTarget);
 
                 showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
                 showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
@@ -461,8 +467,13 @@ namespace Gusto
             // not in interior so draw the game scene
             else
             {
+                // setup lightTarget for spot lights
+                GraphicsDevice.SetRenderTarget(lightsTarget);
+                GraphicsDevice.Clear(Color.Black);
+                DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, DrawOrder);
+
                 // set up gamescene draw
-                GraphicsDevice.SetRenderTarget(gameScene);
+                GraphicsDevice.SetRenderTarget(worldScene);
                 GraphicsDevice.Clear(Color.PeachPuff);
 
                 // draw map
@@ -519,6 +530,12 @@ namespace Gusto
                     {
                         IPlaceable placeObj = (IPlaceable)sprite;
                         placeObj.DrawCanPickUp(spriteBatchView, camera);
+                    }
+
+                    if (sprite is IStructure)
+                    {
+                        IStructure structure = (IStructure)sprite;
+                        structure.DrawNearInterior(spriteBatchView, camera);
                     }
 
                     if (sprite is IStorage)
@@ -603,7 +620,7 @@ namespace Gusto
                 // lighting shader - for ambient day/night light and lanterns
                 GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(Color.White);
-                dayLight.Draw(spriteBatchStatic, gameScene, lightsTarget);
+                dayLight.Draw(spriteBatchStatic, worldScene, lightsTarget);
             }
 
             // lightning is drawn after ambient light

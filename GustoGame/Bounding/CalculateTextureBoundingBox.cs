@@ -118,7 +118,7 @@ namespace Gusto.Bounds
         private static List<Line> ReducePolygon(List<Line> lines)
         {
             List<Line> reducedPoly = new List<Line>();
-            int maxPoints = 10;
+            int maxPoints = 7;
             int window = lines.Count / maxPoints;
 
             for (int i = 0; i < maxPoints; i++)

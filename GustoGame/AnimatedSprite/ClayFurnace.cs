@@ -1,5 +1,6 @@
 ﻿using Gusto.Models;
 using Gusto.Models.Animated;
+using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
