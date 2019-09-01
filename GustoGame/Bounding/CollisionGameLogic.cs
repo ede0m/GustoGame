@@ -26,7 +26,7 @@ namespace Gusto.Bounding
                     return false;
             }
 
-            if (a.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
+            if (a is IShip)
             {
                 Ship ship = (Ship)a;
                 // a ship doesn't collide with its any ship's sails
@@ -45,11 +45,11 @@ namespace Gusto.Bounding
                 }
             }
 
-            else if (a.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
+            else if (a is IPlayer)
             {
                 PlayerPirate pirate = (PlayerPirate)a;
                 // a player doesn't collide with its own shots
-                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo))
+                if (b is IAmmo)
                 {
                     Ammo ball = (Ammo)b;
                     if (ball.teamType == pirate.teamType)
@@ -63,7 +63,7 @@ namespace Gusto.Bounding
             {
                 BaseTower tower = (BaseTower)a;
                 // a tower doesn't collide with its own shots
-                if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Ammo))
+                if (b is IAmmo)
                 {
                     Ammo ball = (Ammo)b;
                     if (ball.teamType == tower.teamType)
