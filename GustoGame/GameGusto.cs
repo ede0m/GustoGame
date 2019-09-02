@@ -111,7 +111,7 @@ namespace Gusto
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
             Texture2D textureTeePee = Content.Load<Texture2D>("TeePee");
-            LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.14f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.5f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
             LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
