@@ -47,6 +47,7 @@ namespace Gusto.Models.Animated
         {
             nearStructure = false;
 
+            // sructure lighting animation
             foreach (var obj in structureInterior.interiorObjects)
             {
                 if (obj is ILight)
