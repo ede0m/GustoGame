@@ -35,6 +35,7 @@ namespace Gusto
         WindArrows windArrows;
         Texture2D anchorIcon;
         Texture2D repairIcon;
+        Texture2D boardingIcon;
         Texture2D treasureXMark;
         Inventory inventoryMenu;
         CraftingMenu craftingMenu;
@@ -211,6 +212,7 @@ namespace Gusto
             // static load
             anchorIcon = Content.Load<Texture2D>("anchor-shape");
             repairIcon = Content.Load<Texture2D>("work-hammer-");
+            boardingIcon = Content.Load<Texture2D>("icons8-sword-52");
             treasureXMark = Content.Load<Texture2D>("XSpot");
             font = Content.Load<SpriteFont>("helperFont");
 
@@ -634,6 +636,9 @@ namespace Gusto
             {
                 playerShip.DrawAnchorMeter(spriteBatchStatic, new Vector2(1660, 30), anchorIcon);
                 playerShip.DrawRepairHammer(spriteBatchStatic, new Vector2(1600, 30), repairIcon);
+
+                if (playerShip.msBoarding > 0)
+                    playerShip.DrawBeingBoarded(spriteBatchStatic, new Vector2(1540, 30), boardingIcon);
 
                 if (gameState.player.playerInInterior != null)
                     invItemsShip = null;

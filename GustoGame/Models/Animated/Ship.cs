@@ -39,6 +39,7 @@ namespace Gusto.Models.Animated
         public float millisecondToSink;
         public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
+        public float msBoarding;
 
         // aim line stuff
         Vector2 edgeFull;
@@ -57,6 +58,7 @@ namespace Gusto.Models.Animated
         public float movementSpeed;
         public float percentNotAnchored;
         public float percentNotRepaired;
+        float percentBoarded;
         public float sinkingTransparency;
         public int maxShotsMoving;
         public int nSails;
@@ -67,6 +69,8 @@ namespace Gusto.Models.Animated
         private bool showHealthBar;
         public bool hittingLand;
         public bool sinking;
+        public bool beingBoarded;
+        public bool boarded;
         public bool aiming;
         public bool anchored;
         public bool playerAboard;
@@ -79,6 +83,7 @@ namespace Gusto.Models.Animated
         public List<Ammo> Shots;
         public List<InventoryItem> actionInventory;
         public Interior shipInterior;
+        Ship boardingShip;
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
@@ -145,6 +150,10 @@ namespace Gusto.Models.Animated
             {
                 colliding = false;
                 anchored = true;
+
+                Ship sh = (Ship)collidedWith;
+                if (sh.teamType != teamType)
+                    boardingShip = sh;
             }
         }
 
@@ -210,8 +219,6 @@ namespace Gusto.Models.Animated
 
             // ship sail update
             shipSail.Update(kstate, gameTime, windDir, windSp);
-
-            //SpatialBounding.SetQuad(GetBase());
             
             // sinking
             if (health <= 0)
@@ -241,6 +248,24 @@ namespace Gusto.Models.Animated
                     shipInterior.interiorObjects.Clear();
                 }
             }
+
+            // being boarded
+            if (boardingShip != null)
+            {
+                msBoarding += gameTime.ElapsedGameTime.Milliseconds;
+                percentBoarded = msBoarding / 8000;
+                if (msBoarding > 8000)
+                {
+                    if (teamType != TeamType.Player) // players will initiate their boarding with controls TODO
+                    {
+                        NpcsBoardShip();
+                    }
+                }
+            }
+            else
+                msBoarding = 0;
+
+            boardingShip = null;
         }
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
@@ -427,126 +452,132 @@ namespace Gusto.Models.Animated
 
         private void AIUpdate(GameTime gameTime)
         {
-            // AI ship direction and movement
-            if (timeSinceLastTurn > millisecondsPerTurn)
+            // AI only works if NPC aboard
+            if (shipInterior.interiorObjects.OfType<Npc>().Any())
             {
-                Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
-                if (target != null)
+                // AI ship direction and movement
+                if (timeSinceLastTurn > millisecondsPerTurn)
                 {
-                    roaming = false;
-                    var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
-                    if (distanceToTarget <= stopRange || health <= 0)
+                    Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+                    if (target != null)
                     {
-                        moving = false;
-                        shipSail.moving = false;
-                    }
-                    else
-                    {
-                        moving = true;
-                        shipSail.moving = true;
-                    }
-                }
-                else
-                {
-                    // TODO: roaming can get stuck... 
-
-                    if (!roaming)
-                        randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
-
-                    roaming = true;
-                    target = new Tuple<int, int>((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
-                    if (GetBoundingBox().Intersects(randomRoamTile.GetBoundingBox()))
                         roaming = false;
-                    
-                }
-
-                // TODO: need some sort of timer to unachor ai ship when it is stuck.
-                //if (anchored)
-                //moving = false;
-
-
-                // collision avoidance take 2
-                bool probesCollides = false;
-                int lineOfSightDistance = 2500;
-                Vector2 shipCenterPoint = GetBoundingBox().Center.ToVector2();
-                int crf = currRowFrame;
-                Dictionary<int, float> nonCollidingLOSMap = new Dictionary<int, float>(); // rowFrame and los distance to target
-                for (int i = 0; i < nRows; i++)
-                {
-                    Tuple<int, int> LosFrames = BoundFrames(crf, currColumnFrame);
-                    crf = LosFrames.Item1;
-                    Vector2 pointOfSight = new Vector2(shipCenterPoint.X + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item1 * lineOfSightDistance,
-                        shipCenterPoint.Y + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item2 * lineOfSightDistance);
-                    
-                    foreach (var land in BoundingBoxLocations.LandTileLocationList)
-                    {
-                        int padding = GetBoundingBox().Width / 2; // padd the tile pieces with half of the ships width
-                        Rectangle bbPadded = new Rectangle(land.GetBoundingBox().X, land.GetBoundingBox().Y, land.GetBoundingBox().Width + padding, land.GetBoundingBox().Height + padding);
-
-                        if (AIUtility.LineIntersectsRect(shipCenterPoint, pointOfSight, bbPadded))
+                        var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
+                        if (distanceToTarget <= stopRange || health <= 0)
                         {
-                            nonCollidingLOSMap.Remove(crf);
-                            probesCollides = true;
-                            break;
+                            moving = false;
+                            shipSail.moving = false;
                         }
                         else
                         {
-                            if (!nonCollidingLOSMap.ContainsKey(crf))
-                                nonCollidingLOSMap.Add(crf, PhysicsUtility.VectorMagnitude(target.Item1, pointOfSight.X, target.Item2, pointOfSight.Y));
-                        }   
-                    }
-                    crf++;
-                }
-
-                if (!probesCollides)
-                    currRowFrame = AIUtility.SetAIShipDirection(target, location);
-                else
-                {
-                    if (nonCollidingLOSMap.Keys.Count == 0)
-                    {
-                        // all of our lines of sight collide... TODO
+                            moving = true;
+                            shipSail.moving = true;
+                        }
                     }
                     else
                     {
-                        // go towards min nonCollidable path to target
-                        int bestRowFrame = 0;
-                        float minDistance = float.MaxValue;
-                        foreach (var los in nonCollidingLOSMap.Keys)
+                        // TODO: roaming can get stuck... 
+
+                        if (!roaming)
+                            randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
+
+                        roaming = true;
+                        target = new Tuple<int, int>((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
+                        if (GetBoundingBox().Intersects(randomRoamTile.GetBoundingBox()))
+                            roaming = false;
+
+                    }
+
+                    // TODO: need some sort of timer to unachor ai ship when it is stuck.
+                    //if (anchored)
+                    //moving = false;
+
+
+                    // collision avoidance take 2
+                    bool probesCollides = false;
+                    int lineOfSightDistance = 2500;
+                    Vector2 shipCenterPoint = GetBoundingBox().Center.ToVector2();
+                    int crf = currRowFrame;
+                    Dictionary<int, float> nonCollidingLOSMap = new Dictionary<int, float>(); // rowFrame and los distance to target
+                    for (int i = 0; i < nRows; i++)
+                    {
+                        Tuple<int, int> LosFrames = BoundFrames(crf, currColumnFrame);
+                        crf = LosFrames.Item1;
+                        Vector2 pointOfSight = new Vector2(shipCenterPoint.X + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item1 * lineOfSightDistance,
+                            shipCenterPoint.Y + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item2 * lineOfSightDistance);
+
+                        foreach (var land in BoundingBoxLocations.LandTileLocationList)
                         {
-                            if (nonCollidingLOSMap[los] < minDistance)
+                            int padding = GetBoundingBox().Width / 2; // padd the tile pieces with half of the ships width
+                            Rectangle bbPadded = new Rectangle(land.GetBoundingBox().X, land.GetBoundingBox().Y, land.GetBoundingBox().Width + padding, land.GetBoundingBox().Height + padding);
+
+                            if (AIUtility.LineIntersectsRect(shipCenterPoint, pointOfSight, bbPadded))
                             {
-                                minDistance = nonCollidingLOSMap[los];
-                                bestRowFrame = los;
+                                nonCollidingLOSMap.Remove(crf);
+                                probesCollides = true;
+                                break;
+                            }
+                            else
+                            {
+                                if (!nonCollidingLOSMap.ContainsKey(crf))
+                                    nonCollidingLOSMap.Add(crf, PhysicsUtility.VectorMagnitude(target.Item1, pointOfSight.X, target.Item2, pointOfSight.Y));
                             }
                         }
-                        currRowFrame = bestRowFrame;
+                        crf++;
                     }
+
+                    if (!probesCollides)
+                        currRowFrame = AIUtility.SetAIShipDirection(target, location);
+                    else
+                    {
+                        if (nonCollidingLOSMap.Keys.Count == 0)
+                        {
+                            // all of our lines of sight collide... TODO
+                        }
+                        else
+                        {
+                            // go towards min nonCollidable path to target
+                            int bestRowFrame = 0;
+                            float minDistance = float.MaxValue;
+                            foreach (var los in nonCollidingLOSMap.Keys)
+                            {
+                                if (nonCollidingLOSMap[los] < minDistance)
+                                {
+                                    minDistance = nonCollidingLOSMap[los];
+                                    bestRowFrame = los;
+                                }
+                            }
+                            currRowFrame = bestRowFrame;
+                        }
+                    }
+                    // end collision avoidance
+
+                    shipSail.currRowFrame = currRowFrame;
+                    timeSinceLastTurn -= millisecondsPerTurn;
                 }
-                // end collision avoidance
 
-                shipSail.currRowFrame = currRowFrame;
-                timeSinceLastTurn -= millisecondsPerTurn;
-            }
-
-            // AI Ship Shooting
-            timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastShot > millisecondsNewShot && health > 0)
-            {
-                Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
-                if (shotDirection != null)
+                // AI Ship Shooting
+                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+                if (timeSinceLastShot > millisecondsNewShot && health > 0)
                 {
-                    Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
-                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shipCenter, _content, _graphics);
-                    int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
-                    int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
-                    cannonShot.location.X -= cannonBallTextureCenterOffsetX;
-                    cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
-                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
-                    cannonShot.moving = true;
-                    Shots.Add(cannonShot);
+                    Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+                    if (shotDirection != null)
+                    {
+                        Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
+                        BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shipCenter, _content, _graphics);
+                        int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
+                        int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
+                        cannonShot.location.X -= cannonBallTextureCenterOffsetX;
+                        cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
+                        cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
+                        cannonShot.moving = true;
+                        Shots.Add(cannonShot);
+                    }
+                    timeSinceLastShot = 0;
                 }
-                timeSinceLastShot = 0;
             }
+
+            
         }
 
         /* Adds movement values to X Y location vector based on sail position with wind. 
@@ -603,6 +634,25 @@ namespace Gusto.Models.Animated
             return new Tuple<float, float>(xBonus, yBonus);
         }
 
+        private void NpcsBoardShip()
+        {
+            List<Sprite> toRemove = new List<Sprite>();
+
+            // add npcs over to boarded ship
+            foreach (var npc in shipInterior.interiorObjects)
+            {
+                if (npc is INPC)
+                {
+                    boardingShip.shipInterior.interiorObjects.Add(npc);
+                    npc.location = boardingShip.shipInterior.RandomInteriorTile().location;
+                    toRemove.Add(npc);
+                }
+            }
+
+            foreach (var toRem in toRemove)
+                shipInterior.interiorObjects.Remove(toRem);
+        }
+
         public void DrawAimLine(SpriteBatch sb, Camera camera)
         {
             Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
@@ -648,6 +698,23 @@ namespace Gusto.Models.Animated
                 meterFull.SetData<Color>(new Color[] { Color.IndianRed });
                 meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentNotRepaired) * 40f;
+                Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
+                Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
+                sb.Begin();
+                sb.Draw(meterFull, full, null, Color.IndianRed, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(meterProg, prog, null, Color.DarkSeaGreen, 0, new Vector2(0, 0), SpriteEffects.None, 0);
+                sb.Draw(repairIcon, full, null, Color.AliceBlue, 0, Vector2.Zero, SpriteEffects.None, 0);
+                sb.End();
+            }
+        }
+
+        public void DrawBeingBoarded(SpriteBatch sb, Vector2 pos, Texture2D repairIcon)
+        {
+            if (teamType == TeamType.Player)
+            {
+                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
+                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
+                float progress = (1f - percentBoarded) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
                 sb.Begin();
