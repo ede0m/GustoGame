@@ -33,6 +33,13 @@ namespace Gusto.Bounding
                 if (b.GetType().BaseType == typeof(Gusto.Models.Animated.Sail))
                     return false;
 
+                if (b is ILand)
+                {
+                    TilePiece t = (TilePiece)b;
+                    if (!(t.shorePiece))
+                        return false;
+                }
+
                 // ship doesn't collide with interior tiles
                 if (b is IInteriorTile)
                     return false;

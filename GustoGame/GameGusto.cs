@@ -157,8 +157,8 @@ namespace Gusto
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
-            Texture2D textureLand1 = Content.Load<Texture2D>("Land1Holes");
-            LoadDynamicBoundingBoxPerFrame(false, 4, 4, textureLand1, "landTile", 1.0f, 1.0f);
+            Texture2D textureLand1 = Content.Load<Texture2D>("Land1HolesShore");
+            LoadDynamicBoundingBoxPerFrame(false, 9, 4, textureLand1, "landTile", 1.0f, 1.0f);
             //Texture2D textureShipDeck1 = Content.Load<Texture2D>("ShipDeck");
             //LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipDeck1, "interiorTile", 1.0f, 1.0f);
             //Texture2D textureShipDeck1Wall = Content.Load<Texture2D>("ShipDeckWall");

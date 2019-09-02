@@ -9,15 +9,16 @@ using System.Diagnostics;
 using Gusto.Models;
 using Gusto.Bounds;
 using Gusto.AnimatedSprite;
+using Gusto.Models.Interfaces;
 
 namespace Gusto.AnimatedSprite.GameMap
 {
-    public class LandTile : TilePiece
+    public class LandTile : TilePiece, ILand
     {
         public LandTile(int index, Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (index, groundObj, content, graphics)
         {
-            Texture2D textureLandTile = content.Load<Texture2D>("Land1Holes");
-            Asset landTileAsset = new Asset(textureLandTile, null, 4, 4, 1.0f, "landTile", region);
+            Texture2D textureLandTile = content.Load<Texture2D>("Land1HolesShore");
+            Asset landTileAsset = new Asset(textureLandTile, null, 4, 9, 1.0f, "landTile", region);
             SetSpriteAsset(landTileAsset, location);
         }
 
