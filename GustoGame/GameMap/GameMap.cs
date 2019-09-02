@@ -21,6 +21,9 @@ namespace Gusto.GameMap
 {
     public class TileGameMap
     {
+        ContentManager _content;
+        GraphicsDevice _graphics;
+
         private Camera _cam;
         private int _width;
         private int _height;
@@ -37,7 +40,6 @@ namespace Gusto.GameMap
 
         public TileGameMap(Camera camera)
         {
-
             _width = GameOptions.PrefferedBackBufferWidth * GameOptions.GameMapWidthMult;
             _height = GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult;
             _cols = _width / tileWidth;
@@ -50,6 +52,9 @@ namespace Gusto.GameMap
 
         public void SetGameMap(ContentManager content, GraphicsDevice graphics)
         {
+            _content = content;
+            _graphics = graphics;
+
             var worldLoc = startMapPoint;
             int index = 0;
             for (int i = 0; i < _rows; i++)
@@ -80,6 +85,7 @@ namespace Gusto.GameMap
                         case "o1":
                             tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o1");
                             tile.transparency = 0.6f;
+                            tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "o2":
@@ -92,7 +98,6 @@ namespace Gusto.GameMap
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                     }
-                    tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
 
                     worldLoc.X += tileWidth;
                     map.Add(tile);
@@ -101,7 +106,50 @@ namespace Gusto.GameMap
                 worldLoc.Y += tileHeight;
                 worldLoc.X = startMapPoint.X;
             }
+
+            // Go through again to set all columns to correct frame for walls
+            int index2 = 0;
+            foreach (var tile in map)
+            {
+                if (tile is ILand)
+                {
+                    // inner land
+                    if (map[index2 + 1] is ILand && map[index2 - 1] is ILand && map[index2 + _cols] is ILand && map[index2 - _cols] is ILand)
+                    {
+                        tile.shorePiece = false;
+                        tile.currRowFrame = 0;
+                    }
+                    else
+                    {
+
+                        tile.shorePiece = true;
+
+                        if (map[index2 + 1] is ILand && !(map[index2 - 1] is ILand))
+                            tile.currRowFrame = 1; // left shore
+                        if (map[index2 - _cols] is ILand && !(map[index2 + _cols] is ILand)) // check above
+                            tile.currRowFrame = 4; // bottom shore
+                        if (map[index2 + _cols] is ILand && !(map[index2 - _cols] is ILand)) // check below
+                            tile.currRowFrame = 2; // top shore
+                        if (map[index2 - 1] is ILand && !(map[index2 + 1] is ILand))
+                            tile.currRowFrame = 3; // right shore
+                        if (map[index2 + 1] is ILand && !(map[index2 - 1] is ILand) && !(map[index2 - _cols] is ILand))
+                            tile.currRowFrame = 5; // left top corner shore
+                        if (map[index2 + 1] is ILand && !(map[index2 - 1] is ILand) && !(map[index2 + _cols] is ILand))
+                            tile.currRowFrame = 8; // left bottom corner shore
+                        if (map[index2 - 1] is ILand && !(map[index2 + 1] is ILand) && !(map[index2 - _cols] is ILand))
+                            tile.currRowFrame = 6; // right top corner shore
+                        if (map[index2 - 1] is ILand && !(map[index2 + 1] is ILand) && !(map[index2 + _cols] is ILand))
+                            tile.currRowFrame = 7; // right bottom corner shore
+
+
+                        tile.SetTileDesignColumn(RandomEvents.rand.Next(0, tile.nColumns));
+                    }
+                }
+
+                index2++;
+            }
         }
+
 
         private Sprite GetGroundObject(string key, string region, Vector2 loc, ContentManager content, GraphicsDevice graphics)
         {
@@ -119,13 +167,24 @@ namespace Gusto.GameMap
 
         public void DrawMap(SpriteBatch sb, GameTime gameTime)
         {
-
+            OceanTile shoreOceanTile = new OceanTile(0, null, Vector2.Zero, "GustoGame", _content, _graphics, "o2");
+            shoreOceanTile.transparency = 0.6f;
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
+
+            sb.Begin(_cam);
             foreach (var tile in BoundingBoxLocations.TilesInView)
             {
-                tile.Draw(sb, _cam);
+                // draw water under shore pieces so transparent backbuffer doesn't show through
+                if (tile.shorePiece)
+                {
+                    shoreOceanTile.location = tile.location;
+                    shoreOceanTile.DrawTile(sb);
+                }
+
+                tile.DrawTile(sb);
             }
+            sb.End();
         }
 
         public void LoadMapData(JObject data)

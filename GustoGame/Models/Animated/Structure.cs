@@ -15,6 +15,9 @@ namespace Gusto.Models.Animated
 {
     public class Structure : Sprite, IStructure, IHasInterior, ICanUpdate
     {
+
+        float msLightFrame;
+
         ContentManager _content;
         GraphicsDevice _graphics;
 
@@ -42,8 +45,33 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera cam)
         {
-            //throw new NotImplementedException();
             nearStructure = false;
+
+            // sructure lighting animation
+            foreach (var obj in structureInterior.interiorObjects)
+            {
+                if (obj is ILight)
+                {
+                    ILight l = (ILight)obj;
+                    Light lt = l.GetEmittingLight();
+                    if (lt.lit)
+                    {
+                        msLightFrame += gameTime.ElapsedGameTime.Milliseconds;
+                        if (msLightFrame > 500)
+                        {
+                            msLightFrame = 0;
+                            currColumnFrame++;
+                            if (currColumnFrame >= nColumns)
+                                currColumnFrame = 1;
+                        }
+                    }
+                    else
+                    {
+                        currColumnFrame = 0;
+                    }
+
+                }
+            }
         }
 
 

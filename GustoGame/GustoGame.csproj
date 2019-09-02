@@ -112,6 +112,7 @@
     <Compile Include="Models\Animated\CookingObject.cs" />
     <Compile Include="Models\Animated\CraftingObject.cs" />
     <Compile Include="Models\Animated\Container.cs" />
+    <Compile Include="Models\Interfaces\ILand.cs" />
     <Compile Include="Models\Interior.cs" />
     <Compile Include="Models\Animated\Storage.cs" />
     <Compile Include="Models\Animated\Furnace.cs" />

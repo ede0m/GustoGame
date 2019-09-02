@@ -26,6 +26,7 @@ namespace Gusto.Models
 
         public Sprite groundObject; // any tree, rock, etc asset we want to set to this tile.
         public bool wallPiece;
+        public bool shorePiece;
         
 
         // for digging in a tile
@@ -118,6 +119,31 @@ namespace Gusto.Models
 
                 }
             }
+        }
+
+        public void DrawTile(SpriteBatch sb)
+        {
+            int width = _texture.Width / nColumns;
+            int height = _texture.Height / nRows;
+
+            // update target index frame on sprite sheet (x and Y are cords of the sprite)
+            targetRectangle.X = width * currColumnFrame;
+            targetRectangle.Y = height * currRowFrame;
+            targetRectangle.Width = width;
+            targetRectangle.Height = height;
+
+            // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
+            SetBoundingBox();
+
+
+            Vector2 origin = new Vector2(width / 2, height / 2);
+            if (this is ITilePiece)
+            {
+                origin = Vector2.Zero;
+            }
+            // normal drawing call
+            sb.Draw(_texture, location, targetRectangle, Color.White * transparency, rotation,
+                origin, spriteScale, SpriteEffects.None, 0f);
         }
 
     }

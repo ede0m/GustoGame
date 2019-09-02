@@ -111,7 +111,7 @@ namespace Gusto
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
             Texture2D textureTeePee = Content.Load<Texture2D>("TeePee");
-            LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.14f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.5f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
             LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
@@ -157,8 +157,8 @@ namespace Gusto
             // Tile Pieces, Ground Objects and Invetory Items
             Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
             LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
-            Texture2D textureLand1 = Content.Load<Texture2D>("Land1Holes");
-            LoadDynamicBoundingBoxPerFrame(false, 4, 4, textureLand1, "landTile", 1.0f, 1.0f);
+            Texture2D textureLand1 = Content.Load<Texture2D>("Land1HolesShore");
+            LoadDynamicBoundingBoxPerFrame(false, 9, 4, textureLand1, "landTile", 1.0f, 1.0f);
             //Texture2D textureShipDeck1 = Content.Load<Texture2D>("ShipDeck");
             //LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureShipDeck1, "interiorTile", 1.0f, 1.0f);
             //Texture2D textureShipDeck1Wall = Content.Load<Texture2D>("ShipDeckWall");
