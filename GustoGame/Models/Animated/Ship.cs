@@ -83,7 +83,7 @@ namespace Gusto.Models.Animated
         public List<Ammo> Shots;
         public List<InventoryItem> actionInventory;
         public Interior shipInterior;
-        Ship boardingShip;
+        Guid boardingShipInteriorId;
         public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
@@ -153,7 +153,7 @@ namespace Gusto.Models.Animated
 
                 Ship sh = (Ship)collidedWith;
                 if (sh.teamType != teamType)
-                    boardingShip = sh;
+                    boardingShipInteriorId = sh.shipInterior.interiorId;
             }
         }
 
@@ -250,7 +250,7 @@ namespace Gusto.Models.Animated
             }
 
             // being boarded
-            if (boardingShip != null)
+            if (boardingShipInteriorId != Guid.Empty)
             {
                 msBoarding += gameTime.ElapsedGameTime.Milliseconds;
                 percentBoarded = msBoarding / 8000;
@@ -265,7 +265,7 @@ namespace Gusto.Models.Animated
             else
                 msBoarding = 0;
 
-            boardingShip = null;
+            boardingShipInteriorId = Guid.Empty;
         }
 
         private void PlayerUpdate(KeyboardState kstate, GameTime gameTime, Camera camera)
@@ -643,8 +643,8 @@ namespace Gusto.Models.Animated
             {
                 if (npc is INPC)
                 {
-                    boardingShip.shipInterior.interiorObjects.Add(npc);
-                    npc.location = boardingShip.shipInterior.RandomInteriorTile().location;
+                    BoundingBoxLocations.interiorMap[boardingShipInteriorId].interiorObjects.Add(npc);
+                    npc.location = BoundingBoxLocations.interiorMap[boardingShipInteriorId].RandomInteriorTile().location;
                     toRemove.Add(npc);
                 }
             }
