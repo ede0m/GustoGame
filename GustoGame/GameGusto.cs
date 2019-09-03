@@ -170,6 +170,10 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureShipInterior1Wall, "interiorTileWall", 1.0f, 1.0f);
             Texture2D textureTree1 = Content.Load<Texture2D>("Tree1");
             LoadDynamicBoundingBoxPerFrame(true, 2, 6, textureTree1, "tree1", 0.6f, 1.0f);
+            Texture2D textureTree2 = Content.Load<Texture2D>("Tree2");
+            LoadDynamicBoundingBoxPerFrame(true, 2, 4, textureTree2, "tree2", 0.6f, 1.0f);
+            Texture2D textureTree3 = Content.Load<Texture2D>("Tree3");
+            LoadDynamicBoundingBoxPerFrame(true, 2, 4, textureTree3, "tree3", 0.6f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSoftWood, "softWood", 0.5f, 1.0f);
             Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");

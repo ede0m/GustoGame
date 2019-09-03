@@ -62,6 +62,26 @@ namespace Gusto.Mappings
                     },
                 }
             },
+            { "tree2", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"softWood", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 4 },
+                            {"percentDrop", 100 }
+                        }
+                    },
+                }
+            },
+            { "tree3", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"softWood", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 4 },
+                            {"percentDrop", 100 }
+                        }
+                    },
+                }
+            },
             { "grass1", new Dictionary<string, Dictionary<string, float>>
                 {
                     {"islandGrass", new Dictionary<string, float>

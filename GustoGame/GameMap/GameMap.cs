@@ -97,6 +97,10 @@ namespace Gusto.GameMap
                             tile = new LandTile(index, groundObject, worldLoc, regionName, content, graphics, "l1");
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
+                        case "l2":
+                            tile = new LandTile(index, groundObject, worldLoc, regionName, content, graphics, "l2");
+                            BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
+                            break;
                     }
 
                     worldLoc.X += tileWidth;
@@ -157,6 +161,10 @@ namespace Gusto.GameMap
             {
                 case "t1":
                     return new Tree1(TeamType.GroundObject, region, loc, content, graphics);
+                case "t2":
+                    return new Tree2(TeamType.GroundObject, region, loc, content, graphics);
+                case "t3":
+                    return new Tree3(TeamType.GroundObject, region, loc, content, graphics);
                 case "gr1":
                     return new Grass1(TeamType.GroundObject, region, loc, content, graphics);
                 case "rk1":

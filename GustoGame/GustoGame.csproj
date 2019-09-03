@@ -58,6 +58,8 @@
     <Compile Include="AnimatedSprite\GameMap\Interior\ShipInteriorTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\Interior\ShipInteriorTileWall.cs" />
     <Compile Include="AnimatedSprite\GameMap\Rock1.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Tree2.cs" />
+    <Compile Include="AnimatedSprite\GameMap\Tree3.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\AnvilItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseBarrelItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseChestItem.cs" />
