@@ -510,7 +510,7 @@ namespace Gusto
                 }
 
                 // sort sprites by y cord asc and draw
-                DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+                DrawOrder.Sort((a, b) => a.GetBoundingBox().Bottom.CompareTo(b.GetBoundingBox().Bottom));
                 int i = 0;
                 foreach (var sprite in DrawOrder)
                 {

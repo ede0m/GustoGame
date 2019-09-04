@@ -256,8 +256,7 @@ namespace Gusto.Models
             }
 
             List<Sprite> drawOrder = interiorObjects.ToList();
-            //drawOrder.AddRange(interiorGroundObjects.ToList());
-            drawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+            drawOrder.Sort((a, b) => a.GetBoundingBox().Bottom.CompareTo(b.GetBoundingBox().Bottom));
             // Draw any interior objs
             foreach (var obj in drawOrder)
             {

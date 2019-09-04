@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(430, -400), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(-1400, -1500), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
@@ -74,7 +74,7 @@ namespace Gusto
 
             BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
             Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
-            Tower tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), _content, _graphics);
+            Tower tower = new BaseTower(TeamType.B, "GustoMap", new Vector2(-1600, -1500), _content, _graphics);
             ClayFurnace furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), _content, _graphics);
             CraftingAnvil craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoMap", new Vector2(120, 40), _content, _graphics);
             BaseBarrel barrelLand = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(-20, -160), _content, _graphics);
