@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimatedSprite\BaseBarrel.cs" />
+    <Compile Include="AnimatedSprite\BaseCat.cs" />
     <Compile Include="AnimatedSprite\BaseChest.cs" />
     <Compile Include="AnimatedSprite\CampFire.cs" />
     <Compile Include="AnimatedSprite\Chicken.cs" />

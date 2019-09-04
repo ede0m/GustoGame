@@ -151,6 +151,7 @@ namespace Gusto.Models.Animated
         {
             switch (team)
             {
+                case TeamType.B:
                 case TeamType.A:
                     // Movement
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)

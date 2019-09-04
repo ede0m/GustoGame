@@ -71,6 +71,8 @@ namespace Gusto.Models.Animated
                 if (!ball.exploded)
                     health -= 5;
             }
+
+            collidedWith.colliding = false;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
