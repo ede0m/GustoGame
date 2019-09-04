@@ -426,9 +426,9 @@ namespace Gusto.Models.Animated
                 }
                 else
                 {
-                    Tuple<int, int> shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
+                    //Vector2 shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
                     BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
-                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), 0);
+                    cannonShot.SetFireAtDirection(endAimLineFull, RandomEvents.rand.Next(10, 25), 0);
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                     timeSinceLastShot = 0;
@@ -458,11 +458,11 @@ namespace Gusto.Models.Animated
                 // AI ship direction and movement
                 if (timeSinceLastTurn > millisecondsPerTurn)
                 {
-                    Tuple<int, int> target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+                    Vector2? target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox(), inInteriorId);
                     if (target != null)
                     {
                         roaming = false;
-                        var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Item1, location.X, target.Item2, location.Y);
+                        var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Value.X, location.X, target.Value.Y, location.Y);
                         if (distanceToTarget <= stopRange || health <= 0)
                         {
                             moving = false;
@@ -482,7 +482,7 @@ namespace Gusto.Models.Animated
                             randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
 
                         roaming = true;
-                        target = new Tuple<int, int>((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
+                        target = new Vector2((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
                         if (GetBoundingBox().Intersects(randomRoamTile.GetBoundingBox()))
                             roaming = false;
 
@@ -520,14 +520,14 @@ namespace Gusto.Models.Animated
                             else
                             {
                                 if (!nonCollidingLOSMap.ContainsKey(crf))
-                                    nonCollidingLOSMap.Add(crf, PhysicsUtility.VectorMagnitude(target.Item1, pointOfSight.X, target.Item2, pointOfSight.Y));
+                                    nonCollidingLOSMap.Add(crf, PhysicsUtility.VectorMagnitude(target.Value.X, pointOfSight.X, target.Value.Y, pointOfSight.Y));
                             }
                         }
                         crf++;
                     }
 
                     if (!probesCollides)
-                        currRowFrame = AIUtility.SetAIShipDirection(target, location);
+                        currRowFrame = AIUtility.SetAIShipDirection(target.Value, location);
                     else
                     {
                         if (nonCollidingLOSMap.Keys.Count == 0)
@@ -560,7 +560,7 @@ namespace Gusto.Models.Animated
                 timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
                 if (timeSinceLastShot > millisecondsNewShot && health > 0)
                 {
-                    Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox());
+                    Vector2? shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox(), inInteriorId);
                     if (shotDirection != null)
                     {
                         Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
@@ -569,7 +569,7 @@ namespace Gusto.Models.Animated
                         int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
                         cannonShot.location.X -= cannonBallTextureCenterOffsetX;
                         cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
-                        cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
+                        cannonShot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
                         cannonShot.moving = true;
                         Shots.Add(cannonShot);
                     }

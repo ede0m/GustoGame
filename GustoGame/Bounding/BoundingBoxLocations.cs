@@ -13,11 +13,11 @@ namespace Gusto.Bounding
 {
     public class BoundingBoxLocations
     {
-        public static Dictionary<TeamType, List<Tuple<int,int>>> BoundingBoxLocationMap = new Dictionary<TeamType, List<Tuple<int, int>>>()
+        public static Dictionary<TeamType, List<Tuple<Vector2, Guid>>> BoundingBoxLocationMap = new Dictionary<TeamType, List<Tuple<Vector2, Guid>>>()
         {
-            {TeamType.Player, new List<Tuple<int,int>>()},
-            {TeamType.A, new List<Tuple<int, int>>() },
-            {TeamType.B, new List<Tuple<int, int>>() }
+            {TeamType.Player, new List<Tuple<Vector2,Guid>>()},
+            {TeamType.A, new List<Tuple<Vector2,Guid>>() },
+            {TeamType.B, new List<Tuple<Vector2,Guid>>() }
         };
 
         public static Dictionary<string, Region> RegionMap = new Dictionary<string, Region>();

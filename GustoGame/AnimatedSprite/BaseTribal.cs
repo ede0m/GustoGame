@@ -21,7 +21,7 @@ namespace Gusto.AnimatedSprite
             millisecondToDie = 10000;
             millisecondsPerTurnFrame = 500; // turn speed
             millisecondsPerWalkFrame = 100; // turn speed
-            millisecondsCombatSwing = 75;
+            millisecondsCombatMove = 75;
 
             fullHealth = 25;
             health = fullHealth;

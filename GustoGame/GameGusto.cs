@@ -750,17 +750,17 @@ namespace Gusto
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
                 {
                     Tower tower = (Tower)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
                 {
                     PlayerPirate player = (PlayerPirate)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();

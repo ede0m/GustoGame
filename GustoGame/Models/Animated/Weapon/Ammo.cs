@@ -72,13 +72,13 @@ namespace Gusto.Models.Animated
             SpatialBounding.SetQuad(GetBase());
         }
 
-        public void SetFireAtDirection(Tuple<int,int> fireAtDirection, int shotSpeed, int aimOffset)
+        public void SetFireAtDirection(Vector2 fireAtDirection, int shotSpeed, int aimOffset)
         {
-            vectorMagnitude = PhysicsUtility.VectorMagnitude(GetBoundingBox().X, fireAtDirection.Item1, GetBoundingBox().Y, fireAtDirection.Item2);
-            shotLenX = Math.Max(fireAtDirection.Item1, GetBoundingBox().X) - Math.Min(fireAtDirection.Item1, GetBoundingBox().X);
-            shotLenY = Math.Max(fireAtDirection.Item2, GetBoundingBox().Y) - Math.Min(fireAtDirection.Item2, GetBoundingBox().Y);
-            shotDirX = (fireAtDirection.Item1 - GetBoundingBox().X + aimOffset) / vectorMagnitude  * shotSpeed;
-            shotDirY = (fireAtDirection.Item2 - GetBoundingBox().Y + aimOffset) /vectorMagnitude * shotSpeed;
+            vectorMagnitude = PhysicsUtility.VectorMagnitude(GetBoundingBox().X, fireAtDirection.X, GetBoundingBox().Y, fireAtDirection.Y);
+            shotLenX = Math.Max((int)fireAtDirection.X, GetBoundingBox().X) - Math.Min((int)fireAtDirection.X, GetBoundingBox().X);
+            shotLenY = Math.Max((int)fireAtDirection.Y, GetBoundingBox().Y) - Math.Min((int)fireAtDirection.Y, GetBoundingBox().Y);
+            shotDirX = (fireAtDirection.X - GetBoundingBox().X + aimOffset) / vectorMagnitude  * shotSpeed;
+            shotDirY = (fireAtDirection.Y - GetBoundingBox().Y + aimOffset) /vectorMagnitude * shotSpeed;
         }
     }
 }

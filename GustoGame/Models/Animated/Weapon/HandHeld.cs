@@ -93,7 +93,7 @@ namespace Gusto.Models.Animated
                     currColumnFrame = 1;
                     timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
 
-                    Tuple<int, int> shotDirection = null;
+                    Vector2? shotDirection = null;
                     int shotOffsetX = 0;
                     int shotOffsetY = 0;
                     bool shootHorz = false;
@@ -168,9 +168,9 @@ namespace Gusto.Models.Animated
                                 if (!shootUp && !shootDown)
                                 {
                                     if (currRowFrame == 1) // right
-                                        shotDirection = new Tuple<int, int>((int)pistolShot.GetBoundingBox().Center.ToVector2().X + shotRange, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y);
+                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X + shotRange, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y);
                                     else
-                                        shotDirection = new Tuple<int, int>((int)pistolShot.GetBoundingBox().Center.ToVector2().X - shotRange, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y);
+                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X - shotRange, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y);
                                 }
                                 else
                                 {
@@ -178,16 +178,16 @@ namespace Gusto.Models.Animated
                                     if (shootUp)
                                     {
                                         if (currRowFrame == 1)
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
                                         else
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
                                     }
                                     else
                                     {
                                         if (currRowFrame == 1)
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
                                         else
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
                                     }
                                 }
                             }
@@ -197,9 +197,9 @@ namespace Gusto.Models.Animated
                                 if (!shootLeft && !shootRight)
                                 {
                                     if (currRowFrame == 0) // down
-                                        shotDirection = new Tuple<int, int>((int)pistolShot.GetBoundingBox().Center.ToVector2().X, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y + shotRange);
+                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y + shotRange);
                                     else
-                                        shotDirection = new Tuple<int, int>((int)pistolShot.GetBoundingBox().Center.ToVector2().X, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y - shotRange);
+                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y - shotRange);
                                 }
                                 else
                                 {
@@ -207,21 +207,21 @@ namespace Gusto.Models.Animated
                                     if (shootLeft)
                                     {
                                         if (currRowFrame == 0)
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
                                         else
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
                                     }
                                     else
                                     {
                                         if (currRowFrame == 0)
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
                                         else
-                                            shotDirection = new Tuple<int, int>((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
                                     }
                                 }
                             }
 
-                            pistolShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), 0);
+                            pistolShot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), 0);
                             pistolShot.moving = true;
                             Shots.Add(pistolShot);
                             ammoLoaded.amountStacked -= 1;
