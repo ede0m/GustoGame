@@ -142,7 +142,6 @@ namespace Gusto.Models.Animated
 
             UpdateNpcMovement(teamType, gameTime);
 
-
             colliding = false;
             swimming = true;
         }
@@ -246,6 +245,63 @@ namespace Gusto.Models.Animated
                             }
                             timeSinceCombat += gameTime.ElapsedGameTime.Milliseconds;
                         }
+                    }
+                    break;
+
+
+                case TeamType.PassiveGround:
+
+                    if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
+                    {
+                        if (roaming) // region only rn
+                        {
+                            // go towards random tile
+                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
+                            currRowFrame = frames.Item1;
+                            directionalFrame = frames.Item2;
+
+                            // passive ground can't travel through water
+                            if (swimming)
+                                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)];
+
+                            // FIND a better way to get this value - can't have references
+                            if (npcInInterior != null)
+                                randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
+
+                            if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
+                                roaming = false;
+                        }
+                        else
+                        {
+                            if (npcInInterior != null)
+                            {
+                                randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
+                            }
+                            else
+                                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
+                            roaming = true;
+                        }
+                        timeSinceLastTurnFrame = 0;
+                    }
+
+                    // walking animation
+                    if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
+                    {
+                        currColumnFrame++;
+                        if (currColumnFrame <= 5) // stop before idle frames
+                            moving = false;
+                        else
+                            moving = true;
+                        if (currColumnFrame >= nColumns)
+                            currColumnFrame = 0;
+                        timeSinceLastWalkFrame = 0;
+                    }
+
+                    if (moving && !dying)
+                    {
+                        // actual "regular" movement
+                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
+                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
                     }
                     break;
             }

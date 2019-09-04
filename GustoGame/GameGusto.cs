@@ -117,6 +117,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
             LoadDynamicBoundingBoxPerFrame(false, 4, 12, textureBaseTribal, "baseTribal", 1.0f, 1.0f);
+            Texture2D textureChicken = Content.Load<Texture2D>("Chicken");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 10, textureBaseTribal, "chicken", 0.7f, 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");

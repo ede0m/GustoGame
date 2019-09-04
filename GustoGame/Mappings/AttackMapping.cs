@@ -15,7 +15,8 @@ namespace Gusto.Mappings
                 {
                     { TeamType.Player, true },
                     { TeamType.B, true},
-                    { TeamType.A, false}
+                    { TeamType.A, false},
+                    { TeamType.PassiveGround, false},
                 }
             },
             { TeamType.B, new Dictionary<TeamType, bool>

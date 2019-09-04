@@ -58,7 +58,6 @@ namespace Gusto
 
             //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP that is easily scalable
             List<Sprite> giannaLandTiles = BoundingBoxLocations.RegionMap["Gianna"].RegionLandTiles;
-            Sprite GiannaRegionTile = giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)];
             var screenCenter = new Vector2(_graphics.Viewport.Bounds.Width / 2, _graphics.Viewport.Bounds.Height / 2);
 
             BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), _content, _graphics);
@@ -73,7 +72,8 @@ namespace Gusto
             teePee.structureInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(teePee.structureInterior.interiorId, teePee.structureInterior);
 
-            BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", GiannaRegionTile.location, _content, _graphics);
+            BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
+            Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), _content, _graphics);
             ClayFurnace furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), _content, _graphics);
             CraftingAnvil craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoMap", new Vector2(120, 40), _content, _graphics);
@@ -120,6 +120,7 @@ namespace Gusto
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(player);
             UpdateOrder.Add(baseTribalLand);
+            UpdateOrder.Add(chickenLand);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(teePee);
 
