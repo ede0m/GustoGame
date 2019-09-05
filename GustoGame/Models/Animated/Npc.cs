@@ -18,15 +18,20 @@ namespace Gusto.Models.Animated
 {
     public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, INPC
     {
-        public float timeSinceLastTurnFrame;
-        public float timeSinceLastWalkFrame;
-        public float timeSinceCombat;
-        public float timeSinceExitShipStart;
-        public float timeSinceStartDying;
+        float timeSinceLastTurnFrame;
+        float timeSinceLastWalkFrame;
+        float timeSinceCombat;
+        float timeSinceExitShipStart;
+        float timeSinceStartDying;
+        float timeSinceIdleAnimate;
+        float timeSinceIdleFrame;
         public float millisecondsPerTurnFrame;
         public float millisecondsPerWalkFrame;
         public float millisecondsCombatMove;
         public float millisecondToDie;
+        public float msIdleWaitTime;
+
+        public int combatFrameIndex;
 
         public float health;
         public float fullHealth;
@@ -43,6 +48,7 @@ namespace Gusto.Models.Animated
         public bool inCombat;
         public bool roaming;
         public bool defense;
+        public bool idle;
         public List<InventoryItem> inventory;
         public Interior npcInInterior;
         public Sprite randomRegionRoamTile;
@@ -156,12 +162,13 @@ namespace Gusto.Models.Animated
                     // Movement
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
+                        // attack range
                         Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             // IN COMBAT
                             if (!inCombat)
-                                currColumnFrame = 7;
+                                currColumnFrame = combatFrameIndex;
                             inCombat = true;
                             Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
                             currRowFrame = frames.Item1;
@@ -199,6 +206,7 @@ namespace Gusto.Models.Animated
                                 if (npcInInterior != null)
                                     randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
 
+                                // found roam tile
                                 if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
                                     roaming = false;
                             }
@@ -221,7 +229,7 @@ namespace Gusto.Models.Animated
                         if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
                         {
                             currColumnFrame++;
-                            if (currColumnFrame >= 7) // stop before combat frames
+                            if (currColumnFrame >= combatFrameIndex) // stop before combat frames
                                 currColumnFrame = 0;
                             timeSinceLastWalkFrame = 0;
                         }
@@ -289,7 +297,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
                     {
                         currColumnFrame++;
-                        if (currColumnFrame <= 5) // stop before idle frames
+                        if (currColumnFrame <= 5) // stop on in row idle frames
                             moving = false;
                         else
                             moving = true;
@@ -304,6 +312,92 @@ namespace Gusto.Models.Animated
                         location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
                         location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
                     }
+                    break;
+
+                case TeamType.DefenseGround: // Doesn't roam
+
+                    if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
+                    {
+                        // if target within range, move towards it
+                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 5, GetBoundingBox(), inInteriorId);
+                        if (targetV != null)
+                        {
+                            idle = false;
+                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
+                            currRowFrame = frames.Item1 + 1; // plus one to skip the idle frame
+                            directionalFrame = frames.Item2;
+                            moving = true;
+                        }
+                        else
+                            idle = true;
+
+                        // attack range
+                        targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
+                        if (targetV != null)
+                        {
+                            idle = false;
+                            // IN COMBAT
+                            if (!inCombat)
+                                currColumnFrame = combatFrameIndex;
+                            inCombat = true;
+                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
+                            currRowFrame = frames.Item1 + 1; // plus one to skip the idle frame
+                            directionalFrame = frames.Item2;
+                        }
+
+                        timeSinceLastTurnFrame = 0;
+                    }
+
+                    if (idle)
+                    {
+                        moving = false;
+                        currRowFrame = 0;
+                        timeSinceIdleAnimate += gameTime.ElapsedGameTime.Milliseconds;
+                        if (timeSinceIdleAnimate > msIdleWaitTime) 
+                        {
+                            timeSinceIdleFrame += gameTime.ElapsedGameTime.Milliseconds;
+                            if (timeSinceIdleFrame > 100)
+                            {
+                                currColumnFrame++;
+                                timeSinceIdleFrame = 0;
+                                if (currColumnFrame >= nColumns)
+                                {
+                                    currColumnFrame = 0;
+                                    timeSinceIdleAnimate = 0;
+                                }
+                            }
+                        }
+                    }
+                    else if (moving && !inCombat && !dying)
+                    {
+                        // moving animation
+                        if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
+                        {
+                            currColumnFrame++;
+                            if (currColumnFrame >= combatFrameIndex) // stop before combat frames
+                                currColumnFrame = 0;
+                            timeSinceLastWalkFrame = 0;
+                        }
+
+                        // actual "regular" movement
+                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
+                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
+                    }
+                    else if (inCombat)
+                    {
+                        if (timeSinceCombat > millisecondsCombatMove && !dying)
+                        {
+                            currColumnFrame++;
+                            if (currColumnFrame >= nColumns)
+                            {
+                                inCombat = false;
+                                currColumnFrame = 6;
+                            }
+                            timeSinceCombat = 0;
+                        }
+                        timeSinceCombat += gameTime.ElapsedGameTime.Milliseconds;
+                    }
+
                     break;
             }
         }

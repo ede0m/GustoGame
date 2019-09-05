@@ -120,7 +120,9 @@ namespace Gusto
             Texture2D textureBaseCat = Content.Load<Texture2D>("Cat1");
             LoadDynamicBoundingBoxPerFrame(false, 4, 12, textureBaseCat, "baseCat", 0.7f, 1.0f);
             Texture2D textureChicken = Content.Load<Texture2D>("Chicken");
-            LoadDynamicBoundingBoxPerFrame(false, 4, 10, textureBaseTribal, "chicken", 0.7f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 4, 10, textureChicken, "chicken", 0.7f, 1.0f);
+            Texture2D textureSnake = Content.Load<Texture2D>("Snake1");
+            LoadDynamicBoundingBoxPerFrame(false, 5, 9, textureSnake, "snake", 0.7f, 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");

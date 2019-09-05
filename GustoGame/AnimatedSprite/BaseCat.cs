@@ -16,12 +16,12 @@ namespace Gusto.AnimatedSprite
     {
         public BaseCat(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
-            timeSinceLastTurnFrame = 0;
-            timeSinceLastWalkFrame = 0;
             millisecondToDie = 10000;
             millisecondsPerTurnFrame = 400; // turn speed
             millisecondsPerWalkFrame = 100; // turn speed
             millisecondsCombatMove = 75;
+
+            combatFrameIndex = 7;
 
             fullHealth = 50;
             health = fullHealth;
