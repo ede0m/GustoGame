@@ -25,9 +25,29 @@ namespace Gusto.Mappings
                     {"shortSword", new Dictionary<string, float>
                         {
                             {"maxDrop", 1 },
-                            {"percentDrop", 50 }
+                            {"percentDrop", 20 }
                         }
                     }
+                }
+            },
+            { "baseCat", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"shortSword", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 20 }
+                        }
+                    }
+                }
+            },
+            { "chicken", new Dictionary<string, Dictionary<string, float>>
+                {
+
+                }
+            },
+            { "snake", new Dictionary<string, Dictionary<string, float>>
+                {
+
                 }
             },
             { "teePee", new Dictionary<string, Dictionary<string, float>>

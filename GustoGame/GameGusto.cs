@@ -117,6 +117,12 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 11, texturePlayerPirate, "playerPirate", 1.0f, 1.0f);
             Texture2D textureBaseTribal = Content.Load<Texture2D>("Tribal1");
             LoadDynamicBoundingBoxPerFrame(false, 4, 12, textureBaseTribal, "baseTribal", 1.0f, 1.0f);
+            Texture2D textureBaseCat = Content.Load<Texture2D>("Cat1");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 12, textureBaseCat, "baseCat", 0.7f, 1.0f);
+            Texture2D textureChicken = Content.Load<Texture2D>("Chicken");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 10, textureChicken, "chicken", 0.7f, 1.0f);
+            Texture2D textureSnake = Content.Load<Texture2D>("Snake1");
+            LoadDynamicBoundingBoxPerFrame(false, 5, 9, textureSnake, "snake", 0.7f, 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
@@ -508,7 +514,7 @@ namespace Gusto
                 }
 
                 // sort sprites by y cord asc and draw
-                DrawOrder.Sort((a, b) => a.GetYPosition().CompareTo(b.GetYPosition()));
+                DrawOrder.Sort((a, b) => a.GetBoundingBox().Bottom.CompareTo(b.GetBoundingBox().Bottom));
                 int i = 0;
                 foreach (var sprite in DrawOrder)
                 {
@@ -750,17 +756,17 @@ namespace Gusto
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
                 {
                     Tower tower = (Tower)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
                 {
                     PlayerPirate player = (PlayerPirate)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<int, int>(spriteA.GetBoundingBox().X, spriteA.GetBoundingBox().Y));
+                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();

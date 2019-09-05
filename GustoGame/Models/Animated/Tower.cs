@@ -71,6 +71,8 @@ namespace Gusto.Models.Animated
                 if (!ball.exploded)
                     health -= 5;
             }
+
+            collidedWith.colliding = false;
         }
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
@@ -102,11 +104,11 @@ namespace Gusto.Models.Animated
 
             if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving && health > 0)
             {
-                Tuple<int, int> shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox());
+                Vector2? shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox(), inInteriorId);
                 if (shotDirection != null)
                 {
                     BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, location, _content, _graphics);
-                    cannonShot.SetFireAtDirection(shotDirection, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset
+                    cannonShot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                 }

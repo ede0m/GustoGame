@@ -11,6 +11,8 @@ namespace Gusto.AnimatedSprite
         Gusto,
         GroundObject,
         Player,
+        PassiveGround,
+        DefenseGround,
         A,
         B,
         C

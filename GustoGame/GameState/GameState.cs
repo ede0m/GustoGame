@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(430, -400), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(120, -850), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
@@ -58,14 +58,15 @@ namespace Gusto
 
             //TEMPORARY NEED TO CREATE SOME SORT OF GAME SETUP / REGION SETUP that is easily scalable
             List<Sprite> giannaLandTiles = BoundingBoxLocations.RegionMap["Gianna"].RegionLandTiles;
-            Sprite GiannaRegionTile = giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)];
+            List<Sprite> scLandTiles = BoundingBoxLocations.RegionMap["SnooCat"].RegionLandTiles;
+            List<Sprite> usoppLandTiles = BoundingBoxLocations.RegionMap["Usopp"].RegionLandTiles;
             var screenCenter = new Vector2(_graphics.Viewport.Bounds.Width / 2, _graphics.Viewport.Bounds.Height / 2);
 
             BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), _content, _graphics);
             baseShip.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShip.shipInterior.interiorId, baseShip.shipInterior);
 
-            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(470, 0), _content, _graphics);
+            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(-470, 0), _content, _graphics);
             baseShipAI.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
 
@@ -73,8 +74,11 @@ namespace Gusto
             teePee.structureInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(teePee.structureInterior.interiorId, teePee.structureInterior);
 
-            BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", GiannaRegionTile.location, _content, _graphics);
-            Tower tower = new BaseTower(TeamType.A, "GustoMap", new Vector2(200, 700), _content, _graphics);
+            BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
+            BaseCat baseCatLand = new BaseCat(TeamType.B, "SnooCat", scLandTiles[RandomEvents.rand.Next(scLandTiles.Count)].location, _content, _graphics);
+            Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
+            Snake snakeLand = new Snake(TeamType.DefenseGround, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
+            Tower tower = new BaseTower(TeamType.B, "GustoMap", new Vector2(-1600, -1500), _content, _graphics);
             ClayFurnace furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), _content, _graphics);
             CraftingAnvil craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoMap", new Vector2(120, 40), _content, _graphics);
             BaseBarrel barrelLand = new BaseBarrel(TeamType.A, "GustoMap", new Vector2(-20, -160), _content, _graphics);
@@ -120,6 +124,9 @@ namespace Gusto
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(player);
             UpdateOrder.Add(baseTribalLand);
+            UpdateOrder.Add(baseCatLand);
+            UpdateOrder.Add(chickenLand);
+            UpdateOrder.Add(snakeLand);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(teePee);
 
@@ -521,6 +528,27 @@ namespace Gusto
                     bt.health = npcs.health;
                     bt.inventory = DeserializeInventory(npcs.inventory);
                     return bt;
+
+                case "baseCat":
+                    npcs = (NpcState)objSave;
+                    BaseCat bct = new BaseCat(npcs.team, npcs.region, npcs.location, _content, _graphics);
+                    bct.health = npcs.health;
+                    bct.inventory = DeserializeInventory(npcs.inventory);
+                    return bct;
+
+                case "chicken":
+                    npcs = (NpcState)objSave;
+                    Chicken chk = new Chicken(npcs.team, npcs.region, npcs.location, _content, _graphics);
+                    chk.health = npcs.health;
+                    chk.inventory = DeserializeInventory(npcs.inventory);
+                    return chk;
+
+                case "snake":
+                    npcs = (NpcState)objSave;
+                    Snake snk = new Snake(npcs.team, npcs.region, npcs.location, _content, _graphics);
+                    snk.health = npcs.health;
+                    snk.inventory = DeserializeInventory(npcs.inventory);
+                    return snk;
 
                 case "teePee":
                     sts = (StructureState)objSave;

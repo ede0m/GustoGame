@@ -43,8 +43,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimatedSprite\BaseBarrel.cs" />
+    <Compile Include="AnimatedSprite\BaseCat.cs" />
     <Compile Include="AnimatedSprite\BaseChest.cs" />
     <Compile Include="AnimatedSprite\CampFire.cs" />
+    <Compile Include="AnimatedSprite\Chicken.cs" />
     <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
     <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\TribalTokens.cs" />
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\ShortSword.cs" />
+    <Compile Include="AnimatedSprite\Snake.cs" />
     <Compile Include="AnimatedSprite\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
     <Compile Include="AnimatedSprite\TeePee.cs" />
