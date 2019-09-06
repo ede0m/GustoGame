@@ -598,22 +598,6 @@ namespace Gusto
                         continue;
                     }
 
-                    /*else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
-                    {
-                        Crafter craft = (Crafter)sprite;
-                        if (craft.drawCraftingMenu)
-                            showCraftingMenu = true;
-                        craftSet = craft.craftSet;
-                    }
-
-                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Cooker))
-                    {
-                        Cooker craft = (Cooker)sprite;
-                        if (craft.drawCraftingMenu)
-                            showCraftingMenu = true;
-                        craftSet = craft.craftSet;
-                    }*/
-
                     else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
                     {
                         Npc enemy = (Npc)sprite;

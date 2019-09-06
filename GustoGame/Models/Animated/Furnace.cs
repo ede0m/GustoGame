@@ -128,7 +128,7 @@ namespace Gusto.Models.Animated
                         {
                             item.amountStacked -= 2;
                         }
-                        if (item is IOre)
+                        /*if (item is IOre)
                         {
                             if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal) && !hasCoal)
                                 item.amountStacked -= 1;
@@ -137,7 +137,7 @@ namespace Gusto.Models.Animated
                                 oreType = CheckOreType(item.GetType());
                                 item.amountStacked -= 8;
                             }
-                        }
+                        }*/
                     }
                     smelting = true;
                 }

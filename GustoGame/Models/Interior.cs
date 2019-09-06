@@ -320,28 +320,6 @@ namespace Gusto.Models
                         invStorage = storage;
                     }
                 }
-
-                /*if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
-                {
-                    Crafter craft = (Crafter)obj;
-                    craft.DrawCanCraft(sb, cam);
-                    if (craft.drawCraftingMenu)
-                        showCraftingMenu = true;
-                    else
-                        showCraftingMenu = false;
-                    craftSet = craft.craftSet;
-                }
-
-                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Cooker))
-                {
-                    Cooker craft = (Cooker)obj;
-                    craft.DrawCanCraft(sb, cam);
-                    if (craft.drawCraftingMenu)
-                        showCraftingMenu = true;
-                    else
-                        showCraftingMenu = false;
-                    craftSet = craft.craftSet;
-                }*/
             }
 
             tilesSet = true;
