@@ -591,17 +591,17 @@ namespace Gusto
                         continue;
                     }
 
-                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.CraftingObject))
+                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
                     {
-                        CraftingObject craft = (CraftingObject)sprite;
+                        Crafter craft = (Crafter)sprite;
                         if (craft.drawCraftingMenu)
                             showCraftingMenu = true;
                         craftSet = craft.craftSet;
                     }
 
-                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.CookingObject))
+                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Cooker))
                     {
-                        CookingObject craft = (CookingObject)sprite;
+                        Cooker craft = (Cooker)sprite;
                         if (craft.drawCraftingMenu)
                             showCraftingMenu = true;
                         craftSet = craft.craftSet;

@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class CookingObject : Sprite, ICanUpdate, IPlaceable, ICraftingObject, ILight
+    public class Cooker : Sprite, ICanUpdate, IPlaceable, ICraftingObject, ILight
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -42,7 +42,7 @@ namespace Gusto.Models.Animated
         PiratePlayer playerNearItem;
         public TeamType teamType;
 
-        public CookingObject(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public Cooker(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             _content = content;
             _graphics = graphics;

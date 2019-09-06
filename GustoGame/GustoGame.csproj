@@ -114,8 +114,8 @@
     <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
-    <Compile Include="Models\Animated\CookingObject.cs" />
-    <Compile Include="Models\Animated\CraftingObject.cs" />
+    <Compile Include="Models\Animated\Cooker.cs" />
+    <Compile Include="Models\Animated\Crafter.cs" />
     <Compile Include="Models\Animated\Container.cs" />
     <Compile Include="Models\Interfaces\ICookingObject.cs" />
     <Compile Include="Models\Interfaces\ILand.cs" />

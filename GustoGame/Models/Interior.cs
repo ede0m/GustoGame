@@ -315,9 +315,9 @@ namespace Gusto.Models
                     }
                 }
 
-                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.CraftingObject))
+                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
                 {
-                    CraftingObject craft = (CraftingObject)obj;
+                    Crafter craft = (Crafter)obj;
                     craft.DrawCanCraft(sb, cam);
                     if (craft.drawCraftingMenu)
                         showCraftingMenu = true;
@@ -326,9 +326,9 @@ namespace Gusto.Models
                     craftSet = craft.craftSet;
                 }
 
-                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.CookingObject))
+                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Cooker))
                 {
-                    CookingObject craft = (CookingObject)obj;
+                    Cooker craft = (Cooker)obj;
                     craft.DrawCanCraft(sb, cam);
                     if (craft.drawCraftingMenu)
                         showCraftingMenu = true;
