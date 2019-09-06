@@ -19,6 +19,11 @@ namespace Gusto.Models.Animated
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
+        bool nearObj;
+        public bool drawCraftingMenu;
+
+        public string craftSet;
+
         string recipe;
         public bool canCraft;
         public bool cooking;
@@ -55,6 +60,7 @@ namespace Gusto.Models.Animated
             if (collidedWith.bbKey.Equals("playerPirate") && !canCraft)
             {
                 playerNearItem = (PiratePlayer)collidedWith;
+                nearObj = true;
 
                 // check inventory to see if we have required materials
                 int nWood = 0;
@@ -95,9 +101,9 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+            // start the fire
             if (canCraft && kstate.IsKeyDown(Keys.C)) // TODO: and keypress time
             {
-                // TODO: animate
 
                 bool hasGrass = false;
                 bool hasWood = false;
@@ -121,7 +127,6 @@ namespace Gusto.Models.Animated
                     }
                     cooking = true;
                 }
-
             }
 
             if (cooking)
@@ -136,6 +141,21 @@ namespace Gusto.Models.Animated
                     msThisFrame = 0;
                     if (currColumnFrame == nColumns)
                         currColumnFrame = 1;
+                }
+            }
+
+
+            if (nearObj && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu && cooking)
+            {
+                // TODO: bring up crafting menu
+                drawCraftingMenu = true;
+            }
+
+            if (drawCraftingMenu)
+            {
+                if (kstate.IsKeyDown(Keys.Escape) || !nearObj)
+                {
+                    drawCraftingMenu = false;
                 }
             }
 
@@ -198,6 +218,7 @@ namespace Gusto.Models.Animated
 
 
             canCraft = false;
+            nearObj = false;
             playerNearItem = null;
         }
 

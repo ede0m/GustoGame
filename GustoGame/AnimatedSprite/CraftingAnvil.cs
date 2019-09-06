@@ -16,6 +16,8 @@ namespace Gusto.AnimatedSprite
         public CraftingAnvil(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
 
+            craftSet = "craftT1";
+
             Texture2D texture = content.Load<Texture2D>("Anvil");
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

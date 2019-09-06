@@ -441,6 +441,7 @@ namespace Gusto
             // trackers for statically drawn sprites as we move through draw order
             bool showCraftingMenu = false;
             bool showStorageMenu = false;
+            string craftSet = null;
             Ship playerShip = gameState.player.playerOnShip;
             List<InventoryItem> invItemsPlayer = gameState.player.inventory;
             List<InventoryItem> invItemsShip = (gameState.player.playerOnShip == null) ? null : gameState.player.playerOnShip.actionInventory;
@@ -474,6 +475,7 @@ namespace Gusto
 
                 showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
                 showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
+                craftSet = gameState.player.playerInInterior.craftSet;
                 invStorage = gameState.player.playerInInterior.invStorage;
             }
             // not in interior so draw the game scene
@@ -594,6 +596,15 @@ namespace Gusto
                         CraftingObject craft = (CraftingObject)sprite;
                         if (craft.drawCraftingMenu)
                             showCraftingMenu = true;
+                        craftSet = craft.craftSet;
+                    }
+
+                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.CookingObject))
+                    {
+                        CookingObject craft = (CookingObject)sprite;
+                        if (craft.drawCraftingMenu)
+                            showCraftingMenu = true;
+                        craftSet = craft.craftSet;
                     }
 
                     else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
@@ -664,7 +675,7 @@ namespace Gusto
             else if (showCraftingMenu)
             {
                 craftingMenu.Draw(spriteBatchStatic, null);
-                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer);
+                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, craftSet);
             }
             else if (showStorageMenu)
             {

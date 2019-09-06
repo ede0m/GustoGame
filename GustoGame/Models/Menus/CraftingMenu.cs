@@ -22,6 +22,8 @@ namespace Gusto.Models.Menus
         bool emptySpotAvailable; // can we place in the player's inventory?
         bool itemCanStack; // can we stack in the player's inventory?
 
+        string craftSet; // used to denote what tier of items to cook/craft
+
         int selectedIndex;
         string itemMenuFunc;
         float timeRClicked;
@@ -83,10 +85,11 @@ namespace Gusto.Models.Menus
             };
         }
 
-        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer)
+        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, string cftSet)
         {
             Vector2 itemDrawLoc = itemDrawLocStart;
             menuOpen = true;
+            craftSet = cftSet;
 
             List<InventoryItem> items = itemsPlayer;
 
@@ -102,7 +105,7 @@ namespace Gusto.Models.Menus
             sb.End();
 
 
-            craftableItemsChecked = SearchCraftingRecipes(itemsPlayer);
+            craftableItemsChecked = SearchCraftingRecipes(itemsPlayer, craftSet);
             
             int textureHW = 64;
             // draw slots
@@ -235,7 +238,7 @@ namespace Gusto.Models.Menus
                                     {
                                         if (itm == null)
                                             continue;
-                                        foreach (var ing in Mappings.ItemMappings.CraftingRecipes[item.bbKey])
+                                        foreach (var ing in Mappings.ItemMappings.CraftingRecipes[craftSet][item.bbKey])
                                         {
                                             if (itm.bbKey.Equals(ing.Key))
                                                 itm.amountStacked -= ing.Value;
@@ -266,7 +269,7 @@ namespace Gusto.Models.Menus
 
 
         // returns a list of craftabale items based on the invetory of the player
-        private List<InventoryItem> SearchCraftingRecipes(List<InventoryItem> itemsPlayer)
+        private List<InventoryItem> SearchCraftingRecipes(List<InventoryItem> itemsPlayer, string craftSet)
         {
             List<InventoryItem> craftableItems = new List<InventoryItem>();
             ingredientsAmountDifferences.Clear();
@@ -288,7 +291,7 @@ namespace Gusto.Models.Menus
                     playInvMap.Add(item.bbKey, item.amountStacked);
             }
             // now check our available items against the crafting recipes 
-            foreach (KeyValuePair<string, Dictionary<string, int>> craftingItem in Mappings.ItemMappings.CraftingRecipes)
+            foreach (KeyValuePair<string, Dictionary<string, int>> craftingItem in Mappings.ItemMappings.CraftingRecipes[craftSet])
             {
                 // save if we are crafting anything we already have in the inventory.
                 playerInvCanStackItem.Add(craftingItem.Key, playInvMap.ContainsKey(craftingItem.Key));

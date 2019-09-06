@@ -17,6 +17,8 @@ namespace Gusto.AnimatedSprite
         public CampFire(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
 
+            craftSet = "cookT1";
+
             Texture2D texture = content.Load<Texture2D>("CampFire");
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

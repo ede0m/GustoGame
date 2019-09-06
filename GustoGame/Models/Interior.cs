@@ -48,10 +48,11 @@ namespace Gusto.Models
         public HashSet<Sprite> interiorObjects; // anything placed or drop in this interior (Similar to ItemUtility.ItemsToUpdate except that is for world view) The state of the interiror
         public HashSet<Sprite> interiorObjectsToAdd; // anything that needs to be added to this interior (can't just add in the sprite's update because it modifies collection while lookping through)
 
-        // the following three are used by the calling draw method to do menus
+        // the following four are used by the calling draw method to do menus
         public Storage invStorage;
         public bool showStorageMenu;
         public bool showCraftingMenu;
+        public string craftSet;
 
         public Vector2 startDrawPoint;
 
@@ -322,6 +323,18 @@ namespace Gusto.Models
                         showCraftingMenu = true;
                     else
                         showCraftingMenu = false;
+                    craftSet = craft.craftSet;
+                }
+
+                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.CookingObject))
+                {
+                    CookingObject craft = (CookingObject)obj;
+                    craft.DrawCanCraft(sb, cam);
+                    if (craft.drawCraftingMenu)
+                        showCraftingMenu = true;
+                    else
+                        showCraftingMenu = false;
+                    craftSet = craft.craftSet;
                 }
             }
 

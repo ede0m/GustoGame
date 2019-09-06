@@ -20,11 +20,10 @@ namespace Gusto.Models.Animated
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        float msPerFrame;
-        float msThisFrame;
-
         bool nearAnvil;
         public bool drawCraftingMenu;
+
+        public string craftSet;
 
         int nTimesHit;
         private int hitsToPickUp;
