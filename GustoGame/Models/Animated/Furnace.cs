@@ -19,9 +19,14 @@ namespace Gusto.Models.Animated
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
+        public string craftSet;
+
+        public bool drawCraftingMenu;
+
         string oreType;
         public bool canCraft;
         public bool smelting;
+
         float msPerFrame;
         float msThisFrame;
         float msToSmelt; 
@@ -180,6 +185,19 @@ namespace Gusto.Models.Animated
                 emittingLight.lit = false;
             }
 
+            if (playerNearItem != null && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu && smelting)
+            {
+                drawCraftingMenu = true;
+            }
+
+            if (drawCraftingMenu)
+            {
+                if (kstate.IsKeyDown(Keys.Escape) || playerNearItem == null)
+                {
+                    drawCraftingMenu = false;
+                }
+            }
+
             // lighting the furnace when running
             if (emittingLight.lit)
                 emittingLight.Update(kstate, gameTime, GetBoundingBox().Center.ToVector2());
@@ -254,6 +272,16 @@ namespace Gusto.Models.Animated
         public Light GetEmittingLight()
         {
             return emittingLight;
+        }
+
+        public string GetCraftSet()
+        {
+            return craftSet;
+        }
+
+        public bool GetShowMenu()
+        {
+            return drawCraftingMenu;
         }
     }
 }

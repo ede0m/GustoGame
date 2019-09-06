@@ -215,6 +215,11 @@ namespace Gusto.Mappings
 
                 }
             },
+            { "furnaceT1", new Dictionary<string, Dictionary<string, int>>
+                {
+
+                }
+            },
 
 
         };

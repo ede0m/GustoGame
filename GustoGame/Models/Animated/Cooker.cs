@@ -259,5 +259,15 @@ namespace Gusto.Models.Animated
         {
             return emittingLight;
         }
+
+        public string GetCraftSet()
+        {
+            return craftSet;
+        }
+
+        public bool GetShowMenu()
+        {
+            return drawCraftingMenu;
+        }
     }
 }

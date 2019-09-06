@@ -50,9 +50,9 @@ namespace Gusto.Models
 
         // the following four are used by the calling draw method to do menus
         public Storage invStorage;
+        public ICraftingObject craftObj;
         public bool showStorageMenu;
         public bool showCraftingMenu;
-        public string craftSet;
 
         public Vector2 startDrawPoint;
 
@@ -256,6 +256,12 @@ namespace Gusto.Models
                 drawPoint.X = startDrawPoint.X;
             }
 
+            // reset these menu trackers
+            showCraftingMenu = false;
+            showStorageMenu = false;
+            craftObj = null;
+            invStorage = null;
+
             List<Sprite> drawOrder = interiorObjects.ToList();
             drawOrder.Sort((a, b) => a.GetBoundingBox().Bottom.CompareTo(b.GetBoundingBox().Bottom));
             // Draw any interior objs
@@ -295,8 +301,13 @@ namespace Gusto.Models
 
                 if (obj is ICraftingObject)
                 {
-                    ICraftingObject craftObj = (ICraftingObject)obj;
-                    craftObj.DrawCanCraft(sb, cam);
+                    ICraftingObject tcraftObj = (ICraftingObject)obj;
+                    tcraftObj.DrawCanCraft(sb, cam);
+                    if (tcraftObj.GetShowMenu())
+                    {
+                        showCraftingMenu = true;
+                        craftObj = tcraftObj;
+                    }
                 }
 
                 if (obj is IStorage)
@@ -308,14 +319,9 @@ namespace Gusto.Models
                         showStorageMenu = true;
                         invStorage = storage;
                     }
-                    else
-                    {
-                        showStorageMenu = false;
-                        invStorage = null;
-                    }
                 }
 
-                if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
+                /*if (obj.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
                 {
                     Crafter craft = (Crafter)obj;
                     craft.DrawCanCraft(sb, cam);
@@ -335,7 +341,7 @@ namespace Gusto.Models
                     else
                         showCraftingMenu = false;
                     craftSet = craft.craftSet;
-                }
+                }*/
             }
 
             tilesSet = true;

@@ -85,11 +85,11 @@ namespace Gusto.Models.Menus
             };
         }
 
-        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, string cftSet)
+        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, ICraftingObject craftObj)
         {
             Vector2 itemDrawLoc = itemDrawLocStart;
             menuOpen = true;
-            craftSet = cftSet;
+            craftSet = craftObj.GetCraftSet();
 
             List<InventoryItem> items = itemsPlayer;
 

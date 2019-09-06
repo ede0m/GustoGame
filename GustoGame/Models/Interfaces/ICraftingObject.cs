@@ -11,5 +11,7 @@ namespace Gusto.Models.Interfaces
     public interface ICraftingObject
     {
         void DrawCanCraft(SpriteBatch sb, Camera camera);
+        string GetCraftSet();
+        bool GetShowMenu();
     }
 }

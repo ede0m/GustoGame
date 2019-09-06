@@ -441,13 +441,14 @@ namespace Gusto
             // trackers for statically drawn sprites as we move through draw order
             bool showCraftingMenu = false;
             bool showStorageMenu = false;
-            string craftSet = null;
+            ICraftingObject craftObj = null;
+            Storage invStorage = null;
+
             Ship playerShip = gameState.player.playerOnShip;
             List<InventoryItem> invItemsPlayer = gameState.player.inventory;
             List<InventoryItem> invItemsShip = (gameState.player.playerOnShip == null) ? null : gameState.player.playerOnShip.actionInventory;
             if (gameState.player.onShip)
                 invItemsShip = gameState.player.playerOnShip.actionInventory;
-            Storage invStorage = null;
 
 
             // game menu before everything
@@ -475,7 +476,7 @@ namespace Gusto
 
                 showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
                 showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
-                craftSet = gameState.player.playerInInterior.craftSet;
+                craftObj = gameState.player.playerInInterior.craftObj;
                 invStorage = gameState.player.playerInInterior.invStorage;
             }
             // not in interior so draw the game scene
@@ -536,8 +537,14 @@ namespace Gusto
 
                     if (sprite is ICraftingObject)
                     {
-                        ICraftingObject craftObj = (ICraftingObject)sprite;
-                        craftObj.DrawCanCraft(spriteBatchView, camera);
+                        ICraftingObject tcraftObj = (ICraftingObject)sprite;
+                        tcraftObj.DrawCanCraft(spriteBatchView, camera);
+                        if (tcraftObj.GetShowMenu())
+                        {
+                            showCraftingMenu = true;
+                            craftObj = tcraftObj;
+                        }
+
                     }
 
                     if (sprite is IPlaceable)
@@ -591,7 +598,7 @@ namespace Gusto
                         continue;
                     }
 
-                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
+                    /*else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Crafter))
                     {
                         Crafter craft = (Crafter)sprite;
                         if (craft.drawCraftingMenu)
@@ -605,7 +612,7 @@ namespace Gusto
                         if (craft.drawCraftingMenu)
                             showCraftingMenu = true;
                         craftSet = craft.craftSet;
-                    }
+                    }*/
 
                     else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
                     {
@@ -675,7 +682,7 @@ namespace Gusto
             else if (showCraftingMenu)
             {
                 craftingMenu.Draw(spriteBatchStatic, null);
-                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, craftSet);
+                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, craftObj);
             }
             else if (showStorageMenu)
             {

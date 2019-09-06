@@ -142,5 +142,14 @@ namespace Gusto.Models.Animated
             }
         }
 
+        public string GetCraftSet()
+        {
+            return craftSet;
+        }
+
+        public bool GetShowMenu()
+        {
+            return drawCraftingMenu;
+        }
     }
 }
