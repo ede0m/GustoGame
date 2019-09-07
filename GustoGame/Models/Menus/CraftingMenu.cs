@@ -82,6 +82,9 @@ namespace Gusto.Models.Menus
                 {"baseSword", new BaseSword(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
                 {"nails", new Nails(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
                 {"ironBar", new IronBar(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+                {"cookedMeat", new CookedMeat(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+                {"cookedFish", new CookedFish(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
+                {"chiliFish", new ChiliFish(TeamType.Player, "GustoGame", Vector2.Zero, _content, _graphics) },
             };
         }
 

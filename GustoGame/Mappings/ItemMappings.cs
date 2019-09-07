@@ -37,17 +37,51 @@ namespace Gusto.Mappings
                             {"maxDrop", 1 },
                             {"percentDrop", 20 }
                         }
-                    }
+                    },
+                    {"chiliPepper", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 40 }
+                        }
+                    },
+                    {"cookedFish", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 30 }
+                        }
+                    },
                 }
             },
             { "chicken", new Dictionary<string, Dictionary<string, float>>
                 {
-
+                    {"rawMeat", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 75 }
+                        }
+                    },
+                    {"feather", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 5 },
+                            {"percentDrop", 70 }
+                        }
+                    },
                 }
             },
             { "snake", new Dictionary<string, Dictionary<string, float>>
                 {
-
+                    {"rawMeat", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 50 }
+                        }
+                    },
+                    {"scales", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 50 }
+                        }
+                    },
                 }
             },
             { "teePee", new Dictionary<string, Dictionary<string, float>>
@@ -160,6 +194,18 @@ namespace Gusto.Mappings
                             {"percentDrop", 25}
                         }
                     },
+                    {"goldCoins", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 15 },
+                            {"percentDrop", 20 }
+                        }
+                    },
+                    {"fishOil", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 30 }
+                        }
+                    },
                 }
             },
              { "baseChest", new Dictionary<string, Dictionary<string, float>>
@@ -180,6 +226,12 @@ namespace Gusto.Mappings
                         {
                             {"maxDrop", 1},
                             {"percentDrop", 100}
+                        }
+                    },
+                    {"goldCoins", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 30 },
+                            {"percentDrop", 40 }
                         }
                     },
                 }
@@ -212,7 +264,22 @@ namespace Gusto.Mappings
             },
             {"cookT1", new Dictionary<string, Dictionary<string, int>>
                 {
-
+                    { "cookedFish", new Dictionary<string, int>
+                        {
+                            {"rawFish", 1} 
+                        }
+                    },
+                    { "cookedMeat", new Dictionary<string, int>
+                        {
+                            {"rawMeat", 1}
+                        }
+                    },
+                    { "chiliFish", new Dictionary<string, int>
+                        {
+                            {"rawFish", 1},
+                            {"chiliPepper", 2}
+                        }
+                    },
                 }
             },
             { "furnaceT1", new Dictionary<string, Dictionary<string, int>>

@@ -122,6 +122,42 @@ namespace Gusto.Utility
                 case ("treasureMapItem"):
                     item = new TreasureMapItem(null, team, region, location, content, graphics);
                     break;
+                case ("chiliFish"):
+                    item = new ChiliFish(team, region, location, content, graphics);
+                    break;
+                case ("chiliPepper"):
+                    item = new ChiliPepper(team, region, location, content, graphics);
+                    break;
+                case ("cookedFish"):
+                    item = new CookedFish(team, region, location, content, graphics);
+                    break;
+                case ("cookedMeat"):
+                    item = new CookedMeat(team, region, location, content, graphics);
+                    break;
+                case ("rawFish"):
+                    item = new RawFish(team, region, location, content, graphics);
+                    break;
+                case ("rawMeat"):
+                    item = new RawMeat(team, region, location, content, graphics);
+                    break;
+                case ("spoiledFish"):
+                    item = new SpoiledFish(team, region, location, content, graphics);
+                    break;
+                case ("spoiledMeat"):
+                    item = new SpoiledMeat(team, region, location, content, graphics);
+                    break;
+                case ("feather"):
+                    item = new Feather(team, region, location, content, graphics);
+                    break;
+                case ("scales"):
+                    item = new Scales(team, region, location, content, graphics);
+                    break;
+                case ("fishOil"):
+                    item = new FishOil(team, region, location, content, graphics);
+                    break;
+                case ("goldCoins"):
+                    item = new GoldCoins(team, region, location, content, graphics);
+                    break;
             }
             item.itemKey = key;
             item.amountStacked = amountStacked;

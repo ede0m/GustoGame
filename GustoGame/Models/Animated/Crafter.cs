@@ -89,13 +89,18 @@ namespace Gusto.Models.Animated
                 item.location = dropLoc;
                 item.onGround = true;
                 item.amountStacked = 1;
-                ItemUtility.ItemsToUpdate.Add(item);
+
+
+                if (inInteriorId != Guid.Empty) // add drops to interior
+                    BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                else // add drops to world
+                    ItemUtility.ItemsToUpdate.Add(item);
+
                 msCrafting = 0;
             }
 
             if (playerNearItem != null && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu)
             {
-                // TODO: bring up crafting menu
                 drawCraftingMenu = true;
             }
 

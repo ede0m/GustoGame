@@ -71,8 +71,19 @@
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\CannonBallItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\ChiliFish.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\ClayFurnaceItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Coal.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\ChiliPepper.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\CookedFish.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\CookedMeat.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\FishOil.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\RawFish.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\RawMeat.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\SpoiledFish.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Cooking\SpoiledMeat.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Feather.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\GoldCoins.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pickaxe.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IronBar.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IronOre.cs" />
@@ -81,6 +92,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\Nails.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Scales.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Shovel.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\SoftWood.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\TreasureMapItem.cs" />
