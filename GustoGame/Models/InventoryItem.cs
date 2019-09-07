@@ -32,6 +32,7 @@ namespace Gusto.Models
         public int amountStacked;
 
         public float msSpoilTime;
+        public float msDespawnTime;
 
         public IPlaceable placeableVersion;
         public TeamType teamType;
@@ -59,6 +60,16 @@ namespace Gusto.Models
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+
+            if (onGround)
+            {
+                msDespawnTime += gameTime.ElapsedGameTime.Milliseconds;
+                if (msDespawnTime > 30000) // 30 second despawn time
+                    remove = true;
+            }
+            else
+                msDespawnTime = 0;
+
 
             if (kstate.IsKeyDown(Keys.E) && canPickUp && !inInventory)
             {
