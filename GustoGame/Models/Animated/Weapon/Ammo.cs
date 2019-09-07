@@ -46,7 +46,7 @@ namespace Gusto.Models.Animated
         }
 
         // logic to find correct frame of sprite from user input and update movement values
-        public void Update(KeyboardState kstate, GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             if (colliding)
                 moving = false;

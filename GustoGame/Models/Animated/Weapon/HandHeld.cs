@@ -55,7 +55,7 @@ namespace Gusto.Models.Animated
 
             // clean shots
             foreach (var shot in Shots)
-                shot.Update(kstate, gameTime);
+                shot.Update(gameTime);
             if (timeSinceLastExpClean > millisecondsExplosionLasts)
             {
                 // remove exploded shots

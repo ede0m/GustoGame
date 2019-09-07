@@ -158,7 +158,9 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoon, "rustyHarpoon", 1.0f, 0.5f); // SCALING BOUNDING BOX FOR DIRECTIONAL AMMO
 
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
-            LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
+            Texture2D textureBallista = Content.Load<Texture2D>("BaseCannon");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureBallista, "ballista", 1.0f, 1.0f);
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
             Texture2D textureBarrel = Content.Load<Texture2D>("Barrel");
@@ -617,13 +619,20 @@ namespace Gusto
                         }
                         else
                         {
-                            // Draw a ships sail before a ship
+                            // Draw a ship before its sail and mount
                             ship.Draw(spriteBatchView, this.camera);
+                            if (ship.mountedOnShip != null)
+                            {
+                                foreach (var shot in ship.mountedOnShip.Shots)
+                                    shot.Draw(spriteBatchView, this.camera);
+                                if (ship.mountedOnShip.aiming)
+                                {
+                                    ship.mountedOnShip.Draw(spriteBatchView, this.camera);
+                                    if (ship.teamType == TeamType.Player)
+                                        ship.mountedOnShip.DrawAimLine(spriteBatchView, this.camera);
+                                }
+                            }
                             ship.shipSail.Draw(spriteBatchView, this.camera);
-                            foreach (var shot in ship.Shots)
-                                shot.Draw(spriteBatchView, this.camera);
-                            if (ship.aiming)
-                                ship.DrawAimLine(spriteBatchView, this.camera);
                         }
                         continue;
                     }

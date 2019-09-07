@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(120, -850), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(120, -350), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
@@ -66,7 +66,7 @@ namespace Gusto
             baseShip.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShip.shipInterior.interiorId, baseShip.shipInterior);
 
-            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(670, 0), _content, _graphics);
+            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(-400, -140), _content, _graphics);
             baseShipAI.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
 
@@ -90,18 +90,22 @@ namespace Gusto
             shovel.onGround = true;
             Pickaxe pickaxe = new Pickaxe(TeamType.Player, "GustoMap", new Vector2(130, -430), _content, _graphics);
             pickaxe.onGround = true;
-            Pistol pistol = new Pistol(TeamType.A, "GustoMap", new Vector2(250, -300), _content, _graphics);
-            pistol.amountStacked = 1;
-            pistol.onGround = true;
+            //Pistol pistol = new Pistol(TeamType.A, "GustoMap", new Vector2(250, -300), _content, _graphics);
+            //pistol.amountStacked = 1;
+            //pistol.onGround = true;
+            BaseCannon cannon = new BaseCannon(TeamType.A, "GustoMap", new Vector2(250, -300), _content, _graphics);
+            cannon.onGround = true;
+            Ballista ballista = new Ballista(TeamType.A, "GustoMap", new Vector2(200, -300), _content, _graphics);
+            ballista.onGround = true;
             CrossBow crossBow = new CrossBow(TeamType.A, "GustoMap", new Vector2(220, -350), _content, _graphics);
             crossBow.amountStacked = 1;
             crossBow.onGround = true;
             ArrowItem arrows = new ArrowItem(TeamType.A, "GustoMap", new Vector2(210, -340), _content, _graphics);
             arrows.onGround = true;
             arrows.amountStacked = 10;
-            PistolShotItem pistolAmmo = new PistolShotItem(TeamType.A, "GustoMap", new Vector2(220, -300), _content, _graphics);
-            pistolAmmo.amountStacked = 14;
-            pistolAmmo.onGround = true;
+            //PistolShotItem pistolAmmo = new PistolShotItem(TeamType.A, "GustoMap", new Vector2(220, -300), _content, _graphics);
+            //pistolAmmo.amountStacked = 14;
+            //pistolAmmo.onGround = true;
             CannonBallItem cannonAmmo = new CannonBallItem(TeamType.A, "GustoMap", new Vector2(200, -300), _content, _graphics);
             cannonAmmo.amountStacked = 10;
             cannonAmmo.onGround = true;
@@ -122,11 +126,13 @@ namespace Gusto
             ItemUtility.ItemsToUpdate.Add(barrelOcean);
             ItemUtility.ItemsToUpdate.Add(chestLand);
             ItemUtility.ItemsToUpdate.Add(shovel);
-            ItemUtility.ItemsToUpdate.Add(pistol);
+            //ItemUtility.ItemsToUpdate.Add(pistol);
+            ItemUtility.ItemsToUpdate.Add(cannon);
+            ItemUtility.ItemsToUpdate.Add(ballista);
             ItemUtility.ItemsToUpdate.Add(crossBow);
             ItemUtility.ItemsToUpdate.Add(arrows);
             ItemUtility.ItemsToUpdate.Add(pickaxe);
-            ItemUtility.ItemsToUpdate.Add(pistolAmmo);
+            //ItemUtility.ItemsToUpdate.Add(pistolAmmo);
             ItemUtility.ItemsToUpdate.Add(cannonAmmo);
             ItemUtility.ItemsToUpdate.Add(harpoonAmmo);
             ItemUtility.ItemsToUpdate.Add(basePlank);
@@ -660,6 +666,8 @@ namespace Gusto
                     return new Pickaxe(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "pistol":
                     return new Pistol(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "baseCannon":
+                    return new BaseCannon(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "crossBow":
                     return new CrossBow(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "pistolShotItem":

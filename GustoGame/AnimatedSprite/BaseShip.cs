@@ -11,6 +11,7 @@ using Gusto.Models.Animated;
 using System.Linq;
 using Gusto.Utility;
 using Gusto.Models.Interfaces;
+using Gusto.AnimatedSprite.InventoryItems;
 
 namespace Gusto.AnimatedSprite
 {
@@ -23,9 +24,6 @@ namespace Gusto.AnimatedSprite
             timeSinceStartAnchor = 0;
             millisecondsToAnchor = 1000;
             msToRepair = 5000;
-            timeSinceLastExpClean = 0;
-            millisecondsExplosionLasts = 400;
-            timeSinceLastShot = 0;
             millisecondsNewShot = 2000;
             movementSpeed = 0.2f;
             timeSinceStartSinking = 0;
@@ -33,9 +31,8 @@ namespace Gusto.AnimatedSprite
             nSails = 1;
             fullHealth = 40;
             health = fullHealth;
-            shotRange = 600f;
             stopRange = 260f;
-            attackRange = 400f;
+            attackRange = 600f;
             maxInventorySlots = 5;
 
             string objKey = "baseShip";
@@ -53,6 +50,7 @@ namespace Gusto.AnimatedSprite
             {
                 List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 5);
                 interiorObjs = ItemUtility.CreateInteriorItems(itemDrops, team, region, location, content, graphics);
+                mountedOnShip = new BaseCannon(teamType, regionKey, GetBoundingBox().Center.ToVector2(), content, graphics);
             }
 
             actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
