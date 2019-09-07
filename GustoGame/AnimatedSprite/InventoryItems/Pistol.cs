@@ -23,6 +23,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
             millisecondsNewShot = 1000;
             millisecondsExplosionLasts = 400;
             itemKey = "pistol";
+            msCraftTime = 20000;
             ammoType = typeof(Gusto.AnimatedSprite.InventoryItems.PistolShotItem);
 
             Texture2D texturePistol = content.Load<Texture2D>("pistol");

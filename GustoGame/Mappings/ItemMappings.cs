@@ -37,17 +37,51 @@ namespace Gusto.Mappings
                             {"maxDrop", 1 },
                             {"percentDrop", 20 }
                         }
-                    }
+                    },
+                    {"chiliPepper", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 40 }
+                        }
+                    },
+                    {"cookedFish", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 30 }
+                        }
+                    },
                 }
             },
             { "chicken", new Dictionary<string, Dictionary<string, float>>
                 {
-
+                    {"rawMeat", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 75 }
+                        }
+                    },
+                    {"feather", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 5 },
+                            {"percentDrop", 70 }
+                        }
+                    },
                 }
             },
             { "snake", new Dictionary<string, Dictionary<string, float>>
                 {
-
+                    {"rawMeat", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 50 }
+                        }
+                    },
+                    {"scales", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 50 }
+                        }
+                    },
                 }
             },
             { "teePee", new Dictionary<string, Dictionary<string, float>>
@@ -160,6 +194,18 @@ namespace Gusto.Mappings
                             {"percentDrop", 25}
                         }
                     },
+                    {"goldCoins", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 15 },
+                            {"percentDrop", 20 }
+                        }
+                    },
+                    {"fishOil", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 30 }
+                        }
+                    },
                 }
             },
              { "baseChest", new Dictionary<string, Dictionary<string, float>>
@@ -182,32 +228,80 @@ namespace Gusto.Mappings
                             {"percentDrop", 100}
                         }
                     },
+                    {"goldCoins", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 30 },
+                            {"percentDrop", 40 }
+                        }
+                    },
                 }
             },
 
         };
 
         // TODO:could make this a narrowing index by ingredients
-        public static Dictionary<string, Dictionary<string, int>> CraftingRecipes = new Dictionary<string, Dictionary<string, int>>
+        public static Dictionary<string, Dictionary<string, Dictionary<string, int>>> CraftingRecipes = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>
         {
-            { "anvilItem", new Dictionary<string, int>
+            {"craftT1", new Dictionary<string, Dictionary<string, int>>
                 {
-                    {"ironBar", 1} // TODO: change back to 5
+                    { "anvilItem", new Dictionary<string, int>
+                        {
+                            {"ironBar", 1} // TODO: change back to 5
+                        }
+                    },
+                    { "baseSword", new Dictionary<string, int>
+                        {
+                            {"ironBar", 2},
+                            {"softWood", 2}
+                        }
+                    },
+                    { "nails", new Dictionary<string, int>
+                        {
+                            {"ironOre", 2}
+                        }
+                    },
                 }
             },
-            { "baseSword", new Dictionary<string, int>
+            {"cookT1", new Dictionary<string, Dictionary<string, int>>
                 {
-                    {"ironBar", 2},
-                    {"softWood", 2}
+                    { "cookedFish", new Dictionary<string, int>
+                        {
+                            {"rawFish", 1} 
+                        }
+                    },
+                    { "cookedMeat", new Dictionary<string, int>
+                        {
+                            {"rawMeat", 1}
+                        }
+                    },
+                    { "chiliFish", new Dictionary<string, int>
+                        {
+                            {"rawFish", 1},
+                            {"chiliPepper", 2}
+                        }
+                    },
                 }
             },
-            { "nails", new Dictionary<string, int>
+            { "furnaceT1", new Dictionary<string, Dictionary<string, int>>
                 {
-                    {"ironOre", 2}
+                    { "ironBar", new Dictionary<string, int>
+                        {
+                            {"ironOre", 2},
+                            { "coal", 1 }
+                        }
+                    },
                 }
             },
-
         };
+
+        public static Dictionary<string, Tuple<int, string>> SpoilMappings = new Dictionary<string, Tuple<int, string>>
+        {
+            { "rawMeat", new Tuple<int, string>(10000, "spoiledMeat") },
+            { "rawFish", new Tuple<int, string>(10000, "spoiledFish") },
+            { "cookedMeat", new Tuple<int, string>(200000, "spoiledMeat") },
+            { "cookedFish", new Tuple<int, string>(200000, "spoiledFish") },
+        };
+
 
     }
 }

@@ -188,6 +188,30 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 2, 4, textureRock1, "rock1", 0.3f, 1.0f);
             Texture2D textureIslandGrass = Content.Load<Texture2D>("islandGrass");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureIslandGrass, "islandGrass", 0.5f, 1.0f);
+            Texture2D textureChiliFish = Content.Load<Texture2D>("ChiliFish");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureChiliFish, "chiliFish", 0.5f, 1.0f);
+            Texture2D textureChiliPepper = Content.Load<Texture2D>("ChiliPepper");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureChiliPepper, "chiliPepper", 0.5f, 1.0f);
+            Texture2D textureCookedFish = Content.Load<Texture2D>("CookedFish");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCookedFish, "cookedFish", 0.5f, 1.0f);
+            Texture2D textureCookedMeat = Content.Load<Texture2D>("CookedMeat");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCookedMeat, "cookedMeat", 0.5f, 1.0f);
+            Texture2D textureFeather = Content.Load<Texture2D>("Feather");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureFeather, "feather", 0.5f, 1.0f);
+            Texture2D textureFishOil = Content.Load<Texture2D>("FishOil");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureFishOil, "fishOil", 0.5f, 1.0f);
+            Texture2D textureGoldCoins = Content.Load<Texture2D>("GoldCoins");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureGoldCoins, "goldCoins", 0.5f, 1.0f);
+            Texture2D textureRawFish = Content.Load<Texture2D>("RawFish");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureRawFish, "rawFish", 0.5f, 1.0f);
+            Texture2D textureRawMeat = Content.Load<Texture2D>("RawMeat");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureRawMeat, "rawMeat", 0.5f, 1.0f);
+            Texture2D textureScales = Content.Load<Texture2D>("Scales");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureScales, "scales", 0.5f, 1.0f);
+            Texture2D textureSpoiledFish = Content.Load<Texture2D>("SpoiledFish");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSpoiledFish, "spoiledFish", 0.5f, 1.0f);
+            Texture2D textureSpoiledMeat = Content.Load<Texture2D>("SpoiledMeat");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSpoiledMeat, "spoiledMeat", 0.5f, 1.0f);
             Texture2D textureCoal = Content.Load<Texture2D>("coal");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureCoal, "coal", 1.0f, 1.0f);
             Texture2D textureNails = Content.Load<Texture2D>("Nails");
@@ -441,12 +465,14 @@ namespace Gusto
             // trackers for statically drawn sprites as we move through draw order
             bool showCraftingMenu = false;
             bool showStorageMenu = false;
+            ICraftingObject craftObj = null;
+            Storage invStorage = null;
+
             Ship playerShip = gameState.player.playerOnShip;
             List<InventoryItem> invItemsPlayer = gameState.player.inventory;
             List<InventoryItem> invItemsShip = (gameState.player.playerOnShip == null) ? null : gameState.player.playerOnShip.actionInventory;
             if (gameState.player.onShip)
                 invItemsShip = gameState.player.playerOnShip.actionInventory;
-            Storage invStorage = null;
 
 
             // game menu before everything
@@ -474,6 +500,7 @@ namespace Gusto
 
                 showCraftingMenu = gameState.player.playerInInterior.showCraftingMenu;
                 showStorageMenu = gameState.player.playerInInterior.showStorageMenu;
+                craftObj = gameState.player.playerInInterior.craftObj;
                 invStorage = gameState.player.playerInInterior.invStorage;
             }
             // not in interior so draw the game scene
@@ -534,8 +561,14 @@ namespace Gusto
 
                     if (sprite is ICraftingObject)
                     {
-                        ICraftingObject craftObj = (ICraftingObject)sprite;
-                        craftObj.DrawCanCraft(spriteBatchView, camera);
+                        ICraftingObject tcraftObj = (ICraftingObject)sprite;
+                        tcraftObj.DrawCanCraft(spriteBatchView, camera);
+                        if (tcraftObj.GetShowMenu())
+                        {
+                            showCraftingMenu = true;
+                            craftObj = tcraftObj;
+                        }
+
                     }
 
                     if (sprite is IPlaceable)
@@ -587,13 +620,6 @@ namespace Gusto
                     {
                         DrawUtility.DrawPlayer(spriteBatchView, this.camera, gameState.player);
                         continue;
-                    }
-
-                    else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.CraftingObject))
-                    {
-                        CraftingObject craft = (CraftingObject)sprite;
-                        if (craft.drawCraftingMenu)
-                            showCraftingMenu = true;
                     }
 
                     else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
@@ -664,7 +690,7 @@ namespace Gusto
             else if (showCraftingMenu)
             {
                 craftingMenu.Draw(spriteBatchStatic, null);
-                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer);
+                craftingMenu.DrawInventory(spriteBatchStatic, invItemsPlayer, craftObj);
             }
             else if (showStorageMenu)
             {

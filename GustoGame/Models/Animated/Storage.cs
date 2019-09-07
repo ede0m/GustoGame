@@ -1,6 +1,8 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
 using Gusto.AnimatedSprite.InventoryItems;
+using Gusto.Bounding;
+using Gusto.Mappings;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -80,6 +82,51 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+
+            // Update the storage inventory for timedItems
+            List<int> removeExpiredItem = new List<int>();
+            List<InventoryItem> addTimedItem = new List<InventoryItem>();
+            foreach (var item in inventory)
+            {
+                if (item == null)
+                    continue;
+
+                // for spoiled food
+                if (item is ISpoiles)
+                {
+                    item.msSpoilTime += gameTime.ElapsedGameTime.Milliseconds;
+                    Tuple<int, string> spoilDetails = ItemMappings.SpoilMappings[item.bbKey];
+
+                    if (item.msSpoilTime > spoilDetails.Item1)
+                    {
+                        InventoryItem spoiled = ItemUtility.CreateInventoryItem(spoilDetails.Item2, item.teamType, regionKey, location, _content, _graphics);
+                        item.msSpoilTime = 0;
+                        if (item.amountStacked > 1)
+                            item.amountStacked -= 1;
+                        else
+                            removeExpiredItem.Add(inventory.IndexOf(item));
+
+                        addTimedItem.Add(spoiled);
+                    }
+                }
+            }
+            foreach (var remove in removeExpiredItem)
+                inventory[remove] = null;
+            foreach (var item in addTimedItem)
+            {
+                if (!AddInventoryItem(item))
+                {
+                    item.location = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
+                    item.onGround = true;
+
+                    if (inInteriorId != Guid.Empty) // add drops to interior
+                        BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                    else // add drops to world
+                        ItemUtility.ItemsToUpdate.Add(item);
+                }
+            }
+
+
 
             if (canOpenStorage && !storageOpen && kstate.IsKeyDown(Keys.O))
             {

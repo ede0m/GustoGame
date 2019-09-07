@@ -19,13 +19,15 @@ namespace Gusto.Models.Animated
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        string oreType;
-        public bool canCraft;
-        public bool smelting;
+        public string craftSet;
+
+        public bool drawCraftingMenu;
+        bool smelting;
+
         float msPerFrame;
         float msThisFrame;
-        float msToSmelt; 
-        float msSmelting;
+        float msCrafting;
+
 
         public Light emittingLight;
         int nTimesHit;
@@ -33,6 +35,9 @@ namespace Gusto.Models.Animated
         private bool canPickUp;
         float msPickupTimer;
         float msSinceStartPickupTimer;
+
+
+        Queue<InventoryItem> craftingQueue;
 
         PiratePlayer playerNearItem;
         public TeamType teamType;
@@ -44,41 +49,17 @@ namespace Gusto.Models.Animated
 
             teamType = type;
             msPickupTimer = 5000;
-            msToSmelt = 10000;
             msPerFrame = 200;
             hitsToPickUp = 10;
 
+            craftingQueue = new Queue<InventoryItem>();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
         {
-            if (collidedWith.bbKey.Equals("playerPirate") && !canCraft)
+            if (collidedWith.bbKey.Equals("playerPirate"))
             {
                 playerNearItem = (PiratePlayer)collidedWith;
-
-                // check inventory to see if we have required materials
-                int nWood = 0;
-                int nGrass = 0;
-                int nCoal = 0;
-                int nOre = 0;
-                foreach (var item in playerNearItem.inventory)
-                {
-                    if (item is IWood )
-                        nWood = item.amountStacked;
-                    if (item is IGrass) 
-                        nGrass = item.amountStacked;
-                    if (item is IOre)
-                    {
-                        if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal))
-                            nCoal = item.amountStacked;
-                        else
-                            nOre = item.amountStacked;
-                    }
-                }
-
-                canCraft = true; // TEMP!
-                if (nWood > 1 && nGrass > 1 && nCoal > 0 && nOre > 7) // 2 wood, 2 grass, 1 coal, 8 ore required
-                    canCraft = true;
             }
 
             if (collidedWith.bbKey.Equals("pickaxe"))
@@ -101,49 +82,74 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            if (canCraft && kstate.IsKeyDown(Keys.C)) // TODO: and keypress time
+            if (playerNearItem != null && kstate.IsKeyDown(Keys.C)) // TODO: and keypress time
             {
-                // TODO: animate
+                int nWood = 0;
+                int nGrass = 0;
 
-                bool hasCoal = false;
-                bool hasOre = false;
-                bool hasGrass = false;
-                bool hasWood = false;
-
-                // Remove items from inv TODO: for now this just takes the first ore, grass, wood etc in inventory
+                // start fire and remove kindling items
                 if (!smelting)
                 {
+                    // check for kindling
                     foreach (var item in playerNearItem.inventory)
                     {
-                        if (item is IWood && !hasWood)
-                        {
-                            item.amountStacked -= 2;
-                        }
-                        if (item is IGrass && !hasGrass)
-                        {
-                            item.amountStacked -= 2;
-                        }
-                        if (item is IOre)
-                        {
-                            if (item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.Coal) && !hasCoal)
-                                item.amountStacked -= 1;
-                            else if (!hasOre)
-                            {
-                                oreType = CheckOreType(item.GetType());
-                                item.amountStacked -= 8;
-                            }
-                        }
+                        if (item is IWood)
+                            nWood += item.amountStacked;
+                        if (item is IGrass)
+                            nGrass += item.amountStacked;
                     }
-                    smelting = true;
+
+                    if (nWood >= 2 && nGrass >= 2)
+                    {
+                        smelting = true;
+                        RemoveKindlingConsumables();
+                    }
+                }  
+            }
+
+            if (craftingQueue.Count > 0)
+                msCrafting += gameTime.ElapsedGameTime.Milliseconds;
+
+            // create and drop item when crafting
+            if (craftingQueue.Count > 0 && msCrafting > craftingQueue.Peek().msCraftTime)
+            {
+
+                InventoryItem item = craftingQueue.Dequeue();
+                Vector2 dropLoc = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
+
+                item.location = dropLoc;
+                item.onGround = true;
+
+                if (inInteriorId != Guid.Empty) // add drops to interior
+                    BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                else // add drops to world
+                    ItemUtility.ItemsToUpdate.Add(item);
+
+                msCrafting = 0;
+                // reset smelting
+                if (craftingQueue.Count <= 0)
+                {
+                    smelting = false;
+                    currColumnFrame = 0;
+                    emittingLight.lit = false;
                 }
-                    
+            }
+
+            if (playerNearItem != null && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu && smelting)
+            {
+                drawCraftingMenu = true;
+            }
+            if (drawCraftingMenu)
+            {
+                if (kstate.IsKeyDown(Keys.Escape) || playerNearItem == null)
+                {
+                    drawCraftingMenu = false;
+                }
             }
 
             if (smelting)
             {
                 emittingLight.lit = true;
-                // smelting so animate and being timer
-                msSmelting += gameTime.ElapsedGameTime.Milliseconds;
                 msThisFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (msThisFrame > msPerFrame)
                 {
@@ -152,32 +158,6 @@ namespace Gusto.Models.Animated
                     if (currColumnFrame == nColumns)
                         currColumnFrame = 1;
                 }
-            }
-
-            // create and drop item when done smelting
-            if (msSmelting > msToSmelt)
-            {
-                if (oreType != null)
-                {
-                    InventoryItem bar = null;
-                    Vector2 dropLoc = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
-                    switch (oreType)
-                    {
-                        case "iron":
-                            bar = new IronBar(teamType, regionKey, dropLoc, _content, _graphics);
-                            break;
-                    }
-                    bar.onGround = true;
-                    bar.amountStacked = 1;
-                    ItemUtility.ItemsToUpdate.Add(bar);
-                }
-
-                // reset
-                smelting = false;
-                msSmelting = 0;
-                oreType = null;
-                currColumnFrame = 0;
-                emittingLight.lit = false;
             }
 
             // lighting the furnace when running
@@ -213,14 +193,12 @@ namespace Gusto.Models.Animated
                 }
             }
 
-
-            canCraft = false;
             playerNearItem = null;
         }
 
         public void DrawCanCraft(SpriteBatch sb, Camera camera)
         {
-            if (canCraft)
+            if (playerNearItem != null)
             {
                 SpriteFont font = _content.Load<SpriteFont>("helperFont");
                 sb.Begin(camera);
@@ -241,19 +219,69 @@ namespace Gusto.Models.Animated
         }
 
 
-        private string CheckOreType(Type t)
+        private void RemoveKindlingConsumables()
         {
-            string ret = null;
-            if (t == typeof(Gusto.AnimatedSprite.InventoryItems.IronOre))
-                ret = "iron";
+            int ngrassRemoved = 0;
+            int nwoodRemoved = 0;
+            int index = 0;
+            while (ngrassRemoved < 2)
+            {
+                if (index >= playerNearItem.inventory.Count)
+                    index = 0;
 
-            return ret;
+                if (playerNearItem.inventory[index] == null)
+                {
+                    index++;
+                    continue;
+                }
+                InventoryItem item = playerNearItem.inventory[index];
+                if (item is IGrass)
+                {
+                    item.amountStacked -= 1;
+                    ngrassRemoved += 1;
+                }
+                index++;
+            }
 
+            while (nwoodRemoved < 2)
+            {
+                if (index >= playerNearItem.inventory.Count)
+                    index = 0;
+
+                if (playerNearItem.inventory[index] == null)
+                {
+                    index++;
+                    continue;
+                }
+                InventoryItem item = playerNearItem.inventory[index];
+                if (item is IWood)
+                {
+                    item.amountStacked -= 1;
+                    nwoodRemoved += 1;
+                }
+                index++;
+
+            }
         }
 
         public Light GetEmittingLight()
         {
             return emittingLight;
+        }
+
+        public string GetCraftSet()
+        {
+            return craftSet;
+        }
+
+        public bool GetShowMenu()
+        {
+            return drawCraftingMenu;
+        }
+
+        public Queue<InventoryItem> GetCraftingQueue()
+        {
+            return craftingQueue;
         }
     }
 }

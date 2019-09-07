@@ -16,6 +16,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
         public Nails(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
             itemKey = "nails";
+            msCraftTime = 2000;
 
             Texture2D textureIronOre = content.Load<Texture2D>("Nails");
             Texture2D textureIronOreBB = null;

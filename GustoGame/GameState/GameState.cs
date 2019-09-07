@@ -207,6 +207,7 @@ namespace Gusto
                     PlayerState state = new PlayerState();
                     state.team = player.teamType;
                     state.location = player.location;
+                    state.interiorEntranceLocation = player.entranceLoc;
                     state.region = player.regionKey;
                     state.inventory = SerializeInventory(player.inventory);
                     state.onShip = player.onShip;
@@ -367,6 +368,7 @@ namespace Gusto
                     }
                     else
                     {
+                        player.entranceLoc = ps.interiorEntranceLocation;
                         // check if the interior already exists
                         foreach (KeyValuePair<Guid, Interior> interior in BoundingBoxLocations.interiorMap)
                         {
@@ -592,6 +594,30 @@ namespace Gusto
             switch (itemKey)
             {
                 // TODO: ALL THE ITEMS :( 
+                case "scales":
+                    return new Scales(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "feather":
+                    return new Feather(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "fishOil":
+                    return new FishOil(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "goldCoins":
+                    return new GoldCoins(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "chiliFish":
+                    return new ChiliFish(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "chiliPepper":
+                    return new ChiliPepper(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "cookedFish":
+                    return new CookedFish(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "cookedMeat":
+                    return new CookedMeat(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "rawFish":
+                    return new RawFish(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "rawMeat":
+                    return new RawMeat(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "spoiledFish":
+                    return new SpoiledFish(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "spoiledMeat":
+                    return new SpoiledMeat(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "islandGrass":
                     return new IslandGrass(TeamType.GroundObject, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "baseSword":

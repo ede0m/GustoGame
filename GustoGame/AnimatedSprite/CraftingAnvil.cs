@@ -11,10 +11,12 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite
 {
-    public class CraftingAnvil : CraftingObject
+    public class CraftingAnvil : Crafter
     {
         public CraftingAnvil(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
+
+            craftSet = "craftT1";
 
             Texture2D texture = content.Load<Texture2D>("Anvil");
             Texture2D textureBB = null;

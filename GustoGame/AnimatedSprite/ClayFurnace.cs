@@ -16,6 +16,7 @@ namespace Gusto.AnimatedSprite
     {
         public ClayFurnace(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
+            craftSet = "furnaceT1";
 
             Texture2D texture = content.Load<Texture2D>("Furnace");
             Texture2D textureBB = null;

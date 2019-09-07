@@ -1,5 +1,6 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
+using Gusto.Mappings;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -22,18 +23,22 @@ namespace Gusto.Models
        
         public int restorePoints;
 
+        public float msCraftTime; // time to craft this item
+
         public bool onGround;
         public bool inInventory;
         public bool canPickUp; // proximety
         public bool stackable;
         public int amountStacked;
 
+        public float msSpoilTime;
+        public float msDespawnTime;
+
         public IPlaceable placeableVersion;
+        public TeamType teamType;
 
         private ContentManager _content;
         private GraphicsDevice _graphics;
-
-        public TeamType teamType;
 
         public InventoryItem(TeamType team, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
@@ -55,6 +60,16 @@ namespace Gusto.Models
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
+
+            if (onGround)
+            {
+                msDespawnTime += gameTime.ElapsedGameTime.Milliseconds;
+                if (msDespawnTime > 30000) // 30 second despawn time
+                    remove = true;
+            }
+            else
+                msDespawnTime = 0;
+
 
             if (kstate.IsKeyDown(Keys.E) && canPickUp && !inInventory)
             {

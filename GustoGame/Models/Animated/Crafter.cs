@@ -15,27 +15,28 @@ using System.Diagnostics;
 
 namespace Gusto.Models.Animated
 {
-    public class CraftingObject : Sprite, ICanUpdate, IPlaceable, ICraftingObject
+    public class Crafter : Sprite, ICanUpdate, IPlaceable, ICraftingObject
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        float msPerFrame;
-        float msThisFrame;
-
-        bool nearAnvil;
         public bool drawCraftingMenu;
+        public string craftSet;
 
         int nTimesHit;
-        private int hitsToPickUp;
-        private bool canPickUp;
+        int hitsToPickUp;
+        bool canPickUp;
+
         float msPickupTimer;
         float msSinceStartPickupTimer;
+        float msCrafting;
+
+        Queue<InventoryItem> craftingQueue;
 
         PiratePlayer playerNearItem;
         public TeamType teamType;
 
-        public CraftingObject(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
+        public Crafter(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
             _content = content;
             _graphics = graphics;
@@ -43,6 +44,8 @@ namespace Gusto.Models.Animated
             teamType = type;
             msPickupTimer = 5000;
             hitsToPickUp = 10;
+
+            craftingQueue = new Queue<InventoryItem>();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -50,7 +53,6 @@ namespace Gusto.Models.Animated
 
             if (collidedWith.bbKey.Equals("playerPirate"))
             {
-                nearAnvil = true;
                 playerNearItem = (PiratePlayer)collidedWith;
             }
 
@@ -74,15 +76,35 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            if (nearAnvil && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu)
+
+            if (craftingQueue.Count > 0)
+                msCrafting += gameTime.ElapsedGameTime.Milliseconds;
+            // create and drop item when crafting
+            if (craftingQueue.Count > 0 && msCrafting > craftingQueue.Peek().msCraftTime)
             {
-                // TODO: bring up crafting menu
+
+                InventoryItem item = craftingQueue.Dequeue();
+                Vector2 dropLoc = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
+
+                item.location = dropLoc;
+                item.onGround = true;
+
+                if (inInteriorId != Guid.Empty) // add drops to interior
+                    BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                else // add drops to world
+                    ItemUtility.ItemsToUpdate.Add(item);
+
+                msCrafting = 0;
+            }
+
+            if (playerNearItem != null && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu)
+            {
                 drawCraftingMenu = true;
             }
 
             if (drawCraftingMenu)
             {
-                if (kstate.IsKeyDown(Keys.Escape) || !nearAnvil)
+                if (kstate.IsKeyDown(Keys.Escape) || playerNearItem == null)
                 {
                     drawCraftingMenu = false;
                 }
@@ -116,14 +138,12 @@ namespace Gusto.Models.Animated
                 }
             }
 
-
-            nearAnvil = false;
             playerNearItem = null;
         }
 
         public void DrawCanCraft(SpriteBatch sb, Camera camera)
         {
-            if (nearAnvil)
+            if (playerNearItem != null)
             {
                 SpriteFont font = _content.Load<SpriteFont>("helperFont");
                 sb.Begin(camera);
@@ -143,5 +163,19 @@ namespace Gusto.Models.Animated
             }
         }
 
+        public string GetCraftSet()
+        {
+            return craftSet;
+        }
+
+        public bool GetShowMenu()
+        {
+            return drawCraftingMenu;
+        }
+
+        public Queue<InventoryItem> GetCraftingQueue()
+        {
+            return craftingQueue;
+        }
     }
 }
