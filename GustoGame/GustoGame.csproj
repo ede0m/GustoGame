@@ -134,6 +134,7 @@
     <Compile Include="Models\Animated\Cooker.cs" />
     <Compile Include="Models\Animated\Crafter.cs" />
     <Compile Include="Models\Animated\Container.cs" />
+    <Compile Include="Models\Interfaces\IShipAmmoItem.cs" />
     <Compile Include="Models\Interfaces\ICookingObject.cs" />
     <Compile Include="Models\Interfaces\IDirectionalAmmo.cs" />
     <Compile Include="Models\Interfaces\ILand.cs" />

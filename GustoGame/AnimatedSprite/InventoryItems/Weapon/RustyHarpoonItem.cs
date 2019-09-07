@@ -1,4 +1,5 @@
 ﻿using Gusto.Models;
+using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class RustyHarpoonItem : InventoryItem
+    public class RustyHarpoonItem : InventoryItem, IShipAmmoItem
     {
         public RustyHarpoonItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
@@ -23,6 +24,11 @@ namespace Gusto.AnimatedSprite.InventoryItems
             Asset basePistolShotItemAsset = new Asset(texturePistolShotItem, texturePistolShotItemBB, 2, 1, 1.0f, "rustyHarpoonItem", region);
             SetSpriteAsset(basePistolShotItemAsset, location);
             stackable = true;
+        }
+
+        public string GetFiredAmmoKey()
+        {
+            return "rustyHarpoon";
         }
     }
 }

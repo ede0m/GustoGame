@@ -85,6 +85,8 @@ namespace Gusto.Models.Animated
         public Interior shipInterior;
         Guid boardingShipInteriorId;
         public InventoryItem ammoLoaded;
+        public int ammoLoadedIndex;
+        string firedAmmoKey;
         public int maxInventorySlots;
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
@@ -410,16 +412,22 @@ namespace Gusto.Models.Animated
             // shooting
             if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot && playerAboard)
             {
+
                 // loading ammo
-                if (ammoLoaded == null)
+                if (ammoLoaded == null || actionInventory[ammoLoadedIndex].bbKey != ammoLoaded.bbKey) // ran out of ammo, or switched ammo type. Reload
                 {
                     for (int i = 0; i < actionInventory.Count(); i++)
                     {
                         var item = actionInventory[i];
-                        if (item != null && item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.CannonBallItem)) // TODO: refactor to support multiple cannon types? Maybe have ship have weaponSelected like inHand
+                        if (item != null && item is IShipAmmoItem) // TODO: selects the first item in ship action inv to shoot
                         {
                             if (item.amountStacked > 0)
+                            {
                                 ammoLoaded = item;
+                                ammoLoadedIndex = i;
+                                IShipAmmoItem sai = (IShipAmmoItem)item;
+                                firedAmmoKey = sai.GetFiredAmmoKey();
+                            }
                             break;
                         }
                     }
@@ -427,10 +435,12 @@ namespace Gusto.Models.Animated
                 else
                 {
                     //Vector2 shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
-                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
-                    cannonShot.SetFireAtDirection(endAimLineFull, RandomEvents.rand.Next(10, 25), 0);
-                    cannonShot.moving = true;
-                    Shots.Add(cannonShot);
+                    Ammo shot = (Ammo)ItemUtility.CreateItem(firedAmmoKey, teamType, regionKey, startAimLine, _content, _graphics);
+                    float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
+                    shot.rotation = angleFull + ((float)Math.PI/2);
+                    shot.SetFireAtDirection(endAimLineFull, RandomEvents.rand.Next(10, 25), 0);
+                    shot.moving = true;
+                    Shots.Add(shot);
                     timeSinceLastShot = 0;
                     ammoLoaded.amountStacked -= 1;
                     if (ammoLoaded.amountStacked <= 0)

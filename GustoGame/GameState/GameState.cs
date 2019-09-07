@@ -66,7 +66,7 @@ namespace Gusto
             baseShip.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShip.shipInterior.interiorId, baseShip.shipInterior);
 
-            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(-470, 0), _content, _graphics);
+            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(670, 0), _content, _graphics);
             baseShipAI.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
 
@@ -105,6 +105,9 @@ namespace Gusto
             CannonBallItem cannonAmmo = new CannonBallItem(TeamType.A, "GustoMap", new Vector2(200, -300), _content, _graphics);
             cannonAmmo.amountStacked = 10;
             cannonAmmo.onGround = true;
+            RustyHarpoonItem harpoonAmmo = new RustyHarpoonItem(TeamType.A, "GustoMap", new Vector2(190, -330), _content, _graphics);
+            harpoonAmmo.amountStacked = 10;
+            harpoonAmmo.onGround = true;
             Lantern lantern = new Lantern(TeamType.A, "GustoMap", new Vector2(180, -300), _content, _graphics);
             lantern.onGround = true;
             BasePlank basePlank = new BasePlank(TeamType.A, "GustoMap", new Vector2(150, -300), _content, _graphics);
@@ -125,6 +128,7 @@ namespace Gusto
             ItemUtility.ItemsToUpdate.Add(pickaxe);
             ItemUtility.ItemsToUpdate.Add(pistolAmmo);
             ItemUtility.ItemsToUpdate.Add(cannonAmmo);
+            ItemUtility.ItemsToUpdate.Add(harpoonAmmo);
             ItemUtility.ItemsToUpdate.Add(basePlank);
             ItemUtility.ItemsToUpdate.Add(campfire);
 
