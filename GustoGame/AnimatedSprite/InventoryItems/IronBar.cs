@@ -16,6 +16,7 @@ namespace Gusto.AnimatedSprite
         public IronBar(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
             itemKey = "ironBar";
+            msCraftTime = 8000;
             Texture2D texture = content.Load<Texture2D>("IronBar");
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

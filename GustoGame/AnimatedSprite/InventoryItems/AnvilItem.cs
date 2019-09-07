@@ -17,6 +17,8 @@ namespace Gusto.AnimatedSprite.InventoryItems
         public AnvilItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
             itemKey = "anvilItem";
+            msCraftTime = 18000;
+
             Texture2D texture = content.Load<Texture2D>("Anvil");
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)

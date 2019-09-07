@@ -31,6 +31,8 @@ namespace Gusto.Models.Animated
         float msPickupTimer;
         float msSinceStartPickupTimer;
 
+        Queue<InventoryItem> craftingQueue;
+
         PiratePlayer playerNearItem;
         public TeamType teamType;
 
@@ -42,6 +44,8 @@ namespace Gusto.Models.Animated
             teamType = type;
             msPickupTimer = 5000;
             hitsToPickUp = 10;
+
+            craftingQueue = new Queue<InventoryItem>();
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -150,6 +154,11 @@ namespace Gusto.Models.Animated
         public bool GetShowMenu()
         {
             return drawCraftingMenu;
+        }
+
+        public Queue<InventoryItem> GetCraftingQueue()
+        {
+            return craftingQueue;
         }
     }
 }

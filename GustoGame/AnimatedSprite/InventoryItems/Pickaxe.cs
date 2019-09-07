@@ -19,6 +19,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
             millisecondsPerFrame = 100;
             damage = 0.1f;
             itemKey = "pickaxe";
+            msCraftTime = 10000;
 
             Texture2D texture = content.Load<Texture2D>("pickaxe");
             Texture2D textureBB = null;

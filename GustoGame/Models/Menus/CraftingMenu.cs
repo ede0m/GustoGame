@@ -22,12 +22,12 @@ namespace Gusto.Models.Menus
         bool emptySpotAvailable; // can we place in the player's inventory?
         bool itemCanStack; // can we stack in the player's inventory?
 
-        string craftSet; // used to denote what tier of items to cook/craft
+        ICraftingObject craftObj;
 
         int selectedIndex;
-        string itemMenuFunc;
         float timeRClicked;
         float timeLClicked;
+
         Dictionary<int, Rectangle> slotLocations;
         Dictionary<string, Rectangle> itemMenuButtonLocations;
         Dictionary<InventoryItem, float> saveItemSpriteScale;
@@ -37,7 +37,6 @@ namespace Gusto.Models.Menus
         float itemDisplaySizePix;
         Vector2 itemDrawLocStart;
         Vector2 cursorPos;
-        Vector2 itemMenuPos;
         Texture2D cursor;
         SpriteFont font;
 
@@ -86,11 +85,11 @@ namespace Gusto.Models.Menus
             };
         }
 
-        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, ICraftingObject craftObj)
+        public void DrawInventory(SpriteBatch sb, List<InventoryItem> itemsPlayer, ICraftingObject cftObj)
         {
             Vector2 itemDrawLoc = itemDrawLocStart;
             menuOpen = true;
-            craftSet = craftObj.GetCraftSet();
+            craftObj = cftObj;
 
             List<InventoryItem> items = itemsPlayer;
 
@@ -106,7 +105,7 @@ namespace Gusto.Models.Menus
             sb.End();
 
 
-            craftableItemsChecked = SearchCraftingRecipes(itemsPlayer, craftSet);
+            craftableItemsChecked = SearchCraftingRecipes(itemsPlayer, craftObj.GetCraftSet());
             
             int textureHW = 64;
             // draw slots
@@ -239,7 +238,7 @@ namespace Gusto.Models.Menus
                                     {
                                         if (itm == null)
                                             continue;
-                                        foreach (var ing in Mappings.ItemMappings.CraftingRecipes[craftSet][item.bbKey])
+                                        foreach (var ing in Mappings.ItemMappings.CraftingRecipes[craftObj.GetCraftSet()][item.bbKey])
                                         {
                                             if (itm.bbKey.Equals(ing.Key))
                                                 itm.amountStacked -= ing.Value;
@@ -249,11 +248,14 @@ namespace Gusto.Models.Menus
 
                                     // create inv item and add to players inv
                                     itemCreated = ItemUtility.CreateInventoryItem(item.bbKey, inventoryOfPlayer.teamType, inventoryOfPlayer.regionKey, item.location, _content, _graphics);
-                                    if (inventoryOfPlayer.AddInventoryItem(itemCreated))
+                                    craftObj.GetCraftingQueue().Enqueue(itemCreated);
+
+
+                                    /*if (inventoryOfPlayer.AddInventoryItem(itemCreated))
                                     {
                                         itemCreated.inInventory = true;
                                         itemCreated.onGround = false;
-                                    }
+                                    }*/
 
                                     timeLClicked = 0;
                                 }

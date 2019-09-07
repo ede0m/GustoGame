@@ -13,5 +13,6 @@ namespace Gusto.Models.Interfaces
         void DrawCanCraft(SpriteBatch sb, Camera camera);
         string GetCraftSet();
         bool GetShowMenu();
+        Queue<InventoryItem> GetCraftingQueue();
     }
 }

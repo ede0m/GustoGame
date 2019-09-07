@@ -22,6 +22,8 @@ namespace Gusto.Models
        
         public int restorePoints;
 
+        public float msCraftTime; // time to craft this item
+
         public bool onGround;
         public bool inInventory;
         public bool canPickUp; // proximety
