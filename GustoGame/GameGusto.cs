@@ -127,6 +127,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePistol, "pistol", 1.0f, 1.0f);
+            Texture2D textureCrossBow = Content.Load<Texture2D>("crossBow");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureCrossBow, "crossBow", 1.0f, 1.0f);
             Texture2D texturePickaxe = Content.Load<Texture2D>("pickaxe");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePickaxe, "pickaxe", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
@@ -137,6 +139,7 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTower, "tower", 0.5f, 1.0f);
+
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureCannonBall, "baseCannonBall", 1.0f, 1.0f);
             Texture2D textureCannonBallItem = Content.Load<Texture2D>("CannonBall");
@@ -145,6 +148,15 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShot, "pistolShot", 1.0f, 1.0f);
             Texture2D texturePistolShotItem = Content.Load<Texture2D>("PistolShot");
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShotItem, "pistolShotItem", 1.0f, 1.0f);
+            Texture2D textureArrowItem = Content.Load<Texture2D>("Arrow");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrowItem, "arrowItem", 1.0f, 1.0f);
+            Texture2D textureArrow = Content.Load<Texture2D>("Arrow");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrow, "arrow", 1.0f, 1.0f);
+            Texture2D textureRustyHarpoonItem = Content.Load<Texture2D>("RustyHarpoon");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoonItem, "rustyHarpoonItem", 1.0f, 1.0f);
+            Texture2D textureRustyHarpoon = Content.Load<Texture2D>("RustyHarpoon");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoon, "rustyHarpoon", 1.0f, 1.0f);
+
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");

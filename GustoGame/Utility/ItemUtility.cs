@@ -175,6 +175,12 @@ namespace Gusto.Utility
                 case ("baseChest"):
                     item = new BaseChest(team, region, location, content, graphics);
                     break;
+                case ("pistolShot"):
+                    item = new PistolShot(team, region, location, content, graphics);
+                    break;
+                case ("arrow"):
+                    item = new Arrow(team, region, location, content, graphics);
+                    break;
             }
             return item;
         }

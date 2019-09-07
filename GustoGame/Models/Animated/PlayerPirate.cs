@@ -306,7 +306,7 @@ namespace Gusto.Models.Animated
                     {
                         foreach (var item in inventory)
                         {
-                            if (item != null && item.GetType() == inHand.ammoType)
+                            if (item != null && item.GetType() == inHand.ammoItemType)
                             {
                                 if (item.amountStacked > 0)
                                     inHand.LoadAmmo(item);

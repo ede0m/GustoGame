@@ -17,9 +17,9 @@ namespace Gusto.AnimatedSprite
         {
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
-            baseMovementSpeed = 2.0f;
-            structureDamage = 1.5f;
-            groundDamage = 6.0f;
+            baseMovementSpeed = 3.0f;
+            structureDamage = 2.5f;
+            groundDamage = 9.0f;
 
             Texture2D texturePistolShot = content.Load<Texture2D>("PistolShot");
             Texture2D texturePistolShotBB = null;

@@ -93,6 +93,12 @@ namespace Gusto
             Pistol pistol = new Pistol(TeamType.A, "GustoMap", new Vector2(250, -300), _content, _graphics);
             pistol.amountStacked = 1;
             pistol.onGround = true;
+            CrossBow crossBow = new CrossBow(TeamType.A, "GustoMap", new Vector2(220, -350), _content, _graphics);
+            crossBow.amountStacked = 1;
+            crossBow.onGround = true;
+            ArrowItem arrows = new ArrowItem(TeamType.A, "GustoMap", new Vector2(210, -340), _content, _graphics);
+            arrows.onGround = true;
+            arrows.amountStacked = 10;
             PistolShotItem pistolAmmo = new PistolShotItem(TeamType.A, "GustoMap", new Vector2(220, -300), _content, _graphics);
             pistolAmmo.amountStacked = 14;
             pistolAmmo.onGround = true;
@@ -114,6 +120,8 @@ namespace Gusto
             ItemUtility.ItemsToUpdate.Add(chestLand);
             ItemUtility.ItemsToUpdate.Add(shovel);
             ItemUtility.ItemsToUpdate.Add(pistol);
+            ItemUtility.ItemsToUpdate.Add(crossBow);
+            ItemUtility.ItemsToUpdate.Add(arrows);
             ItemUtility.ItemsToUpdate.Add(pickaxe);
             ItemUtility.ItemsToUpdate.Add(pistolAmmo);
             ItemUtility.ItemsToUpdate.Add(cannonAmmo);
@@ -630,6 +638,10 @@ namespace Gusto
                     return new BasePlank(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "cannonBallItem":
                     return new CannonBallItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "arrowItem":
+                    return new ArrowItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "rustyHarpoonItem":
+                    return new RustyHarpoonItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "coal":
                     return new Coal(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "ironBar":
@@ -644,6 +656,8 @@ namespace Gusto
                     return new Pickaxe(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "pistol":
                     return new Pistol(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "crossBow":
+                    return new CrossBow(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "pistolShotItem":
                     return new PistolShotItem(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "shortSword":
