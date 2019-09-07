@@ -60,8 +60,6 @@ namespace Gusto.Models.Animated
             if (collidedWith.bbKey.Equals("playerPirate"))
             {
                 playerNearItem = (PiratePlayer)collidedWith;
-
-
             }
 
             if (collidedWith.bbKey.Equals("pickaxe"))

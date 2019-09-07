@@ -20,16 +20,16 @@ namespace Gusto.Models.Animated
         private ContentManager _content;
         private GraphicsDevice _graphics;
 
-        bool nearAnvil;
         public bool drawCraftingMenu;
-
         public string craftSet;
 
         int nTimesHit;
-        private int hitsToPickUp;
-        private bool canPickUp;
+        int hitsToPickUp;
+        bool canPickUp;
+
         float msPickupTimer;
         float msSinceStartPickupTimer;
+        float msCrafting;
 
         Queue<InventoryItem> craftingQueue;
 
@@ -53,7 +53,6 @@ namespace Gusto.Models.Animated
 
             if (collidedWith.bbKey.Equals("playerPirate"))
             {
-                nearAnvil = true;
                 playerNearItem = (PiratePlayer)collidedWith;
             }
 
@@ -77,7 +76,24 @@ namespace Gusto.Models.Animated
 
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
-            if (nearAnvil && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu)
+
+            if (craftingQueue.Count > 0)
+                msCrafting += gameTime.ElapsedGameTime.Milliseconds;
+            // create and drop item when crafting
+            if (craftingQueue.Count > 0 && msCrafting > craftingQueue.Peek().msCraftTime)
+            {
+
+                InventoryItem item = craftingQueue.Dequeue();
+                Vector2 dropLoc = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
+
+                item.location = dropLoc;
+                item.onGround = true;
+                item.amountStacked = 1;
+                ItemUtility.ItemsToUpdate.Add(item);
+                msCrafting = 0;
+            }
+
+            if (playerNearItem != null && kstate.IsKeyDown(Keys.C) && !drawCraftingMenu)
             {
                 // TODO: bring up crafting menu
                 drawCraftingMenu = true;
@@ -85,7 +101,7 @@ namespace Gusto.Models.Animated
 
             if (drawCraftingMenu)
             {
-                if (kstate.IsKeyDown(Keys.Escape) || !nearAnvil)
+                if (kstate.IsKeyDown(Keys.Escape) || playerNearItem == null)
                 {
                     drawCraftingMenu = false;
                 }
@@ -119,14 +135,12 @@ namespace Gusto.Models.Animated
                 }
             }
 
-
-            nearAnvil = false;
             playerNearItem = null;
         }
 
         public void DrawCanCraft(SpriteBatch sb, Camera camera)
         {
-            if (nearAnvil)
+            if (playerNearItem != null)
             {
                 SpriteFont font = _content.Load<SpriteFont>("helperFont");
                 sb.Begin(camera);
