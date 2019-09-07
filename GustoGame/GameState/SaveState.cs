@@ -61,6 +61,8 @@ namespace Gusto.SaveState
         [DataMember]
         public Guid playerInInteriorId { get; set; }
         [DataMember]
+        public Vector2 interiorEntranceLocation { get; set; }
+        [DataMember]
         public string inHandItemKey { get; set; }
         [DataMember]
         public float health { get; set; }

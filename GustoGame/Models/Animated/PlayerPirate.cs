@@ -46,7 +46,7 @@ namespace Gusto.Models.Animated
 
         public Ship playerOnShip;
         public Structure playerNearStructure;
-        Vector2 entranceLoc;
+        public Vector2 entranceLoc; // save location where player entered interior
 
         public Interior playerInInterior;
         public HandHeld inHand;

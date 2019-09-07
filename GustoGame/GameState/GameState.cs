@@ -207,6 +207,7 @@ namespace Gusto
                     PlayerState state = new PlayerState();
                     state.team = player.teamType;
                     state.location = player.location;
+                    state.interiorEntranceLocation = player.entranceLoc;
                     state.region = player.regionKey;
                     state.inventory = SerializeInventory(player.inventory);
                     state.onShip = player.onShip;
@@ -367,6 +368,7 @@ namespace Gusto
                     }
                     else
                     {
+                        player.entranceLoc = ps.interiorEntranceLocation;
                         // check if the interior already exists
                         foreach (KeyValuePair<Guid, Interior> interior in BoundingBoxLocations.interiorMap)
                         {
