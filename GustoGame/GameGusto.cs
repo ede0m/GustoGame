@@ -151,11 +151,11 @@ namespace Gusto
             Texture2D textureArrowItem = Content.Load<Texture2D>("Arrow");
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrowItem, "arrowItem", 1.0f, 1.0f);
             Texture2D textureArrow = Content.Load<Texture2D>("Arrow");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrow, "arrow", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrow, "arrow", 1.0f, 0.5f); // SCALING BOUNDING BOX FOR DIRECTIONAL AMMO
             Texture2D textureRustyHarpoonItem = Content.Load<Texture2D>("RustyHarpoon");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoonItem, "rustyHarpoonItem", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoonItem, "rustyHarpoonItem", 1.0f, 0.5f); 
             Texture2D textureRustyHarpoon = Content.Load<Texture2D>("RustyHarpoon");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoon, "rustyHarpoon", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoon, "rustyHarpoon", 1.0f, 0.5f); // SCALING BOUNDING BOX FOR DIRECTIONAL AMMO
 
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);

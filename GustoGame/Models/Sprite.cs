@@ -165,9 +165,9 @@ namespace Gusto.Models
         // SETS Location of bounding box using width and height from preprocessed bb size. 
         public void SetBoundingBox()
         {
-
             if (bbKey != null)
             {
+
                 boundingBoxRect = BoundingBoxTextures.DynamicBoundingBoxTextures[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()];
                 // texture is drawn to orgin, so we must offset our bounding boxes by this manually
                 var originXOffset = ((int)(targetRectangle.Right * spriteScale) - (int)(targetRectangle.Left * spriteScale)) / 2;
@@ -190,7 +190,20 @@ namespace Gusto.Models
                     boundingBoxRect.Y = (int)location.Y - originYOffset + boundingBoxRect.Y;
                 }
 
-                // polygon
+                // THIS DOESN'T WORK FOR NOW :( - non axis aligned collision
+                /*if (rotation != 0)
+                {
+                    Vector2 bbRectVect = boundingBoxRect.Location.ToVector2();
+                    var m = Matrix.CreateRotationZ((rotation * (float)(180.0 / Math.PI)));
+                    var translateTo = Matrix.CreateTranslation(bbRectVect.X, bbRectVect.Y, 0);
+                    var translateBack = Matrix.CreateTranslation(-bbRectVect.X, -bbRectVect.Y, 0);
+                    var combined = translateTo * m * translateBack;
+                    Vector2 rotatedBBLoc = Vector2.Transform(boundingBoxRect.Location.ToVector2(), combined);
+                    boundingBoxRect.X = (int)rotatedBBLoc.X;
+                    boundingBoxRect.Y = (int)rotatedBBLoc.Y;
+                }*/
+
+                // polygon collision
                 if (boundingPolygon != null)
                 {
                     boundingPolygon.Verts = BoundingBoxTextures.DynamicBoundingPolygons[bbKey][currColumnFrame.ToString() + currRowFrame.ToString()].Verts; // TODO - Bug! we nee a copy here, not the static ref
