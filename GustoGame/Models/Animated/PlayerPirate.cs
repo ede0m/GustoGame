@@ -1,6 +1,7 @@
 ﻿using Comora;
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
+using Gusto.Mappings;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
@@ -155,24 +156,60 @@ namespace Gusto.Models.Animated
             timeSinceLastTurnFrame += gameTime.ElapsedGameTime.Milliseconds;
             timeSinceLastWalkFrame += gameTime.ElapsedGameTime.Milliseconds;
 
-            // check inventory for treasure maps
+            // check inventory 
             BoundingBoxLocations.treasureLocationsList.Clear();
-            List<int> removeSolved = new List<int>();
+            List<int> removeSolvedOrSpoiled = new List<int>();
+            List<InventoryItem> addTimedItem = new List<InventoryItem>();
             foreach(var item in inventory)
             {
                 if (item == null)
                     continue;
+
+                // for spoiled food
+                if (item is ISpoiles)
+                {
+                    item.msSpoilTime += gameTime.ElapsedGameTime.Milliseconds;
+                    Tuple<int, string> spoilDetails = ItemMappings.SpoilMappings[item.bbKey];
+
+                    if (item.msSpoilTime > spoilDetails.Item1)
+                    {
+                        InventoryItem spoiled = ItemUtility.CreateInventoryItem(spoilDetails.Item2, teamType, regionKey, location, _content, _graphics);
+                        item.msSpoilTime = 0;
+                        if (item.amountStacked > 1)
+                            item.amountStacked -= 1;
+                        else
+                            removeSolvedOrSpoiled.Add(inventory.IndexOf(item));
+
+                        addTimedItem.Add(spoiled);
+                    }
+                }
+
+                // for treasure maps
                 if (item.bbKey.Equals("treasureMapItem"))
                 {
                     TreasureMap map = (TreasureMap)item;
                     if (map.solved)
-                        removeSolved.Add(inventory.IndexOf(item));
+                        removeSolvedOrSpoiled.Add(inventory.IndexOf(item));
                     else
                         BoundingBoxLocations.treasureLocationsList.Add(map);
                 }
             }
-            foreach (var removeSolvedMap in removeSolved)
-                inventory[removeSolvedMap] = null;
+            foreach (var remove in removeSolvedOrSpoiled)
+                inventory[remove] = null;
+            foreach (var item in addTimedItem)
+            {
+                if (!AddInventoryItem(item))
+                {
+                    item.location = new Vector2(GetBoundingBox().Center.ToVector2().X, GetBoundingBox().Center.ToVector2().Y + 40);
+                    item.onGround = true;
+
+                    if (inInteriorId != Guid.Empty) // add drops to interior
+                        BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
+                    else // add drops to world
+                        ItemUtility.ItemsToUpdate.Add(item);
+                }
+            }
+
             
 
             if (showHealthBar)

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class RawMeat : InventoryItem
+    public class RawMeat : InventoryItem, ISpoiles
     {
         public RawMeat(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {

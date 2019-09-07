@@ -292,9 +292,16 @@ namespace Gusto.Mappings
                     },
                 }
             },
-
-
         };
+
+        public static Dictionary<string, Tuple<int, string>> SpoilMappings = new Dictionary<string, Tuple<int, string>>
+        {
+            { "rawMeat", new Tuple<int, string>(10000, "spoiledMeat") },
+            { "rawFish", new Tuple<int, string>(10000, "spoiledFish") },
+            { "cookedMeat", new Tuple<int, string>(200000, "spoiledMeat") },
+            { "cookedFish", new Tuple<int, string>(200000, "spoiledFish") },
+        };
+
 
     }
 }

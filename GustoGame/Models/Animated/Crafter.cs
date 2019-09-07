@@ -88,8 +88,6 @@ namespace Gusto.Models.Animated
 
                 item.location = dropLoc;
                 item.onGround = true;
-                item.amountStacked = 1;
-
 
                 if (inInteriorId != Guid.Empty) // add drops to interior
                     BoundingBoxLocations.interiorMap[inInteriorId].interiorObjectsToAdd.Add(item);
