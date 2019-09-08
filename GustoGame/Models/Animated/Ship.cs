@@ -359,24 +359,27 @@ namespace Gusto.Models.Animated
                 timeSinceStartRepairing = 0;
             }
 
-            // set ship mount (set as first appearing in action Inv)
             mountedOnShip = null;
-            for (int i = 0; i < actionInventory.Count; i++)
+            if (playerAboard)
             {
-                if (actionInventory[i] is IShipMount)
+                // set ship mount (set as first appearing in action Inv)
+                for (int i = 0; i < actionInventory.Count; i++)
                 {
-                    mountedOnShip = (ShipMount)actionInventory[i];
-                    mountedOnShip.teamType = teamType;
-                    mountedOnShip.remove = false;
-                    mountedOnShip.location = GetBoundingBox().Center.ToVector2(); // displays in center of ship
-                    // todo rotation
-                    break;
+                    if (actionInventory[i] is IShipMount)
+                    {
+                        mountedOnShip = (ShipMount)actionInventory[i];
+                        mountedOnShip.teamType = teamType;
+                        mountedOnShip.remove = false;
+                        mountedOnShip.location = GetBoundingBox().Center.ToVector2(); // displays in center of ship
+                                                                                      // todo rotation
+                        break;
+                    }
                 }
-            }
 
-            // ship mount (aiming and firing)
-            if (mountedOnShip != null)
-                mountedOnShip.Update(kstate, gameTime, camera, actionInventory);
+                // ship mount (aiming and firing)
+                if (mountedOnShip != null)
+                    mountedOnShip.Update(kstate, gameTime, camera, actionInventory);
+            }
 
             if (colliding || anchored || !playerAboard || health <= 0)
             {
