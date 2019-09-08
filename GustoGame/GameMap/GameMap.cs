@@ -176,7 +176,7 @@ namespace Gusto.GameMap
                 case "gr1":
                     groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics));
                     groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics)); 
-                    groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics)); // three grasses encoded per tile
+                    //groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics)); // three grasses encoded per tile
                     break;
                 case "rk1":
                     groundObjs.Add(new Rock1(TeamType.GroundObject, region, loc, content, graphics));

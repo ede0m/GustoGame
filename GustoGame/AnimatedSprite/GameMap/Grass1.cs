@@ -28,7 +28,7 @@ namespace Gusto.AnimatedSprite.GameMap
             Texture2D textureGrass1BB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureGrass1BB = new Texture2D(graphics, textureGrass1.Width, textureGrass1.Height);
-            Asset Grass1Asset = new Asset(textureGrass1, textureGrass1BB, 2, 1, 0.5f, objKey, region);
+            Asset Grass1Asset = new Asset(textureGrass1, textureGrass1BB, 2, 1, 0.6f, objKey, region);
             SetSpriteAsset(Grass1Asset, location);
         }
     }
