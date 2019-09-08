@@ -24,7 +24,7 @@ namespace Gusto.Models
 
         public int tileKey;
 
-        public Sprite groundObject; // any tree, rock, etc asset we want to set to this tile.
+        public List<Sprite> groundObjects; // any tree, rock, etc asset we want to set to this tile.
         public bool wallPiece;
         public bool shorePiece;
         
@@ -35,12 +35,12 @@ namespace Gusto.Models
 
         public bool canFillHole;
 
-        public TilePiece(int key, Sprite _groundObject, ContentManager content, GraphicsDevice graphics) : base(null)
+        public TilePiece(int key, List<Sprite> _groundObjects, ContentManager content, GraphicsDevice graphics) : base(null)
         {
             _graphics = graphics;
             _content = content;
             tileKey = key;
-            groundObject = _groundObject;
+            groundObjects = _groundObjects;
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)

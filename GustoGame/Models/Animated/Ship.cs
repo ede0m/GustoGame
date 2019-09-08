@@ -26,33 +26,23 @@ namespace Gusto.Models.Animated
 
         Guid shipId;
 
-        public float timeSinceLastShot;
+        //public float timeSinceLastShot;
         public float timeSinceStartAnchor;
         public float timeSinceStartRepairing;
         public float timeSinceStartSinking;
-        public int timeSinceLastExpClean;
         public int timeSinceLastTurn;
         public int timeShowingHealthBar;
         public float millisecondsNewShot;
         public float millisecondsToAnchor;
         public float msToRepair;
         public float millisecondToSink;
-        public int millisecondsExplosionLasts;
         public int millisecondsPerTurn; // turning speed
         public float msBoarding;
-
-        // aim line stuff
-        Vector2 edgeFull;
-        Vector2 edgeReload;
-        Vector2 startAimLine;
-        Vector2 endAimLineFull;
-        Vector2 endAimLineReload;
 
         private Texture2D meterFull;
         private Texture2D meterProg;
 
         public Vector2 currentShipSpeed;
-        public float shotRange;
         public float attackRange;
         public float stopRange;
         public float movementSpeed;
@@ -64,6 +54,9 @@ namespace Gusto.Models.Animated
         public int nSails;
         int shipWindWindowMax;
         int shipWindWindowMin;
+
+        Texture2D meterAlive;
+        Texture2D meterDead;
         public float health;
         public float fullHealth;
         private bool showHealthBar;
@@ -80,16 +73,16 @@ namespace Gusto.Models.Animated
         public TeamType teamType;
         public Sprite randomRoamTile;
         public Sail shipSail { get; set; }
-        public List<Ammo> Shots;
+
+        public ShipMount mountedOnShip;
         public List<InventoryItem> actionInventory;
         public Interior shipInterior;
         Guid boardingShipInteriorId;
-        public InventoryItem ammoLoaded;
         public int maxInventorySlots;
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
-            Shots = new List<Ammo>();
+            //Shots = new List<Ammo>();
             actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             teamType = type;
             _content = content;
@@ -99,6 +92,13 @@ namespace Gusto.Models.Animated
             percentNotAnchored = 1;
             meterFull = new Texture2D(_graphics, 1, 1);
             meterProg = new Texture2D(_graphics, 1, 1);
+            meterFull.SetData<Color>(new Color[] { Color.IndianRed });
+            meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
+
+            meterAlive = new Texture2D(_graphics, 1, 1);
+            meterDead = new Texture2D(_graphics, 1, 1);
+            meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
+            meterDead.SetData<Color>(new Color[] { Color.IndianRed });
 
             shipId = Guid.NewGuid();
 
@@ -161,7 +161,6 @@ namespace Gusto.Models.Animated
         public void Update(KeyboardState kstate, GameTime gameTime, Camera camera)
         {
             timeSinceLastTurn += gameTime.ElapsedGameTime.Milliseconds;
-            timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
 
             if (showHealthBar)
                 timeShowingHealthBar += gameTime.ElapsedGameTime.Milliseconds;
@@ -178,20 +177,6 @@ namespace Gusto.Models.Animated
             else
                 PlayerUpdate(kstate, gameTime, camera);
             
-            // clean shots
-            foreach (var shot in Shots)
-                shot.Update(kstate, gameTime);
-            if (timeSinceLastExpClean > millisecondsExplosionLasts)
-            {
-                // remove exploded shots
-                for (int i = 0; i < Shots.Count; i++)
-                {
-                    if (Shots[i].exploded || Shots[i].outOfRange)
-                        Shots.RemoveAt(i);
-                }
-                timeSinceLastExpClean = 0;
-            }
-
             int windDir = WeatherState.wind.getWindDirection();
             int windSp = WeatherState.wind.getWindSpeed();
 
@@ -374,69 +359,24 @@ namespace Gusto.Models.Animated
                 timeSinceStartRepairing = 0;
             }
 
-
-            // aiming
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && playerAboard)
+            // set ship mount (set as first appearing in action Inv)
+            mountedOnShip = null;
+            for (int i = 0; i < actionInventory.Count; i++)
             {
-                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-                float percentReloaded = timeSinceLastShot / millisecondsNewShot;
-
-                aiming = true;
-                startAimLine = GetBoundingBox().Center.ToVector2();
-
-                Vector2 mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                Vector2 clickPos = mousePos - new Vector2(GameOptions.PrefferedBackBufferWidth/2, GameOptions.PrefferedBackBufferHeight/2)+ camera.Position;
-                Vector2 reloadSpot = new Vector2(((1 - percentReloaded) * startAimLine.X + (percentReloaded * clickPos.X)), ((1 - percentReloaded) * startAimLine.Y + (percentReloaded * clickPos.Y)));
-
-                var lineDistanceFull = PhysicsUtility.VectorMagnitude(clickPos.X, startAimLine.X, clickPos.Y, startAimLine.Y);
-                var lineDistanceReload = PhysicsUtility.VectorMagnitude(reloadSpot.X, startAimLine.X, reloadSpot.Y, startAimLine.Y);
-
-                float disRatio = shotRange / lineDistanceFull;
-                Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * clickPos.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * clickPos.Y)));
-
-                // restrict aiming by shotRange
-                if (lineDistanceFull > shotRange)
-                    endAimLineFull = maxPos;
-                else
-                    endAimLineFull = clickPos;
-
-                if (lineDistanceReload > lineDistanceFull || lineDistanceReload > shotRange)
-                    endAimLineReload = endAimLineFull;
-                else
-                    endAimLineReload = reloadSpot;
-            }
-            else { aiming = false; }
-
-            // shooting
-            if (aiming && kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot && playerAboard)
-            {
-                // loading ammo
-                if (ammoLoaded == null)
+                if (actionInventory[i] is IShipMount)
                 {
-                    for (int i = 0; i < actionInventory.Count(); i++)
-                    {
-                        var item = actionInventory[i];
-                        if (item != null && item.GetType() == typeof(Gusto.AnimatedSprite.InventoryItems.CannonBallItem)) // TODO: refactor to support multiple cannon types? Maybe have ship have weaponSelected like inHand
-                        {
-                            if (item.amountStacked > 0)
-                                ammoLoaded = item;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    //Vector2 shotDirection = new Tuple<int, int>((int)endAimLineFull.X, (int)endAimLineFull.Y);
-                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, startAimLine, _content, _graphics);
-                    cannonShot.SetFireAtDirection(endAimLineFull, RandomEvents.rand.Next(10, 25), 0);
-                    cannonShot.moving = true;
-                    Shots.Add(cannonShot);
-                    timeSinceLastShot = 0;
-                    ammoLoaded.amountStacked -= 1;
-                    if (ammoLoaded.amountStacked <= 0)
-                        ammoLoaded = null;  
+                    mountedOnShip = (ShipMount)actionInventory[i];
+                    mountedOnShip.teamType = teamType;
+                    mountedOnShip.remove = false;
+                    mountedOnShip.location = GetBoundingBox().Center.ToVector2(); // displays in center of ship
+                    // todo rotation
+                    break;
                 }
             }
+
+            // ship mount (aiming and firing)
+            if (mountedOnShip != null)
+                mountedOnShip.Update(kstate, gameTime, camera, actionInventory);
 
             if (colliding || anchored || !playerAboard || health <= 0)
             {
@@ -458,7 +398,7 @@ namespace Gusto.Models.Animated
                 // AI ship direction and movement
                 if (timeSinceLastTurn > millisecondsPerTurn)
                 {
-                    Vector2? target = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox(), inInteriorId);
+                    Vector2? target = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
                     if (target != null)
                     {
                         roaming = false;
@@ -556,25 +496,14 @@ namespace Gusto.Models.Animated
                     timeSinceLastTurn -= millisecondsPerTurn;
                 }
 
-                // AI Ship Shooting
-                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-                if (timeSinceLastShot > millisecondsNewShot && health > 0)
+                // AI shooting
+                if (mountedOnShip != null)
                 {
-                    Vector2? shotDirection = AIUtility.ChooseTarget(teamType, shotRange, GetBoundingBox(), inInteriorId);
-                    if (shotDirection != null)
-                    {
-                        Vector2 shipCenter = GetBoundingBox().Center.ToVector2();
-                        BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shipCenter, _content, _graphics);
-                        int cannonBallTextureCenterOffsetX = cannonShot.targetRectangle.Width / 2;
-                        int cannonBallTextureCenterOffsetY = cannonShot.targetRectangle.Height / 2;
-                        cannonShot.location.X -= cannonBallTextureCenterOffsetX;
-                        cannonShot.location.Y -= cannonBallTextureCenterOffsetY;
-                        cannonShot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
-                        cannonShot.moving = true;
-                        Shots.Add(cannonShot);
-                    }
-                    timeSinceLastShot = 0;
+                    Vector2? shotDirection = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
+                    mountedOnShip.UpdateAIMountShot(gameTime, shotDirection);
+                    mountedOnShip.location = GetBoundingBox().Center.ToVector2();
                 }
+
             }
 
             
@@ -653,33 +582,10 @@ namespace Gusto.Models.Animated
                 shipInterior.interiorObjects.Remove(toRem);
         }
 
-        public void DrawAimLine(SpriteBatch sb, Camera camera)
-        {
-            Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
-            Texture2D reloadLineTexture = new Texture2D(_graphics, 1, 1);
-            aimLineTexture.SetData<Color>(new Color[] { Color.IndianRed });
-            reloadLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
-
-            edgeFull = endAimLineFull - startAimLine;
-            edgeReload =  endAimLineReload - startAimLine;
-            float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
-            float angleReload = (float)Math.Atan2(edgeReload.Y, edgeReload.X);
-
-            var lineFull = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeFull.Length(), 4);
-            var lineReload = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeReload.Length(), 4);
-
-            sb.Begin(camera);
-            sb.Draw(aimLineTexture, lineFull, null, Color.IndianRed, angleFull, new Vector2(0, 0), SpriteEffects.None, 0);
-            sb.Draw(reloadLineTexture, lineReload, null, Color.DarkSeaGreen, angleReload, new Vector2(0, 0), SpriteEffects.None, 0);
-            sb.End();
-        }
-
         public void DrawAnchorMeter(SpriteBatch sb, Vector2 pos, Texture2D anchorIcon)
         {
             if (teamType == TeamType.Player)
             {
-                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
-                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentNotAnchored) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
@@ -695,8 +601,6 @@ namespace Gusto.Models.Animated
         {
             if (teamType == TeamType.Player)
             {
-                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
-                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentNotRepaired) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
@@ -712,8 +616,6 @@ namespace Gusto.Models.Animated
         {
             if (teamType == TeamType.Player)
             {
-                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
-                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentBoarded) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
@@ -739,10 +641,6 @@ namespace Gusto.Models.Animated
         {
             if (showHealthBar)
             {
-                Texture2D meterAlive = new Texture2D(_graphics, 1, 1);
-                Texture2D meterDead = new Texture2D(_graphics, 1, 1);
-                meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
-                meterDead.SetData<Color>(new Color[] { Color.IndianRed });
                 float healthLeft = (1f - (1f - (health / fullHealth))) * 60f;
                 Rectangle dead = new Rectangle((int)shipSail.GetBoundingBox().Center.X - 30, (int)shipSail.GetBoundingBox().Center.Y - 130, 60, 7);
                 Rectangle alive = new Rectangle((int)shipSail.GetBoundingBox().Center.X - 30, (int)shipSail.GetBoundingBox().Center.Y - 130, (int)healthLeft, 7);

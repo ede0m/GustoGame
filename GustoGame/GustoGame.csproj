@@ -42,13 +42,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\FiredAmmo\Arrow.cs" />
     <Compile Include="AnimatedSprite\BaseBarrel.cs" />
     <Compile Include="AnimatedSprite\BaseCat.cs" />
     <Compile Include="AnimatedSprite\BaseChest.cs" />
     <Compile Include="AnimatedSprite\CampFire.cs" />
     <Compile Include="AnimatedSprite\Chicken.cs" />
     <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
-    <Compile Include="AnimatedSprite\BaseCannonBall.cs" />
+    <Compile Include="AnimatedSprite\FiredAmmo\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\ClayFurnace.cs" />
@@ -66,11 +67,14 @@
     <Compile Include="AnimatedSprite\InventoryItems\BaseBarrelItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseChestItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\BaseSword.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\ArrowItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\Ballista.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\BaseCannon.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\BaseSword.cs" />
     <Compile Include="AnimatedSprite\BaseTribal.cs" />
     <Compile Include="AnimatedSprite\GameMap\LandTile.cs" />
     <Compile Include="AnimatedSprite\GameMap\OceanTile.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\CannonBallItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\CannonBallItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Cooking\ChiliFish.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\ClayFurnaceItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Coal.cs" />
@@ -82,24 +86,27 @@
     <Compile Include="AnimatedSprite\InventoryItems\Cooking\RawMeat.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Cooking\SpoiledFish.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Cooking\SpoiledMeat.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\CrossBow.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Feather.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\GoldCoins.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\Pickaxe.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\Pickaxe.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IronBar.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IronOre.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\IslandGrass.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Lantern.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Nails.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\Pistol.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\PistolShotItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\Pistol.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\PistolShotItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Scales.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\Shovel.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\RustyHarpoonItem.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\Shovel.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\SoftWood.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\TreasureMapItem.cs" />
-    <Compile Include="AnimatedSprite\PistolShot.cs" />
+    <Compile Include="AnimatedSprite\FiredAmmo\PistolShot.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\TribalTokens.cs" />
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
-    <Compile Include="AnimatedSprite\InventoryItems\ShortSword.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\Weapon\ShortSword.cs" />
+    <Compile Include="AnimatedSprite\FiredAmmo\RustyHarpoon.cs" />
     <Compile Include="AnimatedSprite\Snake.cs" />
     <Compile Include="AnimatedSprite\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
@@ -129,8 +136,12 @@
     <Compile Include="Models\Animated\Cooker.cs" />
     <Compile Include="Models\Animated\Crafter.cs" />
     <Compile Include="Models\Animated\Container.cs" />
+    <Compile Include="Models\Animated\Weapon\ShipMount.cs" />
+    <Compile Include="Models\Interfaces\IShipAmmoItem.cs" />
     <Compile Include="Models\Interfaces\ICookingObject.cs" />
+    <Compile Include="Models\Interfaces\IDirectionalAmmo.cs" />
     <Compile Include="Models\Interfaces\ILand.cs" />
+    <Compile Include="Models\Interfaces\IShipMount.cs" />
     <Compile Include="Models\Interfaces\ISpoiles.cs" />
     <Compile Include="Models\Interior.cs" />
     <Compile Include="Models\Animated\Storage.cs" />
@@ -293,6 +304,7 @@
     <Content Include="Content\tower.png" />
     <Content Include="Content\WindArrows.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

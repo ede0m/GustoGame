@@ -15,7 +15,7 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class LandTile : TilePiece, ILand
     {
-        public LandTile(int index, Sprite groundObj, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (index, groundObj, content, graphics)
+        public LandTile(int index, List<Sprite> groundObjs, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base (index, groundObjs, content, graphics)
         {
             Texture2D textureLandTile = null;
 

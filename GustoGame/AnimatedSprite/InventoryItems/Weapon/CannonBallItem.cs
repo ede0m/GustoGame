@@ -1,4 +1,5 @@
 ﻿using Gusto.Models;
+using Gusto.Models.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gusto.AnimatedSprite.InventoryItems
 {
-    public class CannonBallItem : InventoryItem
+    public class CannonBallItem : InventoryItem, IShipAmmoItem
     {
         public CannonBallItem(TeamType team, string region, Vector2 location, ContentManager content, GraphicsDevice graphics) : base(team, content, graphics)
         {
@@ -23,6 +24,11 @@ namespace Gusto.AnimatedSprite.InventoryItems
             Asset baseCannonBallItemAsset = new Asset(textureCannonBallItem, textureCannonBallItemBB, 2, 1, 1.0f, "cannonBallItem", region);
             SetSpriteAsset(baseCannonBallItemAsset, location);
             stackable = true;
+        }
+
+        public string GetFiredAmmoKey()
+        {
+            return "baseCannonBall";
         }
     }
 }

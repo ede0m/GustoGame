@@ -127,6 +127,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePistol, "pistol", 1.0f, 1.0f);
+            Texture2D textureCrossBow = Content.Load<Texture2D>("crossBow");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureCrossBow, "crossBow", 1.0f, 1.0f);
             Texture2D texturePickaxe = Content.Load<Texture2D>("pickaxe");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePickaxe, "pickaxe", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
@@ -137,6 +139,7 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTower, "tower", 0.5f, 1.0f);
+
             Texture2D textureCannonBall = Content.Load<Texture2D>("CannonBall");
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureCannonBall, "baseCannonBall", 1.0f, 1.0f);
             Texture2D textureCannonBallItem = Content.Load<Texture2D>("CannonBall");
@@ -145,8 +148,19 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShot, "pistolShot", 1.0f, 1.0f);
             Texture2D texturePistolShotItem = Content.Load<Texture2D>("PistolShot");
             LoadDynamicBoundingBoxPerFrame(false, 1, 2, texturePistolShotItem, "pistolShotItem", 1.0f, 1.0f);
+            Texture2D textureArrowItem = Content.Load<Texture2D>("Arrow");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrowItem, "arrowItem", 1.0f, 1.0f);
+            Texture2D textureArrow = Content.Load<Texture2D>("Arrow");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureArrow, "arrow", 1.0f, 0.5f); // SCALING BOUNDING BOX FOR DIRECTIONAL AMMO
+            Texture2D textureRustyHarpoonItem = Content.Load<Texture2D>("RustyHarpoon");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoonItem, "rustyHarpoonItem", 1.0f, 0.5f); 
+            Texture2D textureRustyHarpoon = Content.Load<Texture2D>("RustyHarpoon");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureRustyHarpoon, "rustyHarpoon", 1.0f, 0.5f); // SCALING BOUNDING BOX FOR DIRECTIONAL AMMO
+
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
-            LoadDynamicBoundingBoxPerFrame(false, 8, 1, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
+            Texture2D textureBallista = Content.Load<Texture2D>("Ballista");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureBallista, "ballista", 1.0f, 1.0f);
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
             Texture2D textureBarrel = Content.Load<Texture2D>("Barrel");
@@ -182,8 +196,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(true, 2, 4, textureTree3, "tree3", 0.6f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSoftWood, "softWood", 0.5f, 1.0f);
-            Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureGrass1, "grass1", 1.5f, 1.0f);
+            Texture2D textureGrass1 = Content.Load<Texture2D>("RevisedGrass1");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureGrass1, "grass1", 0.6f, 1.0f);
             Texture2D textureRock1 = Content.Load<Texture2D>("Rock1");
             LoadDynamicBoundingBoxPerFrame(false, 2, 4, textureRock1, "rock1", 0.3f, 1.0f);
             Texture2D textureIslandGrass = Content.Load<Texture2D>("islandGrass");
@@ -375,17 +389,19 @@ namespace Gusto
                         SpatialBounding.SetQuad(tp.GetBase());
                     }
 
-                    // handle ground objects (and respawn)
-                    if (tp.groundObject != null)
+                    if (tp.groundObjects != null)
                     {
-                        if (!tp.groundObject.remove)
-                            BoundingBoxLocations.GroundObjectLocationList.Add(tp.groundObject);
-                        else
+                        foreach (var groundObject in tp.groundObjects)
                         {
-                            if (tp.groundObject is IGroundObject)
+                            if (!groundObject.remove)
+                                BoundingBoxLocations.GroundObjectLocationList.Add(groundObject);
+                            else
                             {
-                                IGroundObject go = (IGroundObject)tp.groundObject;
-                                go.UpdateRespawn(gameTime);
+                                if (groundObject is IGroundObject)
+                                {
+                                    IGroundObject go = (IGroundObject)groundObject;
+                                    go.UpdateRespawn(gameTime);
+                                }
                             }
                         }
                     }
@@ -605,13 +621,20 @@ namespace Gusto
                         }
                         else
                         {
-                            // Draw a ships sail before a ship
+                            // Draw a ship before its sail and mount
                             ship.Draw(spriteBatchView, this.camera);
+                            if (ship.mountedOnShip != null)
+                            {
+                                foreach (var shot in ship.mountedOnShip.Shots)
+                                    shot.Draw(spriteBatchView, this.camera);
+                                if (ship.mountedOnShip.aiming)
+                                {
+                                    ship.mountedOnShip.Draw(spriteBatchView, this.camera);
+                                    if (ship.teamType == TeamType.Player)
+                                        ship.mountedOnShip.DrawAimLine(spriteBatchView, this.camera);
+                                }
+                            }
                             ship.shipSail.Draw(spriteBatchView, this.camera);
-                            foreach (var shot in ship.Shots)
-                                shot.Draw(spriteBatchView, this.camera);
-                            if (ship.aiming)
-                                ship.DrawAimLine(spriteBatchView, this.camera);
                         }
                         continue;
                     }

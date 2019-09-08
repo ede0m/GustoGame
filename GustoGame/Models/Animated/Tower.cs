@@ -89,7 +89,7 @@ namespace Gusto.Models.Animated
             }
 
             foreach (var shot in Shots)
-                shot.Update(kstate, gameTime);
+                shot.Update(gameTime);
 
             if (timeSinceLastExpClean > millisecondsExplosionLasts)
             {

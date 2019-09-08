@@ -96,7 +96,11 @@ namespace Gusto.Bounding
 
             else if (a is IGroundObject)
             {
+                if (b is IGroundObject)
+                    return false;
                 if (b.GetType().BaseType == typeof(Gusto.Models.TilePiece))
+                    return false;
+                if (b is IShip)
                     return false;
             }
 

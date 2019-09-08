@@ -31,7 +31,8 @@ namespace Gusto.Models.Animated
 
         public bool usingItem;
         public InventoryItem ammoLoaded;
-        public Type ammoType;
+        public string ammoTypeKey;
+        public Type ammoItemType;
         public List<Ammo> Shots;
         public Light emittingLight; // if this handheld emits any light
 
@@ -54,7 +55,7 @@ namespace Gusto.Models.Animated
 
             // clean shots
             foreach (var shot in Shots)
-                shot.Update(kstate, gameTime);
+                shot.Update(gameTime);
             if (timeSinceLastExpClean > millisecondsExplosionLasts)
             {
                 // remove exploded shots
@@ -159,8 +160,7 @@ namespace Gusto.Models.Animated
                         if (ammoLoaded != null)
                         {
                             Vector2 shotStart = new Vector2(GetBoundingBox().Center.ToVector2().X + shotOffsetX, GetBoundingBox().Center.ToVector2().Y + shotOffsetY);
-                            PistolShot pistolShot = new PistolShot(teamType, regionKey, shotStart, _content, _graphics);
-                            //int offsetStraight = shootHorz ? (pistolShot.GetBoundingBox().Y - shotDirection.Item2) : (pistolShot.GetBoundingBox().X - shotDirection.Item1);
+                            Ammo shot = (Ammo)ItemUtility.CreateItem(ammoTypeKey, TeamType.Player, regionKey, shotStart, _content, _graphics);
 
                             if (shootHorz)
                             {
@@ -168,9 +168,15 @@ namespace Gusto.Models.Animated
                                 if (!shootUp && !shootDown)
                                 {
                                     if (currRowFrame == 1) // right
-                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X + shotRange, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y);
+                                    {
+                                        shot.rotation = (shot is IDirectionalAmmo) ? 1.5f : 0;
+                                        shotDirection = new Vector2((int)shot.GetBoundingBox().Center.ToVector2().X + shotRange, (int)shot.GetBoundingBox().Center.ToVector2().Y);
+                                    }
                                     else
-                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X - shotRange, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y);
+                                    {
+                                        shot.rotation = (shot is IDirectionalAmmo) ? -1.5f : 0;
+                                        shotDirection = new Vector2((int)shot.GetBoundingBox().Center.ToVector2().X - shotRange, (int)shot.GetBoundingBox().Center.ToVector2().Y);
+                                    }
                                 }
                                 else
                                 {
@@ -178,16 +184,29 @@ namespace Gusto.Models.Animated
                                     if (shootUp)
                                     {
                                         if (currRowFrame == 1)
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? 0.75f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        }
+
                                         else
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? -0.75f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        }
                                     }
                                     else
                                     {
                                         if (currRowFrame == 1)
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? 2.25f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        }
                                         else
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? -2.25f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        }
                                     }
                                 }
                             }
@@ -197,9 +216,12 @@ namespace Gusto.Models.Animated
                                 if (!shootLeft && !shootRight)
                                 {
                                     if (currRowFrame == 0) // down
-                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y + shotRange);
+                                    {
+                                        shot.rotation = (shot is IDirectionalAmmo) ? 3.1f : 0;
+                                        shotDirection = new Vector2((int)shot.GetBoundingBox().Center.ToVector2().X, (int)shot.GetBoundingBox().Center.ToVector2().Y + shotRange);
+                                    }
                                     else
-                                        shotDirection = new Vector2((int)pistolShot.GetBoundingBox().Center.ToVector2().X, (int)pistolShot.GetBoundingBox().Center.ToVector2().Y - shotRange);
+                                        shotDirection = new Vector2((int)shot.GetBoundingBox().Center.ToVector2().X, (int)shot.GetBoundingBox().Center.ToVector2().Y - shotRange);
                                 }
                                 else
                                 {
@@ -207,23 +229,36 @@ namespace Gusto.Models.Animated
                                     if (shootLeft)
                                     {
                                         if (currRowFrame == 0)
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? 3.8f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        }
                                         else
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? -0.75f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X - (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        }
+                                            
                                     }
                                     else
                                     {
                                         if (currRowFrame == 0)
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? 2.25f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y + (shotRange * PhysicsUtility.sin45deg)));
+                                        }
                                         else
-                                            shotDirection = new Vector2((int)(pistolShot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(pistolShot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        {
+                                            shot.rotation = (shot is IDirectionalAmmo) ? 0.75f : 0;
+                                            shotDirection = new Vector2((int)(shot.GetBoundingBox().Center.ToVector2().X + (shotRange * PhysicsUtility.sin45deg)), (int)(shot.GetBoundingBox().Center.ToVector2().Y - (shotRange * PhysicsUtility.sin45deg)));
+                                        }
                                     }
                                 }
                             }
 
-                            pistolShot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), 0);
-                            pistolShot.moving = true;
-                            Shots.Add(pistolShot);
+                            shot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), 0);
+                            shot.moving = true;
+                            Shots.Add(shot);
                             ammoLoaded.amountStacked -= 1;
                             if (ammoLoaded.amountStacked == 0)
                                 ammoLoaded = null;
