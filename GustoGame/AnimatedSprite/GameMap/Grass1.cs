@@ -24,11 +24,11 @@ namespace Gusto.AnimatedSprite.GameMap
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 2);
             drops = ItemUtility.CreateNPInventory(itemDrops, team, region, location, content, graphics);
 
-            Texture2D textureGrass1 = content.Load<Texture2D>("Grass1");
+            Texture2D textureGrass1 = content.Load<Texture2D>("RevisedGrass1");
             Texture2D textureGrass1BB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureGrass1BB = new Texture2D(graphics, textureGrass1.Width, textureGrass1.Height);
-            Asset Grass1Asset = new Asset(textureGrass1, textureGrass1BB, 2, 1, 1.5f, objKey, region);
+            Asset Grass1Asset = new Asset(textureGrass1, textureGrass1BB, 2, 1, 0.5f, objKey, region);
             SetSpriteAsset(Grass1Asset, location);
         }
     }

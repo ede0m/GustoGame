@@ -159,7 +159,7 @@ namespace Gusto
 
             Texture2D textureBaseCannon = Content.Load<Texture2D>("BaseCannon");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureBaseCannon, "baseCannon", 1.0f, 1.0f);
-            Texture2D textureBallista = Content.Load<Texture2D>("BaseCannon");
+            Texture2D textureBallista = Content.Load<Texture2D>("Ballista");
             LoadDynamicBoundingBoxPerFrame(false, 1, 4, textureBallista, "ballista", 1.0f, 1.0f);
             Texture2D textureLantern = Content.Load<Texture2D>("Lantern");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureLantern, "lantern", 1.0f, 1.0f);
@@ -196,8 +196,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(true, 2, 4, textureTree3, "tree3", 0.6f, 1.0f);
             Texture2D textureSoftWood = Content.Load<Texture2D>("softwoodpile");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureSoftWood, "softWood", 0.5f, 1.0f);
-            Texture2D textureGrass1 = Content.Load<Texture2D>("Grass1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureGrass1, "grass1", 1.5f, 1.0f);
+            Texture2D textureGrass1 = Content.Load<Texture2D>("RevisedGrass1");
+            LoadDynamicBoundingBoxPerFrame(false, 1, 2, textureGrass1, "grass1", 0.5f, 1.0f);
             Texture2D textureRock1 = Content.Load<Texture2D>("Rock1");
             LoadDynamicBoundingBoxPerFrame(false, 2, 4, textureRock1, "rock1", 0.3f, 1.0f);
             Texture2D textureIslandGrass = Content.Load<Texture2D>("islandGrass");
@@ -389,17 +389,19 @@ namespace Gusto
                         SpatialBounding.SetQuad(tp.GetBase());
                     }
 
-                    // handle ground objects (and respawn)
-                    if (tp.groundObject != null)
+                    if (tp.groundObjects != null)
                     {
-                        if (!tp.groundObject.remove)
-                            BoundingBoxLocations.GroundObjectLocationList.Add(tp.groundObject);
-                        else
+                        foreach (var groundObject in tp.groundObjects)
                         {
-                            if (tp.groundObject is IGroundObject)
+                            if (!groundObject.remove)
+                                BoundingBoxLocations.GroundObjectLocationList.Add(groundObject);
+                            else
                             {
-                                IGroundObject go = (IGroundObject)tp.groundObject;
-                                go.UpdateRespawn(gameTime);
+                                if (groundObject is IGroundObject)
+                                {
+                                    IGroundObject go = (IGroundObject)groundObject;
+                                    go.UpdateRespawn(gameTime);
+                                }
                             }
                         }
                     }

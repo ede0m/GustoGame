@@ -62,7 +62,7 @@ namespace Gusto.GameMap
                 for (int j = 0; j < _cols; j++)
                 {
                     TilePiece tile = null;
-                    Sprite groundObject = null;
+                    List<Sprite> groundObjects = null;
                     JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
 
                     // region
@@ -73,32 +73,36 @@ namespace Gusto.GameMap
                     // ground object
                     if ((string)tileDetails["sittingObject"] != "null")
                     {
-                        groundObject = GetGroundObject((string)tileDetails["sittingObject"], regionName, worldLoc, content, graphics);
-                        groundObject.SetTileDesignRow(RandomEvents.rand.Next(0, groundObject.nRows));
-                        groundObject.location.X += RandomEvents.rand.Next(-tileWidth, tileWidth);
-                        groundObject.location.Y += RandomEvents.rand.Next(-tileHeight, tileHeight);
+                        groundObjects = GetGroundObjects((string)tileDetails["sittingObject"], regionName, worldLoc, content, graphics);
+
+                        foreach (var groundObject in groundObjects)
+                        {
+                            groundObject.SetTileDesignRow(RandomEvents.rand.Next(0, groundObject.nRows));
+                            groundObject.location.X += RandomEvents.rand.Next(-tileWidth, tileWidth);
+                            groundObject.location.Y += RandomEvents.rand.Next(-tileHeight, tileHeight);
+                        }
                     }
 
                     // set terrain piece
                     switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o1");
+                            tile = new OceanTile(index, groundObjects, worldLoc, regionName, content, graphics, "o1");
                             tile.transparency = 0.6f;
                             tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "o2":
-                            tile = new OceanTile(index, groundObject, worldLoc, regionName, content, graphics, "o2");
+                            tile = new OceanTile(index, groundObjects, worldLoc, regionName, content, graphics, "o2");
                             tile.transparency = 0.6f;
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "l1":
-                            tile = new LandTile(index, groundObject, worldLoc, regionName, content, graphics, "l1");
+                            tile = new LandTile(index, groundObjects, worldLoc, regionName, content, graphics, "l1");
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                         case "l2":
-                            tile = new LandTile(index, groundObject, worldLoc, regionName, content, graphics, "l2");
+                            tile = new LandTile(index, groundObjects, worldLoc, regionName, content, graphics, "l2");
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                     }
@@ -155,22 +159,30 @@ namespace Gusto.GameMap
         }
 
 
-        private Sprite GetGroundObject(string key, string region, Vector2 loc, ContentManager content, GraphicsDevice graphics)
+        private List<Sprite> GetGroundObjects(string key, string region, Vector2 loc, ContentManager content, GraphicsDevice graphics)
         {
+            List<Sprite> groundObjs = new List<Sprite>();
             switch (key)
             {
                 case "t1":
-                    return new Tree1(TeamType.GroundObject, region, loc, content, graphics);
+                    groundObjs.Add( new Tree1(TeamType.GroundObject, region, loc, content, graphics));
+                    break;
                 case "t2":
-                    return new Tree2(TeamType.GroundObject, region, loc, content, graphics);
+                    groundObjs.Add(new Tree2(TeamType.GroundObject, region, loc, content, graphics));
+                    break;
                 case "t3":
-                    return new Tree3(TeamType.GroundObject, region, loc, content, graphics);
+                    groundObjs.Add(new Tree3(TeamType.GroundObject, region, loc, content, graphics));
+                    break;
                 case "gr1":
-                    return new Grass1(TeamType.GroundObject, region, loc, content, graphics);
+                    groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics));
+                    groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics)); 
+                    groundObjs.Add(new Grass1(TeamType.GroundObject, region, loc, content, graphics)); // three grasses encoded per tile
+                    break;
                 case "rk1":
-                    return new Rock1(TeamType.GroundObject, region, loc, content, graphics);
+                    groundObjs.Add(new Rock1(TeamType.GroundObject, region, loc, content, graphics));
+                    break;
             }
-            return null;
+            return groundObjs;
         }
 
         public void DrawMap(SpriteBatch sb, GameTime gameTime)

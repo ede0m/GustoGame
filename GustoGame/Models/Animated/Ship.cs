@@ -54,6 +54,9 @@ namespace Gusto.Models.Animated
         public int nSails;
         int shipWindWindowMax;
         int shipWindWindowMin;
+
+        Texture2D meterAlive;
+        Texture2D meterDead;
         public float health;
         public float fullHealth;
         private bool showHealthBar;
@@ -89,6 +92,13 @@ namespace Gusto.Models.Animated
             percentNotAnchored = 1;
             meterFull = new Texture2D(_graphics, 1, 1);
             meterProg = new Texture2D(_graphics, 1, 1);
+            meterFull.SetData<Color>(new Color[] { Color.IndianRed });
+            meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
+
+            meterAlive = new Texture2D(_graphics, 1, 1);
+            meterDead = new Texture2D(_graphics, 1, 1);
+            meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
+            meterDead.SetData<Color>(new Color[] { Color.IndianRed });
 
             shipId = Guid.NewGuid();
 
@@ -573,33 +583,10 @@ namespace Gusto.Models.Animated
                 shipInterior.interiorObjects.Remove(toRem);
         }
 
-/*        public void DrawAimLine(SpriteBatch sb, Camera camera)
-        {
-            Texture2D aimLineTexture = new Texture2D(_graphics, 1, 1);
-            Texture2D reloadLineTexture = new Texture2D(_graphics, 1, 1);
-            aimLineTexture.SetData<Color>(new Color[] { Color.IndianRed });
-            reloadLineTexture.SetData<Color>(new Color[] { Color.DarkSeaGreen });
-
-            edgeFull = endAimLineFull - startAimLine;
-            edgeReload =  endAimLineReload - startAimLine;
-            float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
-            float angleReload = (float)Math.Atan2(edgeReload.Y, edgeReload.X);
-
-            var lineFull = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeFull.Length(), 4);
-            var lineReload = new Rectangle((int)startAimLine.X, (int)startAimLine.Y, (int)edgeReload.Length(), 4);
-
-            sb.Begin(camera);
-            sb.Draw(aimLineTexture, lineFull, null, Color.IndianRed, angleFull, new Vector2(0, 0), SpriteEffects.None, 0);
-            sb.Draw(reloadLineTexture, lineReload, null, Color.DarkSeaGreen, angleReload, new Vector2(0, 0), SpriteEffects.None, 0);
-            sb.End();
-        }*/
-
         public void DrawAnchorMeter(SpriteBatch sb, Vector2 pos, Texture2D anchorIcon)
         {
             if (teamType == TeamType.Player)
             {
-                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
-                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentNotAnchored) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
@@ -615,8 +602,6 @@ namespace Gusto.Models.Animated
         {
             if (teamType == TeamType.Player)
             {
-                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
-                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentNotRepaired) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
@@ -632,8 +617,6 @@ namespace Gusto.Models.Animated
         {
             if (teamType == TeamType.Player)
             {
-                meterFull.SetData<Color>(new Color[] { Color.IndianRed });
-                meterProg.SetData<Color>(new Color[] { Color.DarkKhaki });
                 float progress = (1f - percentBoarded) * 40f;
                 Rectangle full = new Rectangle((int)pos.X, (int)pos.Y, 40, 40);
                 Rectangle prog = new Rectangle((int)pos.X, (int)pos.Y, 40, (int)progress);
@@ -659,10 +642,6 @@ namespace Gusto.Models.Animated
         {
             if (showHealthBar)
             {
-                Texture2D meterAlive = new Texture2D(_graphics, 1, 1);
-                Texture2D meterDead = new Texture2D(_graphics, 1, 1);
-                meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
-                meterDead.SetData<Color>(new Color[] { Color.IndianRed });
                 float healthLeft = (1f - (1f - (health / fullHealth))) * 60f;
                 Rectangle dead = new Rectangle((int)shipSail.GetBoundingBox().Center.X - 30, (int)shipSail.GetBoundingBox().Center.Y - 130, 60, 7);
                 Rectangle alive = new Rectangle((int)shipSail.GetBoundingBox().Center.X - 30, (int)shipSail.GetBoundingBox().Center.Y - 130, (int)healthLeft, 7);

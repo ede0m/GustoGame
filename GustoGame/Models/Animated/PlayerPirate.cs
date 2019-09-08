@@ -30,6 +30,9 @@ namespace Gusto.Models.Animated
         public float millisecondsCombatSwing;
         float msToggleInterior;
 
+        Texture2D meterAlive;
+        Texture2D meterDead;
+
         public float health;
         public float fullHealth;
         private bool showHealthBar;
@@ -64,6 +67,11 @@ namespace Gusto.Models.Animated
             teamType = type;
             _content = content;
             _graphics = graphics;
+
+            meterAlive = new Texture2D(_graphics, 1, 1);
+            meterDead = new Texture2D(_graphics, 1, 1);
+            meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
+            meterDead.SetData<Color>(new Color[] { Color.IndianRed });
 
             timeShowingHealthBar = 0;
         }
@@ -579,10 +587,6 @@ namespace Gusto.Models.Animated
         {
             if (showHealthBar)
             {
-                Texture2D meterAlive = new Texture2D(_graphics, 1, 1);
-                Texture2D meterDead = new Texture2D(_graphics, 1, 1);
-                meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
-                meterDead.SetData<Color>(new Color[] { Color.IndianRed });
                 float healthLeft = (1f - (1f - (health / fullHealth))) * 60f;
                 Rectangle dead = new Rectangle((int)GetBoundingBox().Center.X - 30, (int)GetBoundingBox().Center.Y - 130, 60, 7);
                 Rectangle alive = new Rectangle((int)GetBoundingBox().Center.X - 30, (int)GetBoundingBox().Center.Y - 130, (int)healthLeft, 7);

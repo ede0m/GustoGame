@@ -28,7 +28,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
 
             ammoItemType = typeof(Gusto.AnimatedSprite.InventoryItems.RustyHarpoonItem);
 
-            Texture2D texture = content.Load<Texture2D>("BaseCannon");
+            Texture2D texture = content.Load<Texture2D>("Ballista");
             Texture2D textureBB = null;
             if (Gusto.GameOptions.ShowBoundingBox)
                 textureBB = new Texture2D(graphics, texture.Width, texture.Height);

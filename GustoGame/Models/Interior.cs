@@ -98,37 +98,41 @@ namespace Gusto.Models
                 {
                     TilePiece tile = null;
                     JObject tileDetails = _interiorMapData["data"][index.ToString()].Value<JObject>();
-                    Sprite groundObject = null;
+                    List<Sprite> groundObjects = null;
 
                     // ground object
                     if ((string)tileDetails["sittingObject"] != "null")
                     {
-                        groundObject = GetGroundObject((string)tileDetails["sittingObject"], drawPoint, content, graphics);
-                        groundObject.SetTileDesignRow(RandomEvents.rand.Next(0, groundObject.nRows));
-                        //interiorGroundObjects.Add(groundObject);
-                        interiorObjects.Add(groundObject);
+                        groundObjects = GetGroundObjects((string)tileDetails["sittingObject"], drawPoint, content, graphics);
+
+                        foreach (var groundObject in groundObjects)
+                        {
+                            groundObject.SetTileDesignRow(RandomEvents.rand.Next(0, groundObject.nRows));
+                            //interiorGroundObjects.Add(groundObject);
+                            interiorObjects.Add(groundObject);
+                        }
                     }
 
                     // set interiorPiece piece
                     switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "sd1":
-                            tile = new ShipDeckTile(index, groundObject, drawPoint, "GameGusto", content, graphics, "shipDeckTile");
+                            tile = new ShipDeckTile(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipDeckTile");
                             break;
                         case "sd1w":
-                            tile = new ShipDeckTileWall(index, groundObject, drawPoint, "GameGusto", content, graphics, "shipDeckTileWall");
+                            tile = new ShipDeckTileWall(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipDeckTileWall");
                             break;
                         case "si1":
-                            tile = new ShipInteriorTile(index, groundObject, drawPoint, "GameGusto", content, graphics, "shipInteriorTile");
+                            tile = new ShipInteriorTile(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipInteriorTile");
                             break;
                         case "si1w":
-                            tile = new ShipInteriorTileWall(index, groundObject, drawPoint, "GameGusto", content, graphics, "shipInteriorTileWall");
+                            tile = new ShipInteriorTileWall(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipInteriorTileWall");
                             break;
                         case "d1":
-                            tile = new DirtTile(index, groundObject, drawPoint, "GameGusto", content, graphics, "dirtTile");
+                            tile = new DirtTile(index, groundObjects, drawPoint, "GameGusto", content, graphics, "dirtTile");
                             break;
                         case "cvs1w":
-                            tile = new CanvasTileWall(index, groundObject, drawPoint, "GameGusto", content, graphics, "canvasTileWall");
+                            tile = new CanvasTileWall(index, groundObjects, drawPoint, "GameGusto", content, graphics, "canvasTileWall");
                             break;
                     }
 
@@ -241,9 +245,11 @@ namespace Gusto.Models
                     tile.inInteriorId = interiorId; // TODO: need to move setting of InteriorId to constructor, but this screws up serialization
                     interiorTiles.Add(tile);
 
-                    // ground obj loc location
-                    if (tile.groundObject != null)
-                        tile.groundObject.location = loc;
+                    if (tile.groundObjects != null)
+                    {
+                        foreach (var groundObject in tile.groundObjects)
+                            groundObject.location = loc;
+                    }
 
                     // draw if in viewporit
                     if ((loc.X >= minCorner.X && loc.X <= maxCorner.X) && (loc.Y >= minCorner.Y && loc.Y <= maxCorner.Y))
@@ -327,14 +333,16 @@ namespace Gusto.Models
 
         }
 
-        private Sprite GetGroundObject(string key, Vector2 loc, ContentManager content, GraphicsDevice graphics)
+        private List<Sprite> GetGroundObjects(string key, Vector2 loc, ContentManager content, GraphicsDevice graphics)
         {
+            List<Sprite> groundObjs = new List<Sprite>();
             switch (key)
             {
                 case "fire1":
-                    return new CampFire(TeamType.GroundObject, "GustoGame", loc, content, graphics);
+                    groundObjs.Add(new CampFire(TeamType.GroundObject, "GustoGame", loc, content, graphics));
+                    break;
             }
-            return null;
+            return groundObjs;
         }
 
         public TilePiece RandomInteriorTile()
