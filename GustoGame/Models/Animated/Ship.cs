@@ -496,15 +496,14 @@ namespace Gusto.Models.Animated
                     timeSinceLastTurn -= millisecondsPerTurn;
                 }
 
+                // AI shooting
                 if (mountedOnShip != null)
-                    mountedOnShip.location = GetBoundingBox().Center.ToVector2();
-
-                // AI Ship Shooting/Aiming
-                Vector2? shotDirection = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
-                if (shotDirection != null)
                 {
-                    mountedOnShip.UpdateAIMountShot(gameTime, (Vector2)shotDirection);
+                    Vector2? shotDirection = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
+                    mountedOnShip.UpdateAIMountShot(gameTime, shotDirection);
+                    mountedOnShip.location = GetBoundingBox().Center.ToVector2();
                 }
+
             }
 
             

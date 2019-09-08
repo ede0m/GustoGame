@@ -197,7 +197,7 @@ namespace Gusto.Models.Animated
 
         }
 
-        public void UpdateAIMountShot(GameTime gameTime, Vector2 target)
+        public void UpdateAIMountShot(GameTime gameTime, Vector2? target)
         {
             timeSinceLastExpClean += gameTime.ElapsedGameTime.Milliseconds;
             // clean shots
@@ -214,68 +214,72 @@ namespace Gusto.Models.Animated
                 timeSinceLastExpClean = 0;
             }
 
-            float percentReloaded = timeSinceLastShot / millisecondsNewShot;
-            startAimLine = GetBoundingBox().Center.ToVector2();
-
-            aiming = true;
-            Vector2 reloadSpot = new Vector2(((1 - percentReloaded) * startAimLine.X + (percentReloaded * target.X)), ((1 - percentReloaded) * startAimLine.Y + (percentReloaded * target.Y)));
-
-            var lineDistanceFull = PhysicsUtility.VectorMagnitude(target.X, startAimLine.X, target.Y, startAimLine.Y);
-            var lineDistanceReload = PhysicsUtility.VectorMagnitude(reloadSpot.X, startAimLine.X, reloadSpot.Y, startAimLine.Y);
-
-            // max range
-            float disRatio = shotRange / lineDistanceFull;
-            Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * target.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * target.Y)));
-
-            // shot offset from mount
-            float shotOffsetRatio = 30 / lineDistanceFull;
-            shotOffsetPos = new Vector2(((1 - shotOffsetRatio) * startAimLine.X + (shotOffsetRatio * target.X)), ((1 - shotOffsetRatio) * startAimLine.Y + (shotOffsetRatio * target.Y)));
-
-            // restrict aiming by shotRange
-            if (lineDistanceFull > shotRange)
-                endAimLineFull = maxPos;
-            else
-                endAimLineFull = target;
-
-            if (lineDistanceReload > lineDistanceFull || lineDistanceReload > shotRange)
-                endAimLineReload = endAimLineFull;
-            else
-                endAimLineReload = reloadSpot;
-
-            edgeFull = endAimLineFull - startAimLine;
-            edgeReload = endAimLineReload - startAimLine;
-            // rotate the mount
-            float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
-            rotation = angleFull + ((float)Math.PI / 2);
-
-
-            timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastShot > millisecondsNewShot)
+            if (target != null)
             {
-                // TODO: just cannon balls for now. Cannon is hard coded to BaseShip animatedSprite AI for now
-                animateShot = true;
-                BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shotOffsetPos, _content, _graphics);
-                cannonShot.SetFireAtDirection(target, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
-                cannonShot.moving = true;
-                Shots.Add(cannonShot);
-                timeSinceLastShot = 0;
-            }
+                Vector2 targetV = target.Value;
 
-            if (animateShot)
-            {
-                msAnimateShot += gameTime.ElapsedGameTime.Milliseconds;
-                if (msAnimateShot > 70)
+                float percentReloaded = timeSinceLastShot / millisecondsNewShot;
+                startAimLine = GetBoundingBox().Center.ToVector2();
+
+                aiming = true;
+                Vector2 reloadSpot = new Vector2(((1 - percentReloaded) * startAimLine.X + (percentReloaded * targetV.X)), ((1 - percentReloaded) * startAimLine.Y + (percentReloaded * targetV.Y)));
+
+                var lineDistanceFull = PhysicsUtility.VectorMagnitude(targetV.X, startAimLine.X, targetV.Y, startAimLine.Y);
+                var lineDistanceReload = PhysicsUtility.VectorMagnitude(reloadSpot.X, startAimLine.X, reloadSpot.Y, startAimLine.Y);
+
+                // max range
+                float disRatio = shotRange / lineDistanceFull;
+                Vector2 maxPos = new Vector2(((1 - disRatio) * startAimLine.X + (disRatio * targetV.X)), ((1 - disRatio) * startAimLine.Y + (disRatio * targetV.Y)));
+
+                // shot offset from mount
+                float shotOffsetRatio = 30 / lineDistanceFull;
+                shotOffsetPos = new Vector2(((1 - shotOffsetRatio) * startAimLine.X + (shotOffsetRatio * targetV.X)), ((1 - shotOffsetRatio) * startAimLine.Y + (shotOffsetRatio * targetV.Y)));
+
+                // restrict aiming by shotRange
+                if (lineDistanceFull > shotRange)
+                    endAimLineFull = maxPos;
+                else
+                    endAimLineFull = targetV;
+
+                if (lineDistanceReload > lineDistanceFull || lineDistanceReload > shotRange)
+                    endAimLineReload = endAimLineFull;
+                else
+                    endAimLineReload = reloadSpot;
+
+                edgeFull = endAimLineFull - startAimLine;
+                edgeReload = endAimLineReload - startAimLine;
+                // rotate the mount
+                float angleFull = (float)Math.Atan2(edgeFull.Y, edgeFull.X);
+                rotation = angleFull + ((float)Math.PI / 2);
+
+
+                timeSinceLastShot += gameTime.ElapsedGameTime.Milliseconds;
+                if (timeSinceLastShot > millisecondsNewShot)
                 {
-                    currColumnFrame++;
-                    msAnimateShot = 0;
+                    // TODO: just cannon balls for now. Cannon is hard coded to BaseShip animatedSprite AI for now
+                    animateShot = true;
+                    BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shotOffsetPos, _content, _graphics);
+                    cannonShot.SetFireAtDirection(targetV, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
+                    cannonShot.moving = true;
+                    Shots.Add(cannonShot);
+                    timeSinceLastShot = 0;
                 }
-                if (currColumnFrame >= nColumns)
+
+                if (animateShot)
                 {
-                    currColumnFrame = 0;
-                    animateShot = false;
+                    msAnimateShot += gameTime.ElapsedGameTime.Milliseconds;
+                    if (msAnimateShot > 70)
+                    {
+                        currColumnFrame++;
+                        msAnimateShot = 0;
+                    }
+                    if (currColumnFrame >= nColumns)
+                    {
+                        currColumnFrame = 0;
+                        animateShot = false;
+                    }
                 }
             }
-
         }
 
         public void LoadAmmo(InventoryItem item)
