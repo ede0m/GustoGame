@@ -17,6 +17,7 @@ namespace Gusto.Mappings
                     { TeamType.B, true},
                     { TeamType.A, false},
                     { TeamType.PassiveGround, false},
+                    { TeamType.PassiveAir, false},
                     { TeamType.DefenseGround, false},
                 }
             },
@@ -26,6 +27,7 @@ namespace Gusto.Mappings
                     { TeamType.A, true},
                     { TeamType.B, false},
                     { TeamType.PassiveGround, false},
+                    { TeamType.PassiveAir, false},
                     { TeamType.DefenseGround, false},
                 }
             },
@@ -33,15 +35,27 @@ namespace Gusto.Mappings
                 {
                     { TeamType.Player, false },
                     { TeamType.PassiveGround, false},
+                    { TeamType.PassiveAir, false},
                     { TeamType.DefenseGround, false},
                     { TeamType.A, false},
                     { TeamType.B, false}
+                }
+            },
+            { TeamType.PassiveAir, new Dictionary<TeamType, bool>
+                {
+                    { TeamType.Player, true },
+                    { TeamType.PassiveGround, false},
+                    { TeamType.PassiveAir, false},
+                    { TeamType.DefenseGround, true},
+                    { TeamType.A, true},
+                    { TeamType.B, true}
                 }
             },
             { TeamType.DefenseGround, new Dictionary<TeamType, bool>
                 {
                     { TeamType.Player, true },
                     { TeamType.PassiveGround, false},
+                    { TeamType.PassiveAir, false},
                     { TeamType.DefenseGround, false},
                     { TeamType.A, false},
                     { TeamType.B, false},
@@ -54,6 +68,7 @@ namespace Gusto.Mappings
                     { TeamType.A, true},
                     { TeamType.PassiveGround, true},
                     { TeamType.DefenseGround, true},
+                    { TeamType.PassiveAir, true},
                 }
             },
         };

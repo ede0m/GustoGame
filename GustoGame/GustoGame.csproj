@@ -42,12 +42,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite\Animals\BlueBird.cs" />
     <Compile Include="AnimatedSprite\FiredAmmo\Arrow.cs" />
     <Compile Include="AnimatedSprite\BaseBarrel.cs" />
     <Compile Include="AnimatedSprite\BaseCat.cs" />
     <Compile Include="AnimatedSprite\BaseChest.cs" />
     <Compile Include="AnimatedSprite\CampFire.cs" />
-    <Compile Include="AnimatedSprite\Chicken.cs" />
+    <Compile Include="AnimatedSprite\Animals\Chicken.cs" />
     <Compile Include="AnimatedSprite\CraftingAnvil.cs" />
     <Compile Include="AnimatedSprite\FiredAmmo\BaseCannonBall.cs" />
     <Compile Include="AnimatedSprite\BaseSail.cs" />
@@ -107,7 +108,7 @@
     <Compile Include="AnimatedSprite\PiratePlayer.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Weapon\ShortSword.cs" />
     <Compile Include="AnimatedSprite\FiredAmmo\RustyHarpoon.cs" />
-    <Compile Include="AnimatedSprite\Snake.cs" />
+    <Compile Include="AnimatedSprite\Animals\Snake.cs" />
     <Compile Include="AnimatedSprite\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
     <Compile Include="AnimatedSprite\TeePee.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Models\Animated\Crafter.cs" />
     <Compile Include="Models\Animated\Container.cs" />
     <Compile Include="Models\Animated\Weapon\ShipMount.cs" />
+    <Compile Include="Models\Interfaces\IFlying.cs" />
     <Compile Include="Models\Interfaces\IShipAmmoItem.cs" />
     <Compile Include="Models\Interfaces\ICookingObject.cs" />
     <Compile Include="Models\Interfaces\IDirectionalAmmo.cs" />

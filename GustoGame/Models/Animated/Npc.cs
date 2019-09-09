@@ -44,6 +44,7 @@ namespace Gusto.Models.Animated
 
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
+        public bool flying;
         public bool nearShip;
         public bool onShip;
         public bool inCombat;
@@ -156,7 +157,8 @@ namespace Gusto.Models.Animated
             UpdateNpcMovement(teamType, gameTime);
 
             colliding = false;
-            swimming = true;
+            if (!(this is IFlying))
+                swimming = true;
         }
 
 
@@ -315,6 +317,80 @@ namespace Gusto.Models.Animated
 
                     if (moving && !dying)
                     {
+                        // actual "regular" movement
+                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
+                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
+                    }
+                    break;
+
+
+                case TeamType.PassiveAir:
+
+                    if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
+                    {
+                        // if target within range, move towards it
+                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
+                        if (targetV != null && !roaming)
+                        {
+                            idle = false;
+                            flying = true;
+
+                            if (npcInInterior != null)
+                                randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
+                            else
+                                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
+                            roaming = true;
+                        }
+                        else if (roaming)
+                        {
+                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
+                            currRowFrame = frames.Item1 + 1; // plus one to skip the idle frame
+                            directionalFrame = frames.Item2;
+                            moving = true;
+
+                            if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
+                            {
+                                flying = false;
+                                roaming = false;
+                            }
+                        }
+                        else
+                            idle = true;
+
+                        timeSinceLastTurnFrame = 0;
+                    }
+
+                    if (idle)
+                    {
+                        moving = false;
+                        currRowFrame = 0;
+                        timeSinceIdleAnimate += gameTime.ElapsedGameTime.Milliseconds;
+                        if (timeSinceIdleAnimate > msIdleWaitTime)
+                        {
+                            timeSinceIdleFrame += gameTime.ElapsedGameTime.Milliseconds;
+                            if (timeSinceIdleFrame > 100)
+                            {
+                                currColumnFrame++;
+                                timeSinceIdleFrame = 0;
+                                if (currColumnFrame >= nColumns)
+                                {
+                                    currColumnFrame = 0;
+                                    timeSinceIdleAnimate = 0;
+                                }
+                            }
+                        }
+                    }
+                    else if (moving && !inCombat && !dying)
+                    {
+                        // moving animation
+                        if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
+                        {
+                            currColumnFrame++;
+                            if (currColumnFrame >= combatFrameIndex || currColumnFrame >= nColumns) // stop before combat frames
+                                currColumnFrame = 0;
+                            timeSinceLastWalkFrame = 0;
+                        }
+
                         // actual "regular" movement
                         location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
                         location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);

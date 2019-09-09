@@ -68,6 +68,22 @@ namespace Gusto.Mappings
                     },
                 }
             },
+            { "blueBird", new Dictionary<string, Dictionary<string, float>>
+                {
+                    {"rawMeat", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 1 },
+                            {"percentDrop", 75 }
+                        }
+                    },
+                    {"feather", new Dictionary<string, float>
+                        {
+                            {"maxDrop", 5 },
+                            {"percentDrop", 70 }
+                        }
+                    },
+                }
+            },
             { "snake", new Dictionary<string, Dictionary<string, float>>
                 {
                     {"rawMeat", new Dictionary<string, float>

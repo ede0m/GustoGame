@@ -123,6 +123,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 10, textureChicken, "chicken", 0.7f, 1.0f);
             Texture2D textureSnake = Content.Load<Texture2D>("Snake1");
             LoadDynamicBoundingBoxPerFrame(false, 5, 9, textureSnake, "snake", 0.7f, 1.0f);
+            Texture2D textblueBird = Content.Load<Texture2D>("BlueBird");
+            LoadDynamicBoundingBoxPerFrame(false, 5, 4, textblueBird, "blueBird", 0.4f, 1.0f);
             Texture2D textureBaseSword = Content.Load<Texture2D>("BaseSword");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureBaseSword, "baseSword", 1.0f, 1.0f);
             Texture2D texturePistol = Content.Load<Texture2D>("pistol");
@@ -556,6 +558,7 @@ namespace Gusto
                     }
                 }
 
+                List<Sprite> fliers = new List<Sprite>(); // draw any flyers on top of everything
                 // sort sprites by y cord asc and draw
                 DrawOrder.Sort((a, b) => a.GetBoundingBox().Bottom.CompareTo(b.GetBoundingBox().Bottom));
                 int i = 0;
@@ -647,15 +650,21 @@ namespace Gusto
 
                     else if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
                     {
-                        Npc enemy = (Npc)sprite;
+                        Npc npc = (Npc)sprite;
 
-                        if (enemy.swimming && !enemy.onShip)
-                            enemy.DrawSwimming(spriteBatchView, this.camera);
-                        else if (!enemy.onShip)
-                            enemy.Draw(spriteBatchView, this.camera);
+                        // flying drawn after everything else
+                        if (npc.flying)
+                        {
+                            fliers.Add(npc);
+                            continue;
+                        }
 
-                        if (enemy.dying)
-                            enemy.DrawDying(spriteBatchView, this.camera);
+                        if (npc.swimming && !npc.onShip)
+                            npc.DrawSwimming(spriteBatchView, this.camera);
+                        else if (!npc.onShip)
+                            npc.Draw(spriteBatchView, this.camera);
+                        if (npc.dying)
+                            npc.DrawDying(spriteBatchView, this.camera);
                         continue;
                     }
 
@@ -674,6 +683,10 @@ namespace Gusto
 
                     sprite.Draw(spriteBatchView, this.camera);
                 }
+
+                // draw fliers
+                foreach (var flier in fliers)
+                    flier.Draw(spriteBatchView, this.camera);
 
                 // draw weather
                 weather.DrawWeather(spriteBatchStatic);

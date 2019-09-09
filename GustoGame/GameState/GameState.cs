@@ -78,6 +78,7 @@ namespace Gusto
             BaseCat baseCatLand = new BaseCat(TeamType.B, "SnooCat", scLandTiles[RandomEvents.rand.Next(scLandTiles.Count)].location, _content, _graphics);
             Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
             Snake snakeLand = new Snake(TeamType.DefenseGround, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
+            BlueBird blueBird = new BlueBird(TeamType.PassiveAir, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.B, "GustoMap", new Vector2(-1600, -1500), _content, _graphics);
             ClayFurnace furnace = new ClayFurnace(TeamType.Player, "GustoMap", new Vector2(180, 140), _content, _graphics);
             CraftingAnvil craftingAnvil = new CraftingAnvil(TeamType.Player, "GustoMap", new Vector2(120, 40), _content, _graphics);
@@ -144,6 +145,7 @@ namespace Gusto
             UpdateOrder.Add(baseTribalLand);
             UpdateOrder.Add(baseCatLand);
             UpdateOrder.Add(chickenLand);
+            UpdateOrder.Add(blueBird);
             UpdateOrder.Add(snakeLand);
             UpdateOrder.Add(tower);
             UpdateOrder.Add(teePee);
