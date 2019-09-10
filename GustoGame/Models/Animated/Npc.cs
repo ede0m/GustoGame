@@ -172,7 +172,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         // attack range
-                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
+                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             // IN COMBAT
@@ -191,7 +191,7 @@ namespace Gusto.Models.Animated
                             if (npcInInterior != null)
                             {
                                 // attack any player within a large range in the ship
-                                targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 10, GetBoundingBox(), inInteriorId);
+                                targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 10, GetBoundingBox(), inInteriorId);
                                 if (targetV != null)
                                 {
                                     Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
@@ -329,7 +329,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         // if target within range, move towards it
-                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
+                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
                         if (targetV != null && !roaming)
                         {
                             idle = false;
@@ -402,7 +402,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         // if target within range, move towards it
-                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 5, GetBoundingBox(), inInteriorId);
+                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 5, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             idle = false;
@@ -415,7 +415,7 @@ namespace Gusto.Models.Animated
                             idle = true;
 
                         // attack range
-                        targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
+                        targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             idle = false;

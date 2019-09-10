@@ -69,6 +69,7 @@ namespace Gusto.Models.Animated
         public bool playerAboard;
         public bool playerInInterior;
         bool roaming;
+        List<TilePiece> currentPath;
 
         public TeamType teamType;
         public Sprite randomRoamTile;
@@ -398,10 +399,53 @@ namespace Gusto.Models.Animated
             // AI only works if NPC aboard
             if (shipInterior.interiorObjects.OfType<Npc>().Any())
             {
+
                 // AI ship direction and movement
                 if (timeSinceLastTurn > millisecondsPerTurn)
                 {
-                    Vector2? target = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
+                    if (!roaming)
+                    {
+                        if (regionKey.Equals("GustoMap")) // TEMP see pathFind comment below
+                            regionKey = "Usopp";
+
+                        // TODO: find a better way to get a mapCordPoint from ships in ocean
+                        foreach (var tile in BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles)
+                        {
+                            if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
+                            {
+                                TilePiece tp = (TilePiece)tile;
+                                mapCordPoint = tp.tileGridPoint.Value;
+                                break;
+                            }
+                        }
+
+                        randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
+                        roaming = true;
+                        TilePiece rtp = (TilePiece)randomRoamTile;
+                        Point? gridPointTo = rtp.tileGridPoint;
+                        currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value); // This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                    }
+                    else
+                    {
+                        // we have found the next tile in path
+                        if (currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
+                        {
+                            currentPath.RemoveAt(0);
+                            if (currentPath.Count == 0)
+                                roaming = false;
+                        }
+
+                        if (roaming)
+                            currRowFrame = AIUtility.SetAIShipDirection(currentPath[0].GetBoundingBox().Center.ToVector2(), location);
+
+                    }
+
+
+
+
+
+
+                    /*Point? target = AIUtility.ChooseTargetPoint(teamType, attackRange, GetBoundingBox(), inInteriorId);
                     if (target != null)
                     {
                         roaming = false;
@@ -425,11 +469,12 @@ namespace Gusto.Models.Animated
                             randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
 
                         roaming = true;
-                        target = new Vector2((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
+                        TilePiece tp = (TilePiece)randomRoamTile;
+                        target = tp.tileGridPoint;
                         if (GetBoundingBox().Intersects(randomRoamTile.GetBoundingBox()))
                             roaming = false;
 
-                    }
+                    }*/
 
                     // TODO: need some sort of timer to unachor ai ship when it is stuck.
                     //if (anchored)
@@ -437,7 +482,7 @@ namespace Gusto.Models.Animated
 
 
                     // collision avoidance take 2
-                    bool probesCollides = false;
+                    /*bool probesCollides = false;
                     int lineOfSightDistance = 2500;
                     Vector2 shipCenterPoint = GetBoundingBox().Center.ToVector2();
                     int crf = currRowFrame;
@@ -492,8 +537,10 @@ namespace Gusto.Models.Animated
                             }
                             currRowFrame = bestRowFrame;
                         }
-                    }
+                    }*/
                     // end collision avoidance
+
+
 
                     shipSail.currRowFrame = currRowFrame;
                     timeSinceLastTurn -= millisecondsPerTurn;
@@ -502,7 +549,7 @@ namespace Gusto.Models.Animated
                 // AI shooting
                 if (mountedOnShip != null)
                 {
-                    Vector2? shotDirection = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
+                    Vector2? shotDirection = AIUtility.ChooseTargetVector(teamType, attackRange, GetBoundingBox(), inInteriorId);
                     mountedOnShip.UpdateAIMountShot(gameTime, shotDirection);
                     mountedOnShip.location = GetBoundingBox().Center.ToVector2();
                 }

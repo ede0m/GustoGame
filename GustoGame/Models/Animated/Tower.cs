@@ -104,7 +104,7 @@ namespace Gusto.Models.Animated
 
             if (timeSinceLastShot > millisecondsNewShot && Shots.Count < maxShotsMoving && health > 0)
             {
-                Vector2? shotDirection = AIUtility.ChooseTarget(teamType, range, GetBoundingBox(), inInteriorId);
+                Vector2? shotDirection = AIUtility.ChooseTargetVector(teamType, range, GetBoundingBox(), inInteriorId);
                 if (shotDirection != null)
                 {
                     BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, location, _content, _graphics);

@@ -117,22 +117,22 @@ namespace Gusto.Models
                     switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "sd1":
-                            tile = new ShipDeckTile(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipDeckTile");
+                            tile = new ShipDeckTile(index, null, groundObjects, drawPoint, "GameGusto", content, graphics, "shipDeckTile");
                             break;
                         case "sd1w":
-                            tile = new ShipDeckTileWall(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipDeckTileWall");
+                            tile = new ShipDeckTileWall(index, null, groundObjects, drawPoint, "GameGusto", content, graphics, "shipDeckTileWall");
                             break;
                         case "si1":
-                            tile = new ShipInteriorTile(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipInteriorTile");
+                            tile = new ShipInteriorTile(index, null, groundObjects, drawPoint, "GameGusto", content, graphics, "shipInteriorTile");
                             break;
                         case "si1w":
-                            tile = new ShipInteriorTileWall(index, groundObjects, drawPoint, "GameGusto", content, graphics, "shipInteriorTileWall");
+                            tile = new ShipInteriorTileWall(index, null, groundObjects, drawPoint, "GameGusto", content, graphics, "shipInteriorTileWall");
                             break;
                         case "d1":
-                            tile = new DirtTile(index, groundObjects, drawPoint, "GameGusto", content, graphics, "dirtTile");
+                            tile = new DirtTile(index, null, groundObjects, drawPoint, "GameGusto", content, graphics, "dirtTile");
                             break;
                         case "cvs1w":
-                            tile = new CanvasTileWall(index, groundObjects, drawPoint, "GameGusto", content, graphics, "canvasTileWall");
+                            tile = new CanvasTileWall(index, null, groundObjects, drawPoint, "GameGusto", content, graphics, "canvasTileWall");
                             break;
                     }
 

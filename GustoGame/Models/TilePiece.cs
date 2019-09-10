@@ -27,6 +27,10 @@ namespace Gusto.Models
         public List<Sprite> groundObjects; // any tree, rock, etc asset we want to set to this tile.
         public bool wallPiece;
         public bool shorePiece;
+
+        // for a* path finding
+        public byte weight;
+        public Point? tileGridPoint;
         
 
         // for digging in a tile
@@ -35,8 +39,10 @@ namespace Gusto.Models
 
         public bool canFillHole;
 
-        public TilePiece(int key, List<Sprite> _groundObjects, ContentManager content, GraphicsDevice graphics) : base(null)
+        public TilePiece(int key, Point? p, List<Sprite> _groundObjects, ContentManager content, GraphicsDevice graphics) : base(null)
         {
+            tileGridPoint = p;
+            weight = 0;
             _graphics = graphics;
             _content = content;
             tileKey = key;

@@ -117,6 +117,7 @@
     <Compile Include="Bounding\Line.cs" />
     <Compile Include="Bounding\Polygon.cs" />
     <Compile Include="Bounding\SpatialBounding.cs" />
+    <Compile Include="Bounding\Target.cs" />
     <Compile Include="GameMap\DayLight.cs" />
     <Compile Include="GameMap\GameMap.cs" />
     <Compile Include="GameMap\lightning\BranchLightning.cs" />

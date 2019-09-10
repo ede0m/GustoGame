@@ -35,6 +35,7 @@ namespace Gusto.Models
         public bool colliding { get; set; }
         public bool remove;
 
+        public Point mapCordPoint { get; set; }
         public Guid inInteriorId { get; set; }
 
         public Sprite(GraphicsDevice graphics)

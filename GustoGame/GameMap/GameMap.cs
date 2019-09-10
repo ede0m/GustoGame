@@ -19,6 +19,14 @@ using Gusto.Models.Interfaces;
 
 namespace Gusto.GameMap
 {
+
+    public static class GameMapTiles
+    {
+        public static List<TilePiece> map = new List<TilePiece>();
+        public static int rows;
+        public static int cols;
+    }
+
     public class TileGameMap
     {
         ContentManager _content;
@@ -30,7 +38,6 @@ namespace Gusto.GameMap
         private int _cols;
         private int _rows;
 
-        private List<TilePiece> map;
         private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
         private JObject _mapData;
 
@@ -44,10 +51,12 @@ namespace Gusto.GameMap
             _height = GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult;
             _cols = _width / tileWidth;
             _rows = _height / tileHeight;
+            GameMapTiles.rows = _rows;
+            GameMapTiles.cols = _cols;
+            AIUtility.Weight = new byte[_rows, _cols];
             startMapPoint = new Vector2(0 - (_width/2), 0 - (_height/2));
 
             _cam = camera;
-            map = new List<TilePiece>();
         }
 
         public void SetGameMap(ContentManager content, GraphicsDevice graphics)
@@ -87,66 +96,70 @@ namespace Gusto.GameMap
                     switch (tileDetails["terrainPiece"].ToString())
                     {
                         case "o1":
-                            tile = new OceanTile(index, groundObjects, worldLoc, regionName, content, graphics, "o1");
+                            tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "o1");
                             tile.transparency = 0.6f;
                             tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
+                            AIUtility.Weight[i, j] = 1;
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "o2":
-                            tile = new OceanTile(index, groundObjects, worldLoc, regionName, content, graphics, "o2");
+                            tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "o2");
                             tile.transparency = 0.6f;
-                            BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
+                            AIUtility.Weight[i, j] = 0;
+                            //BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile); omit these since they cause no path found in A*
                             break;
                         case "l1":
-                            tile = new LandTile(index, groundObjects, worldLoc, regionName, content, graphics, "l1");
+                            tile = new LandTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "l1");
+                            AIUtility.Weight[i, j] = 0;
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                         case "l2":
-                            tile = new LandTile(index, groundObjects, worldLoc, regionName, content, graphics, "l2");
+                            tile = new LandTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "l2");
+                            AIUtility.Weight[i, j] = 0;
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                     }
 
                     worldLoc.X += tileWidth;
-                    map.Add(tile);
+                    GameMapTiles.map.Add(tile);
                     index++;
                 }
                 worldLoc.Y += tileHeight;
                 worldLoc.X = startMapPoint.X;
             }
 
-            // Go through again to set all columns to correct frame for walls
+            // Go through again to set all columns to correct frame for land tiles
             int index2 = 0;
-            foreach (var tile in map)
+            foreach (var tile in GameMapTiles.map)
             {
                 if (tile is ILand)
                 {
                     // inner land
-                    if (map[index2 + 1] is ILand && map[index2 - 1] is ILand && map[index2 + _cols] is ILand && map[index2 - _cols] is ILand)
+                    if (GameMapTiles.map[index2 + 1] is ILand && GameMapTiles.map[index2 - 1] is ILand && GameMapTiles.map[index2 + _cols] is ILand && GameMapTiles.map[index2 - _cols] is ILand)
                     {
                         tile.shorePiece = false;
                         tile.currRowFrame = 0;
                     }
                     else
                     {
-
+                        // land tile rounding
                         tile.shorePiece = true;
 
-                        if (map[index2 + 1] is ILand && !(map[index2 - 1] is ILand))
+                        if (GameMapTiles.map[index2 + 1] is ILand && !(GameMapTiles.map[index2 - 1] is ILand))
                             tile.currRowFrame = 1; // left shore
-                        if (map[index2 - _cols] is ILand && !(map[index2 + _cols] is ILand)) // check above
+                        if (GameMapTiles.map[index2 - _cols] is ILand && !(GameMapTiles.map[index2 + _cols] is ILand)) // check above
                             tile.currRowFrame = 4; // bottom shore
-                        if (map[index2 + _cols] is ILand && !(map[index2 - _cols] is ILand)) // check below
+                        if (GameMapTiles.map[index2 + _cols] is ILand && !(GameMapTiles.map[index2 - _cols] is ILand)) // check below
                             tile.currRowFrame = 2; // top shore
-                        if (map[index2 - 1] is ILand && !(map[index2 + 1] is ILand))
+                        if (GameMapTiles.map[index2 - 1] is ILand && !(GameMapTiles.map[index2 + 1] is ILand))
                             tile.currRowFrame = 3; // right shore
-                        if (map[index2 + 1] is ILand && !(map[index2 - 1] is ILand) && !(map[index2 - _cols] is ILand))
+                        if (GameMapTiles.map[index2 + 1] is ILand && !(GameMapTiles.map[index2 - 1] is ILand) && !(GameMapTiles.map[index2 - _cols] is ILand))
                             tile.currRowFrame = 5; // left top corner shore
-                        if (map[index2 + 1] is ILand && !(map[index2 - 1] is ILand) && !(map[index2 + _cols] is ILand))
+                        if (GameMapTiles.map[index2 + 1] is ILand && !(GameMapTiles.map[index2 - 1] is ILand) && !(GameMapTiles.map[index2 + _cols] is ILand))
                             tile.currRowFrame = 8; // left bottom corner shore
-                        if (map[index2 - 1] is ILand && !(map[index2 + 1] is ILand) && !(map[index2 - _cols] is ILand))
+                        if (GameMapTiles.map[index2 - 1] is ILand && !(GameMapTiles.map[index2 + 1] is ILand) && !(GameMapTiles.map[index2 - _cols] is ILand))
                             tile.currRowFrame = 6; // right top corner shore
-                        if (map[index2 - 1] is ILand && !(map[index2 + 1] is ILand) && !(map[index2 + _cols] is ILand))
+                        if (GameMapTiles.map[index2 - 1] is ILand && !(GameMapTiles.map[index2 + 1] is ILand) && !(GameMapTiles.map[index2 + _cols] is ILand))
                             tile.currRowFrame = 7; // right bottom corner shore
 
 
@@ -157,7 +170,6 @@ namespace Gusto.GameMap
                 index2++;
             }
         }
-
 
         private List<Sprite> GetGroundObjects(string key, string region, Vector2 loc, ContentManager content, GraphicsDevice graphics)
         {
@@ -187,7 +199,7 @@ namespace Gusto.GameMap
 
         public void DrawMap(SpriteBatch sb, GameTime gameTime)
         {
-            OceanTile shoreOceanTile = new OceanTile(0, null, Vector2.Zero, "GustoGame", _content, _graphics, "o2");
+            OceanTile shoreOceanTile = new OceanTile(0, null, null, Vector2.Zero, "GustoGame", _content, _graphics, "o2");
             shoreOceanTile.transparency = 0.6f;
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
@@ -212,9 +224,5 @@ namespace Gusto.GameMap
             _mapData = data;
         }
 
-        public List<TilePiece> GetMap()
-        {
-            return map;
-        }
     }
 }

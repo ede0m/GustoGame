@@ -62,11 +62,11 @@ namespace Gusto
             List<Sprite> usoppLandTiles = BoundingBoxLocations.RegionMap["Usopp"].RegionLandTiles;
             var screenCenter = new Vector2(_graphics.Viewport.Bounds.Width / 2, _graphics.Viewport.Bounds.Height / 2);
 
-            BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -500), _content, _graphics);
+            BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -600), _content, _graphics);
             baseShip.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShip.shipInterior.interiorId, baseShip.shipInterior);
 
-            BaseShip baseShipAI = new BaseShip(TeamType.A, "GustoMap", new Vector2(-400, -140), _content, _graphics);
+            BaseShip baseShipAI = new BaseShip(TeamType.A, "Usopp", new Vector2(500, -140), _content, _graphics);
             baseShipAI.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShipAI.shipInterior.interiorId, baseShipAI.shipInterior);
 
