@@ -19,12 +19,12 @@ namespace Gusto.AnimatedSprite.InventoryItems
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
             damage = 0.0f;
-            shotRange = 100;
             millisecondsNewShot = 1000;
             millisecondsExplosionLasts = 400;
             itemKey = "baseCannon";
             msCraftTime = 40000;
-            shotRange = 600;
+            shotRange = 400;
+            shotWander = 50;
             //ammoTypeKey = "baseCannonBall";
 
             ammoItemType = typeof(Gusto.AnimatedSprite.InventoryItems.CannonBallItem);

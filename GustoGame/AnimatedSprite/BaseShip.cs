@@ -32,7 +32,6 @@ namespace Gusto.AnimatedSprite
             fullHealth = 40;
             health = fullHealth;
             stopRange = 260f;
-            attackRange = 600f;
             maxInventorySlots = 5;
 
             string objKey = "baseShip";

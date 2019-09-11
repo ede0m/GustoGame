@@ -43,7 +43,6 @@ namespace Gusto.Models.Animated
         private Texture2D meterProg;
 
         public Vector2 currentShipSpeed;
-        public float attackRange;
         public float stopRange;
         public float movementSpeed;
         public float percentNotAnchored;
@@ -83,7 +82,6 @@ namespace Gusto.Models.Animated
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
-            //Shots = new List<Ammo>();
             actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             teamType = type;
             _content = content;
@@ -549,7 +547,7 @@ namespace Gusto.Models.Animated
                 // AI shooting
                 if (mountedOnShip != null)
                 {
-                    Vector2? shotDirection = AIUtility.ChooseTargetVector(teamType, attackRange, GetBoundingBox(), inInteriorId);
+                    Vector2? shotDirection = AIUtility.ChooseTargetVector(teamType, mountedOnShip.shotRange, GetBoundingBox(), inInteriorId);
                     mountedOnShip.UpdateAIMountShot(gameTime, shotDirection);
                     mountedOnShip.location = GetBoundingBox().Center.ToVector2();
                 }
