@@ -818,7 +818,8 @@ namespace Gusto
                 Target targetEntry = new Target(); 
                 targetEntry.interiorId = spriteA.inInteriorId;
                 targetEntry.targetLoc = spriteA.GetBoundingBox().Center.ToVector2();
-                targetEntry.mapCordPoint = spriteA.mapCordPoint;
+                if (spriteA.mapCordPoint != null)
+                    targetEntry.mapCordPoint = spriteA.mapCordPoint.Value;
                 // BoundBoxLocationMap update - this structure is used for AI locating targets. Set all needed target values
                 // pathType denotes what pathType ai will move to. ( i.e. Ships won't move to targets with Land pathType because it wouldn't find a path there and would waste time)
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))

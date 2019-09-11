@@ -30,7 +30,7 @@ namespace Gusto.Models
 
         // for a* path finding
         public byte weight;
-        public Point? tileGridPoint;
+        //public Point? tileGridPoint;
         
 
         // for digging in a tile
@@ -41,7 +41,7 @@ namespace Gusto.Models
 
         public TilePiece(int key, Point? p, List<Sprite> _groundObjects, ContentManager content, GraphicsDevice graphics) : base(null)
         {
-            tileGridPoint = p;
+            mapCordPoint = p;
             weight = 0;
             _graphics = graphics;
             _content = content;

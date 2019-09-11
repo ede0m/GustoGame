@@ -182,7 +182,7 @@ namespace Gusto.Models.Animated
                     {
                         TilePiece tp = (TilePiece)tile;
                         currMapCordTile = tp;
-                        mapCordPoint = tp.tileGridPoint.Value;
+                        mapCordPoint = tp.mapCordPoint;
                         break;
                     }
                 }
@@ -428,8 +428,8 @@ namespace Gusto.Models.Animated
                         randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
                         roaming = true;
                         TilePiece rtp = (TilePiece)randomRoamTile;
-                        Point? gridPointTo = rtp.tileGridPoint;
-                        currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value, PathType.Ocean); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                        Point? gridPointTo = rtp.mapCordPoint;
+                        currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.Ocean); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
                     }
                     else
                     {
@@ -439,7 +439,7 @@ namespace Gusto.Models.Animated
                         {
                             Point? target = AIUtility.ChooseTargetPoint(teamType, shotRange, GetBoundingBox(), inInteriorId, PathType.Ocean);
                             if (target != null)
-                                currentPath = AIUtility.Pathfind(mapCordPoint, target.Value, PathType.Ocean);
+                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, target.Value, PathType.Ocean);
                         }
 
 

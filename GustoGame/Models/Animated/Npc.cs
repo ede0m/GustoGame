@@ -88,7 +88,7 @@ namespace Gusto.Models.Animated
                 TilePiece tp = (TilePiece)collidedWith;
 
                 colliding = false;
-                mapCordPoint = tp.tileGridPoint.Value;
+                mapCordPoint = tp.mapCordPoint;
 
                 // narrow the collision to just the feet (appears more realistic)
                 Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
@@ -315,11 +315,11 @@ namespace Gusto.Models.Animated
                                 randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
 
                             TilePiece rtp = (TilePiece)randomRegionRoamTile;
-                            Point? gridPointTo = rtp.tileGridPoint;
+                            Point? gridPointTo = rtp.mapCordPoint;
                             if (mapCordPoint != Point.Zero)
                             {
                                 roaming = true;
-                                currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value, PathType.Land); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.Land); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
                             }
                         }
                         timeSinceLastTurnFrame = 0;
