@@ -13,13 +13,13 @@ namespace Gusto.Utility
 {
     public class AIUtility
     {
+        //TODO! CREATE WEIGHTS FOR LAND AND WATER 
+        public static byte[,] OceanPathWeights; // for A* pathing
+        public static byte[,] LandPathWeights; // for A* pathing
 
-        //public static byte[,] WatherPathWeights; // for A* pathing
-        //public static byte[,] LandPathWeights; // for A* pathing
+        //public static byte[,] Weight;
 
-        public static byte[,] Weight;
-
-        public static List<TilePiece> Pathfind(Point start, Point end)
+        public static List<TilePiece> Pathfind(Point start, Point end, PathType pathType)
         {
             // nodes that have already been analyzed and have a path from the start to them
             var closedSet = new List<Point>();
@@ -71,7 +71,7 @@ namespace Gusto.Utility
                 closedSet.Add(current);
 
                 // process each valid node around the current node
-                foreach (var neighbor in GetNeighborNodes(current))
+                foreach (var neighbor in GetNeighborNodes(current, pathType))
                 {
                     var tempCurrentDistance = currentDistance[current] + 1;
 
@@ -135,45 +135,88 @@ namespace Gusto.Utility
         }
 
 
-        private static IEnumerable<Point> GetNeighborNodes(Point node)
+        private static IEnumerable<Point> GetNeighborNodes(Point node, PathType pathType)
         {
             var nodes = new List<Point>();
 
-            if (node.Y > 0)
+            if (pathType == PathType.Ocean)
             {
-                // up
-                if (Weight[node.X, node.Y - 1] > 0)
+                if (node.Y > 0)
                 {
-                    nodes.Add(new Point(node.X, node.Y - 1));
+                    // up
+                    if (OceanPathWeights[node.X, node.Y - 1] > 0)
+                    {
+                        nodes.Add(new Point(node.X, node.Y - 1));
+                    }
+                }
+
+                // right
+                if (node.X < GameMapTiles.rows - 1)
+                {
+                    if (OceanPathWeights[node.X + 1, node.Y] > 0)
+                    {
+                        nodes.Add(new Point(node.X + 1, node.Y));
+                    }
+                }
+
+                if (node.Y < GameMapTiles.cols - 1)
+                {
+                    // down
+                    if (OceanPathWeights[node.X, node.Y + 1] > 0)
+                    {
+                        nodes.Add(new Point(node.X, node.Y + 1));
+                    }
+                }
+
+                if (node.X > 0)
+                {
+                    // left
+                    if (OceanPathWeights[node.X - 1, node.Y] > 0)
+                    {
+                        nodes.Add(new Point(node.X - 1, node.Y));
+                    }
+                }
+            }
+            else if (pathType == PathType.Land)
+            {
+                if (node.Y > 0)
+                {
+                    // up
+                    if (LandPathWeights[node.X, node.Y - 1] > 0)
+                    {
+                        nodes.Add(new Point(node.X, node.Y - 1));
+                    }
+                }
+
+                // right
+                if (node.X < GameMapTiles.rows - 1)
+                {
+                    if (LandPathWeights[node.X + 1, node.Y] > 0)
+                    {
+                        nodes.Add(new Point(node.X + 1, node.Y));
+                    }
+                }
+
+                if (node.Y < GameMapTiles.cols - 1)
+                {
+                    // down
+                    if (LandPathWeights[node.X, node.Y + 1] > 0)
+                    {
+                        nodes.Add(new Point(node.X, node.Y + 1));
+                    }
+                }
+
+                if (node.X > 0)
+                {
+                    // left
+                    if (LandPathWeights[node.X - 1, node.Y] > 0)
+                    {
+                        nodes.Add(new Point(node.X - 1, node.Y));
+                    }
                 }
             }
 
-            // right
-            if (node.X < GameMapTiles.rows - 1)
-            {
-                if (Weight[node.X + 1, node.Y] > 0)
-                {
-                    nodes.Add(new Point(node.X + 1, node.Y));
-                }
-            }
 
-            if (node.Y < GameMapTiles.cols - 1)
-            {
-                // down
-                if (Weight[node.X, node.Y + 1] > 0)
-                {
-                    nodes.Add(new Point(node.X, node.Y + 1));
-                }
-            }
-
-            if (node.X > 0)
-            {
-                // left
-                if (Weight[node.X - 1, node.Y] > 0)
-                {
-                    nodes.Add(new Point(node.X - 1, node.Y));
-                }
-            }
 
             return nodes;
         }

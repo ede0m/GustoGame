@@ -76,7 +76,7 @@ namespace Gusto
 
             BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
             BaseCat baseCatLand = new BaseCat(TeamType.B, "SnooCat", scLandTiles[RandomEvents.rand.Next(scLandTiles.Count)].location, _content, _graphics);
-            Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
+            Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
             Snake snakeLand = new Snake(TeamType.DefenseGround, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
             BlueBird blueBird = new BlueBird(TeamType.PassiveAir, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.B, "GustoMap", new Vector2(-1600, -1500), _content, _graphics);

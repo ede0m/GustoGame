@@ -53,7 +53,8 @@ namespace Gusto.GameMap
             _rows = _height / tileHeight;
             GameMapTiles.rows = _rows;
             GameMapTiles.cols = _cols;
-            AIUtility.Weight = new byte[_rows, _cols];
+            AIUtility.LandPathWeights = new byte[_rows, _cols];
+            AIUtility.OceanPathWeights = new byte[_rows, _cols];
             startMapPoint = new Vector2(0 - (_width/2), 0 - (_height/2));
 
             _cam = camera;
@@ -99,23 +100,27 @@ namespace Gusto.GameMap
                             tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "o1");
                             tile.transparency = 0.6f;
                             tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
-                            AIUtility.Weight[i, j] = 1;
+                            AIUtility.OceanPathWeights[i, j] = 1;
+                            AIUtility.LandPathWeights[i, j] = 0;
                             BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile);
                             break;
                         case "o2":
                             tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "o2");
                             tile.transparency = 0.6f;
-                            AIUtility.Weight[i, j] = 0;
+                            AIUtility.OceanPathWeights[i, j] = 0;
+                            AIUtility.LandPathWeights[i, j] = 1;
                             //BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile); omit these since they cause no path found in A*
                             break;
                         case "l1":
                             tile = new LandTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "l1");
-                            AIUtility.Weight[i, j] = 0;
+                            AIUtility.OceanPathWeights[i, j] = 0;
+                            AIUtility.LandPathWeights[i, j] = 1;
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                         case "l2":
                             tile = new LandTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "l2");
-                            AIUtility.Weight[i, j] = 0;
+                            AIUtility.OceanPathWeights[i, j] = 0;
+                            AIUtility.LandPathWeights[i, j] = 1;
                             BoundingBoxLocations.RegionMap[regionName].RegionLandTiles.Add(tile);
                             break;
                     }

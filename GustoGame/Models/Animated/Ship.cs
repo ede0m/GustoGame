@@ -71,7 +71,7 @@ namespace Gusto.Models.Animated
 
         bool roaming;
         List<TilePiece> currentPath;
-        TilePiece currMapCordTile;
+        TilePiece currMapCordTile; // used here and not in npcs because npcs can get this value from land tile collision. Ocean tiles are not run through collision because there are so many.
 
         public TeamType teamType;
         public Sprite randomRoamTile;
@@ -429,16 +429,17 @@ namespace Gusto.Models.Animated
                         roaming = true;
                         TilePiece rtp = (TilePiece)randomRoamTile;
                         Point? gridPointTo = rtp.tileGridPoint;
-                        currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                        currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value, PathType.Ocean); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
                     }
                     else
                     {
+                        // move to attack target when in range
                         int shotRange = mountedOnShip == null ? 0 : mountedOnShip.shotRange;
                         if (shotRange > 0)
                         {
                             Point? target = AIUtility.ChooseTargetPoint(teamType, shotRange, GetBoundingBox(), inInteriorId, PathType.Ocean);
                             if (target != null)
-                                currentPath = AIUtility.Pathfind(mapCordPoint, target.Value);
+                                currentPath = AIUtility.Pathfind(mapCordPoint, target.Value, PathType.Ocean);
                         }
 
 
