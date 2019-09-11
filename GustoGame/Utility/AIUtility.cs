@@ -1,21 +1,23 @@
-﻿using Gusto.AnimatedSprite;
+﻿using Gusto.Models;
 using Gusto.Bounding;
 using Gusto.GameMap;
 using Gusto.Mappings;
-using Gusto.Models;
+using Gusto.Models.Types;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Gusto.Utility
 {
     public class AIUtility
     {
 
-        public static byte[,] Weight; // for A* pathing
+        //public static byte[,] WatherPathWeights; // for A* pathing
+        //public static byte[,] LandPathWeights; // for A* pathing
+
+        public static byte[,] Weight;
 
         public static List<TilePiece> Pathfind(Point start, Point end)
         {
@@ -210,8 +212,8 @@ namespace Gusto.Utility
         }
 
 
-        // Returns tile point of target 
-        public static Point? ChooseTargetPoint(TeamType teamType, float range, Rectangle bb, Guid interiorId)
+        // Returns tile point of target (pass the pathType on which you desire to find a target - i.e. ships don't build paths to land tiles)
+        public static Point? ChooseTargetPoint(TeamType teamType, float range, Rectangle bb, Guid interiorId, PathType pathType)
         {
             foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
             {
@@ -224,6 +226,9 @@ namespace Gusto.Utility
 
                         foreach (var target in BoundingBoxLocations.BoundingBoxLocationMap[otherTeam])
                         {
+                            if (target.pathType != pathType)
+                                continue;
+
                             float vmag = PhysicsUtility.VectorMagnitude(target.targetLoc.X, bb.X, target.targetLoc.Y, bb.Y);
                             if (vmag < minVMag && interiorId == target.interiorId)
                             {

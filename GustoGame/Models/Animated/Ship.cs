@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Gusto.AnimatedSprite.InventoryItems;
+using Gusto.Models.Types;
 
 namespace Gusto.Models.Animated
 {
@@ -67,8 +68,10 @@ namespace Gusto.Models.Animated
         public bool anchored;
         public bool playerAboard;
         public bool playerInInterior;
+
         bool roaming;
         List<TilePiece> currentPath;
+        TilePiece currMapCordTile;
 
         public TeamType teamType;
         public Sprite randomRoamTile;
@@ -167,6 +170,22 @@ namespace Gusto.Models.Animated
             {
                 showHealthBar = false;
                 timeShowingHealthBar = 0;
+            }
+
+            // set our map cord point (when it has changed)
+            if (currMapCordTile == null || !currMapCordTile.GetBoundingBox().Intersects(GetBoundingBox()))
+            {
+                // TODO: find a better way to get a mapCordPoint from ships in ocean (could just check neighbor cells from this tiles next index positions in the map)
+                foreach (var tile in BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles)
+                {
+                    if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
+                    {
+                        TilePiece tp = (TilePiece)tile;
+                        currMapCordTile = tp;
+                        mapCordPoint = tp.tileGridPoint.Value;
+                        break;
+                    }
+                }
             }
 
             // AI logic
@@ -406,25 +425,23 @@ namespace Gusto.Models.Animated
                         if (regionKey.Equals("GustoMap")) // TEMP see pathFind comment below
                             regionKey = "Usopp";
 
-                        // TODO: find a better way to get a mapCordPoint from ships in ocean
-                        foreach (var tile in BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles)
-                        {
-                            if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
-                            {
-                                TilePiece tp = (TilePiece)tile;
-                                mapCordPoint = tp.tileGridPoint.Value;
-                                break;
-                            }
-                        }
-
                         randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
                         roaming = true;
                         TilePiece rtp = (TilePiece)randomRoamTile;
                         Point? gridPointTo = rtp.tileGridPoint;
-                        currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value); // This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                        currentPath = AIUtility.Pathfind(mapCordPoint, gridPointTo.Value); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
                     }
                     else
                     {
+                        int shotRange = mountedOnShip == null ? 0 : mountedOnShip.shotRange;
+                        if (shotRange > 0)
+                        {
+                            Point? target = AIUtility.ChooseTargetPoint(teamType, shotRange, GetBoundingBox(), inInteriorId, PathType.Ocean);
+                            if (target != null)
+                                currentPath = AIUtility.Pathfind(mapCordPoint, target.Value);
+                        }
+
+
                         // we have found the next tile in path
                         if (currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
                         {

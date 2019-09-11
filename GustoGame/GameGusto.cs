@@ -19,6 +19,7 @@ using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using System.Linq;
+using Gusto.Models.Types;
 
 namespace Gusto
 {
@@ -814,7 +815,7 @@ namespace Gusto
 
                 Polygon polyA = null;
 
-                Target targetEntry = new Target();
+                Target targetEntry = new Target(); // pathType denotes what pathType ai will move to. ( i.e. Ships won't move to Land pathType targets)
                 targetEntry.interiorId = spriteA.inInteriorId;
                 targetEntry.targetLoc = spriteA.GetBoundingBox().Center.ToVector2();
                 targetEntry.mapCordPoint = spriteA.mapCordPoint;
@@ -822,17 +823,26 @@ namespace Gusto
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship)spriteA;
+                    targetEntry.pathType = PathType.Ocean;
                     BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(targetEntry);
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
                 {
                     Tower tower = (Tower)spriteA;
+                    targetEntry.pathType = PathType.Land;
                     BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(targetEntry);
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
                 {
                     PlayerPirate player = (PlayerPirate)spriteA;
+                    targetEntry.pathType = PathType.Land;
                     BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(targetEntry);
+                }
+                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
+                {
+                    Npc npc = (Npc)spriteA;
+                    targetEntry.pathType = PathType.Land;
+                    BoundingBoxLocations.BoundingBoxLocationMap[npc.teamType].Add(targetEntry);
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();

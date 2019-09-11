@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gusto.Models.Types;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace Gusto.Bounding
         public Point mapCordPoint { get; set; }
         public Vector2 targetLoc { get; set; }
         public Guid interiorId { get; set; }
+        public PathType pathType { get; set; }
     }
 }

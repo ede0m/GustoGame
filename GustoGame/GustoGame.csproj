@@ -109,7 +109,8 @@
     <Compile Include="AnimatedSprite\InventoryItems\Weapon\ShortSword.cs" />
     <Compile Include="AnimatedSprite\FiredAmmo\RustyHarpoon.cs" />
     <Compile Include="AnimatedSprite\Animals\Snake.cs" />
-    <Compile Include="AnimatedSprite\TeamType.cs" />
+    <Compile Include="Models\Types\PathType.cs" />
+    <Compile Include="Models\Types\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
     <Compile Include="AnimatedSprite\TeePee.cs" />
     <Compile Include="Bounding\BoundingBoxLocations.cs" />

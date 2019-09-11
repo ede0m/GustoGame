@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gusto.AnimatedSprite
+namespace Gusto.Models
 {
     public enum TeamType
     {
