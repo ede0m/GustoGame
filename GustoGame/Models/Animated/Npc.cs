@@ -276,7 +276,7 @@ namespace Gusto.Models.Animated
                     }
                     break;
 
-
+                // NOTE! PassiveGround currently using A* where other npcs use directional vector. A* will not find a path between two islands in the same region (unless I add the AllOutdoor weight matrix with all 1)
                 case TeamType.PassiveGround:
 
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
