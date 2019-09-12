@@ -225,8 +225,8 @@ namespace Gusto.Utility
         }
 
 
-        // Returns tile point of target (pass the pathType on which you desire to find a target - i.e. ships don't build paths to land tiles)
-        public static Point? ChooseTargetPoint(TeamType teamType, float range, Rectangle bb, Guid interiorId, PathType pathType)
+        // Returns tile point of target (pass the pathType on which you desire to find a target - i.e. ships don't build paths to land tiles) and the distance between target and this bb
+        public static Tuple<Point?, float> ChooseTargetPoint(TeamType teamType, float range, Rectangle bb, Guid interiorId, PathType pathType)
         {
             foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
             {
@@ -251,7 +251,7 @@ namespace Gusto.Utility
 
                         }
                         if (minVMag <= range)
-                            return targetTilePoint;
+                            return new Tuple<Point?, float>(targetTilePoint, minVMag);
                     }
                     else
                         return null;

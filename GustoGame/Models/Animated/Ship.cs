@@ -70,6 +70,7 @@ namespace Gusto.Models.Animated
         public bool playerInInterior;
 
         bool roaming;
+        bool following;
         List<TilePiece> currentPath;
         TilePiece currMapCordTile; // used here and not in npcs because npcs can get this value from land tile collision. Ocean tiles are not run through collision because there are so many.
 
@@ -172,10 +173,9 @@ namespace Gusto.Models.Animated
                 timeShowingHealthBar = 0;
             }
 
-            // set our map cord point (when it has changed)
+            // set our map cord point (initially and when it changes TODO: fix the "optimization" using currMapCordTile neighbors below. It doesn't properly update mapCordPoint when used)
             if (currMapCordTile == null || !currMapCordTile.GetBoundingBox().Intersects(GetBoundingBox()))
             {
-                // TODO: find a better way to get a mapCordPoint from ships in ocean (could just check neighbor cells from this tiles next index positions in the map)
                 foreach (var tile in BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles)
                 {
                     if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
@@ -187,6 +187,25 @@ namespace Gusto.Models.Animated
                     }
                 }
             }
+            /*else if (!currMapCordTile.GetBoundingBox().Intersects(GetBoundingBox())) // (when it has changed)
+            {
+                List<TilePiece> neighbors = new List<TilePiece>();
+                neighbors.Add(GameMapTiles.map[currMapCordTile.mapCordPoint.Value.X * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y + 1]); // right neighbor
+                neighbors.Add(GameMapTiles.map[currMapCordTile.mapCordPoint.Value.X * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y - 1]); // left neighbor
+                neighbors.Add(GameMapTiles.map[(currMapCordTile.mapCordPoint.Value.X + 1) * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y]); // bottom neighbor
+                neighbors.Add(GameMapTiles.map[(currMapCordTile.mapCordPoint.Value.X - 1) * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y]); // top neighbor
+                foreach (var tile in neighbors)
+                {
+                    if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
+                    {
+                        TilePiece tp = (TilePiece)tile;
+                        currMapCordTile = tp;
+                        mapCordPoint = tp.mapCordPoint;
+                        break;
+                    }
+                }
+            }*/
+
 
             // AI logic
             if (teamType != TeamType.Player)
@@ -433,13 +452,36 @@ namespace Gusto.Models.Animated
                     }
                     else
                     {
-                        // move to attack target when in range
+                        // move to attack/follow target when in range
                         int shotRange = mountedOnShip == null ? 0 : mountedOnShip.shotRange;
                         if (shotRange > 0)
                         {
-                            Point? target = AIUtility.ChooseTargetPoint(teamType, shotRange, GetBoundingBox(), inInteriorId, PathType.Ocean);
-                            if (target != null)
-                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, target.Value, PathType.Ocean);
+                            Tuple<Point?, float> targetInfo = AIUtility.ChooseTargetPoint(teamType, shotRange, GetBoundingBox(), inInteriorId, PathType.Ocean);
+                            if (targetInfo != null)
+                            {
+                                // stop distance
+                                var distanceToTarget = targetInfo.Item2;
+                                if (distanceToTarget <= stopRange)
+                                {
+                                    moving = false;
+                                    shipSail.moving = false;
+                                }
+                                else
+                                {
+                                    moving = true;
+                                    shipSail.moving = true;
+                                }
+
+                                Point? targetMapCords = targetInfo.Item1;
+                                // compute follow path
+                                if (!following)
+                                {
+                                    currentPath = AIUtility.Pathfind(mapCordPoint.Value, targetMapCords.Value, PathType.Ocean);
+                                    following = true;
+                                }
+                            }
+                            else
+                                following = false;
                         }
 
 
@@ -448,7 +490,10 @@ namespace Gusto.Models.Animated
                         {
                             currentPath.RemoveAt(0);
                             if (currentPath.Count == 0)
+                            {
                                 roaming = false;
+                                following = false;
+                            }
                         }
 
                         if (roaming)
