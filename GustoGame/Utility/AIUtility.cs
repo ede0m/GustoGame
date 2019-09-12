@@ -16,6 +16,7 @@ namespace Gusto.Utility
         //TODO! CREATE WEIGHTS FOR LAND AND WATER 
         public static byte[,] OceanPathWeights; // for A* pathing
         public static byte[,] LandPathWeights; // for A* pathing
+        public static byte[,] AllPathWeights; // for A* pathing
 
         //public static byte[,] Weight;
 
@@ -138,85 +139,56 @@ namespace Gusto.Utility
         private static IEnumerable<Point> GetNeighborNodes(Point node, PathType pathType)
         {
             var nodes = new List<Point>();
-
-            if (pathType == PathType.Ocean)
+            byte[,] Weights = null;
+            switch (pathType)
             {
-                if (node.Y > 0)
-                {
-                    // up
-                    if (OceanPathWeights[node.X, node.Y - 1] > 0)
-                    {
-                        nodes.Add(new Point(node.X, node.Y - 1));
-                    }
-                }
+                case PathType.Ocean:
+                    Weights = OceanPathWeights;
+                    break;
+                case PathType.Land:
+                    Weights = LandPathWeights;
+                    break;
+                case PathType.AllOutdoor:
+                    Weights = AllPathWeights;
+                    break;
 
-                // right
-                if (node.X < GameMapTiles.rows - 1)
-                {
-                    if (OceanPathWeights[node.X + 1, node.Y] > 0)
-                    {
-                        nodes.Add(new Point(node.X + 1, node.Y));
-                    }
-                }
-
-                if (node.Y < GameMapTiles.cols - 1)
-                {
-                    // down
-                    if (OceanPathWeights[node.X, node.Y + 1] > 0)
-                    {
-                        nodes.Add(new Point(node.X, node.Y + 1));
-                    }
-                }
-
-                if (node.X > 0)
-                {
-                    // left
-                    if (OceanPathWeights[node.X - 1, node.Y] > 0)
-                    {
-                        nodes.Add(new Point(node.X - 1, node.Y));
-                    }
-                }
             }
-            else if (pathType == PathType.Land)
+
+            if (node.Y > 0)
             {
-                if (node.Y > 0)
+                // up
+                if (Weights[node.X, node.Y - 1] > 0)
                 {
-                    // up
-                    if (LandPathWeights[node.X, node.Y - 1] > 0)
-                    {
-                        nodes.Add(new Point(node.X, node.Y - 1));
-                    }
-                }
-
-                // right
-                if (node.X < GameMapTiles.rows - 1)
-                {
-                    if (LandPathWeights[node.X + 1, node.Y] > 0)
-                    {
-                        nodes.Add(new Point(node.X + 1, node.Y));
-                    }
-                }
-
-                if (node.Y < GameMapTiles.cols - 1)
-                {
-                    // down
-                    if (LandPathWeights[node.X, node.Y + 1] > 0)
-                    {
-                        nodes.Add(new Point(node.X, node.Y + 1));
-                    }
-                }
-
-                if (node.X > 0)
-                {
-                    // left
-                    if (LandPathWeights[node.X - 1, node.Y] > 0)
-                    {
-                        nodes.Add(new Point(node.X - 1, node.Y));
-                    }
+                    nodes.Add(new Point(node.X, node.Y - 1));
                 }
             }
 
+            // right
+            if (node.X < GameMapTiles.rows - 1)
+            {
+                if (Weights[node.X + 1, node.Y] > 0)
+                {
+                    nodes.Add(new Point(node.X + 1, node.Y));
+                }
+            }
 
+            if (node.Y < GameMapTiles.cols - 1)
+            {
+                // down
+                if (Weights[node.X, node.Y + 1] > 0)
+                {
+                    nodes.Add(new Point(node.X, node.Y + 1));
+                }
+            }
+
+            if (node.X > 0)
+            {
+                // left
+                if (Weights[node.X - 1, node.Y] > 0)
+                {
+                    nodes.Add(new Point(node.X - 1, node.Y));
+                }
+            }
 
             return nodes;
         }

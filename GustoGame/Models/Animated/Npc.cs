@@ -294,12 +294,13 @@ namespace Gusto.Models.Animated
                                 currentPath.RemoveAt(0);
                                 if (currentPath.Count == 0) // found the end of the path
                                     roaming = false;
-                                else
-                                {
-                                    Tuple<int, int> frameInfo = AIUtility.SetAIGroundMovement(currentPath[0].GetBoundingBox().Center.ToVector2(), location);
-                                    currRowFrame = frameInfo.Item1;
-                                    directionalFrame = frameInfo.Item2;
-                                }
+                            }
+
+                            if (roaming)
+                            {
+                                Tuple<int, int> frameInfo = AIUtility.SetAIGroundMovement(currentPath[0].GetBoundingBox().Center.ToVector2(), location);
+                                currRowFrame = frameInfo.Item1;
+                                directionalFrame = frameInfo.Item2;
                             }
 
                             // FIND a better way to get this value - can't have references so we have to search through this static list of interior tiles
