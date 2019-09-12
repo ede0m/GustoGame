@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(120, -350), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(-120, -550), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region
@@ -76,7 +76,7 @@ namespace Gusto
 
             BaseTribal baseTribalLand = new BaseTribal(TeamType.A, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
             BaseCat baseCatLand = new BaseCat(TeamType.B, "SnooCat", scLandTiles[RandomEvents.rand.Next(scLandTiles.Count)].location, _content, _graphics);
-            Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
+            Chicken chickenLand = new Chicken(TeamType.PassiveGround, "Gianna", giannaLandTiles[RandomEvents.rand.Next(giannaLandTiles.Count)].location, _content, _graphics);
             Snake snakeLand = new Snake(TeamType.DefenseGround, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
             BlueBird blueBird = new BlueBird(TeamType.PassiveAir, "Usopp", usoppLandTiles[RandomEvents.rand.Next(usoppLandTiles.Count)].location, _content, _graphics);
             Tower tower = new BaseTower(TeamType.B, "GustoMap", new Vector2(-1600, -1500), _content, _graphics);

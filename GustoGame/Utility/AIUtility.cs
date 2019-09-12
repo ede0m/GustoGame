@@ -13,7 +13,6 @@ namespace Gusto.Utility
 {
     public class AIUtility
     {
-        //TODO! CREATE WEIGHTS FOR LAND AND WATER 
         public static byte[,] OceanPathWeights; // for A* pathing
         public static byte[,] LandPathWeights; // for A* pathing
         public static byte[,] AllPathWeights; // for A* pathing
@@ -151,7 +150,6 @@ namespace Gusto.Utility
                 case PathType.AllOutdoor:
                     Weights = AllPathWeights;
                     break;
-
             }
 
             if (node.Y > 0)

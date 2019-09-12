@@ -283,10 +283,6 @@ namespace Gusto.Models.Animated
                     {
                         if (roaming) // region only rn
                         {
-                            /*// go towards random tile
-                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
-                            currRowFrame = frames.Item1;
-                            directionalFrame = frames.Item2;*/
 
                             // we have found the next tile in path
                             if (currentPath != null && currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
@@ -320,7 +316,7 @@ namespace Gusto.Models.Animated
                             if (mapCordPoint != Point.Zero)
                             {
                                 roaming = true;
-                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.Land); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.AllOutdoor); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
                             }
                         }
                         timeSinceLastTurnFrame = 0;
