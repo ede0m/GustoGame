@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Gusto.AnimatedSprite.InventoryItems;
+using Gusto.Models.Types;
 
 namespace Gusto.Models.Animated
 {
@@ -43,7 +44,6 @@ namespace Gusto.Models.Animated
         private Texture2D meterProg;
 
         public Vector2 currentShipSpeed;
-        public float attackRange;
         public float stopRange;
         public float movementSpeed;
         public float percentNotAnchored;
@@ -68,7 +68,11 @@ namespace Gusto.Models.Animated
         public bool anchored;
         public bool playerAboard;
         public bool playerInInterior;
+
         bool roaming;
+        bool following;
+        List<TilePiece> currentPath;
+        TilePiece currMapCordTile; // used here and not in npcs because npcs can get this value from land tile collision. Ocean tiles are not run through collision because there are so many.
 
         public TeamType teamType;
         public Sprite randomRoamTile;
@@ -82,7 +86,6 @@ namespace Gusto.Models.Animated
 
         public Ship(TeamType type, ContentManager content, GraphicsDevice graphics) : base(graphics)
         {
-            //Shots = new List<Ammo>();
             actionInventory = Enumerable.Repeat<InventoryItem>(null, maxInventorySlots).ToList();
             teamType = type;
             _content = content;
@@ -169,6 +172,40 @@ namespace Gusto.Models.Animated
                 showHealthBar = false;
                 timeShowingHealthBar = 0;
             }
+
+            // set our map cord point (initially and when it changes TODO: fix the "optimization" using currMapCordTile neighbors below. It doesn't properly update mapCordPoint when used)
+            if (currMapCordTile == null || !currMapCordTile.GetBoundingBox().Intersects(GetBoundingBox()))
+            {
+                foreach (var tile in BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles)
+                {
+                    if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
+                    {
+                        TilePiece tp = (TilePiece)tile;
+                        currMapCordTile = tp;
+                        mapCordPoint = tp.mapCordPoint;
+                        break;
+                    }
+                }
+            }
+            /*else if (!currMapCordTile.GetBoundingBox().Intersects(GetBoundingBox())) // (when it has changed)
+            {
+                List<TilePiece> neighbors = new List<TilePiece>();
+                neighbors.Add(GameMapTiles.map[currMapCordTile.mapCordPoint.Value.X * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y + 1]); // right neighbor
+                neighbors.Add(GameMapTiles.map[currMapCordTile.mapCordPoint.Value.X * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y - 1]); // left neighbor
+                neighbors.Add(GameMapTiles.map[(currMapCordTile.mapCordPoint.Value.X + 1) * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y]); // bottom neighbor
+                neighbors.Add(GameMapTiles.map[(currMapCordTile.mapCordPoint.Value.X - 1) * GameMapTiles.cols + currMapCordTile.mapCordPoint.Value.Y]); // top neighbor
+                foreach (var tile in neighbors)
+                {
+                    if (GetBoundingBox().Intersects(tile.GetBoundingBox()))
+                    {
+                        TilePiece tp = (TilePiece)tile;
+                        currMapCordTile = tp;
+                        mapCordPoint = tp.mapCordPoint;
+                        break;
+                    }
+                }
+            }*/
+
 
             // AI logic
             if (teamType != TeamType.Player)
@@ -398,102 +435,71 @@ namespace Gusto.Models.Animated
             // AI only works if NPC aboard
             if (shipInterior.interiorObjects.OfType<Npc>().Any())
             {
+
                 // AI ship direction and movement
                 if (timeSinceLastTurn > millisecondsPerTurn)
                 {
-                    Vector2? target = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
-                    if (target != null)
+                    if (!roaming)
                     {
-                        roaming = false;
-                        var distanceToTarget = PhysicsUtility.VectorMagnitude(target.Value.X, location.X, target.Value.Y, location.Y);
-                        if (distanceToTarget <= stopRange || health <= 0)
-                        {
-                            moving = false;
-                            shipSail.moving = false;
-                        }
-                        else
-                        {
-                            moving = true;
-                            shipSail.moving = true;
-                        }
-                    }
-                    else
-                    {
-                        // TODO: roaming can get stuck... 
+                        if (regionKey.Equals("GustoMap")) // TEMP see pathFind comment below
+                            regionKey = "Usopp";
 
-                        if (!roaming)
-                            randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
-
+                        randomRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionOceanTiles.Count)];
                         roaming = true;
-                        target = new Vector2((int)randomRoamTile.GetBoundingBox().X, (int)randomRoamTile.GetBoundingBox().Y);
-                        if (GetBoundingBox().Intersects(randomRoamTile.GetBoundingBox()))
-                            roaming = false;
-
+                        TilePiece rtp = (TilePiece)randomRoamTile;
+                        Point? gridPointTo = rtp.mapCordPoint;
+                        currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.Ocean); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
                     }
-
-                    // TODO: need some sort of timer to unachor ai ship when it is stuck.
-                    //if (anchored)
-                    //moving = false;
-
-
-                    // collision avoidance take 2
-                    bool probesCollides = false;
-                    int lineOfSightDistance = 2500;
-                    Vector2 shipCenterPoint = GetBoundingBox().Center.ToVector2();
-                    int crf = currRowFrame;
-                    Dictionary<int, float> nonCollidingLOSMap = new Dictionary<int, float>(); // rowFrame and los distance to target
-                    for (int i = 0; i < nRows; i++)
-                    {
-                        Tuple<int, int> LosFrames = BoundFrames(crf, currColumnFrame);
-                        crf = LosFrames.Item1;
-                        Vector2 pointOfSight = new Vector2(shipCenterPoint.X + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item1 * lineOfSightDistance,
-                            shipCenterPoint.Y + ShipMovementVectorMapping.ShipDirectionVectorValues[crf].Item2 * lineOfSightDistance);
-
-                        foreach (var land in BoundingBoxLocations.LandTileLocationList)
-                        {
-                            int padding = GetBoundingBox().Width / 2; // padd the tile pieces with half of the ships width
-                            Rectangle bbPadded = new Rectangle(land.GetBoundingBox().X, land.GetBoundingBox().Y, land.GetBoundingBox().Width + padding, land.GetBoundingBox().Height + padding);
-
-                            if (AIUtility.LineIntersectsRect(shipCenterPoint, pointOfSight, bbPadded))
-                            {
-                                nonCollidingLOSMap.Remove(crf);
-                                probesCollides = true;
-                                break;
-                            }
-                            else
-                            {
-                                if (!nonCollidingLOSMap.ContainsKey(crf))
-                                    nonCollidingLOSMap.Add(crf, PhysicsUtility.VectorMagnitude(target.Value.X, pointOfSight.X, target.Value.Y, pointOfSight.Y));
-                            }
-                        }
-                        crf++;
-                    }
-
-                    if (!probesCollides)
-                        currRowFrame = AIUtility.SetAIShipDirection(target.Value, location);
                     else
                     {
-                        if (nonCollidingLOSMap.Keys.Count == 0)
+                        // move to attack/follow target when in range
+                        int shotRange = mountedOnShip == null ? 0 : mountedOnShip.shotRange;
+                        if (shotRange > 0)
                         {
-                            // all of our lines of sight collide... TODO
-                        }
-                        else
-                        {
-                            // go towards min nonCollidable path to target
-                            int bestRowFrame = 0;
-                            float minDistance = float.MaxValue;
-                            foreach (var los in nonCollidingLOSMap.Keys)
+                            Tuple<Point?, float> targetInfo = AIUtility.ChooseTargetPoint(teamType, shotRange, GetBoundingBox(), inInteriorId, PathType.Ocean);
+                            if (targetInfo != null)
                             {
-                                if (nonCollidingLOSMap[los] < minDistance)
+                                // stop distance
+                                var distanceToTarget = targetInfo.Item2;
+                                if (distanceToTarget <= stopRange)
                                 {
-                                    minDistance = nonCollidingLOSMap[los];
-                                    bestRowFrame = los;
+                                    moving = false;
+                                    shipSail.moving = false;
+                                }
+                                else
+                                {
+                                    moving = true;
+                                    shipSail.moving = true;
+                                }
+
+                                Point? targetMapCords = targetInfo.Item1;
+                                // compute follow path
+                                if (!following)
+                                {
+                                    currentPath = AIUtility.Pathfind(mapCordPoint.Value, targetMapCords.Value, PathType.Ocean);
+                                    following = true;
                                 }
                             }
-                            currRowFrame = bestRowFrame;
+                            else
+                                following = false;
                         }
+
+
+                        // we have found the next tile in path
+                        if (currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
+                        {
+                            currentPath.RemoveAt(0);
+                            if (currentPath.Count == 0)
+                            {
+                                roaming = false;
+                                following = false;
+                            }
+                        }
+
+                        if (roaming)
+                            currRowFrame = AIUtility.SetAIShipDirection(currentPath[0].GetBoundingBox().Center.ToVector2(), location);
+
                     }
-                    // end collision avoidance
 
                     shipSail.currRowFrame = currRowFrame;
                     timeSinceLastTurn -= millisecondsPerTurn;
@@ -502,7 +508,7 @@ namespace Gusto.Models.Animated
                 // AI shooting
                 if (mountedOnShip != null)
                 {
-                    Vector2? shotDirection = AIUtility.ChooseTarget(teamType, attackRange, GetBoundingBox(), inInteriorId);
+                    Vector2? shotDirection = AIUtility.ChooseTargetVector(teamType, mountedOnShip.shotRange, GetBoundingBox(), inInteriorId);
                     mountedOnShip.UpdateAIMountShot(gameTime, shotDirection);
                     mountedOnShip.location = GetBoundingBox().Center.ToVector2();
                 }

@@ -19,6 +19,7 @@ using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using System.Linq;
+using Gusto.Models.Types;
 
 namespace Gusto
 {
@@ -379,7 +380,7 @@ namespace Gusto
             Vector2 minCorner = new Vector2(camera.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(camera.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
 
-            foreach (var tp in map.GetMap())
+            foreach (var tp in GameMapTiles.map)
             {
                 if ((tp.location.X >= minCorner.X && tp.location.X <= maxCorner.X) && (tp.location.Y >= minCorner.Y && tp.location.Y <= maxCorner.Y))
                 {
@@ -814,21 +815,36 @@ namespace Gusto
 
                 Polygon polyA = null;
 
-                // BoundBoxLocationMap update - this structure is used for AI locating targets
+                Target targetEntry = new Target(); 
+                targetEntry.interiorId = spriteA.inInteriorId;
+                targetEntry.targetLoc = spriteA.GetBoundingBox().Center.ToVector2();
+                if (spriteA.mapCordPoint != null)
+                    targetEntry.mapCordPoint = spriteA.mapCordPoint.Value;
+                // BoundBoxLocationMap update - this structure is used for AI locating targets. Set all needed target values
+                // pathType denotes what pathType ai will move to. ( i.e. Ships won't move to targets with Land pathType because it wouldn't find a path there and would waste time)
                 if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))
                 {
                     Ship ship = (Ship)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
+                    targetEntry.pathType = PathType.Ocean;
+                    BoundingBoxLocations.BoundingBoxLocationMap[ship.teamType].Add(targetEntry);
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Tower))
                 {
                     Tower tower = (Tower)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
+                    targetEntry.pathType = PathType.Land;
+                    BoundingBoxLocations.BoundingBoxLocationMap[tower.teamType].Add(targetEntry);
                 }
                 else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.PlayerPirate))
                 {
                     PlayerPirate player = (PlayerPirate)spriteA;
-                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(new Tuple<Vector2, Guid>(spriteA.GetBoundingBox().Center.ToVector2(), spriteA.inInteriorId));
+                    targetEntry.pathType = PathType.Land;
+                    BoundingBoxLocations.BoundingBoxLocationMap[player.teamType].Add(targetEntry);
+                }
+                else if (spriteA.GetType().BaseType == typeof(Gusto.Models.Animated.Npc))
+                {
+                    Npc npc = (Npc)spriteA;
+                    targetEntry.pathType = PathType.Land;
+                    BoundingBoxLocations.BoundingBoxLocationMap[npc.teamType].Add(targetEntry);
                 }
 
                 Rectangle bbA = spriteA.GetBoundingBox();

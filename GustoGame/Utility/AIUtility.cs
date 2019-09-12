@@ -1,19 +1,199 @@
-﻿using Gusto.AnimatedSprite;
+﻿using Gusto.Models;
 using Gusto.Bounding;
+using Gusto.GameMap;
 using Gusto.Mappings;
+using Gusto.Models.Types;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Gusto.Utility
 {
     public class AIUtility
     {
-        // Returns attack postion of target as tuple
-        public static Vector2? ChooseTarget(TeamType teamType, float range, Rectangle bb, Guid interiorId)
+        public static byte[,] OceanPathWeights; // for A* pathing
+        public static byte[,] LandPathWeights; // for A* pathing
+        public static byte[,] AllPathWeights; // for A* pathing
+
+        //public static byte[,] Weight;
+
+        public static List<TilePiece> Pathfind(Point start, Point end, PathType pathType)
+        {
+            // nodes that have already been analyzed and have a path from the start to them
+            var closedSet = new List<Point>();
+            // nodes that have been identified as a neighbor of an analyzed node, but have 
+            // yet to be fully analyzed
+            var openSet = new List<Point> { start };
+            // a dictionary identifying the optimal origin point to each node. this is used 
+            // to back-track from the end to find the optimal path
+            var cameFrom = new Dictionary<Point, Point>();
+            // a dictionary indicating how far each analyzed node is from the start
+            var currentDistance = new Dictionary<Point, int>();
+            // a dictionary indicating how far it is expected to reach the end, if the path 
+            // travels through the specified node. 
+            var predictedDistance = new Dictionary<Point, float>();
+
+            // initialize the start node as having a distance of 0, and an estmated distance 
+            // of y-distance + x-distance, which is the optimal path in a square grid that 
+            // doesn't allow for diagonal movement
+            currentDistance.Add(start, 0);
+            predictedDistance.Add(
+                start,
+                0 + +Math.Abs(start.X - end.X) + Math.Abs(start.Y - end.Y)
+            );
+
+            // if there are any unanalyzed nodes, process them
+            while (openSet.Count > 0)
+            {
+                // get the node with the lowest estimated cost to finish
+                var current = (
+                    from p in openSet orderby predictedDistance[p] ascending select p
+                ).First();
+
+                // if it is the finish, return the path
+                if (current.X == end.X && current.Y == end.Y)
+                {
+                    // generate the found path
+                    List<Point> pathPoints = ReconstructPath(cameFrom, end);
+                    // map to tile pieces
+                    List<TilePiece> tiles = new List<TilePiece>();
+                    foreach (Point p in pathPoints)
+                    {
+                        tiles.Add(GameMapTiles.map[(p.X * GameMapTiles.cols) + p.Y]);
+                    }
+                    return tiles;
+                }
+
+                // move current node from open to closed
+                openSet.Remove(current);
+                closedSet.Add(current);
+
+                // process each valid node around the current node
+                foreach (var neighbor in GetNeighborNodes(current, pathType))
+                {
+                    var tempCurrentDistance = currentDistance[current] + 1;
+
+                    // if we already know a faster way to this neighbor, use that route and 
+                    // ignore this one
+                    if (closedSet.Contains(neighbor)
+                        && tempCurrentDistance >= currentDistance[neighbor])
+                    {
+                        continue;
+                    }
+
+                    // if we don't know a route to this neighbor, or if this is faster, 
+                    // store this route
+                    if (!closedSet.Contains(neighbor)
+                        || tempCurrentDistance < currentDistance[neighbor])
+                    {
+                        if (cameFrom.Keys.Contains(neighbor))
+                        {
+                            cameFrom[neighbor] = current;
+                        }
+                        else
+                        {
+                            cameFrom.Add(neighbor, current);
+                        }
+
+                        currentDistance[neighbor] = tempCurrentDistance;
+                        predictedDistance[neighbor] =
+                            currentDistance[neighbor]
+                            + Math.Abs(neighbor.X - end.X)
+                            + Math.Abs(neighbor.Y - end.Y);
+
+                        // if this is a new node, add it to processing
+                        if (!openSet.Contains(neighbor))
+                        {
+                            openSet.Add(neighbor);
+                        }
+                    }
+                }
+            }
+
+            // unable to figure out a path, abort.
+            throw new Exception(
+                string.Format(
+                    "unable to find a path between {0},{1} and {2},{3}",
+                    start.X, start.Y,
+                    end.X, end.Y
+                )
+            );
+        }
+
+        private static List<Point> ReconstructPath(Dictionary<Point, Point> cameFrom, Point current)
+        {
+            if (!cameFrom.Keys.Contains(current))
+            {
+                return new List<Point> { current };
+            }
+
+            var path = ReconstructPath(cameFrom, cameFrom[current]);
+            path.Add(current);
+            return path;
+        }
+
+
+        private static IEnumerable<Point> GetNeighborNodes(Point node, PathType pathType)
+        {
+            var nodes = new List<Point>();
+            byte[,] Weights = null;
+            switch (pathType)
+            {
+                case PathType.Ocean:
+                    Weights = OceanPathWeights;
+                    break;
+                case PathType.Land:
+                    Weights = LandPathWeights;
+                    break;
+                case PathType.AllOutdoor:
+                    Weights = AllPathWeights;
+                    break;
+            }
+
+            if (node.Y > 0)
+            {
+                // up
+                if (Weights[node.X, node.Y - 1] > 0)
+                {
+                    nodes.Add(new Point(node.X, node.Y - 1));
+                }
+            }
+
+            // right
+            if (node.X < GameMapTiles.rows - 1)
+            {
+                if (Weights[node.X + 1, node.Y] > 0)
+                {
+                    nodes.Add(new Point(node.X + 1, node.Y));
+                }
+            }
+
+            if (node.Y < GameMapTiles.cols - 1)
+            {
+                // down
+                if (Weights[node.X, node.Y + 1] > 0)
+                {
+                    nodes.Add(new Point(node.X, node.Y + 1));
+                }
+            }
+
+            if (node.X > 0)
+            {
+                // left
+                if (Weights[node.X - 1, node.Y] > 0)
+                {
+                    nodes.Add(new Point(node.X - 1, node.Y));
+                }
+            }
+
+            return nodes;
+        }
+
+
+        // Returns attack postion of target in world
+        public static Vector2? ChooseTargetVector(TeamType teamType, float range, Rectangle bb, Guid interiorId)
         {
             foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
             {
@@ -26,16 +206,52 @@ namespace Gusto.Utility
                         
                         foreach (var target in BoundingBoxLocations.BoundingBoxLocationMap[otherTeam])
                         {
-                            float vmag = PhysicsUtility.VectorMagnitude(target.Item1.X, bb.X, target.Item1.Y, bb.Y);
-                            if (vmag < minVMag && interiorId == target.Item2)
+                            float vmag = PhysicsUtility.VectorMagnitude(target.targetLoc.X, bb.X, target.targetLoc.Y, bb.Y);
+                            if (vmag < minVMag && interiorId == target.interiorId)
                             {
                                 minVMag = vmag;
-                                shotCords = target.Item1;
+                                shotCords = target.targetLoc;
                             }
 
                         }
                         if (minVMag <= range)
                             return shotCords;
+                    }
+                    else
+                        return null;
+                }
+            }
+            return null;
+        }
+
+
+        // Returns tile point of target (pass the pathType on which you desire to find a target - i.e. ships don't build paths to land tiles) and the distance between target and this bb
+        public static Tuple<Point?, float> ChooseTargetPoint(TeamType teamType, float range, Rectangle bb, Guid interiorId, PathType pathType)
+        {
+            foreach (var otherTeam in BoundingBoxLocations.BoundingBoxLocationMap.Keys)
+            {
+                if (AttackMapping.AttackMappings[teamType][otherTeam])
+                {
+                    Point? targetTilePoint = null;
+                    if (BoundingBoxLocations.BoundingBoxLocationMap[otherTeam].Any())
+                    {
+                        float minVMag = float.MaxValue;
+
+                        foreach (var target in BoundingBoxLocations.BoundingBoxLocationMap[otherTeam])
+                        {
+                            if (target.pathType != pathType)
+                                continue;
+
+                            float vmag = PhysicsUtility.VectorMagnitude(target.targetLoc.X, bb.X, target.targetLoc.Y, bb.Y);
+                            if (vmag < minVMag && interiorId == target.interiorId)
+                            {
+                                minVMag = vmag;
+                                targetTilePoint = target.mapCordPoint;
+                            }
+
+                        }
+                        if (minVMag <= range)
+                            return new Tuple<Point?, float>(targetTilePoint, minVMag);
                     }
                     else
                         return null;
@@ -67,7 +283,7 @@ namespace Gusto.Utility
                 }
                 else if (slope > 2.5)
                 {
-                    if ((target.X - location.Y) > 0)
+                    if ((target.Y - location.Y) > 0)
                         currRowFrame = 4; // down
                     else
                         currRowFrame = 0; // up

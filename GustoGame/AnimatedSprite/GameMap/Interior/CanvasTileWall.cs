@@ -15,7 +15,7 @@ namespace Gusto.AnimatedSprite.GameMap
 {
     public class CanvasTileWall : TilePiece, IInteriorTile
     {
-        public CanvasTileWall(int index, List<Sprite> groundObjs, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base(index, groundObjs, content, graphics)
+        public CanvasTileWall(int index, Point? p, List<Sprite> groundObjs, Vector2 location, string region, ContentManager content, GraphicsDevice graphics, string key) : base(index, p, groundObjs, content, graphics)
         {
             Texture2D textureTile = content.Load<Texture2D>("CanvasInteriorWall");
             Asset tileAsset = new Asset(textureTile, null, 4, 1, 1.0f, "interiorTileWall", region);

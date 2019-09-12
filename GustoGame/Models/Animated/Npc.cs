@@ -2,6 +2,7 @@
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Models.Interfaces;
+using Gusto.Models.Types;
 using Gusto.Utility;
 using GustoGame.Mappings;
 using Microsoft.Xna.Framework;
@@ -21,7 +22,6 @@ namespace Gusto.Models.Animated
         float timeSinceLastTurnFrame;
         float timeSinceLastWalkFrame;
         float timeSinceCombat;
-        float timeSinceExitShipStart;
         float timeSinceStartDying;
         float timeSinceIdleAnimate;
         float timeSinceIdleFrame;
@@ -42,18 +42,20 @@ namespace Gusto.Models.Animated
         public bool dying;
         public float dyingTransparency;
 
-        int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
+        public Sprite randomRegionRoamTile;
+        List<TilePiece> currentPath;
+        public bool roaming;
         public bool swimming;
         public bool flying;
         public bool nearShip;
         public bool onShip;
         public bool inCombat;
-        public bool roaming;
         public bool defense;
         public bool idle;
+        int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
+
         public List<InventoryItem> inventory;
         public Interior npcInInterior;
-        public Sprite randomRegionRoamTile;
         public TeamType teamType;
 
         ContentManager _content;
@@ -81,14 +83,22 @@ namespace Gusto.Models.Animated
                 showHealthBar = true;
                 health -= handHeld.damage;
             }
-            else if (collidedWith.bbKey.Equals("landTile") || collidedWith.bbKey.Equals("interiorTile") || collidedWith is IGroundObject)
+            else if (collidedWith.bbKey.Equals("landTile") || collidedWith.bbKey.Equals("interiorTile"))
             {
+                TilePiece tp = (TilePiece)collidedWith;
+
                 colliding = false;
+                mapCordPoint = tp.mapCordPoint;
 
                 // narrow the collision to just the feet (appears more realistic)
                 Rectangle footSpace = new Rectangle(GetBoundingBox().Left, GetBoundingBox().Bottom - (GetBoundingBox().Height / 3), GetBoundingBox().Width, GetBoundingBox().Height / 3);
                 if (footSpace.Intersects(collidedWith.GetBoundingBox()))
                     swimming = false;
+            }
+
+            else if (collidedWith is IGroundObject)
+            {
+                colliding = false;
             }
 
             else if (collidedWith.bbKey.Equals("interiorTileWall"))
@@ -172,7 +182,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         // attack range
-                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
+                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             // IN COMBAT
@@ -191,7 +201,7 @@ namespace Gusto.Models.Animated
                             if (npcInInterior != null)
                             {
                                 // attack any player within a large range in the ship
-                                targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 10, GetBoundingBox(), inInteriorId);
+                                targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 10, GetBoundingBox(), inInteriorId);
                                 if (targetV != null)
                                 {
                                     Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
@@ -266,38 +276,48 @@ namespace Gusto.Models.Animated
                     }
                     break;
 
-
+                // NOTE! PassiveGround currently using A* where other npcs use directional vector. A* will not find a path between two islands in the same region (unless I add the AllOutdoor weight matrix with all 1)
                 case TeamType.PassiveGround:
 
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         if (roaming) // region only rn
                         {
-                            // go towards random tile
-                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
-                            currRowFrame = frames.Item1;
-                            directionalFrame = frames.Item2;
 
-                            // passive ground can't travel through water
-                            if (swimming)
-                                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)];
+                            // we have found the next tile in path
+                            if (currentPath != null && currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
+                            {
+                                currentPath.RemoveAt(0);
+                                if (currentPath.Count == 0) // found the end of the path
+                                    roaming = false;
+                            }
 
-                            // FIND a better way to get this value - can't have references
+                            if (roaming)
+                            {
+                                Tuple<int, int> frameInfo = AIUtility.SetAIGroundMovement(currentPath[0].GetBoundingBox().Center.ToVector2(), location);
+                                currRowFrame = frameInfo.Item1;
+                                directionalFrame = frameInfo.Item2;
+                            }
+
+                            // FIND a better way to get this value - can't have references so we have to search through this static list of interior tiles
                             if (npcInInterior != null)
                                 randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
 
-                            if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
-                                roaming = false;
                         }
                         else
                         {
                             if (npcInInterior != null)
-                            {
                                 randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
-                            }
                             else
                                 randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
-                            roaming = true;
+
+                            TilePiece rtp = (TilePiece)randomRegionRoamTile;
+                            Point? gridPointTo = rtp.mapCordPoint;
+                            if (mapCordPoint != Point.Zero)
+                            {
+                                roaming = true;
+                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.AllOutdoor); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                            }
                         }
                         timeSinceLastTurnFrame = 0;
                     }
@@ -329,7 +349,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         // if target within range, move towards it
-                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
+                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
                         if (targetV != null && !roaming)
                         {
                             idle = false;
@@ -402,7 +422,7 @@ namespace Gusto.Models.Animated
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         // if target within range, move towards it
-                        Vector2? targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 5, GetBoundingBox(), inInteriorId);
+                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 5, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             idle = false;
@@ -415,7 +435,7 @@ namespace Gusto.Models.Animated
                             idle = true;
 
                         // attack range
-                        targetV = AIUtility.ChooseTarget(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
+                        targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
                         if (targetV != null)
                         {
                             idle = false;

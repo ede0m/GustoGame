@@ -30,6 +30,7 @@ namespace Gusto.Models.Animated
         public float damage;
         public bool inCombat;
         public int shotRange;
+        public int shotWander;
 
         // aim line stuff
         Vector2 edgeFull;
@@ -259,7 +260,7 @@ namespace Gusto.Models.Animated
                     // TODO: just cannon balls for now. Cannon is hard coded to BaseShip animatedSprite AI for now
                     animateShot = true;
                     BaseCannonBall cannonShot = new BaseCannonBall(teamType, regionKey, shotOffsetPos, _content, _graphics);
-                    cannonShot.SetFireAtDirection(targetV, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-100, 100)); // 3rd param is aim offset for cannon ai
+                    cannonShot.SetFireAtDirection(targetV, RandomEvents.rand.Next(10, 25), RandomEvents.rand.Next(-shotWander, shotWander)); // 3rd param is aim offset for cannon ai
                     cannonShot.moving = true;
                     Shots.Add(cannonShot);
                     timeSinceLastShot = 0;

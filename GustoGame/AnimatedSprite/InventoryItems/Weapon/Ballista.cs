@@ -19,12 +19,12 @@ namespace Gusto.AnimatedSprite.InventoryItems
             timeSinceLastFrame = 0;
             millisecondsPerFrame = 100;
             damage = 0.0f;
-            shotRange = 100;
+            shotRange = 250;
+            shotWander = 10;
             millisecondsNewShot = 1000;
             millisecondsExplosionLasts = 400;
             itemKey = "ballista";
             msCraftTime = 40000;
-            shotRange = 600;
 
             ammoItemType = typeof(Gusto.AnimatedSprite.InventoryItems.RustyHarpoonItem);
 
