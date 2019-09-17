@@ -154,6 +154,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) }, // this int key is the current weapon slot pos
                             {1, new Tuple<int, int>(-30, -30) },
                             {2, new Tuple<int, int>(30, -30) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {1, new Dictionary<int, Tuple<int, int>>
@@ -161,6 +163,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(-45, -30) },
                             {2, new Tuple<int, int>(-10, -50) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {2, new Dictionary<int, Tuple<int, int>>
@@ -168,6 +172,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(-50, 20) },
                             {2, new Tuple<int, int>(-50, -20) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {3, new Dictionary<int, Tuple<int, int>>
@@ -175,6 +181,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(-15, 65) },
                             {2, new Tuple<int, int>(-45, 30) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {4, new Dictionary<int, Tuple<int, int>>
@@ -182,6 +190,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(25, 50) },
                             {2, new Tuple<int, int>(-25, 50) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {5, new Dictionary<int, Tuple<int, int>>
@@ -189,6 +199,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(50, 45) },
                             {2, new Tuple<int, int>(12, 62) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {6, new Dictionary<int, Tuple<int, int>>
@@ -196,6 +208,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(40, -20) },
                             {2, new Tuple<int, int>(40, 20) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                     {7, new Dictionary<int, Tuple<int, int>>
@@ -203,6 +217,8 @@ namespace Gusto.Mappings
                             {0, new Tuple<int, int>(0, 0) },
                             {1, new Tuple<int, int>(5, -45) },
                             {2, new Tuple<int, int>(35, -15) },
+                            {3, new Tuple<int, int>(0, 0) },
+                            {4, new Tuple<int, int>(0, 0) },
                         }
                     },
                 }
