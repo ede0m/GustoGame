@@ -62,7 +62,11 @@ namespace Gusto
             List<Sprite> usoppLandTiles = BoundingBoxLocations.RegionMap["Usopp"].RegionLandTiles;
             var screenCenter = new Vector2(_graphics.Viewport.Bounds.Width / 2, _graphics.Viewport.Bounds.Height / 2);
 
-            BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-100, -600), _content, _graphics);
+            ShortShip shortShip = new ShortShip(TeamType.Player, "GustoMap", new Vector2(-100, -600), _content, _graphics);
+            shortShip.shipInterior.interiorId = Guid.NewGuid();
+            BoundingBoxLocations.interiorMap.Add(shortShip.shipInterior.interiorId, shortShip.shipInterior);
+
+            BaseShip baseShip = new BaseShip(TeamType.Player, "GustoMap", new Vector2(-300, -600), _content, _graphics);
             baseShip.shipInterior.interiorId = Guid.NewGuid();
             BoundingBoxLocations.interiorMap.Add(baseShip.shipInterior.interiorId, baseShip.shipInterior);
 
@@ -94,7 +98,7 @@ namespace Gusto
             //Pistol pistol = new Pistol(TeamType.A, "GustoMap", new Vector2(250, -300), _content, _graphics);
             //pistol.amountStacked = 1;
             //pistol.onGround = true;
-            BaseCannon cannon = new BaseCannon(TeamType.A, "GustoMap", new Vector2(250, -300), _content, _graphics);
+            BaseCannon cannon = new BaseCannon(TeamType.A, "GustoMap", new Vector2(0, -450), _content, _graphics);
             cannon.onGround = true;
             Ballista ballista = new Ballista(TeamType.A, "GustoMap", new Vector2(200, -300), _content, _graphics);
             ballista.onGround = true;
@@ -139,6 +143,7 @@ namespace Gusto
             ItemUtility.ItemsToUpdate.Add(basePlank);
             ItemUtility.ItemsToUpdate.Add(campfire);
 
+            UpdateOrder.Add(shortShip);
             UpdateOrder.Add(baseShip);
             UpdateOrder.Add(baseShipAI);
             UpdateOrder.Add(player);
@@ -565,6 +570,13 @@ namespace Gusto
                     chk.inventory = DeserializeInventory(npcs.inventory);
                     return chk;
 
+                case "blueBird":
+                    npcs = (NpcState)objSave;
+                    BlueBird bbr = new BlueBird(npcs.team, npcs.region, npcs.location, _content, _graphics);
+                    bbr.health = npcs.health;
+                    bbr.inventory = DeserializeInventory(npcs.inventory);
+                    return bbr;
+
                 case "snake":
                     npcs = (NpcState)objSave;
                     Snake snk = new Snake(npcs.team, npcs.region, npcs.location, _content, _graphics);
@@ -670,6 +682,8 @@ namespace Gusto
                     return new Pistol(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "baseCannon":
                     return new BaseCannon(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
+                case "ballista":
+                    return new Ballista(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "crossBow":
                     return new CrossBow(TeamType.Gusto, "GustoMap", Vector2.Zero, _content, _graphics);
                 case "pistolShotItem":

@@ -109,6 +109,8 @@
     <Compile Include="AnimatedSprite\InventoryItems\Weapon\ShortSword.cs" />
     <Compile Include="AnimatedSprite\FiredAmmo\RustyHarpoon.cs" />
     <Compile Include="AnimatedSprite\Animals\Snake.cs" />
+    <Compile Include="AnimatedSprite\ShortSail.cs" />
+    <Compile Include="AnimatedSprite\ShortShip.cs" />
     <Compile Include="Models\Types\PathType.cs" />
     <Compile Include="Models\Types\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />
@@ -133,7 +135,7 @@
     <Compile Include="Mappings\AttackMapping.cs" />
     <Compile Include="Mappings\ItemMappings.cs" />
     <Compile Include="Mappings\PlayerMovementVectorMappings.cs" />
-    <Compile Include="Mappings\SailMountTextureCoordinates.cs" />
+    <Compile Include="Mappings\ShipMountTextureCoordinates.cs" />
     <Compile Include="GameOptions.cs" />
     <Compile Include="Mappings\ShipMovementVectorMapping.cs" />
     <Compile Include="Models\Animated\Cooker.cs" />

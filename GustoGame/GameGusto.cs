@@ -112,6 +112,12 @@ namespace Gusto
             // PREPROCESSING Bounding Sprites
             Texture2D textureBaseShip = Content.Load<Texture2D>("BaseShip");
             LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureBaseShip, "baseShip", 0.6f, 1.0f);
+            Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
+            LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
+            Texture2D textureShortShip = Content.Load<Texture2D>("ShortShipHullRedMark");
+            LoadDynamicBoundingBoxPerFrame(true, 8, 1, textureShortShip, "shortShip", 1.1f, 1.0f);
+            Texture2D textureShortSail = Content.Load<Texture2D>("ShortSail");
+            LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureShortSail, "shortSail", 1.1f, 1.0f);
             Texture2D textureTeePee = Content.Load<Texture2D>("TeePee");
             LoadDynamicBoundingBoxPerFrame(true, 1, 4, textureTeePee, "teePee", 0.5f, 1.0f);
             Texture2D texturePlayerPirate = Content.Load<Texture2D>("Pirate1-combat");
@@ -138,8 +144,6 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShortSword, "shortSword", 1.0f, 1.0f);
             Texture2D textureShovel = Content.Load<Texture2D>("Shovel");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureShovel, "shovel", 1.0f, 1.0f);
-            Texture2D textureBaseSail = Content.Load<Texture2D>("DecomposedBaseSail");
-            LoadDynamicBoundingBoxPerFrame(false, 8, 3, textureBaseSail, "baseSail", 0.6f, 1.0f);
             Texture2D textureTower = Content.Load<Texture2D>("tower");
             LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureTower, "tower", 0.5f, 1.0f);
 

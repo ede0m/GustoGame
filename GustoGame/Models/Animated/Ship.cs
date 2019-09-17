@@ -143,7 +143,7 @@ namespace Gusto.Models.Animated
                 return;
             }
 
-            if (collidedWith.bbKey.Equals("playerPirate"))
+            if (collidedWith.bbKey.Equals("playerPirate") || collidedWith is INPC)
             {
                 colliding = false;
                 return;
@@ -234,8 +234,8 @@ namespace Gusto.Models.Animated
             shipInterior.speed = currentShipSpeed;
 
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
-            int sailMountX = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
-            int sailMountY = SailMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
+            int sailMountX = ShipMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item1;
+            int sailMountY = ShipMountTextureCoordinates.SailMountCords[bbKey][shipSail.bbKey][shipSail.currRowFrame][shipSail.currColumnFrame].Item2;
             shipSail.location.X = location.X + sailMountX;
             shipSail.location.Y = location.Y + sailMountY;
 
@@ -407,9 +407,9 @@ namespace Gusto.Models.Animated
                         mountedOnShip = (ShipMount)actionInventory[i];
                         mountedOnShip.teamType = teamType;
                         mountedOnShip.remove = false;
-                        mountedOnShip.location = GetBoundingBox().Center.ToVector2(); // displays in center of ship
-                                                                                      // todo rotation
-                        break;
+                        //mountedOnShip.location = GetBoundingBox().Center.ToVector2(); // displays in center of ship
+                        Vector2 weaponPosOffset = new Vector2(ShipMountTextureCoordinates.WeaponMountCords[bbKey][currRowFrame][i].Item1, ShipMountTextureCoordinates.WeaponMountCords[bbKey][currRowFrame][i].Item2);
+                        mountedOnShip.location = GetBoundingBox().Center.ToVector2() + weaponPosOffset;
                     }
                 }
 
@@ -510,7 +510,9 @@ namespace Gusto.Models.Animated
                 {
                     Vector2? shotDirection = AIUtility.ChooseTargetVector(teamType, mountedOnShip.shotRange, GetBoundingBox(), inInteriorId);
                     mountedOnShip.UpdateAIMountShot(gameTime, shotDirection);
-                    mountedOnShip.location = GetBoundingBox().Center.ToVector2();
+                    // temp setting AI to use weapon slot 0
+                    Vector2 weaponPosOffset = new Vector2(ShipMountTextureCoordinates.WeaponMountCords[bbKey][currRowFrame][0].Item1, ShipMountTextureCoordinates.WeaponMountCords[bbKey][currRowFrame][0].Item2);
+                    mountedOnShip.location = GetBoundingBox().Center.ToVector2() + weaponPosOffset;
                 }
 
             }

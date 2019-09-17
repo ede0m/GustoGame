@@ -313,7 +313,7 @@ namespace Gusto.Models.Animated
 
                             TilePiece rtp = (TilePiece)randomRegionRoamTile;
                             Point? gridPointTo = rtp.mapCordPoint;
-                            if (mapCordPoint != Point.Zero)
+                            if (mapCordPoint != Point.Zero && mapCordPoint != null)
                             {
                                 roaming = true;
                                 currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.AllOutdoor); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
