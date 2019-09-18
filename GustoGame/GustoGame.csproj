@@ -111,6 +111,7 @@
     <Compile Include="AnimatedSprite\Animals\Snake.cs" />
     <Compile Include="AnimatedSprite\ShortSail.cs" />
     <Compile Include="AnimatedSprite\ShortShip.cs" />
+    <Compile Include="Models\Types\NPCActionState.cs" />
     <Compile Include="Models\Types\PathType.cs" />
     <Compile Include="Models\Types\TeamType.cs" />
     <Compile Include="AnimatedSprite\GameMap\Tree1.cs" />

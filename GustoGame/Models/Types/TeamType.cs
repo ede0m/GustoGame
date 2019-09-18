@@ -11,9 +11,7 @@ namespace Gusto.Models
         Gusto,
         GroundObject,
         Player,
-        PassiveGround,
-        PassiveAir,
-        DefenseGround,
+        Animal,
         A,
         B,
         C

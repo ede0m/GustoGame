@@ -31,7 +31,10 @@ namespace Gusto.Models.Animated
         public float millisecondToDie;
         public float msIdleWaitTime;
 
-        public int combatFrameIndex;
+        public int combatFrameIndex; // what is the starting combat frameCol
+        public int nIdleRowFrames; // how many rows of idle frames does this sprite sheet have?
+        public int idleFreezeColFrame; // all column frames before this freeze movement 
+
         Texture2D meterAlive;
         Texture2D meterDead;
         public float health;
@@ -56,6 +59,7 @@ namespace Gusto.Models.Animated
 
         public List<InventoryItem> inventory;
         public Interior npcInInterior;
+        public ActionState actionState;
         public TeamType teamType;
 
         ContentManager _content;
@@ -164,216 +168,83 @@ namespace Gusto.Models.Animated
             if (colliding)
                 moving = false;
 
-            UpdateNpcMovement(teamType, gameTime);
+
+            //UpdateNpcMovement(teamType, gameTime);
+
+            UpdateNpcActionMovement(gameTime);
+
+
 
             colliding = false;
             if (!(this is IFlying))
                 swimming = true;
         }
 
-
-        private void UpdateNpcMovement(TeamType team, GameTime gameTime)
+        private void UpdateNpcActionMovement(GameTime gameTime)
         {
-            switch (team)
+            switch (actionState)
             {
-                case TeamType.B:
-                case TeamType.A:
+                case ActionState.DefenseRoam:
                     // Movement
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
-                        // attack range
-                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
-                        if (targetV != null)
-                        {
-                            // IN COMBAT
-                            if (!inCombat)
-                                currColumnFrame = combatFrameIndex;
-                            inCombat = true;
-                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
-                            currRowFrame = frames.Item1;
-                            directionalFrame = frames.Item2;
-                        }
+                        if (npcInInterior != null)
+                            NpcSetMoveTowardsTarget(10, gameTime); // wider defense range in ship
                         else
-                        {
-                            inCombat = false;
+                            NpcSetMoveTowardsTarget(5, gameTime);
 
-                            // if we want to move to attack within a range
-                            if (npcInInterior != null)
-                            {
-                                // attack any player within a large range in the ship
-                                targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 10, GetBoundingBox(), inInteriorId);
-                                if (targetV != null)
-                                {
-                                    Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
-                                    currRowFrame = frames.Item1;
-                                    directionalFrame = frames.Item2;
-                                    defense = true;
-                                }
-                                else
-                                    defense = false;
-                            }
+                        NpcSetAttackInRange(gameTime);
 
-                            if (roaming && !defense) // region only rn
-                            {
-                                moving = true;
-                                // go towards random tile
-                                Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
-                                currRowFrame = frames.Item1;
-                                directionalFrame = frames.Item2;
+                        if (roaming && !defense)
+                            NpcSetRoamMovement(false, gameTime);
+                        else if (!defense)
+                            ResetRoam(false);
 
-                                // FIND a better way to get this value - can't have references
-                                if (npcInInterior != null)
-                                    randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
-
-                                // found roam tile
-                                if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
-                                    roaming = false;
-                            }
-                            else if (!defense)
-                            {
-                                if (npcInInterior != null)
-                                {
-                                    randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
-                                }
-                                else
-                                    randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
-                                roaming = true;
-                            }
-                        }
                         timeSinceLastTurnFrame = 0;
                     }
                     if (moving && !inCombat && !dying)
-                    {
-                        // walking animation
-                        if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
-                        {
-                            currColumnFrame++;
-                            if (currColumnFrame >= combatFrameIndex) // stop before combat frames
-                                currColumnFrame = 0;
-                            timeSinceLastWalkFrame = 0;
-                        }
-
-                        // actual "regular" movement
-                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
-                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
-                    }
-                    else
-                    {
-                        if (inCombat)
-                        {
-                            if (timeSinceCombat > millisecondsCombatMove && !dying)
-                            {
-                                currColumnFrame++;
-                                if (currColumnFrame >= nColumns)
-                                {
-                                    inCombat = false;
-                                    currColumnFrame = 7;
-                                }
-                                timeSinceCombat = 0;
-                            }
-                            timeSinceCombat += gameTime.ElapsedGameTime.Milliseconds;
-                        }
-                    }
+                        NpcMove(gameTime);
+                    else if (inCombat)
+                        NpcAttack(gameTime);
                     break;
 
-                // NOTE! PassiveGround currently using A* where other npcs use directional vector. A* will not find a path between two islands in the same region (unless I add the AllOutdoor weight matrix with all 1)
-                case TeamType.PassiveGround:
+                case ActionState.IdleDefense:
+                    if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
+                    {
+                        NpcSetMoveTowardsTarget(5, gameTime);
+                        NpcSetAttackInRange(gameTime);
+                        timeSinceLastTurnFrame = 0;
+                    }
 
+                    if (idle)
+                        NpcIdle(gameTime);
+                    else if (moving && !inCombat && !dying)
+                        NpcMove(gameTime);
+                    else if (inCombat)
+                        NpcAttack(gameTime);
+
+                    break;
+
+                case ActionState.PassiveRoam:
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
                         if (roaming) // region only rn
-                        {
-
-                            // we have found the next tile in path
-                            if (currentPath != null && currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
-                            {
-                                currentPath.RemoveAt(0);
-                                if (currentPath.Count == 0) // found the end of the path
-                                    roaming = false;
-                            }
-
-                            if (roaming)
-                            {
-                                Tuple<int, int> frameInfo = AIUtility.SetAIGroundMovement(currentPath[0].GetBoundingBox().Center.ToVector2(), location);
-                                currRowFrame = frameInfo.Item1;
-                                directionalFrame = frameInfo.Item2;
-                            }
-
-                            // FIND a better way to get this value - can't have references so we have to search through this static list of interior tiles
-                            if (npcInInterior != null)
-                                randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
-
-                        }
+                            NpcSetRoamMovement(true, gameTime);
                         else
-                        {
-                            if (npcInInterior != null)
-                                randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
-                            else
-                                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
-
-                            TilePiece rtp = (TilePiece)randomRegionRoamTile;
-                            Point? gridPointTo = rtp.mapCordPoint;
-                            if (mapCordPoint != Point.Zero && mapCordPoint != null)
-                            {
-                                roaming = true;
-                                currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.AllOutdoor); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
-                            }
-                        }
+                            ResetRoam(true);
                         timeSinceLastTurnFrame = 0;
                     }
 
-                    // walking animation
-                    if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
-                    {
-                        currColumnFrame++;
-                        if (currColumnFrame <= 5) // stop on in row idle frames
-                            moving = false;
-                        else
-                            moving = true;
-                        if (currColumnFrame >= nColumns)
-                            currColumnFrame = 0;
-                        timeSinceLastWalkFrame = 0;
-                    }
-
-                    if (moving && !dying)
-                    {
-                        // actual "regular" movement
-                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
-                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
-                    }
+                    NpcMove(gameTime);
                     break;
 
-
-                case TeamType.PassiveAir:
-
+                case ActionState.IdleFlee:
                     if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
                     {
-                        // if target within range, move towards it
-                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
-                        if (targetV != null && !roaming)
-                        {
-                            idle = false;
-                            flying = true;
+                        NpcSetFlee(false, gameTime);
 
-                            if (npcInInterior != null)
-                                randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
-                            else
-                                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
-                            roaming = true;
-                        }
-                        else if (roaming)
-                        {
-                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(randomRegionRoamTile.location, location);
-                            currRowFrame = frames.Item1 + 1; // plus one to skip the idle frame
-                            directionalFrame = frames.Item2;
-                            moving = true;
-
-                            if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
-                            {
-                                flying = false;
-                                roaming = false;
-                            }
-                        }
+                        if (roaming)
+                            NpcSetRoamMovement(false, gameTime);
                         else
                             idle = true;
 
@@ -381,130 +252,200 @@ namespace Gusto.Models.Animated
                     }
 
                     if (idle)
-                    {
-                        moving = false;
-                        currRowFrame = 0;
-                        timeSinceIdleAnimate += gameTime.ElapsedGameTime.Milliseconds;
-                        if (timeSinceIdleAnimate > msIdleWaitTime)
-                        {
-                            timeSinceIdleFrame += gameTime.ElapsedGameTime.Milliseconds;
-                            if (timeSinceIdleFrame > 100)
-                            {
-                                currColumnFrame++;
-                                timeSinceIdleFrame = 0;
-                                if (currColumnFrame >= nColumns)
-                                {
-                                    currColumnFrame = 0;
-                                    timeSinceIdleAnimate = 0;
-                                }
-                            }
-                        }
-                    }
+                        NpcIdle(gameTime);
                     else if (moving && !inCombat && !dying)
-                    {
-                        // moving animation
-                        if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
-                        {
-                            currColumnFrame++;
-                            if (currColumnFrame >= combatFrameIndex || currColumnFrame >= nColumns) // stop before combat frames
-                                currColumnFrame = 0;
-                            timeSinceLastWalkFrame = 0;
-                        }
-
-                        // actual "regular" movement
-                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
-                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
-                    }
-                    break;
-
-                case TeamType.DefenseGround: // Doesn't roam
-
-                    if (timeSinceLastTurnFrame > millisecondsPerTurnFrame)
-                    {
-                        // if target within range, move towards it
-                        Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 5, GetBoundingBox(), inInteriorId);
-                        if (targetV != null)
-                        {
-                            idle = false;
-                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
-                            currRowFrame = frames.Item1 + 1; // plus one to skip the idle frame
-                            directionalFrame = frames.Item2;
-                            moving = true;
-                        }
-                        else
-                            idle = true;
-
-                        // attack range
-                        targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
-                        if (targetV != null)
-                        {
-                            idle = false;
-                            // IN COMBAT
-                            if (!inCombat)
-                                currColumnFrame = combatFrameIndex;
-                            inCombat = true;
-                            Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
-                            currRowFrame = frames.Item1 + 1; // plus one to skip the idle frame
-                            directionalFrame = frames.Item2;
-                        }
-
-                        timeSinceLastTurnFrame = 0;
-                    }
-
-                    if (idle)
-                    {
-                        moving = false;
-                        currRowFrame = 0;
-                        timeSinceIdleAnimate += gameTime.ElapsedGameTime.Milliseconds;
-                        if (timeSinceIdleAnimate > msIdleWaitTime) 
-                        {
-                            timeSinceIdleFrame += gameTime.ElapsedGameTime.Milliseconds;
-                            if (timeSinceIdleFrame > 100)
-                            {
-                                currColumnFrame++;
-                                timeSinceIdleFrame = 0;
-                                if (currColumnFrame >= nColumns)
-                                {
-                                    currColumnFrame = 0;
-                                    timeSinceIdleAnimate = 0;
-                                }
-                            }
-                        }
-                    }
-                    else if (moving && !inCombat && !dying)
-                    {
-                        // moving animation
-                        if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
-                        {
-                            currColumnFrame++;
-                            if (currColumnFrame >= combatFrameIndex) // stop before combat frames
-                                currColumnFrame = 0;
-                            timeSinceLastWalkFrame = 0;
-                        }
-
-                        // actual "regular" movement
-                        location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
-                        location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
-                    }
-                    else if (inCombat)
-                    {
-                        if (timeSinceCombat > millisecondsCombatMove && !dying)
-                        {
-                            currColumnFrame++;
-                            if (currColumnFrame >= nColumns)
-                            {
-                                inCombat = false;
-                                currColumnFrame = 6;
-                            }
-                            timeSinceCombat = 0;
-                        }
-                        timeSinceCombat += gameTime.ElapsedGameTime.Milliseconds;
-                    }
-
+                        NpcMove(gameTime);
                     break;
             }
         }
 
+        private void NpcMove(GameTime gt)
+        {
+            // walking animation
+            if (timeSinceLastWalkFrame > millisecondsPerWalkFrame)
+            {
+                currColumnFrame++;
+
+                // idle freeze frames
+                if (idleFreezeColFrame > 0)
+                {
+                    if (currColumnFrame <= idleFreezeColFrame) // stop on in row idle frames
+                        moving = false;
+                    else
+                        moving = true;
+                }
+
+                if (combatFrameIndex > 0)
+                {
+                    if (currColumnFrame >= combatFrameIndex) // stop before combat frames
+                        currColumnFrame = 0;
+                }
+                else
+                {
+                    if (currColumnFrame >= nColumns) // reset cols
+                        currColumnFrame = 0;
+                }
+
+                timeSinceLastWalkFrame = 0;
+            }
+
+            if (moving && !dying)
+            {
+                // actual "regular" movement
+                location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
+                location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
+            } 
+
+        }
+
+        private void NpcAttack(GameTime gt)
+        {
+            if (timeSinceCombat > millisecondsCombatMove && !dying)
+            {
+                currColumnFrame++;
+                if (currColumnFrame >= nColumns)
+                {
+                    inCombat = false;
+                    currColumnFrame = combatFrameIndex;
+                }
+                timeSinceCombat = 0;
+            }
+            timeSinceCombat += gt.ElapsedGameTime.Milliseconds;
+        }
+
+        private void NpcIdle(GameTime gt)
+        {
+            moving = false;
+            currRowFrame = 0; // idle row frame -- TODO: what if i want a few idel row frames?
+            timeSinceIdleAnimate += gt.ElapsedGameTime.Milliseconds;
+            if (timeSinceIdleAnimate > msIdleWaitTime)
+            {
+                timeSinceIdleFrame += gt.ElapsedGameTime.Milliseconds;
+                if (timeSinceIdleFrame > 100)
+                {
+                    currColumnFrame++;
+                    timeSinceIdleFrame = 0;
+                    if (currColumnFrame >= nColumns)
+                    {
+                        currColumnFrame = 0;
+                        timeSinceIdleAnimate = 0;
+                    }
+                }
+            }
+        }
+
+        private void NpcSetMoveTowardsTarget(int bbRange, GameTime gt)
+        {
+            // if target within range, move towards it
+            Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * bbRange, GetBoundingBox(), inInteriorId);
+            if (targetV != null)
+            {
+                idle = false;
+                Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
+                currRowFrame = frames.Item1 + nIdleRowFrames; // plus one to skip the idle frame
+                directionalFrame = frames.Item2;
+                moving = true;
+                defense = true;
+            }
+            else
+            {
+                idle = true;
+                defense = false;
+            }
+        }
+
+        private void NpcSetAttackInRange(GameTime gt)
+        {
+            // attack range
+            Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 2, GetBoundingBox(), inInteriorId);
+            if (targetV != null)
+            {
+                idle = false;
+                // IN COMBAT
+                if (!inCombat)
+                    currColumnFrame = combatFrameIndex;
+                inCombat = true;
+                Tuple<int, int> frames = AIUtility.SetAIGroundMovement((Vector2)targetV, location);
+                currRowFrame = frames.Item1 + nIdleRowFrames; // plus one to skip the idle frame
+                directionalFrame = frames.Item2;
+            }
+        }
+
+        private void NpcSetFlee(bool useAStar, GameTime gt)
+        {
+            // if target within range, move towards it
+            Vector2? targetV = AIUtility.ChooseTargetVector(teamType, GetBoundingBox().Width * 3, GetBoundingBox(), inInteriorId);
+            if (targetV != null && !roaming)
+            {
+                idle = false;
+                if (this is IFlying)
+                    flying = true;
+
+                ResetRoam(useAStar);
+            }
+        }
+
+        private void NpcSetRoamMovement(bool useAStar, GameTime gt)
+        {
+            moving = true;
+            // go towards random tile
+            Vector2 targetLoc;
+            if (useAStar)
+                targetLoc = currentPath[0].GetBoundingBox().Center.ToVector2();
+            else
+                targetLoc = randomRegionRoamTile.location;
+
+            Tuple<int, int> frames = AIUtility.SetAIGroundMovement(targetLoc, location);
+            currRowFrame = frames.Item1 + nIdleRowFrames;
+            directionalFrame = frames.Item2;
+
+            // FIND a better way to get this value - can't have references
+            if (npcInInterior != null)
+                randomRegionRoamTile = npcInInterior.interiorTiles.ToList()[npcInInterior.interiorTiles.ToList().IndexOf((TilePiece)randomRegionRoamTile)];
+
+            if (useAStar)
+            {
+                // we have found the next tile in path
+                if (currentPath != null && currentPath[0].GetBoundingBox().Intersects(GetBoundingBox()))
+                {
+                    currentPath.RemoveAt(0);
+                    if (currentPath.Count == 0) // found the end of the path
+                        roaming = false;
+                }
+            }
+            else
+            {
+                // found roam tile
+                if (GetBoundingBox().Intersects(randomRegionRoamTile.GetBoundingBox()))
+                {
+                    roaming = false;
+                    flying = false; // for anything flying
+                }
+            }
+        }
+
+        private void ResetRoam(bool useAStar)
+        {
+            if (npcInInterior != null)
+                randomRegionRoamTile = npcInInterior.RandomInteriorTile(); // interior tile roaming
+            else
+                randomRegionRoamTile = BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles[RandomEvents.rand.Next(BoundingBoxLocations.RegionMap[regionKey].RegionLandTiles.Count)]; // region tile roaming
+
+            if (useAStar)
+            {
+                TilePiece rtp = (TilePiece)randomRegionRoamTile;
+                Point? gridPointTo = rtp.mapCordPoint;
+                if (mapCordPoint != Point.Zero && mapCordPoint != null)
+                {
+                    roaming = true;
+                    currentPath = AIUtility.Pathfind(mapCordPoint.Value, gridPointTo.Value, PathType.AllOutdoor); // NOTE: This freezes the game when hitting GustoMap region (because it is almost all the tiles at the moment)
+                }
+            }
+            else
+            {
+                roaming = true;
+            }
+        }
 
         public void DrawHealthBar(SpriteBatch sb, Camera camera)
         {

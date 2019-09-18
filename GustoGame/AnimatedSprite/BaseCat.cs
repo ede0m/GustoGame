@@ -9,6 +9,7 @@ using Gusto.Models;
 using Gusto.Bounds;
 using Gusto.Utility;
 using Gusto.Models.Animated;
+using Gusto.Models.Types;
 
 namespace Gusto.AnimatedSprite
 {
@@ -26,6 +27,8 @@ namespace Gusto.AnimatedSprite
             fullHealth = 50;
             health = fullHealth;
             damage = 0.08f;
+
+            actionState = ActionState.DefenseRoam;
             string objKey = "baseCat";
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);
