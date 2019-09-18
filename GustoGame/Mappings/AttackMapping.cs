@@ -16,9 +16,8 @@ namespace Gusto.Mappings
                     { TeamType.Player, true },
                     { TeamType.B, true},
                     { TeamType.A, false},
-                    { TeamType.PassiveGround, false},
-                    { TeamType.PassiveAir, false},
-                    { TeamType.DefenseGround, false},
+                    { TeamType.Animal, false},
+
                 }
             },
             { TeamType.B, new Dictionary<TeamType, bool>
@@ -26,39 +25,7 @@ namespace Gusto.Mappings
                     { TeamType.Player, true },
                     { TeamType.A, true},
                     { TeamType.B, false},
-                    { TeamType.PassiveGround, false},
-                    { TeamType.PassiveAir, false},
-                    { TeamType.DefenseGround, false},
-                }
-            },
-            { TeamType.PassiveGround, new Dictionary<TeamType, bool>
-                {
-                    { TeamType.Player, false },
-                    { TeamType.PassiveGround, false},
-                    { TeamType.PassiveAir, false},
-                    { TeamType.DefenseGround, false},
-                    { TeamType.A, false},
-                    { TeamType.B, false}
-                }
-            },
-            { TeamType.PassiveAir, new Dictionary<TeamType, bool>
-                {
-                    { TeamType.Player, true },
-                    { TeamType.PassiveGround, false},
-                    { TeamType.PassiveAir, false},
-                    { TeamType.DefenseGround, true},
-                    { TeamType.A, true},
-                    { TeamType.B, true}
-                }
-            },
-            { TeamType.DefenseGround, new Dictionary<TeamType, bool>
-                {
-                    { TeamType.Player, true },
-                    { TeamType.PassiveGround, false},
-                    { TeamType.PassiveAir, false},
-                    { TeamType.DefenseGround, false},
-                    { TeamType.A, false},
-                    { TeamType.B, false},
+                    { TeamType.Animal, false},
                 }
             },
             { TeamType.Player, new Dictionary<TeamType, bool>
@@ -66,9 +33,15 @@ namespace Gusto.Mappings
                     { TeamType.Player, false },
                     { TeamType.B, true},
                     { TeamType.A, true},
-                    { TeamType.PassiveGround, true},
-                    { TeamType.DefenseGround, true},
-                    { TeamType.PassiveAir, true},
+                    { TeamType.Animal, true},
+                }
+            },
+            { TeamType.Animal, new Dictionary<TeamType, bool>
+                {
+                    { TeamType.Player, true},
+                    { TeamType.B, false},
+                    { TeamType.A, false},
+                    { TeamType.Animal, false},
                 }
             },
         };

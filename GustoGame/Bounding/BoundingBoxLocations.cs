@@ -18,9 +18,8 @@ namespace Gusto.Bounding
             {TeamType.Player, new List<Target>()},
             {TeamType.A, new List<Target>() },
             {TeamType.B, new List<Target>() },
-            {TeamType.DefenseGround, new List<Target>() },
-            {TeamType.PassiveGround, new List<Target>() },
-            {TeamType.PassiveAir, new List<Target>() },
+            {TeamType.Animal, new List<Target>() },
+
         };
 
         public static Dictionary<string, Region> RegionMap = new Dictionary<string, Region>();
