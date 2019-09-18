@@ -7,6 +7,7 @@ using Gusto.Models;
 using Gusto.Utility;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
+using Gusto.Models.Types;
 
 namespace Gusto.AnimatedSprite
 {
@@ -20,11 +21,12 @@ namespace Gusto.AnimatedSprite
             millisecondsCombatMove = 75;
             msIdleWaitTime = 6000;
 
-            combatFrameIndex = 6;
+            nIdleRowFrames = 1;
 
             fullHealth = 25;
             health = fullHealth;
             damage = 0.05f;
+            actionState = ActionState.IdleFlee;
             string objKey = "blueBird";
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);

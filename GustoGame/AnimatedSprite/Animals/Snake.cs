@@ -9,6 +9,7 @@ using Gusto.Models;
 using Gusto.Bounds;
 using Gusto.Utility;
 using Gusto.Models.Animated;
+using Gusto.Models.Types;
 
 namespace Gusto.AnimatedSprite
 {
@@ -23,10 +24,12 @@ namespace Gusto.AnimatedSprite
             msIdleWaitTime = 6000;
 
             combatFrameIndex = 6;
+            nIdleRowFrames = 1;
 
             fullHealth = 25;
             health = fullHealth;
             damage = 0.05f;
+            actionState = ActionState.IdleDefense;
             string objKey = "snake";
 
             List<Tuple<string, int>> itemDrops = RandomEvents.RandomNPDrops(objKey, 3);
