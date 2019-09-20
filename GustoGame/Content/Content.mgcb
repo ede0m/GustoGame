@@ -614,6 +614,18 @@
 /processorParam:TextureFormat=Color
 /build:Ocean1.png
 
+#begin Ocean1v2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Ocean1v2.png
+
 #begin Ocean2.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -625,6 +637,36 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Ocean2.png
+
+#begin Ocean2v2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Ocean2v2.png
+
+#begin oceanRippleEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:oceanRippleEffect.fx
+
+#begin OceanWaterTexture.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:OceanWaterTexture.png
 
 #begin pickaxe.png
 /importer:TextureImporter
@@ -1033,6 +1075,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:TribalTokens.png
+
+#begin waterbump.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:waterbump.png
 
 #begin WindArrows.png
 /importer:TextureImporter

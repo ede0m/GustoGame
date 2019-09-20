@@ -27,6 +27,7 @@ namespace Gusto.Models
         public List<Sprite> groundObjects; // any tree, rock, etc asset we want to set to this tile.
         public bool wallPiece;
         public bool shorePiece;
+        public bool shallowWaterPiece;
 
         // for a* path finding
         public byte weight;

@@ -18,11 +18,14 @@ namespace Gusto.AnimatedSprite.GameMap
             Texture2D textureOceanTile = null;
 
             if (key.Equals("o1"))
-                textureOceanTile = content.Load<Texture2D>("Ocean1");
+                textureOceanTile = content.Load<Texture2D>("Ocean1v2");
             else if (key.Equals("o2"))
-                textureOceanTile = content.Load<Texture2D>("Ocean2");
+            {
+                textureOceanTile = content.Load<Texture2D>("Ocean2v2");
+                shallowWaterPiece = true;
+            }
 
-            Asset oceanTileAsset = new Asset(textureOceanTile, null, 1, 4, 1.0f, "oceanTile", region);
+            Asset oceanTileAsset = new Asset(textureOceanTile, null, 1, 1, 1.0f, "oceanTile", region);
             SetSpriteAsset(oceanTileAsset, location);
         }
 

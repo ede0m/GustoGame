@@ -16,6 +16,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
+using GustoGame.GameMap;
 
 namespace Gusto.GameMap
 {
@@ -43,6 +44,9 @@ namespace Gusto.GameMap
 
         int tileHeight = GameOptions.tileHeight;
         int tileWidth = GameOptions.tileWidth;
+
+        OceanWater oceanWater;
+
         Vector2 startMapPoint;
 
         public TileGameMap(Camera camera)
@@ -65,6 +69,8 @@ namespace Gusto.GameMap
         {
             _content = content;
             _graphics = graphics;
+
+            oceanWater = new OceanWater(_content, _graphics);
 
             var worldLoc = startMapPoint;
             int index = 0;
@@ -108,7 +114,7 @@ namespace Gusto.GameMap
                             break;
                         case "o2":
                             tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "o2");
-                            tile.transparency = 0.6f;
+                            tile.transparency = 0.7f;
                             AIUtility.OceanPathWeights[i, j] = 0;
                             AIUtility.LandPathWeights[i, j] = 1;
                             AIUtility.AllPathWeights[i, j] = 1;
@@ -207,26 +213,41 @@ namespace Gusto.GameMap
             return groundObjs;
         }
 
-        public void DrawMap(SpriteBatch sb, GameTime gameTime)
+        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, GameTime gameTime)
         {
             OceanTile shoreOceanTile = new OceanTile(0, null, null, Vector2.Zero, "GustoGame", _content, _graphics, "o2");
-            shoreOceanTile.transparency = 0.6f;
+            shoreOceanTile.transparency = 0.7f;
+
+            LandTile shallowWaterLandTile = new LandTile(0, null, null, Vector2.Zero, "GustoGame", _content, _graphics, "l1");
+
             Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
             Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
 
-            sb.Begin(_cam);
+            oceanWater.Draw(sbStatic);
+
+            sbWorld.Begin(_cam);
             foreach (var tile in BoundingBoxLocations.TilesInView)
             {
+                // draw shallow water land tile underneath shallow water
+                /*if (tile.shallowWaterPiece)
+                {
+                    shallowWaterLandTile.location = tile.location;
+                    shallowWaterLandTile.DrawTile(sbWorld);
+                }
+
                 // draw water under shore pieces so transparent backbuffer doesn't show through
                 if (tile.shorePiece)
                 {
+                    shallowWaterLandTile.location = tile.location;
+                    shallowWaterLandTile.DrawTile(sbWorld);
                     shoreOceanTile.location = tile.location;
-                    shoreOceanTile.DrawTile(sb);
-                }
+                    shoreOceanTile.DrawTile(sbWorld);
+                }*/
 
-                tile.DrawTile(sb);
+                if (tile.bbKey != "oceanTile")
+                    tile.DrawTile(sbWorld);
             }
-            sb.End();
+            sbWorld.End();
         }
 
         public void LoadMapData(JObject data)
