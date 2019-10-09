@@ -128,7 +128,7 @@ namespace Gusto.Models
             }
         }
 
-        public void DrawTile(SpriteBatch sb)
+        public void DrawTile(SpriteBatch sb, bool useOrigin)
         {
             int width = _texture.Width / nColumns;
             int height = _texture.Height / nRows;
@@ -142,10 +142,14 @@ namespace Gusto.Models
             // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
             SetBoundingBox();
 
-            Vector2 origin = new Vector2(width / 2, height / 2);
-            if (this is ITilePiece)
+            Vector2 origin = Vector2.Zero;
+            if (useOrigin)
             {
-                origin = Vector2.Zero;
+                origin = new Vector2(width / 2, height / 2);
+                if (this is ITilePiece)
+                {
+                    origin = Vector2.Zero;
+                }
             }
             // normal drawing call
             sb.Draw(_texture, location, targetRectangle, Color.White * transparency, rotation,

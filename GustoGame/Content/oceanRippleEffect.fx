@@ -24,21 +24,21 @@ sampler2D waterSampler = sampler_state
 };
 // MAG,MIN,MIRRR SETTINGS? SEE RIEMERS
 
-/*struct VertexShaderInput
+struct VertexShaderInput
 {
 	float4 Position : POSITION0;
 	float2 TextureCords : TEXCOORD;
 	float4 Color : COLOR0;
-};*/
+};
 
-/*struct VertexShaderOutput
+struct VertexShaderOutput
 {
 	float4 Pos : SV_POSITION;
 	float2 BumpMapSamplingPos : TEXCOORD2;
 	float4 Color : COLOR0;
-};*/
+};
 
-/*VertexShaderOutput MainVS(in VertexShaderInput input)
+VertexShaderOutput MainVS(in VertexShaderInput input)
 {
 	VertexShaderOutput output = (VertexShaderOutput)0;
 
@@ -47,7 +47,7 @@ sampler2D waterSampler = sampler_state
 	output.Color = input.Color;
 
 	return output;
-}*/
+}
 
 float4 MainPS(float4 pos : SV_POSITION, float4 color1 : COLOR0, float2 texCoord : TEXCOORD0) : COLOR
 {

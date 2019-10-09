@@ -257,7 +257,7 @@ namespace Gusto
 
             // Game Map
             mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
-            map.SetGameMap(Content, GraphicsDevice, mapData);
+            map.SetGameMap(Content, GraphicsDevice, spriteBatchView, mapData);
             BuildRegionTree();
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
