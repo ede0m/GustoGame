@@ -9,7 +9,7 @@ namespace GustoGame.GameMap
         ContentManager _content;
         GraphicsDevice _graphics;
         Effect oceanRippleEffect;
-        Texture2D oceanWaterTexture;
+        //Texture2D oceanWaterTexture;
         Texture2D waterBumpMap;
 
         public OceanWater(ContentManager content, GraphicsDevice graphics)
@@ -18,20 +18,20 @@ namespace GustoGame.GameMap
             _graphics = graphics;
 
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            oceanWaterTexture = _content.Load<Texture2D>("OceanWaterTexture");
+            //oceanWaterTexture = _content.Load<Texture2D>("OceanWaterTexture");
             waterBumpMap = _content.Load<Texture2D>("waterbump");
         }
 
-        public void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb, RenderTarget2D waterScene)
         {
             // ocean ripple
             sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             oceanRippleEffect.Parameters["bumpMap"].SetValue(waterBumpMap);
-            oceanRippleEffect.Parameters["water"].SetValue(oceanWaterTexture);
+            oceanRippleEffect.Parameters["water"].SetValue(waterScene);
             //oceanRippleEffect.Parameters["xWaveLength"].SetValue(3f);
             oceanRippleEffect.Parameters["xWaveHeight"].SetValue(0.3f);
             ExecuteTechnique("oceanRipple");
-            sb.Draw(oceanWaterTexture, Vector2.Zero, Color.White);
+            sb.Draw(waterScene, Vector2.Zero, Color.White);
             sb.End();
         }
 

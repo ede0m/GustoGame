@@ -40,7 +40,6 @@ namespace Gusto.GameMap
         private int _rows;
 
         private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
-        private JObject _mapData;
 
         int tileHeight = GameOptions.tileHeight;
         int tileWidth = GameOptions.tileWidth;
@@ -65,7 +64,7 @@ namespace Gusto.GameMap
             _cam = camera;
         }
 
-        public void SetGameMap(ContentManager content, GraphicsDevice graphics)
+        public void SetGameMap(ContentManager content, GraphicsDevice graphics, JObject mapData)
         {
             _content = content;
             _graphics = graphics;
@@ -80,7 +79,7 @@ namespace Gusto.GameMap
                 {
                     TilePiece tile = null;
                     List<Sprite> groundObjects = null;
-                    JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
+                    JObject tileDetails = mapData[index.ToString()].Value<JObject>();
 
                     // region
                     string regionName = (string)tileDetails["regionName"];
@@ -213,46 +212,46 @@ namespace Gusto.GameMap
             return groundObjs;
         }
 
-        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, GameTime gameTime)
+        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, RenderTarget2D worldScene, GameTime gameTime)
         {
-            OceanTile shoreOceanTile = new OceanTile(0, null, null, Vector2.Zero, "GustoGame", _content, _graphics, "o2");
-            shoreOceanTile.transparency = 0.7f;
 
-            LandTile shallowWaterLandTile = new LandTile(0, null, null, Vector2.Zero, "GustoGame", _content, _graphics, "l1");
+            // Set Water RenderTarget
+            /*RenderTarget2D waterScene = new RenderTarget2D(_graphics, _graphics.Viewport.Width, _graphics.Viewport.Height);
+            _graphics.SetRenderTarget(waterScene);
+            _graphics.Clear(Color.CornflowerBlue);
+            sbWorld.Begin(_cam, SpriteSortMode.Texture);
+            foreach (var t in BoundingBoxLocations.OceanTileLocationList)
+            {
+                TilePiece tile = (TilePiece)t;
+                tile.DrawTile(sbWorld);
+            }
+            sbWorld.End();
 
-            Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
-            Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
+            // set up gamescene draw
+            _graphics.SetRenderTarget(worldScene);
+            _graphics.Clear(Color.PeachPuff);
 
-            oceanWater.Draw(sbStatic);
+            // water
+            oceanWater.Draw(sbWorld, waterScene);
 
+            // land
+            sbWorld.Begin(_cam, SpriteSortMode.Texture);
+            foreach (var t in BoundingBoxLocations.LandTileLocationList)
+            {
+                TilePiece tile = (TilePiece)t;
+                tile.DrawTile(sbWorld);
+            }
+            sbWorld.End();*/
+
+            _graphics.SetRenderTarget(worldScene);
+            _graphics.Clear(Color.PeachPuff);
             sbWorld.Begin(_cam);
             foreach (var tile in BoundingBoxLocations.TilesInView)
             {
-                // draw shallow water land tile underneath shallow water
-                /*if (tile.shallowWaterPiece)
-                {
-                    shallowWaterLandTile.location = tile.location;
-                    shallowWaterLandTile.DrawTile(sbWorld);
-                }
-
-                // draw water under shore pieces so transparent backbuffer doesn't show through
-                if (tile.shorePiece)
-                {
-                    shallowWaterLandTile.location = tile.location;
-                    shallowWaterLandTile.DrawTile(sbWorld);
-                    shoreOceanTile.location = tile.location;
-                    shoreOceanTile.DrawTile(sbWorld);
-                }*/
-
-                if (tile.bbKey != "oceanTile")
-                    tile.DrawTile(sbWorld);
+                tile.DrawTile(sbWorld);
             }
             sbWorld.End();
-        }
 
-        public void LoadMapData(JObject data)
-        {
-            _mapData = data;
         }
 
     }

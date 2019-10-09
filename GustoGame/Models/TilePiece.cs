@@ -142,7 +142,6 @@ namespace Gusto.Models
             // update bounding box (x and y are cords of the screen here) -- WONT UPDATE STATIC SPRITES
             SetBoundingBox();
 
-
             Vector2 origin = new Vector2(width / 2, height / 2);
             if (this is ITilePiece)
             {

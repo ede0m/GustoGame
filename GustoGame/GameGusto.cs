@@ -102,9 +102,6 @@ namespace Gusto
         protected override void LoadContent()
         {
 
-            mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
-            map.LoadMapData(mapData);
-
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatchView = new SpriteBatch(GraphicsDevice);
             spriteBatchStatic = new SpriteBatch(GraphicsDevice);
@@ -183,8 +180,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureCampFire, "campFire", 0.3f, 1.0f);
 
             // Tile Pieces, Ground Objects and Invetory Items
-            Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
-            LoadDynamicBoundingBoxPerFrame(false, 1, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
+            Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1v3");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1HolesShore");
             LoadDynamicBoundingBoxPerFrame(false, 9, 4, textureLand1, "landTile", 1.0f, 1.0f);
             //Texture2D textureShipDeck1 = Content.Load<Texture2D>("ShipDeck");
@@ -259,7 +256,8 @@ namespace Gusto
             gameState = new GameState(Content, GraphicsDevice);
 
             // Game Map
-            map.SetGameMap(Content, GraphicsDevice);
+            mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
+            map.SetGameMap(Content, GraphicsDevice, mapData);
             BuildRegionTree();
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
@@ -379,6 +377,7 @@ namespace Gusto
 
             // set any viewport visible(and not visible when in interior) collidable map pieces for collision - update LandTileLocList and GroundObjLocList
             BoundingBoxLocations.LandTileLocationList.Clear();
+            BoundingBoxLocations.OceanTileLocationList.Clear();
             BoundingBoxLocations.GroundObjectLocationList.Clear();
             BoundingBoxLocations.TilesInView.Clear();
             Vector2 minCorner = new Vector2(camera.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
@@ -395,6 +394,8 @@ namespace Gusto
                         BoundingBoxLocations.LandTileLocationList.Add(tp);
                         SpatialBounding.SetQuad(tp.GetBase());
                     }
+                    else
+                        BoundingBoxLocations.OceanTileLocationList.Add(tp);
 
                     if (tp.groundObjects != null)
                     {
@@ -535,11 +536,11 @@ namespace Gusto
                 DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, DrawOrder);
 
                 // set up gamescene draw
-                GraphicsDevice.SetRenderTarget(worldScene);
-                GraphicsDevice.Clear(Color.PeachPuff);
+                //GraphicsDevice.SetRenderTarget(worldScene);
+                //GraphicsDevice.Clear(Color.PeachPuff);
 
                 // draw map
-                map.DrawMap(spriteBatchView, spriteBatchStatic, gameTime);
+                map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene, gameTime);
 
                 // draw treasure locations if any
                 spriteBatchView.Begin(this.camera);
