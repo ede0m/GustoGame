@@ -45,6 +45,7 @@ namespace Gusto.GameMap
         int tileWidth = GameOptions.tileWidth;
 
         OceanWater oceanWater;
+        RenderTarget2D waterScene;
 
         Vector2 startMapPoint;
 
@@ -70,6 +71,7 @@ namespace Gusto.GameMap
             _graphics = graphics;
 
             oceanWater = new OceanWater(_content, _graphics);
+            waterScene = new RenderTarget2D(_graphics, _graphics.Viewport.Width, _graphics.Viewport.Height);
 
             var worldLoc = startMapPoint;
             int index = 0;
@@ -216,7 +218,6 @@ namespace Gusto.GameMap
         {
 
             // Set Water RenderTarget
-            /*RenderTarget2D waterScene = new RenderTarget2D(_graphics, _graphics.Viewport.Width, _graphics.Viewport.Height);
             _graphics.SetRenderTarget(waterScene);
             _graphics.Clear(Color.CornflowerBlue);
             sbWorld.Begin(_cam, SpriteSortMode.Texture);
@@ -241,16 +242,16 @@ namespace Gusto.GameMap
                 TilePiece tile = (TilePiece)t;
                 tile.DrawTile(sbWorld);
             }
-            sbWorld.End();*/
+            sbWorld.End();
 
-            _graphics.SetRenderTarget(worldScene);
+            /*_graphics.SetRenderTarget(worldScene);
             _graphics.Clear(Color.PeachPuff);
             sbWorld.Begin(_cam);
             foreach (var tile in BoundingBoxLocations.TilesInView)
             {
                 tile.DrawTile(sbWorld);
             }
-            sbWorld.End();
+            sbWorld.End();*/
 
         }
 
