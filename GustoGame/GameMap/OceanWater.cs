@@ -19,10 +19,10 @@ namespace GustoGame.GameMap
             _graphics = graphics;
 
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            noiseMap = _content.Load<Texture2D>("perlinNoise");
+            noiseMap = _content.Load<Texture2D>("noise2");
         }
 
-        public void Draw(SpriteBatch sb, RenderTarget2D waterScene, Vector2 camMoveDistance)
+        public void Draw(SpriteBatch sb, RenderTarget2D waterScene, Vector2 camMove)
         {
 
             //noiseMap = GenerateNoiseMap(256);
@@ -33,14 +33,15 @@ namespace GustoGame.GameMap
             oceanRippleEffect.Parameters["water"].SetValue(waterScene);
 
             float noisePow = 0.3f;
-            //noiseOffset += 0.0001f;
+            noiseOffset += 0.0001f;
 
             oceanRippleEffect.Parameters["noisePower"].SetValue(noisePow);
             oceanRippleEffect.Parameters["noiseOffset"].SetValue(noiseOffset);
             oceanRippleEffect.Parameters["noiseFrequency"].SetValue(noisePow * 3.0f);
 
-            oceanRippleEffect.Parameters["camMoveX"].SetValue(camMoveDistance.X);
-            oceanRippleEffect.Parameters["camMoveX"].SetValue(camMoveDistance.Y);
+            oceanRippleEffect.Parameters["camMoveX"].SetValue(camMove.X);
+            oceanRippleEffect.Parameters["camMoveY"].SetValue(camMove.Y);
+            //oceanRippleEffect.Parameters["camMove"].SetValue(camMove);
 
             ExecuteTechnique("oceanRipple");
             sb.Draw(waterScene, Vector2.Zero, Color.White);

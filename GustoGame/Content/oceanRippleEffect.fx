@@ -15,6 +15,7 @@ float noiseFrequency;
 
 float camMoveX;
 float camMoveY;
+//float2 camMove;
 
 texture noiseTexture;
 sampler2D noiseSampler = sampler_state
@@ -69,20 +70,6 @@ float4 MainPS(float4 pos : SV_POSITION, float4 color1 : COLOR0, float2 texCoord 
 
     float4 color = tex2D(waterSampler, texCoord.xy + offset.xy);
     return color;
-
-	
-	/*float4 perlin = tex2D(noiseSampler, ((texCoord.xy + noiseOffset.xy) * noiseFrequency))/2;
-	perlin += tex2D(noiseSampler, (texCoord.xy) * 2)/4;
-	perlin += tex2D(noiseSampler, (texCoord.xy) * 4)/8;
-	perlin += tex2D(noiseSampler, (texCoord.xy) * 8)/16;
-	perlin += tex2D(noiseSampler, (texCoord.xy) * 16)/32;
-	perlin += tex2D(noiseSampler, (texCoord.xy) * 32)/32;
-
-	float2 offset = noisePower * (perlin.xy - 0.5f) * 2.0f;
-
-	float4 color = tex2D(waterSampler, texCoord.xy + offset.xy);
-	return color;*/
-
 }
 
 technique oceanRipple
