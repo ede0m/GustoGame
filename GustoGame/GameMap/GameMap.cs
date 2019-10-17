@@ -235,26 +235,26 @@ namespace Gusto.GameMap
             return groundObjs;
         }
 
-        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, RenderTarget2D worldScene, GameTime gameTime)
+        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, RenderTarget2D worldScene, GameTime gameTime, Vector2 camMoveDistance)
         {
 
             // Set Ocean Water RenderTarget
             _graphics.SetRenderTarget(waterScene);
             _graphics.Clear(Color.CornflowerBlue);
             sbWorld.Begin(_cam, SpriteSortMode.Texture);
-            foreach (var tile in BoundingBoxLocations.OceanTileLocationList) // can switch to TilesInView 
+            foreach (var tile in BoundingBoxLocations.TilesInView) // can switch to TilesInView 
             {
-                /*if (tile.bbKey.Equals("landTile") || tile.shallowWaterPiece)
+                if (tile.bbKey.Equals("landTile") || tile.shallowWaterPiece)
                 {
                     OceanTile oTile = new OceanTile(0, null, null, tile.location, "GustoGame", _content, _graphics, "o1");
                     oTile.transparency = 0.7f;
-                    oTile.SetTileDesignRow();
+                    //oTile.SetTileDesignRow(RandomEvents.rand.Next(0, oTile.nRows));
                     oTile.DrawTile(sbWorld, true);
                 }
                 else
-                    tile.DrawTile(sbWorld, true); */
-                TilePiece tp = (TilePiece)tile;
-                tp.DrawTile(sbWorld, true);
+                    tile.DrawTile(sbWorld, true); 
+                //TilePiece tp = (TilePiece)tile;
+                //tp.DrawTile(sbWorld, true);
 
             }
             sbWorld.End();
@@ -265,7 +265,7 @@ namespace Gusto.GameMap
             _graphics.Clear(Color.PeachPuff);
 
             // water
-            oceanWater.Draw(sbWorld, waterScene);
+            oceanWater.Draw(sbWorld, waterScene, camMoveDistance);
 
             // land
             sbWorld.Begin(_cam, SpriteSortMode.Texture);

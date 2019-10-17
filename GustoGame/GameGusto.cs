@@ -61,6 +61,7 @@ namespace Gusto
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
+        Vector2 camMoveTransform;
         
         public GameGusto()
         {
@@ -435,8 +436,22 @@ namespace Gusto
                 }
             }
 
-            // update any gameObjects that need to track state
+            // TODO!
+            Vector2 lastCamPosW = camera.Position;
+            //Vector2 lastCamPosS = Vector2.Transform(lastCamPosW, camera.ViewportOffset.Local);
+
+            // update any gameObjects that need to track state (will set camera pos to player)
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);
+
+            // use this to offset water noise
+            Vector2 currCamPosW = camera.Position;
+            //Vector2 currCamPosS = Vector2.Transform(currCamPosW, camera.ViewportOffset.Local);
+
+            Vector2 camMove =  currCamPosW - lastCamPosW;
+            //camMoveTransform = Vector2.Transform(camMove, camera.ViewportOffset.Local);
+            camMoveTransform.X += (camMove.X / GameOptions.PrefferedBackBufferWidth)/2;
+            camMoveTransform.Y += (camMove.Y / GameOptions.PrefferedBackBufferHeight)/2;
+            //camMoveTransform = new Vector2(camMove.X / GameOptions.PrefferedBackBufferWidth, camMove.Y / GameOptions.PrefferedBackBufferHeight);
 
             // update ground objects (they do not track their state since they are encoded in the map)
             foreach (var sp in BoundingBoxLocations.GroundObjectLocationList)
@@ -540,7 +555,7 @@ namespace Gusto
                 //GraphicsDevice.Clear(Color.PeachPuff);
 
                 // draw map
-                map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene, gameTime);
+                map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene, gameTime, camMoveTransform);
 
                 // draw treasure locations if any
                 spriteBatchView.Begin(this.camera);

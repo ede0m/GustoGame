@@ -38,6 +38,7 @@ namespace Gusto.Models.Animated
         private bool showHealthBar;
         private int timeShowingHealthBar;
 
+        public Vector2 speed;
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
         public bool swimming;
         public bool canBury;
@@ -415,9 +416,12 @@ namespace Gusto.Models.Animated
                     timeSinceLastWalkFrame = 0;
                 }
 
+                speed = new Vector2(PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1, PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2);
+
                 // actual "regular" movement
-                location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1);
-                location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2);
+                location += speed;
+                //location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1);
+                //location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2);
             }
             else
             {

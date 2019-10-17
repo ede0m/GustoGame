@@ -8,13 +8,23 @@
 #endif
 
 matrix WorldViewProjection;
-float xWaveLength;
-float xWaveHeight;
 
-texture bumpMap;
-sampler2D bumpSampler = sampler_state
+float2 noiseOffset;
+float2 noisePower;
+float noiseFrequency;
+
+float camMoveX;
+float camMoveY;
+
+texture noiseTexture;
+sampler2D noiseSampler = sampler_state
 {
-	Texture = <bumpMap>;
+    Texture = <noiseTexture>;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
 };
 
 texture water;
@@ -22,7 +32,7 @@ sampler2D waterSampler = sampler_state
 {
 	Texture = <water>;
 };
-// MAG,MIN,MIRRR SETTINGS? SEE RIEMERS
+
 
 struct VertexShaderInput
 {
@@ -34,7 +44,7 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
 	float4 Pos : SV_POSITION;
-	float2 BumpMapSamplingPos : TEXCOORD2;
+	float2 texCoord : TEXCOORD2;
 	float4 Color : COLOR0;
 };
 
@@ -42,8 +52,8 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
 	VertexShaderOutput output = (VertexShaderOutput)0;
 
-	output.BumpMapSamplingPos = input.TextureCords/xWaveLength;
 	output.Pos = mul(input.Position, WorldViewProjection);
+	output.texCoord = input.TextureCords;
 	output.Color = input.Color;
 
 	return output;
@@ -51,17 +61,28 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(float4 pos : SV_POSITION, float4 color1 : COLOR0, float2 texCoord : TEXCOORD0) : COLOR
 {
-	float4 bumpColor = tex2D(bumpSampler, texCoord.xy);
-	//get offset 
-    float2 perturbation = xWaveHeight * (bumpColor.rg - 0.5f)*2.0f;
+	float2 camMove = float2(camMoveX, camMoveY);
+	//float4 camMoveTransform = mul(WorldViewProjection, camMove);
 
-    //apply offset to coordinates in original texture
-    float2 currentCoords = texCoord.xy;
-    float2 perturbatedTexCoords = currentCoords + perturbation;
+    float4 noise = tex2D(noiseSampler, (texCoord.xy + noiseOffset.xy - camMove.xy) * noiseFrequency);
+    float2 offset = (noisePower * (noise.xy - 0.5f) * 2.0f);
 
-    //return the perturbed values
-    float4 color = tex2D(waterSampler, perturbatedTexCoords);
+    float4 color = tex2D(waterSampler, texCoord.xy + offset.xy);
     return color;
+
+	
+	/*float4 perlin = tex2D(noiseSampler, ((texCoord.xy + noiseOffset.xy) * noiseFrequency))/2;
+	perlin += tex2D(noiseSampler, (texCoord.xy) * 2)/4;
+	perlin += tex2D(noiseSampler, (texCoord.xy) * 4)/8;
+	perlin += tex2D(noiseSampler, (texCoord.xy) * 8)/16;
+	perlin += tex2D(noiseSampler, (texCoord.xy) * 16)/32;
+	perlin += tex2D(noiseSampler, (texCoord.xy) * 32)/32;
+
+	float2 offset = noisePower * (perlin.xy - 0.5f) * 2.0f;
+
+	float4 color = tex2D(waterSampler, texCoord.xy + offset.xy);
+	return color;*/
+
 }
 
 technique oceanRipple

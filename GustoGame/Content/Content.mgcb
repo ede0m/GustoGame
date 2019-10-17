@@ -668,6 +668,12 @@
 /processorParam:DebugMode=Auto
 /build:oceanRippleEffect.fx
 
+#begin oceanRippleEffect2.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:oceanRippleEffect2.fx
+
 #begin OceanWaterTexture.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -679,6 +685,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:OceanWaterTexture.png
+
+#begin perlinNoise.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:perlinNoise.png
 
 #begin pickaxe.png
 /importer:TextureImporter
