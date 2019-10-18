@@ -39,9 +39,9 @@ namespace GustoGame.GameMap
             oceanRippleEffect.Parameters["noiseOffset"].SetValue(noiseOffset);
             oceanRippleEffect.Parameters["noiseFrequency"].SetValue(noisePow * 3.0f);
 
-            oceanRippleEffect.Parameters["camMoveX"].SetValue(camMove.X);
-            oceanRippleEffect.Parameters["camMoveY"].SetValue(camMove.Y);
-            //oceanRippleEffect.Parameters["camMove"].SetValue(camMove);
+            //oceanRippleEffect.Parameters["camMoveX"].SetValue(camMove.X);
+            //oceanRippleEffect.Parameters["camMoveY"].SetValue(camMove.Y);
+            oceanRippleEffect.Parameters["camMove"].SetValue(camMove);
 
             ExecuteTechnique("oceanRipple");
             sb.Draw(waterScene, Vector2.Zero, Color.White);

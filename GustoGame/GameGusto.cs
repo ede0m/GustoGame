@@ -62,6 +62,7 @@ namespace Gusto
         SpriteBatch spriteBatchStatic;
         Camera camera;
         Vector2 camMove;
+        Vector2 startCamPos;
         
         public GameGusto()
         {
@@ -351,11 +352,13 @@ namespace Gusto
             else if (startingMenu.selected == "new" && !gameState.ready)
             {
                 gameState.CreateNewGame();
+                startCamPos = gameState.player.location;
                 return;
             }
             else if (startingMenu.selected == "load" && !gameState.ready)
             {
                 gameState.LoadGameState();
+                startCamPos = gameState.player.location;
                 return;
             }
 
@@ -436,8 +439,6 @@ namespace Gusto
                 }
             }
 
-            // TODO!
-            Vector2 startCamPos = new Vector2(-120, -550);
             //Vector2 lastCamPosS = Vector2.Transform(lastCamPosW, camera.ViewportOffset.Local);
 
             // update any gameObjects that need to track state (will set camera pos to player)
@@ -446,8 +447,6 @@ namespace Gusto
             // use this to offset water noise
             Vector2 currCamPos = camera.Position;
             Vector2 camDistance = currCamPos - startCamPos;
-
-            //camMoveTransform = Vector2.Transform(camMove, camera.ViewportOffset.Local);
             camMove.X = ((camDistance.X / (GameOptions.PrefferedBackBufferWidth * GameOptions.GameMapWidthMult)));
             camMove.Y = ((camDistance.Y / (GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult)));
 
