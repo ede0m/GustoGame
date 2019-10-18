@@ -142,6 +142,14 @@ namespace Gusto.GameMap
                             AIUtility.AllPathWeights[i, j] = 1;
                             //BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile); omit these since they cause no path found in A*
                             break;
+                        case "oD":
+                            tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "oD");
+                            tile.transparency = 0.7f;
+                            AIUtility.OceanPathWeights[i, j] = 0;
+                            AIUtility.LandPathWeights[i, j] = 1;
+                            AIUtility.AllPathWeights[i, j] = 1;
+                            //BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile); omit these since they cause no path found in A*
+                            break;
                         case "l1":
                             tile = new LandTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "l1");
                             AIUtility.OceanPathWeights[i, j] = 0;

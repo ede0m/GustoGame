@@ -14,6 +14,8 @@ namespace Gusto.AnimatedSprite.GameMap
 
             if (key.Equals("o1"))
                 textureOceanTile = content.Load<Texture2D>("Ocean1");
+            else if (key.Equals("oD"))
+                textureOceanTile = content.Load<Texture2D>("OceanDark");
             else if (key.Equals("o2"))
             {
                 textureOceanTile = content.Load<Texture2D>("Ocean2");

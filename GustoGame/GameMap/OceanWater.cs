@@ -21,7 +21,7 @@ namespace GustoGame.GameMap
             _graphics = graphics;
 
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            noiseMap = _content.Load<Texture2D>("perlinNoise");
+            noiseMap = _content.Load<Texture2D>("waterbump");
         }
 
         public void Draw(SpriteBatch sb, RenderTarget2D waterScene, Vector2 camMove)

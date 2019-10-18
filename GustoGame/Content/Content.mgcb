@@ -614,6 +614,18 @@
 /processorParam:TextureFormat=Color
 /build:noise2.png
 
+#begin noise3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:noise3.png
+
 #begin Ocean1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -674,6 +686,18 @@
 /processorParam:TextureFormat=Color
 /build:Ocean2v2.png
 
+#begin OceanDark.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:OceanDark.png
+
 #begin oceanRippleEffect.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -721,6 +745,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:pickaxe.png
+
+#begin pinknoise.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:pinknoise.png
 
 #begin Pirate1.png
 /importer:TextureImporter
