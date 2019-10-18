@@ -20,8 +20,8 @@ sampler2D noiseSampler = sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
-    AddressU = Wrap;
-    AddressV = Wrap;
+    AddressU = CLAMP;
+    AddressV = CLAMP;
 };
 
 texture water;

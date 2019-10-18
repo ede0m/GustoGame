@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System;
-using System.Diagnostics;
 using Gusto.Models;
-using Gusto.Bounds;
-using Gusto.AnimatedSprite;
 
 namespace Gusto.AnimatedSprite.GameMap
 {
@@ -18,10 +13,10 @@ namespace Gusto.AnimatedSprite.GameMap
             Texture2D textureOceanTile = null;
 
             if (key.Equals("o1"))
-                textureOceanTile = content.Load<Texture2D>("Ocean1v3");
+                textureOceanTile = content.Load<Texture2D>("Ocean1");
             else if (key.Equals("o2"))
             {
-                textureOceanTile = content.Load<Texture2D>("Ocean2v2");
+                textureOceanTile = content.Load<Texture2D>("Ocean2");
                 shallowWaterPiece = true;
             }
 

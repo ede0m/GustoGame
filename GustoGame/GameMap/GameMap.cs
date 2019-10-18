@@ -240,13 +240,13 @@ namespace Gusto.GameMap
 
             // Set Ocean Water RenderTarget
             _graphics.SetRenderTarget(waterScene);
-            _graphics.Clear(Color.CornflowerBlue);
+            _graphics.Clear(Color.PeachPuff);
             sbWorld.Begin(_cam, SpriteSortMode.Texture);
             foreach (var tile in BoundingBoxLocations.TilesInView) // can switch to TilesInView 
             {
-                if (tile.bbKey.Equals("landTile") || tile.shallowWaterPiece)
+                if (tile.bbKey.Equals("landTile"))
                 {
-                    OceanTile oTile = new OceanTile(0, null, null, tile.location, "GustoGame", _content, _graphics, "o1");
+                    OceanTile oTile = new OceanTile(0, null, null, tile.location, "GustoGame", _content, _graphics, "o2");
                     oTile.transparency = 0.7f;
                     //oTile.SetTileDesignRow(RandomEvents.rand.Next(0, oTile.nRows));
                     oTile.DrawTile(sbWorld, true);

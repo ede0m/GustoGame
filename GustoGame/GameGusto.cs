@@ -439,8 +439,6 @@ namespace Gusto
                 }
             }
 
-            //Vector2 lastCamPosS = Vector2.Transform(lastCamPosW, camera.ViewportOffset.Local);
-
             // update any gameObjects that need to track state (will set camera pos to player)
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);
 
@@ -547,10 +545,6 @@ namespace Gusto
                 GraphicsDevice.SetRenderTarget(lightsTarget);
                 GraphicsDevice.Clear(Color.Black);
                 DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, DrawOrder);
-
-                // set up gamescene draw
-                //GraphicsDevice.SetRenderTarget(worldScene);
-                //GraphicsDevice.Clear(Color.PeachPuff);
 
                 // draw map
                 map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene, gameTime, camMove);

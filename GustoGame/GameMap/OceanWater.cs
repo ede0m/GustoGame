@@ -1,4 +1,5 @@
-﻿using Gusto.Utility;
+﻿using Gusto;
+using Gusto.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,6 +12,7 @@ namespace GustoGame.GameMap
         GraphicsDevice _graphics;
         Effect oceanRippleEffect;
         Texture2D noiseMap;
+
         float noiseOffset = 0.0f;
 
         public OceanWater(ContentManager content, GraphicsDevice graphics)
@@ -19,28 +21,25 @@ namespace GustoGame.GameMap
             _graphics = graphics;
 
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            noiseMap = _content.Load<Texture2D>("noise2");
+            noiseMap = _content.Load<Texture2D>("perlinNoise");
         }
 
         public void Draw(SpriteBatch sb, RenderTarget2D waterScene, Vector2 camMove)
         {
-
-            //noiseMap = GenerateNoiseMap(256);
 
             // ocean ripple
             sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             oceanRippleEffect.Parameters["noiseTexture"].SetValue(noiseMap);
             oceanRippleEffect.Parameters["water"].SetValue(waterScene);
 
-            float noisePow = 0.3f;
-            noiseOffset += 0.0001f;
+            Vector2 noisePow = new Vector2(0.017f, 0.032f); // artistic param?
+            float noiseFreq = 0.9f; // This has to stay here.. why this value??!
+
+            noiseOffset += 0.00015f;
 
             oceanRippleEffect.Parameters["noisePower"].SetValue(noisePow);
             oceanRippleEffect.Parameters["noiseOffset"].SetValue(noiseOffset);
-            oceanRippleEffect.Parameters["noiseFrequency"].SetValue(noisePow * 3.0f);
-
-            //oceanRippleEffect.Parameters["camMoveX"].SetValue(camMove.X);
-            //oceanRippleEffect.Parameters["camMoveY"].SetValue(camMove.Y);
+            oceanRippleEffect.Parameters["noiseFrequency"].SetValue(noiseFreq);
             oceanRippleEffect.Parameters["camMove"].SetValue(camMove);
 
             ExecuteTechnique("oceanRipple");
