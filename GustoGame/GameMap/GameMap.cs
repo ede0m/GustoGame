@@ -266,6 +266,12 @@ namespace Gusto.GameMap
 
             }
             sbWorld.End();
+
+            /*if (!File.Exists("C:\\Users\\GMON\\source\\repos\\GustoGame\\GustoGame\\Content\\waterScene.png") && BoundingBoxLocations.TilesInView.Count > 0)
+            {
+                Stream s = File.Create("C:\\Users\\GMON\\source\\repos\\GustoGame\\GustoGame\\Content\\waterScene.png");
+                waterScene.SaveAsPng(s, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
+            }*/
             
 
             // set up gamescene draw

@@ -20,20 +20,25 @@ sampler2D noiseSampler = sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
-    AddressU = CLAMP;
-    AddressV = CLAMP;
+    AddressU = WRAP;
+    AddressV = WRAP;
 };
 
 texture water;
 sampler2D waterSampler = sampler_state
 {
 	Texture = <water>;
+	MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
+    AddressU = WRAP;
+    AddressV = WRAP;
 };
 
 
 float4 MainPS(float4 pos : SV_POSITION, float4 color1 : COLOR0, float2 texCoord : TEXCOORD0) : COLOR
 {
-    float4 noise = tex2D(noiseSampler, (texCoord.xy + noiseOffset.xy - camMove.xy) * noiseFrequency);
+    float4 noise = tex2D(noiseSampler, (texCoord.xy + noiseOffset.xy - (camMove.xy)) * noiseFrequency);
     float2 offset = (noisePower * (noise.xy - 0.5f) * 2.0f);
 
     float4 color = tex2D(waterSampler, texCoord.xy + offset.xy);

@@ -13,12 +13,12 @@ namespace Gusto.AnimatedSprite.GameMap
             Texture2D textureOceanTile = null;
 
             if (key.Equals("o1"))
-                textureOceanTile = content.Load<Texture2D>("Ocean1");
+                textureOceanTile = content.Load<Texture2D>("Ocean1v3");
             else if (key.Equals("oD"))
-                textureOceanTile = content.Load<Texture2D>("OceanDark");
+                textureOceanTile = content.Load<Texture2D>("OceanD");
             else if (key.Equals("o2"))
             {
-                textureOceanTile = content.Load<Texture2D>("Ocean2");
+                textureOceanTile = content.Load<Texture2D>("Ocean2v3");
                 shallowWaterPiece = true;
             }
 

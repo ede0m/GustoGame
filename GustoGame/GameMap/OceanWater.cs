@@ -32,10 +32,12 @@ namespace GustoGame.GameMap
             oceanRippleEffect.Parameters["noiseTexture"].SetValue(noiseMap);
             oceanRippleEffect.Parameters["water"].SetValue(waterScene);
 
-            Vector2 noisePow = new Vector2(0.017f, 0.032f); // artistic param?
+            Vector2 noisePow = new Vector2(0.017f, 0.031f) * 15; // artistic param? 0.017f, 0.031f
             float noiseFreq = 0.9f; // This has to stay here.. why this value??!
 
             noiseOffset += 0.00015f;
+            //if (noiseOffset > 0.18)
+            //    noiseOffset = 0;
 
             oceanRippleEffect.Parameters["noisePower"].SetValue(noisePow);
             oceanRippleEffect.Parameters["noiseOffset"].SetValue(noiseOffset);
