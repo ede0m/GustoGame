@@ -72,7 +72,7 @@ namespace Gusto.GameMap
 
             oceanWater = new OceanWater(_content, _graphics);
             // set water render target
-            waterScene = new RenderTarget2D(_graphics, _graphics.Viewport.Width, _graphics.Viewport.Height);
+            waterScene = new RenderTarget2D(_graphics, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
             /*_graphics.SetRenderTarget(waterScene);
             _graphics.Clear(Color.CornflowerBlue);
             int vpCols = GameOptions.PrefferedBackBufferWidth / GameOptions.tileWidth;
@@ -249,7 +249,7 @@ namespace Gusto.GameMap
             // Set Ocean Water RenderTarget
             _graphics.SetRenderTarget(waterScene);
             _graphics.Clear(Color.PeachPuff);
-            sbWorld.Begin(_cam, SpriteSortMode.Texture);
+            sbWorld.Begin(_cam);
             foreach (var tile in BoundingBoxLocations.TilesInView) // can switch to TilesInView 
             {
                 if (tile.bbKey.Equals("landTile"))
@@ -261,9 +261,6 @@ namespace Gusto.GameMap
                 }
                 else
                     tile.DrawTile(sbWorld, true); 
-                //TilePiece tp = (TilePiece)tile;
-                //tp.DrawTile(sbWorld, true);
-
             }
             sbWorld.End();
 
@@ -272,23 +269,26 @@ namespace Gusto.GameMap
                 Stream s = File.Create("C:\\Users\\GMON\\source\\repos\\GustoGame\\GustoGame\\Content\\waterScene.png");
                 waterScene.SaveAsPng(s, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
             }*/
-            
+           
+
+            // ocean effect
+            RenderTarget2D ocean = oceanWater.RenderOcean(waterScene, camMoveDistance, _cam.ViewportOffset.InvertAbsolute);
 
             // set up gamescene draw
             _graphics.SetRenderTarget(worldScene);
             _graphics.Clear(Color.PeachPuff);
-
-            // water
-            oceanWater.Draw(sbWorld, waterScene, camMoveDistance);
-
-            // land
-            sbWorld.Begin(_cam, SpriteSortMode.Texture);
+            // draw the game scene
+            sbWorld.Begin(_cam);
+            // ocean
+            sbWorld.Draw(ocean, new Vector2(_cam.Position.X - GameOptions.PrefferedBackBufferWidth/2, _cam.Position.Y - GameOptions.PrefferedBackBufferHeight / 2), Color.White);
+            //land
             foreach (var t in BoundingBoxLocations.LandTileLocationList)
             {
                 TilePiece tile = (TilePiece)t;
                 tile.DrawTile(sbWorld, true);
             }
             sbWorld.End();
+            
 
         }
 

@@ -216,6 +216,7 @@
     <Compile Include="Utility\FrameCounter.cs" />
     <Compile Include="Utility\ItemUtility.cs" />
     <Compile Include="Utility\PhysicsUtility.cs" />
+    <Compile Include="Utility\QuadRenderer.cs" />
     <Compile Include="Utility\RandomEvents.cs" />
     <Compile Include="Utility\TextureUtility.cs" />
   </ItemGroup>

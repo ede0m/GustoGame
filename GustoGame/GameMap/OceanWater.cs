@@ -1,8 +1,11 @@
 ﻿using Gusto;
 using Gusto.Utility;
+using GustoGame.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GustoGame.GameMap
 {
@@ -10,52 +13,64 @@ namespace GustoGame.GameMap
     {
         ContentManager _content;
         GraphicsDevice _graphics;
+        QuadRenderer _quadRenderer;
+
         Effect oceanRippleEffect;
         Texture2D noiseMap;
+        RenderTarget2D oceanEffectRT;
 
         float noiseOffset = 0.0f;
+        float noiseFreq = 1.0f; // This has to stay here.. (0.9F) why this value??!
+        Vector2 noisePow = Vector2.Zero; // artistic param? 0.017f, 0.031f
 
         public OceanWater(ContentManager content, GraphicsDevice graphics)
         {
             _content = content;
             _graphics = graphics;
+            _quadRenderer = new QuadRenderer(graphics);
 
+            oceanEffectRT = new RenderTarget2D(_graphics, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            noiseMap = _content.Load<Texture2D>("waterbump");
+            noiseMap = _content.Load<Texture2D>("fractal-tiled");
         }
 
-        public void Draw(SpriteBatch sb, RenderTarget2D waterScene, Vector2 camMove)
+        public RenderTarget2D RenderOcean(RenderTarget2D waterScene, Vector2 camMove, Matrix wvm)
         {
+            noisePow = new Vector2(0.01724f, 0.03125f) * 3; // 3 tile sample radius looks good
+            noiseFreq = 1.0f; 
+            noiseOffset += 0.0002f;
 
-            // ocean ripple
-            sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            oceanRippleEffect.Parameters["noiseTexture"].SetValue(noiseMap);
-            oceanRippleEffect.Parameters["water"].SetValue(waterScene);
-
-            Vector2 noisePow = new Vector2(0.017f, 0.031f) * 15; // artistic param? 0.017f, 0.031f
-            float noiseFreq = 0.9f; // This has to stay here.. why this value??!
-
-            noiseOffset += 0.00015f;
-            //if (noiseOffset > 0.18)
-            //    noiseOffset = 0;
-
-            oceanRippleEffect.Parameters["noisePower"].SetValue(noisePow);
+            oceanRippleEffect.Parameters["WorldViewProjection"].SetValue(wvm);
             oceanRippleEffect.Parameters["noiseOffset"].SetValue(noiseOffset);
             oceanRippleEffect.Parameters["noiseFrequency"].SetValue(noiseFreq);
             oceanRippleEffect.Parameters["camMove"].SetValue(camMove);
+            oceanRippleEffect.Parameters["noisePower"].SetValue(noisePow);
+            oceanRippleEffect.Parameters["noiseTexture"].SetValue(noiseMap);
+            oceanRippleEffect.Parameters["water"].SetValue(waterScene);
 
-            ExecuteTechnique("oceanRipple");
-            sb.Draw(waterScene, Vector2.Zero, Color.White);
-            sb.End();
+            _graphics.SetRenderTarget(oceanEffectRT);
+            _graphics.Clear(Color.PeachPuff);
+            oceanRippleEffect.CurrentTechnique.Passes[0].Apply();
+            _quadRenderer.Render(Vector2.One * -1, Vector2.One);
+
+            return oceanEffectRT;
         }
 
-        public void ExecuteTechnique(string techniqueName)
+        private void DebugNoiseDist()
         {
-            oceanRippleEffect.CurrentTechnique = oceanRippleEffect.Techniques[techniqueName];
-            foreach (EffectPass pass in oceanRippleEffect.CurrentTechnique.Passes)
+            var noiseData = new Color[noiseMap.Width * noiseMap.Height];
+            noiseMap.GetData<Color>(noiseData);
+            Dictionary<Color, int> dist = new Dictionary<Color, int>();
+            foreach (var color in noiseData)
             {
-                pass.Apply();
+                if (!dist.ContainsKey(color))
+                    dist.Add(color, 1);
+                else 
+                    dist[color] += 1;
             }
+
+            foreach (KeyValuePair<Color, int> kvp in dist)
+                Trace.WriteLine(kvp.Key + ": " + ((double)kvp.Value/noiseData.Length));
         }
 
         private Texture2D GenerateNoiseMap(int resolution)

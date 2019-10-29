@@ -1,20 +1,16 @@
 ﻿using Comora;
-using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
 using Gusto.Models.Interfaces;
 using Gusto.GameMap;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
@@ -440,14 +436,24 @@ namespace Gusto
                 }
             }
 
+            Vector2 lastCamPos = camera.Position;
+
             // update any gameObjects that need to track state (will set camera pos to player)
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);
 
             // use this to offset water noise
             Vector2 currCamPos = camera.Position;
             Vector2 camDistance = currCamPos - startCamPos;
-            camMove.X = ((camDistance.X / (GameOptions.PrefferedBackBufferWidth * GameOptions.GameMapWidthMult)));
-            camMove.Y = ((camDistance.Y / (GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult)));
+
+            //camMove = currCamPos - lastCamPos;
+            //camMove.X = camMove.X / GameOptions.PrefferedBackBufferWidth;
+            //camMove.Y = camMove.Y / GameOptions.PrefferedBackBufferHeight;
+
+            //camMove.X = (camDistance.X / (GameOptions.PrefferedBackBufferWidth / 2));
+            //camMove.Y = (camDistance.Y / (GameOptions.PrefferedBackBufferHeight / 2));
+
+            //camMove.X = ((camDistance.X / (GameOptions.PrefferedBackBufferWidth * GameOptions.GameMapWidthMult)));
+            //camMove.Y = ((camDistance.Y / (GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult)));
 
 
             // update ground objects (they do not track their state since they are encoded in the map)

@@ -11,7 +11,8 @@ float2 noiseOffset;
 float2 noisePower;
 float noiseFrequency;
 
-float2 camMove;
+matrix WorldViewProjection;
+float4 camMove;
 
 texture noiseTexture;
 sampler2D noiseSampler = sampler_state
@@ -35,20 +36,46 @@ sampler2D waterSampler = sampler_state
     AddressV = WRAP;
 };
 
-
-float4 MainPS(float4 pos : SV_POSITION, float4 color1 : COLOR0, float2 texCoord : TEXCOORD0) : COLOR
+struct VertexShaderInput
 {
-    float4 noise = tex2D(noiseSampler, (texCoord.xy + noiseOffset.xy - (camMove.xy)) * noiseFrequency);
-    float2 offset = (noisePower * (noise.xy - 0.5f) * 2.0f);
+	float3 Position : POSITION0;
+	float2 texCoord : TEXCOORD0;
+};
 
-    float4 color = tex2D(waterSampler, texCoord.xy + offset.xy);
+struct VertexShaderOutput 
+{
+	float4 Position : POSITION0;
+	float2 texCoord : TEXCOORD0;
+};
+
+VertexShaderOutput MainVS(VertexShaderInput input)
+{
+	VertexShaderOutput output;
+	output.Position = float4(input.Position, 1);
+	output.texCoord = input.texCoord;
+	return output;
+}
+
+float4 MainPS(VertexShaderOutput input) : COLOR
+{
+
+	float4 noise = tex2D(noiseSampler, (input.texCoord.xy + noiseOffset.xy - mul(camMove, WorldViewProjection)) * noiseFrequency);
+	//float4 noise = tex2D(noiseSampler, (input.texCoord.xy + noiseOffset.xy) * noiseFrequency);
+    float2 offset = (noisePower * (noise.xy - 0.5f));
+
+	//float4 noise = tex2D(noiseSampler, input.texCoord.xy);
+	//float2 offset = noisePower * (noise.xy - 0.5f);
+
+    float4 color = tex2D(waterSampler, input.texCoord.xy + offset.xy);
     return color;
 }
+
 
 technique oceanRipple
 {
 	pass P0
 	{
+		VertexShader = compile VS_SHADERMODEL MainVS();
 		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
 };
