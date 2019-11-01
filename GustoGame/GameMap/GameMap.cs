@@ -277,10 +277,15 @@ namespace Gusto.GameMap
             // set up gamescene draw
             _graphics.SetRenderTarget(worldScene);
             _graphics.Clear(Color.PeachPuff);
+
+            // ocean
+            sbWorld.Begin();
+            sbWorld.Draw(ocean, Vector2.Zero, Color.White);
+            sbWorld.End();
+
             // draw the game scene
             sbWorld.Begin(_cam);
-            // ocean
-            sbWorld.Draw(ocean, new Vector2(_cam.Position.X - GameOptions.PrefferedBackBufferWidth/2, _cam.Position.Y - GameOptions.PrefferedBackBufferHeight / 2), Color.White);
+            //sbWorld.Draw(ocean, new Vector2(_cam.Position.X - GameOptions.PrefferedBackBufferWidth / 2, _cam.Position.Y - GameOptions.PrefferedBackBufferHeight / 2), Color.White);
             //land
             foreach (var t in BoundingBoxLocations.LandTileLocationList)
             {

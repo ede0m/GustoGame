@@ -445,16 +445,11 @@ namespace Gusto
             Vector2 currCamPos = camera.Position;
             Vector2 camDistance = currCamPos - startCamPos;
 
-            //camMove = currCamPos - lastCamPos;
-            //camMove.X = camMove.X / GameOptions.PrefferedBackBufferWidth;
-            //camMove.Y = camMove.Y / GameOptions.PrefferedBackBufferHeight;
-
-            //camMove.X = (camDistance.X / (GameOptions.PrefferedBackBufferWidth / 2));
-            //camMove.Y = (camDistance.Y / (GameOptions.PrefferedBackBufferHeight / 2));
-
             //camMove.X = ((camDistance.X / (GameOptions.PrefferedBackBufferWidth * GameOptions.GameMapWidthMult)));
             //camMove.Y = ((camDistance.Y / (GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult)));
 
+            camMove.X = ((currCamPos.X % GameOptions.PrefferedBackBufferWidth) / (GameOptions.PrefferedBackBufferWidth));
+            camMove.Y = ((currCamPos.Y % GameOptions.PrefferedBackBufferHeight) / (GameOptions.PrefferedBackBufferHeight));
 
             // update ground objects (they do not track their state since they are encoded in the map)
             foreach (var sp in BoundingBoxLocations.GroundObjectLocationList)

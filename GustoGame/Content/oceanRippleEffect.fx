@@ -11,7 +11,6 @@ float2 noiseOffset;
 float2 noisePower;
 float noiseFrequency;
 
-matrix WorldViewProjection;
 float4 camMove;
 
 texture noiseTexture;
@@ -38,7 +37,7 @@ sampler2D waterSampler = sampler_state
 
 struct VertexShaderInput
 {
-	float3 Position : POSITION0;
+	float4 Position : POSITION0;
 	float2 texCoord : TEXCOORD0;
 };
 
@@ -51,20 +50,15 @@ struct VertexShaderOutput
 VertexShaderOutput MainVS(VertexShaderInput input)
 {
 	VertexShaderOutput output;
-	output.Position = float4(input.Position, 1);
+	output.Position = input.Position;
 	output.texCoord = input.texCoord;
 	return output;
 }
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-
-	float4 noise = tex2D(noiseSampler, (input.texCoord.xy + noiseOffset.xy - mul(camMove, WorldViewProjection)) * noiseFrequency);
-	//float4 noise = tex2D(noiseSampler, (input.texCoord.xy + noiseOffset.xy) * noiseFrequency);
+	float4 noise = tex2D(noiseSampler, (input.texCoord.xy - noiseOffset.xy + camMove.xy) * noiseFrequency);
     float2 offset = (noisePower * (noise.xy - 0.5f));
-
-	//float4 noise = tex2D(noiseSampler, input.texCoord.xy);
-	//float2 offset = noisePower * (noise.xy - 0.5f);
 
     float4 color = tex2D(waterSampler, input.texCoord.xy + offset.xy);
     return color;

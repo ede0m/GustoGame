@@ -20,7 +20,7 @@ namespace GustoGame.GameMap
         RenderTarget2D oceanEffectRT;
 
         float noiseOffset = 0.0f;
-        float noiseFreq = 1.0f; // This has to stay here.. (0.9F) why this value??!
+        float noiseFreq = 1.0f;
         Vector2 noisePow = Vector2.Zero; // artistic param? 0.017f, 0.031f
 
         public OceanWater(ContentManager content, GraphicsDevice graphics)
@@ -31,16 +31,17 @@ namespace GustoGame.GameMap
 
             oceanEffectRT = new RenderTarget2D(_graphics, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            noiseMap = _content.Load<Texture2D>("fractal-tiled");
+            noiseMap = _content.Load<Texture2D>("cellnoise");
         }
 
         public RenderTarget2D RenderOcean(RenderTarget2D waterScene, Vector2 camMove, Matrix wvm)
         {
-            noisePow = new Vector2(0.01724f, 0.03125f) * 3; // 3 tile sample radius looks good
+            noisePow = new Vector2(0.031f, 0.03125f) * 3; // 3 tile sample radius looks good
+            //noisePow = new Vector2(0.12f, 0.06f);
             noiseFreq = 1.0f; 
             noiseOffset += 0.0002f;
 
-            oceanRippleEffect.Parameters["WorldViewProjection"].SetValue(wvm);
+            //oceanRippleEffect.Parameters["WorldViewProjection"].SetValue(wvm);
             oceanRippleEffect.Parameters["noiseOffset"].SetValue(noiseOffset);
             oceanRippleEffect.Parameters["noiseFrequency"].SetValue(noiseFreq);
             oceanRippleEffect.Parameters["camMove"].SetValue(camMove);
