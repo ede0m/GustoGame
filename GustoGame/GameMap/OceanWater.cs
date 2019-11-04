@@ -31,14 +31,15 @@ namespace GustoGame.GameMap
 
             oceanEffectRT = new RenderTarget2D(_graphics, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
             oceanRippleEffect = _content.Load<Effect>("oceanRippleEffect");
-            noiseMap = _content.Load<Texture2D>("cellnoise");
+            noiseMap = _content.Load<Texture2D>("cellnoise"); // bing noise good for wakes?
         }
 
         public RenderTarget2D RenderOcean(RenderTarget2D waterScene, Vector2 camMove, Matrix wvm)
         {
             noisePow = new Vector2(0.031f, 0.03125f) * 3; // 3 tile sample radius looks good
-            //noisePow = new Vector2(0.12f, 0.06f);
-            noiseFreq = 1.0f; 
+            noiseFreq = 1.0f;
+
+            // TODO set offset by location in map (ocean currents)
             noiseOffset += 0.0002f;
 
             //oceanRippleEffect.Parameters["WorldViewProjection"].SetValue(wvm);

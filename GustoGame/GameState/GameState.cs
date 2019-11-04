@@ -100,7 +100,7 @@ namespace Gusto
             //pistol.onGround = true;
             BaseCannon cannon = new BaseCannon(TeamType.A, "GustoMap", new Vector2(0, -450), _content, _graphics);
             cannon.onGround = true;
-            Ballista ballista = new Ballista(TeamType.A, "GustoMap", new Vector2(200, -300), _content, _graphics);
+            Ballista ballista = new Ballista(TeamType.A, "GustoMap", new Vector2(-120, -550), _content, _graphics);
             ballista.onGround = true;
             CrossBow crossBow = new CrossBow(TeamType.A, "GustoMap", new Vector2(220, -350), _content, _graphics);
             crossBow.amountStacked = 1;
@@ -114,7 +114,7 @@ namespace Gusto
             CannonBallItem cannonAmmo = new CannonBallItem(TeamType.A, "GustoMap", new Vector2(200, -300), _content, _graphics);
             cannonAmmo.amountStacked = 10;
             cannonAmmo.onGround = true;
-            RustyHarpoonItem harpoonAmmo = new RustyHarpoonItem(TeamType.A, "GustoMap", new Vector2(190, -330), _content, _graphics);
+            RustyHarpoonItem harpoonAmmo = new RustyHarpoonItem(TeamType.A, "GustoMap", new Vector2(-120, -550), _content, _graphics);
             harpoonAmmo.amountStacked = 10;
             harpoonAmmo.onGround = true;
             Lantern lantern = new Lantern(TeamType.A, "GustoMap", new Vector2(180, -300), _content, _graphics);

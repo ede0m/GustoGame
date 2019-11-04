@@ -58,7 +58,6 @@ namespace Gusto
         SpriteBatch spriteBatchStatic;
         Camera camera;
         Vector2 camMove;
-        Vector2 startCamPos;
         
         public GameGusto()
         {
@@ -348,13 +347,11 @@ namespace Gusto
             else if (startingMenu.selected == "new" && !gameState.ready)
             {
                 gameState.CreateNewGame();
-                startCamPos = gameState.player.location;
                 return;
             }
             else if (startingMenu.selected == "load" && !gameState.ready)
             {
                 gameState.LoadGameState();
-                startCamPos = gameState.player.location;
                 return;
             }
 
@@ -442,14 +439,8 @@ namespace Gusto
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);
 
             // use this to offset water noise
-            Vector2 currCamPos = camera.Position;
-            Vector2 camDistance = currCamPos - startCamPos;
-
-            //camMove.X = ((camDistance.X / (GameOptions.PrefferedBackBufferWidth * GameOptions.GameMapWidthMult)));
-            //camMove.Y = ((camDistance.Y / (GameOptions.PrefferedBackBufferHeight * GameOptions.GameMapHeightMult)));
-
-            camMove.X = ((currCamPos.X % GameOptions.PrefferedBackBufferWidth) / (GameOptions.PrefferedBackBufferWidth));
-            camMove.Y = ((currCamPos.Y % GameOptions.PrefferedBackBufferHeight) / (GameOptions.PrefferedBackBufferHeight));
+            camMove.X = ((camera.Position.X % GameOptions.PrefferedBackBufferWidth) / (GameOptions.PrefferedBackBufferWidth));
+            camMove.Y = ((camera.Position.Y % GameOptions.PrefferedBackBufferHeight) / (GameOptions.PrefferedBackBufferHeight));
 
             // update ground objects (they do not track their state since they are encoded in the map)
             foreach (var sp in BoundingBoxLocations.GroundObjectLocationList)
