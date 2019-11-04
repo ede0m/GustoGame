@@ -16,6 +16,7 @@ using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using System.Linq;
 using Gusto.Models.Types;
+using GustoGame.Utility;
 
 namespace Gusto
 {
@@ -617,6 +618,13 @@ namespace Gusto
                             showStorageMenu = true;
                             invStorage = storage;
                         }
+                    }
+
+                    if (sprite is IWakes)
+                    {
+                        IWakes waker = (IWakes)sprite;
+                        WakeParticleEngine wpe = waker.GetWakeEngine();
+                        wpe.Draw(spriteBatchView, camera);
                     }
 
                     if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))

@@ -235,18 +235,6 @@
 /processorParam:TextureFormat=Color
 /build:cellnoise.png
 
-#begin cellnoise.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:cellnoise.png
-
 #begin Chicken.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -282,6 +270,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ChiliPepper.png
+
+#begin circle_particle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:circle_particle.png
 
 #begin coal.png
 /importer:TextureImporter
@@ -342,6 +342,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:DecomposedBaseSail.png
+
+#begin diamond_particle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:diamond_particle.png
 
 #begin DirtInterior.png
 /importer:TextureImporter
@@ -637,18 +649,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:NextShipSpriteSheetRevised.png
-
-#begin noise3-tiled.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:noise3-tiled.png
 
 #begin noise3-tiled.png
 /importer:TextureImporter
@@ -1123,6 +1123,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:SpoiledMeat.png
+
+#begin star_particle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:star_particle.png
 
 #begin TeePee.png
 /importer:TextureImporter

@@ -1,10 +1,7 @@
 ﻿using Comora;
-using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.GameMap;
 using Gusto.Mappings;
-using Gusto.Models.Animated;
-using Gusto.Models.Menus;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using Microsoft.Xna.Framework;
@@ -15,12 +12,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Models.Types;
+using GustoGame.Utility;
 
 namespace Gusto.Models.Animated
 {
-    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster, IHasInterior
+    public class Ship : Sprite, IShip, IVulnerable, ICanUpdate, IShadowCaster, IHasInterior, IWakes
     {
         private ContentManager _content;
         private GraphicsDevice _graphics;
@@ -69,13 +66,15 @@ namespace Gusto.Models.Animated
         public bool playerAboard;
         public bool playerInInterior;
 
+        public TeamType teamType;
         bool roaming;
         bool following;
+
         List<TilePiece> currentPath;
         TilePiece currMapCordTile; // used here and not in npcs because npcs can get this value from land tile collision. Ocean tiles are not run through collision because there are so many.
-
-        public TeamType teamType;
         public Sprite randomRoamTile;
+
+        private WakeParticleEngine wake;
         public Sail shipSail { get; set; }
 
         public ShipMount mountedOnShip;
@@ -91,6 +90,8 @@ namespace Gusto.Models.Animated
             _content = content;
             _graphics = graphics;
 
+            timeShowingHealthBar = 0;
+
             // anchor feat init
             percentNotAnchored = 1;
             meterFull = new Texture2D(_graphics, 1, 1);
@@ -103,9 +104,9 @@ namespace Gusto.Models.Animated
             meterAlive.SetData<Color>(new Color[] { Color.DarkKhaki });
             meterDead.SetData<Color>(new Color[] { Color.IndianRed });
 
-            shipId = Guid.NewGuid();
+            wake = new WakeParticleEngine(content, location);
 
-            timeShowingHealthBar = 0;
+            shipId = Guid.NewGuid();
         }
 
         // Ship collision handler
@@ -223,8 +224,13 @@ namespace Gusto.Models.Animated
                 Tuple<float, float> bonus = SetSailBonusMovement(ShipMovementVectorMapping.ShipDirectionVectorValues, windDir, windSp, shipSail.sailSpeed, shipSail.sailIsRightColumn, shipSail.sailIsLeftColumn);
                 currentShipSpeed = new Vector2((ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored,
                     (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored);
-                location.X += currentShipSpeed.X;
-                location.Y += currentShipSpeed.Y;
+                location += currentShipSpeed;
+
+                // wake particles
+                wake.EmitterLocation = new Vector2(location.X + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item1,
+                    location.Y + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item2); ;
+                wake.Update();
+                
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
             else
@@ -684,6 +690,11 @@ namespace Gusto.Models.Animated
         public void SetInteriorForId(Guid id)
         {
             shipId = id;
+        }
+
+        public WakeParticleEngine GetWakeEngine()
+        {
+            return wake;
         }
     }
 }
