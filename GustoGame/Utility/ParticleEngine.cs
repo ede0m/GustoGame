@@ -43,7 +43,7 @@ namespace GustoGame.Utility
             TTL--;
             Position += Velocity;
             Angle += AngularVelocity;
-            Transparency = Math.Min((float)TTL / (float)LifeTime, 0.3f);
+            Transparency = Math.Min((float)TTL / (float)LifeTime, 0.2f);
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -77,12 +77,12 @@ namespace GustoGame.Utility
             random = new Random();
         }
 
-        private Particle GenerateNewParticle(Vector2 velocity)
+        private Particle GenerateNewParticle(Vector2 velocity, int displacement)
         {
             Texture2D texture = textures[random.Next(textures.Count)];
             Vector2 position = EmitterLocation;
-            position.X += random.Next(-8, 8);
-            position.Y += random.Next(-8, 8);
+            position.X += random.Next(-displacement, displacement);
+            position.Y += random.Next(-displacement, displacement);
 
             Vector2 velocityInvert = velocity * -1;
             float randomAngleOffset = (float)random.NextDouble() * 15;
@@ -97,18 +97,20 @@ namespace GustoGame.Utility
             float size = (float)random.NextDouble();
             int ttl = 20 + random.Next(40);
 
-            return new Particle(texture, position, finalVelocity, angle, angularVelocity, Color.White, 0.3f, size, ttl);
+            return new Particle(texture, position, finalVelocity, angle, angularVelocity, Color.White, 0.2f, size, ttl);
         }
 
-        public void Update(Vector2 velocity)
+        public void Update(Vector2 velocity, string bbKey)
         {
-            int total = 5;
+            int displacement = WakeModelParameters[bbKey]["wakeDisplacement"];
+            int maxParticle = WakeModelParameters[bbKey]["maxParticle"];
 
+            int total = maxParticle;
             if (Math.Abs(velocity.X) > 0.7f || Math.Abs(velocity.Y) > 0.7f)
-                total = 7;
+                total = maxParticle + 1;
 
             for (int i = 0; i < total; i++)
-                particles.Add(GenerateNewParticle(velocity));
+                particles.Add(GenerateNewParticle(velocity, displacement));
 
             for (int particle = 0; particle < particles.Count; particle++)
             {
@@ -130,5 +132,22 @@ namespace GustoGame.Utility
             }
             spriteBatch.End();
         }
+
+        private static Dictionary<string, Dictionary<string, int>> WakeModelParameters = new Dictionary<string, Dictionary<string, int>>()
+        {
+            {"baseShip", new Dictionary<string, int>
+                {
+                    { "wakeDisplacement", 12},
+                    { "maxParticle", 5},
+                }
+            },
+            {"shortShip", new Dictionary<string, int>
+                {
+                    { "wakeDisplacement", 8},
+                    { "maxParticle", 5},
+                }
+            },
+        };
+
     }
 }

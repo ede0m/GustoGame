@@ -281,14 +281,14 @@ namespace Gusto.Mappings
         {
             {"baseShip", new Dictionary<int, Tuple<int, int>>
                 {
-                    {0, new Tuple<int, int>(0, 55)},
-                    {1, new Tuple<int, int>(25, 35)},
-                    {2, new Tuple<int, int>(75, 10)},
-                    {3, new Tuple<int, int>(40, -15)},
-                    {4, new Tuple<int, int>(0, -55)},
-                    {5, new Tuple<int, int>(-55, -20)},
-                    {6, new Tuple<int, int>(-75, 10)},
-                    {7, new Tuple<int, int>(-20, 35)},
+                    {0, new Tuple<int, int>(0, 75)},
+                    {1, new Tuple<int, int>(30, 65)},
+                    {2, new Tuple<int, int>(75, 30)},
+                    {3, new Tuple<int, int>(70, -10)},
+                    {4, new Tuple<int, int>(0, -75)},
+                    {5, new Tuple<int, int>(-70, -10)},
+                    {6, new Tuple<int, int>(-75, 30)},
+                    {7, new Tuple<int, int>(-30, 65)},
                 }
             },
             {"shortShip", new Dictionary<int, Tuple<int, int>>
@@ -304,6 +304,5 @@ namespace Gusto.Mappings
                 }
             },
         };
-
     }
 }
