@@ -20,9 +20,11 @@ namespace GustoGame.Utility
         public Color Color { get; set; }            // The color of the particle
         public float Size { get; set; }                // The size of the particle
         public int TTL { get; set; }                // The 'time to live' of the particle
+        public int LifeTime { get; set; }
+        public float Transparency { get; set; }     // the transparancey for fade out
 
         public Particle(Texture2D texture, Vector2 position, Vector2 velocity,
-            float angle, float angularVelocity, Color color, float size, int ttl)
+            float angle, float angularVelocity, Color color, float transparency, float size, int ttl)
         {
             Texture = texture;
             Position = position;
@@ -30,8 +32,10 @@ namespace GustoGame.Utility
             Angle = angle;
             AngularVelocity = angularVelocity;
             Color = color;
+            Transparency = transparency;
             Size = size;
             TTL = ttl;
+            LifeTime = ttl;
         }
 
         public void Update()
@@ -39,6 +43,7 @@ namespace GustoGame.Utility
             TTL--;
             Position += Velocity;
             Angle += AngularVelocity;
+            Transparency = Math.Min((float)TTL / (float)LifeTime, 0.3f);
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -46,7 +51,7 @@ namespace GustoGame.Utility
             Rectangle sourceRectangle = new Rectangle(0, 0, Texture.Width, Texture.Height);
             Vector2 origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
 
-            spriteBatch.Draw(Texture, Position, sourceRectangle, Color,
+            spriteBatch.Draw(Texture, Position, sourceRectangle, Color * Transparency,
                 Angle, origin, Size, SpriteEffects.None, 0f);
         }
     }
@@ -62,20 +67,27 @@ namespace GustoGame.Utility
         {
             EmitterLocation = location;
             textures = new List<Texture2D>();
-            textures.Add(content.Load<Texture2D>("circle_particle"));
-            textures.Add(content.Load<Texture2D>("star_particle"));
-            textures.Add(content.Load<Texture2D>("diamond_particle"));
+            //textures.Add(content.Load<Texture2D>("circle_particle"));
+            //textures.Add(content.Load<Texture2D>("star_particle"));
+            //textures.Add(content.Load<Texture2D>("diamond_particle"));
+            textures.Add(content.Load<Texture2D>("Particle1"));
+            textures.Add(content.Load<Texture2D>("Particle2"));
+            textures.Add(content.Load<Texture2D>("Particle3"));
             this.particles = new List<Particle>();
             random = new Random();
         }
 
-        private Particle GenerateNewParticle()
+        private Particle GenerateNewParticle(Vector2 velocity)
         {
             Texture2D texture = textures[random.Next(textures.Count)];
             Vector2 position = EmitterLocation;
-            Vector2 velocity = new Vector2(
-                    1f * (float)(random.NextDouble() * 2 - 1),
-                    1f * (float)(random.NextDouble() * 2 - 1));
+            position.X += random.Next(-8, 8);
+            position.Y += random.Next(-8, 8);
+
+            Vector2 velocityInvert = velocity * -1;
+            float randomAngleOffset = (float)random.NextDouble() * 15;
+            Vector2 finalVelocity = Vector2.Transform(velocityInvert, Matrix.CreateRotationX(randomAngleOffset));
+
             float angle = 0;
             float angularVelocity = 0.1f * (float)(random.NextDouble() * 2 - 1);
             Color color = new Color(
@@ -85,17 +97,18 @@ namespace GustoGame.Utility
             float size = (float)random.NextDouble();
             int ttl = 20 + random.Next(40);
 
-            return new Particle(texture, position, velocity, angle, angularVelocity, color, size, ttl);
+            return new Particle(texture, position, finalVelocity, angle, angularVelocity, Color.White, 0.3f, size, ttl);
         }
 
-        public void Update()
+        public void Update(Vector2 velocity)
         {
-            int total = 10;
+            int total = 5;
+
+            if (Math.Abs(velocity.X) > 0.7f || Math.Abs(velocity.Y) > 0.7f)
+                total = 7;
 
             for (int i = 0; i < total; i++)
-            {
-                particles.Add(GenerateNewParticle());
-            }
+                particles.Add(GenerateNewParticle(velocity));
 
             for (int particle = 0; particle < particles.Count; particle++)
             {

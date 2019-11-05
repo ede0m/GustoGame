@@ -229,7 +229,7 @@ namespace Gusto.Models.Animated
                 // wake particles
                 wake.EmitterLocation = new Vector2(location.X + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item1,
                     location.Y + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item2); ;
-                wake.Update();
+                wake.Update(currentShipSpeed);
                 
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
