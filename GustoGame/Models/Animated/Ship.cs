@@ -74,7 +74,7 @@ namespace Gusto.Models.Animated
         TilePiece currMapCordTile; // used here and not in npcs because npcs can get this value from land tile collision. Ocean tiles are not run through collision because there are so many.
         public Sprite randomRoamTile;
 
-        private WakeParticleEngine wake;
+        public WakeParticleEngine wake;
         public Sail shipSail { get; set; }
 
         public ShipMount mountedOnShip;
@@ -229,7 +229,7 @@ namespace Gusto.Models.Animated
                 // wake particles
                 wake.EmitterLocation = new Vector2(location.X + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item1,
                     location.Y + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item2); ;
-                wake.Update(currentShipSpeed, bbKey);
+                wake.Update(currentShipSpeed);
                 
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }

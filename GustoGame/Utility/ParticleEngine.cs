@@ -58,8 +58,11 @@ namespace GustoGame.Utility
 
     public class WakeParticleEngine
     {
-        private Random random;
         public Vector2 EmitterLocation { get; set; }
+        public int WakeDisplacement { get; set; }
+        public int MaxParticle { get; set; }
+
+        private Random random;
         private List<Particle> particles;
         private List<Texture2D> textures;
 
@@ -75,6 +78,10 @@ namespace GustoGame.Utility
             textures.Add(content.Load<Texture2D>("Particle3"));
             this.particles = new List<Particle>();
             random = new Random();
+
+            // defaults
+            WakeDisplacement = 8;
+            MaxParticle = 5;
         }
 
         private Particle GenerateNewParticle(Vector2 velocity, int displacement)
@@ -100,17 +107,14 @@ namespace GustoGame.Utility
             return new Particle(texture, position, finalVelocity, angle, angularVelocity, Color.White, 0.2f, size, ttl);
         }
 
-        public void Update(Vector2 velocity, string bbKey)
+        public void Update(Vector2 velocity)
         {
-            int displacement = WakeModelParameters[bbKey]["wakeDisplacement"];
-            int maxParticle = WakeModelParameters[bbKey]["maxParticle"];
-
-            int total = maxParticle;
+            int total = MaxParticle;
             if (Math.Abs(velocity.X) > 0.7f || Math.Abs(velocity.Y) > 0.7f)
-                total = maxParticle + 1;
+                total = MaxParticle + 1;
 
             for (int i = 0; i < total; i++)
-                particles.Add(GenerateNewParticle(velocity, displacement));
+                particles.Add(GenerateNewParticle(velocity, WakeDisplacement));
 
             for (int particle = 0; particle < particles.Count; particle++)
             {
@@ -132,22 +136,6 @@ namespace GustoGame.Utility
             }
             spriteBatch.End();
         }
-
-        private static Dictionary<string, Dictionary<string, int>> WakeModelParameters = new Dictionary<string, Dictionary<string, int>>()
-        {
-            {"baseShip", new Dictionary<string, int>
-                {
-                    { "wakeDisplacement", 12},
-                    { "maxParticle", 5},
-                }
-            },
-            {"shortShip", new Dictionary<string, int>
-                {
-                    { "wakeDisplacement", 8},
-                    { "maxParticle", 5},
-                }
-            },
-        };
 
     }
 }

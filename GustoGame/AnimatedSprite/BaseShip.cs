@@ -76,6 +76,10 @@ namespace Gusto.AnimatedSprite
                 }
             }
 
+            // set wake
+            wake.MaxParticle = 5;
+            wake.WakeDisplacement = 13;
+
             SetSpriteAsset(baseShipAsset, location);
         }
     }
