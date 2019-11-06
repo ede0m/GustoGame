@@ -107,14 +107,17 @@ namespace GustoGame.Utility
             return new Particle(texture, position, finalVelocity, angle, angularVelocity, Color.White, 0.2f, size, ttl);
         }
 
-        public void Update(Vector2 velocity)
+        public void Update(Vector2 velocity, bool createWake)
         {
             int total = MaxParticle;
             if (Math.Abs(velocity.X) > 0.7f || Math.Abs(velocity.Y) > 0.7f)
                 total = MaxParticle + 1;
 
-            for (int i = 0; i < total; i++)
-                particles.Add(GenerateNewParticle(velocity, WakeDisplacement));
+            if (createWake)
+            {
+                for (int i = 0; i < total; i++)
+                    particles.Add(GenerateNewParticle(velocity, WakeDisplacement));
+            }
 
             for (int particle = 0; particle < particles.Count; particle++)
             {

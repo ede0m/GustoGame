@@ -551,7 +551,7 @@ namespace Gusto
                 }
                 spriteBatchView.End();
 
-                // draw shadows
+                // draw shadows and wakes
                 foreach (var sprite in DrawOrder)
                 {
                     if (sprite is IShadowCaster)
@@ -562,6 +562,13 @@ namespace Gusto
                             Ship ship = (Ship)sprite;
                             ship.shipSail.DrawShadow(spriteBatchView, this.camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
                         }
+                    }
+
+                    if (sprite is IWakes)
+                    {
+                        IWakes waker = (IWakes)sprite;
+                        WakeParticleEngine wpe = waker.GetWakeEngine();
+                        wpe.Draw(spriteBatchView, camera);
                     }
                 }
 
@@ -618,13 +625,6 @@ namespace Gusto
                             showStorageMenu = true;
                             invStorage = storage;
                         }
-                    }
-
-                    if (sprite is IWakes)
-                    {
-                        IWakes waker = (IWakes)sprite;
-                        WakeParticleEngine wpe = waker.GetWakeEngine();
-                        wpe.Draw(spriteBatchView, camera);
                     }
 
                     if (sprite.GetType().BaseType == typeof(Gusto.Models.Animated.Ship))

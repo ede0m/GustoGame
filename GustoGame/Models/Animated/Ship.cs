@@ -225,18 +225,17 @@ namespace Gusto.Models.Animated
                 currentShipSpeed = new Vector2((ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item1 + bonus.Item1) * percentNotAnchored,
                     (ShipMovementVectorMapping.ShipDirectionVectorValues[currRowFrame].Item2 + bonus.Item2) * percentNotAnchored);
                 location += currentShipSpeed;
-
-                // wake particles
-                wake.EmitterLocation = new Vector2(location.X + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item1,
-                    location.Y + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item2); ;
-                wake.Update(currentShipSpeed);
-                
                 //Trace.WriteLine("X: " + location.X.ToString() + "\nY: " + location.Y.ToString() + "\n");
             }
             else
             {
                 currentShipSpeed = Vector2.Zero;
             }
+
+            // wake particles
+            wake.EmitterLocation = new Vector2(location.X + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item1,
+                location.Y + ShipMountTextureCoordinates.BackOfShipCords[bbKey][currRowFrame].Item2);
+            wake.Update(currentShipSpeed, moving);
             shipInterior.speed = currentShipSpeed;
 
             // set the sail and cannon offsets here (equal to ship location plus the offset on the texture to hit the mount)
