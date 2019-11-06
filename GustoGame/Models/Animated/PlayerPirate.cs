@@ -2,7 +2,6 @@
 using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Mappings;
-using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
 using Gusto.Utility;
 using GustoGame.Mappings;
@@ -14,8 +13,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Gusto.Models.Animated
 {
@@ -423,7 +421,8 @@ namespace Gusto.Models.Animated
                     timeSinceLastWalkFrame = 0;
                 }
 
-                currentSpeed = new Vector2(PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1, PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2);
+                currentSpeed = new Vector2(PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1, 
+                    PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2);
 
                 // actual "regular" movement
                 location += currentSpeed;
