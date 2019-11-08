@@ -109,7 +109,7 @@ namespace Gusto.Models.Animated
                 startAimLine = GetBoundingBox().Center.ToVector2();
 
                 Vector2 mousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                Vector2 clickPos = mousePos - new Vector2(GameOptions.PrefferedBackBufferWidth/2, GameOptions.PrefferedBackBufferHeight/2)+ camera.Position;
+                Vector2 clickPos = mousePos - new Vector2(GameOptions.PrefferedBackBufferWidth/2, GameOptions.PrefferedBackBufferHeight/2) + camera.Position;
                 Vector2 reloadSpot = new Vector2(((1 - percentReloaded) * startAimLine.X + (percentReloaded * clickPos.X)), ((1 - percentReloaded) * startAimLine.Y + (percentReloaded * clickPos.Y)));
 
                 var lineDistanceFull = PhysicsUtility.VectorMagnitude(clickPos.X, startAimLine.X, clickPos.Y, startAimLine.Y);

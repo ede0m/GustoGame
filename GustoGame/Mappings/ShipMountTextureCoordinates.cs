@@ -277,5 +277,32 @@ namespace Gusto.Mappings
             },
         };
 
+        public static Dictionary<string, Dictionary<int, Tuple<int, int>>> BackOfShipCords = new Dictionary<string, Dictionary<int, Tuple<int, int>>>
+        {
+            {"baseShip", new Dictionary<int, Tuple<int, int>>
+                {
+                    {0, new Tuple<int, int>(0, 75)},
+                    {1, new Tuple<int, int>(30, 65)},
+                    {2, new Tuple<int, int>(75, 30)},
+                    {3, new Tuple<int, int>(70, -10)},
+                    {4, new Tuple<int, int>(0, -75)},
+                    {5, new Tuple<int, int>(-70, -10)},
+                    {6, new Tuple<int, int>(-75, 30)},
+                    {7, new Tuple<int, int>(-30, 65)},
+                }
+            },
+            {"shortShip", new Dictionary<int, Tuple<int, int>>
+                {
+                    {0, new Tuple<int, int>(0, 65)},
+                    {1, new Tuple<int, int>(30, 25)},
+                    {2, new Tuple<int, int>(45, 10)},
+                    {3, new Tuple<int, int>(45, -15)},
+                    {4, new Tuple<int, int>(0, -65)},
+                    {5, new Tuple<int, int>(-45, -20)},
+                    {6, new Tuple<int, int>(-45, 10)},
+                    {7, new Tuple<int, int>(-30, 25)},
+                }
+            },
+        };
     }
 }

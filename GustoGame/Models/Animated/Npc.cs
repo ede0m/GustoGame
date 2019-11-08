@@ -1,10 +1,10 @@
 ﻿using Comora;
-using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Models.Interfaces;
 using Gusto.Models.Types;
 using Gusto.Utility;
 using GustoGame.Mappings;
+using GustoGame.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,12 +12,10 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gusto.Models.Animated
 {
-    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, INPC
+    public class Npc : Sprite, IWalks, IVulnerable, ICanUpdate, IShadowCaster, INPC, IWakes
     {
         float timeSinceLastTurnFrame;
         float timeSinceLastWalkFrame;
@@ -47,6 +45,7 @@ namespace Gusto.Models.Animated
 
         public Sprite randomRegionRoamTile;
         List<TilePiece> currentPath;
+        public WakeParticleEngine wake;
         public bool roaming;
         public bool swimming;
         public bool flying;
@@ -57,6 +56,7 @@ namespace Gusto.Models.Animated
         public bool idle;
         int directionalFrame; // sprite doesn't have frames for diagnoal, but we still want to use 8 directional movements. So we use dirFrame instead of rowFrame for direction vector values
 
+        public Vector2 currentSpeed;
         public List<InventoryItem> inventory;
         public Interior npcInInterior;
         public ActionState actionState;
@@ -77,6 +77,8 @@ namespace Gusto.Models.Animated
             meterDead.SetData<Color>(new Color[] { Color.IndianRed });
 
             timeShowingHealthBar = 0;
+
+            wake = new WakeParticleEngine(content, location);
         }
 
         public override void HandleCollision(Sprite collidedWith, Rectangle overlap)
@@ -168,12 +170,11 @@ namespace Gusto.Models.Animated
             if (colliding)
                 moving = false;
 
-
-            //UpdateNpcMovement(teamType, gameTime);
-
             UpdateNpcActionMovement(gameTime);
 
-
+            // update any water wake
+            wake.EmitterLocation = location;
+            wake.Update(currentSpeed, (swimming && moving));
 
             colliding = false;
             if (!(this is IFlying))
@@ -292,8 +293,9 @@ namespace Gusto.Models.Animated
             if (moving && !dying)
             {
                 // actual "regular" movement
-                location.X += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.5f);
-                location.Y += (PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.5f);
+                currentSpeed = new Vector2(PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item1 * 0.8f,
+                    PlayerMovementVectorMappings.PlayerDirectionVectorValues[directionalFrame].Item2 * 0.8f);
+                location += currentSpeed;
             } 
 
         }
@@ -495,6 +497,11 @@ namespace Gusto.Models.Animated
         public bool GetSwimming()
         {
             return swimming;
+        }
+
+        public WakeParticleEngine GetWakeEngine()
+        {
+            return wake;
         }
     }
 }

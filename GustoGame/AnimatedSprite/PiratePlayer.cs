@@ -34,7 +34,13 @@ namespace Gusto.AnimatedSprite
 
             // Temporary??
             inHand = new BaseSword(team, region, location, content, graphics);
+
+            // set wake
+            wake.MaxParticle = 3;
+            wake.WakeDisplacement = 3;
+
             SetSpriteAsset(playerPirateAsset, location);
+
         }
     }
 

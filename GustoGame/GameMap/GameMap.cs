@@ -16,6 +16,7 @@ using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Models.Animated;
 using Gusto.Models.Interfaces;
+using GustoGame.GameMap;
 
 namespace Gusto.GameMap
 {
@@ -39,10 +40,13 @@ namespace Gusto.GameMap
         private int _rows;
 
         private Dictionary<string, List<Sprite>> _regionMap = new Dictionary<string, List<Sprite>>();
-        private JObject _mapData;
 
         int tileHeight = GameOptions.tileHeight;
         int tileWidth = GameOptions.tileWidth;
+
+        OceanWater oceanWater;
+        RenderTarget2D waterScene;
+
         Vector2 startMapPoint;
 
         public TileGameMap(Camera camera)
@@ -61,10 +65,34 @@ namespace Gusto.GameMap
             _cam = camera;
         }
 
-        public void SetGameMap(ContentManager content, GraphicsDevice graphics)
+        public void SetGameMap(ContentManager content, GraphicsDevice graphics, SpriteBatch sb, JObject mapData)
         {
             _content = content;
             _graphics = graphics;
+
+            oceanWater = new OceanWater(_content, _graphics);
+            // set water render target
+            waterScene = new RenderTarget2D(_graphics, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
+            /*_graphics.SetRenderTarget(waterScene);
+            _graphics.Clear(Color.CornflowerBlue);
+            int vpCols = GameOptions.PrefferedBackBufferWidth / GameOptions.tileWidth;
+            int vpRows = GameOptions.PrefferedBackBufferHeight / GameOptions.tileHeight;
+            sb.Begin(_cam, SpriteSortMode.Texture);
+            Vector2 pos = new Vector2(0, 0);
+            for (int i = 0; i < vpRows; i++)
+            {
+                for (int j = 0; j < vpCols; j++)
+                {
+                    TilePiece tile = new OceanTile(0, null, null, pos, "GustoGame", content, graphics, "o1");
+                    tile.transparency = 0.6f;
+                    tile.SetTileDesignRow(RandomEvents.rand.Next(0, tile.nRows));
+                    tile.DrawTile(sb, false);
+                    pos.X += GameOptions.tileWidth;
+                }
+                pos.Y += GameOptions.tileWidth;
+            }
+            sb.End();
+            _graphics.SetRenderTarget(null);*/
 
             var worldLoc = startMapPoint;
             int index = 0;
@@ -74,7 +102,7 @@ namespace Gusto.GameMap
                 {
                     TilePiece tile = null;
                     List<Sprite> groundObjects = null;
-                    JObject tileDetails = _mapData[index.ToString()].Value<JObject>();
+                    JObject tileDetails = mapData[index.ToString()].Value<JObject>();
 
                     // region
                     string regionName = (string)tileDetails["regionName"];
@@ -108,7 +136,15 @@ namespace Gusto.GameMap
                             break;
                         case "o2":
                             tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "o2");
-                            tile.transparency = 0.6f;
+                            tile.transparency = 0.7f;
+                            AIUtility.OceanPathWeights[i, j] = 0;
+                            AIUtility.LandPathWeights[i, j] = 1;
+                            AIUtility.AllPathWeights[i, j] = 1;
+                            //BoundingBoxLocations.RegionMap[regionName].RegionOceanTiles.Add(tile); omit these since they cause no path found in A*
+                            break;
+                        case "oD":
+                            tile = new OceanTile(index, new Point(i, j), groundObjects, worldLoc, regionName, content, graphics, "oD");
+                            tile.transparency = 0.7f;
                             AIUtility.OceanPathWeights[i, j] = 0;
                             AIUtility.LandPathWeights[i, j] = 1;
                             AIUtility.AllPathWeights[i, j] = 1;
@@ -207,31 +243,61 @@ namespace Gusto.GameMap
             return groundObjs;
         }
 
-        public void DrawMap(SpriteBatch sb, GameTime gameTime)
+        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, RenderTarget2D worldScene)
         {
-            OceanTile shoreOceanTile = new OceanTile(0, null, null, Vector2.Zero, "GustoGame", _content, _graphics, "o2");
-            shoreOceanTile.transparency = 0.6f;
-            Vector2 minCorner = new Vector2(_cam.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
-            Vector2 maxCorner = new Vector2(_cam.Position.X + (GameOptions.PrefferedBackBufferWidth / 2), _cam.Position.Y + (GameOptions.PrefferedBackBufferHeight / 2));
 
-            sb.Begin(_cam);
-            foreach (var tile in BoundingBoxLocations.TilesInView)
+            // Set Ocean Water RenderTarget
+            _graphics.SetRenderTarget(waterScene);
+            _graphics.Clear(Color.PeachPuff);
+            sbWorld.Begin(_cam);
+            foreach (var tile in BoundingBoxLocations.TilesInView) // can switch to TilesInView 
             {
-                // draw water under shore pieces so transparent backbuffer doesn't show through
-                if (tile.shorePiece)
+                if (tile.bbKey.Equals("landTile"))
                 {
-                    shoreOceanTile.location = tile.location;
-                    shoreOceanTile.DrawTile(sb);
+                    OceanTile oTile = new OceanTile(0, null, null, tile.location, "GustoGame", _content, _graphics, "o2");
+                    oTile.transparency = 0.7f;
+                    //oTile.SetTileDesignRow(RandomEvents.rand.Next(0, oTile.nRows));
+                    oTile.DrawTile(sbWorld, true);
                 }
-
-                tile.DrawTile(sb);
+                else
+                    tile.DrawTile(sbWorld, true); 
             }
-            sb.End();
-        }
+            sbWorld.End();
 
-        public void LoadMapData(JObject data)
-        {
-            _mapData = data;
+            /*if (!File.Exists("C:\\Users\\GMON\\source\\repos\\GustoGame\\GustoGame\\Content\\waterScene.png") && BoundingBoxLocations.TilesInView.Count > 0)
+            {
+                Stream s = File.Create("C:\\Users\\GMON\\source\\repos\\GustoGame\\GustoGame\\Content\\waterScene.png");
+                waterScene.SaveAsPng(s, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
+            }*/
+
+
+            // ocean effect
+            Vector2 camMove;
+            camMove.X = ((_cam.Position.X % GameOptions.PrefferedBackBufferWidth) / (GameOptions.PrefferedBackBufferWidth));
+            camMove.Y = ((_cam.Position.Y % GameOptions.PrefferedBackBufferHeight) / (GameOptions.PrefferedBackBufferHeight));
+            RenderTarget2D ocean = oceanWater.RenderOcean(waterScene, camMove);
+
+            // set up gamescene draw
+            _graphics.SetRenderTarget(worldScene);
+            _graphics.Clear(Color.PeachPuff);
+
+            // ocean
+            sbWorld.Begin();
+            sbWorld.Draw(ocean, Vector2.Zero, Color.White);
+            sbWorld.End();
+
+            // draw the game scene
+            sbWorld.Begin(_cam);
+            //sbWorld.Draw(ocean, new Vector2(_cam.Position.X - GameOptions.PrefferedBackBufferWidth / 2, _cam.Position.Y - GameOptions.PrefferedBackBufferHeight / 2), Color.White);
+            //land
+            foreach (var t in BoundingBoxLocations.LandTileLocationList)
+            {
+                TilePiece tile = (TilePiece)t;
+                tile.DrawTile(sbWorld, true);
+            }
+            sbWorld.End();
+            
+
         }
 
     }

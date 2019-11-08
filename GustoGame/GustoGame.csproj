@@ -111,6 +111,8 @@
     <Compile Include="AnimatedSprite\Animals\Snake.cs" />
     <Compile Include="AnimatedSprite\ShortSail.cs" />
     <Compile Include="AnimatedSprite\ShortShip.cs" />
+    <Compile Include="GameMap\OceanWater.cs" />
+    <Compile Include="Models\Interfaces\IWakes.cs" />
     <Compile Include="Models\Types\NPCActionState.cs" />
     <Compile Include="Models\Types\PathType.cs" />
     <Compile Include="Models\Types\TeamType.cs" />
@@ -214,7 +216,9 @@
     <Compile Include="Utility\DrawUtility.cs" />
     <Compile Include="Utility\FrameCounter.cs" />
     <Compile Include="Utility\ItemUtility.cs" />
+    <Compile Include="Utility\ParticleEngine.cs" />
     <Compile Include="Utility\PhysicsUtility.cs" />
+    <Compile Include="Utility\QuadRenderer.cs" />
     <Compile Include="Utility\RandomEvents.cs" />
     <Compile Include="Utility\TextureUtility.cs" />
   </ItemGroup>

@@ -27,6 +27,7 @@ namespace Gusto.Bounding
 
         public static List<TilePiece> TilesInView = new List<TilePiece>();
         public static HashSet<Sprite> LandTileLocationList = new HashSet<Sprite>(); // TODO: update to TilePiece
+        public static HashSet<Sprite> OceanTileLocationList = new HashSet<Sprite>(); // TODO: update to TilePiece
         public static HashSet<TilePiece> InteriorTileList = new HashSet<TilePiece>(); // Tiles for the interior that the player is in
         public static HashSet<Sprite> GroundObjectLocationList = new HashSet<Sprite>(); // World ground objects
         public static HashSet<Light> WorldLightLocationList = new HashSet<Light>(); // world light list

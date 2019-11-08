@@ -1,25 +1,22 @@
 ﻿using Comora;
-using Gusto.AnimatedSprite;
 using Gusto.Bounding;
 using Gusto.Bounds;
 using Gusto.Models;
 using Gusto.Models.Interfaces;
 using Gusto.GameMap;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using Gusto.AnimatedSprite.InventoryItems;
 using Gusto.Utility;
 using Gusto.Models.Menus;
 using Gusto.Models.Animated;
 using System.Linq;
 using Gusto.Models.Types;
+using GustoGame.Utility;
 
 namespace Gusto
 {
@@ -61,6 +58,7 @@ namespace Gusto
         SpriteBatch spriteBatchView;
         SpriteBatch spriteBatchStatic;
         Camera camera;
+        Vector2 camMove;
         
         public GameGusto()
         {
@@ -101,9 +99,6 @@ namespace Gusto
         /// </summary>
         protected override void LoadContent()
         {
-
-            mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
-            map.LoadMapData(mapData);
 
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatchView = new SpriteBatch(GraphicsDevice);
@@ -183,7 +178,7 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 1, 6, textureCampFire, "campFire", 0.3f, 1.0f);
 
             // Tile Pieces, Ground Objects and Invetory Items
-            Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1");
+            Texture2D textureOcean1 = Content.Load<Texture2D>("Ocean1v3");
             LoadDynamicBoundingBoxPerFrame(false, 4, 1, textureOcean1, "oceanTile", 1.0f, 1.0f);
             Texture2D textureLand1 = Content.Load<Texture2D>("Land1HolesShore");
             LoadDynamicBoundingBoxPerFrame(false, 9, 4, textureLand1, "landTile", 1.0f, 1.0f);
@@ -259,7 +254,8 @@ namespace Gusto
             gameState = new GameState(Content, GraphicsDevice);
 
             // Game Map
-            map.SetGameMap(Content, GraphicsDevice);
+            mapData = JObject.Parse(File.ReadAllText(@"C:\Users\GMON\source\repos\GustoGame\GustoGame\Content\gamemap.json"));
+            map.SetGameMap(Content, GraphicsDevice, spriteBatchView, mapData);
             BuildRegionTree();
 
             var screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
@@ -379,6 +375,7 @@ namespace Gusto
 
             // set any viewport visible(and not visible when in interior) collidable map pieces for collision - update LandTileLocList and GroundObjLocList
             BoundingBoxLocations.LandTileLocationList.Clear();
+            BoundingBoxLocations.OceanTileLocationList.Clear();
             BoundingBoxLocations.GroundObjectLocationList.Clear();
             BoundingBoxLocations.TilesInView.Clear();
             Vector2 minCorner = new Vector2(camera.Position.X - (GameOptions.PrefferedBackBufferWidth / 2), camera.Position.Y - (GameOptions.PrefferedBackBufferHeight / 2));
@@ -386,7 +383,8 @@ namespace Gusto
 
             foreach (var tp in GameMapTiles.map)
             {
-                if ((tp.location.X >= minCorner.X && tp.location.X <= maxCorner.X) && (tp.location.Y >= minCorner.Y && tp.location.Y <= maxCorner.Y))
+                if ((tp.location.X >= (minCorner.X - GameOptions.tileWidth) && tp.location.X <= (maxCorner.X + GameOptions.tileWidth)) && 
+                    (tp.location.Y >= (minCorner.Y - GameOptions.tileHeight) && tp.location.Y <= (maxCorner.Y + GameOptions.tileHeight)))
                 {
                     BoundingBoxLocations.TilesInView.Add(tp);
 
@@ -395,6 +393,8 @@ namespace Gusto
                         BoundingBoxLocations.LandTileLocationList.Add(tp);
                         SpatialBounding.SetQuad(tp.GetBase());
                     }
+                    else
+                        BoundingBoxLocations.OceanTileLocationList.Add(tp);
 
                     if (tp.groundObjects != null)
                     {
@@ -434,8 +434,14 @@ namespace Gusto
                 }
             }
 
-            // update any gameObjects that need to track state
+            Vector2 lastCamPos = camera.Position;
+
+            // update any gameObjects that need to track state (will set camera pos to player)
             HashSet<Sprite> GameStateObjectUpdateOrder = gameState.Update(kstate, gameTime, camera);
+
+            // use this to offset water noise
+            camMove.X = ((camera.Position.X % GameOptions.PrefferedBackBufferWidth) / (GameOptions.PrefferedBackBufferWidth));
+            camMove.Y = ((camera.Position.Y % GameOptions.PrefferedBackBufferHeight) / (GameOptions.PrefferedBackBufferHeight));
 
             // update ground objects (they do not track their state since they are encoded in the map)
             foreach (var sp in BoundingBoxLocations.GroundObjectLocationList)
@@ -534,12 +540,8 @@ namespace Gusto
                 GraphicsDevice.Clear(Color.Black);
                 DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, DrawOrder);
 
-                // set up gamescene draw
-                GraphicsDevice.SetRenderTarget(worldScene);
-                GraphicsDevice.Clear(Color.PeachPuff);
-
                 // draw map
-                map.DrawMap(spriteBatchView, gameTime);
+                map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene);
 
                 // draw treasure locations if any
                 spriteBatchView.Begin(this.camera);
@@ -549,7 +551,7 @@ namespace Gusto
                 }
                 spriteBatchView.End();
 
-                // draw shadows
+                // draw shadows and wakes
                 foreach (var sprite in DrawOrder)
                 {
                     if (sprite is IShadowCaster)
@@ -560,6 +562,13 @@ namespace Gusto
                             Ship ship = (Ship)sprite;
                             ship.shipSail.DrawShadow(spriteBatchView, this.camera, WeatherState.sunAngleX, WeatherState.shadowTransparency);
                         }
+                    }
+
+                    if (sprite is IWakes)
+                    {
+                        IWakes waker = (IWakes)sprite;
+                        WakeParticleEngine wpe = waker.GetWakeEngine();
+                        wpe.Draw(spriteBatchView, camera);
                     }
                 }
 
