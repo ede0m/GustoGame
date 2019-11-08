@@ -34,7 +34,7 @@ namespace GustoGame.GameMap
             noiseMap = _content.Load<Texture2D>("cellnoise"); // bing noise good for wakes?
         }
 
-        public RenderTarget2D RenderOcean(RenderTarget2D waterScene, Vector2 camMove, Matrix wvm)
+        public RenderTarget2D RenderOcean(RenderTarget2D waterScene, Vector2 camMove)
         {
             noisePow = new Vector2(0.031f, 0.03125f) * 3; // 3 tile sample radius looks good
             noiseFreq = 1.0f;

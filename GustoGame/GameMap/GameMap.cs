@@ -243,7 +243,7 @@ namespace Gusto.GameMap
             return groundObjs;
         }
 
-        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, RenderTarget2D worldScene, GameTime gameTime, Vector2 camMoveDistance)
+        public void DrawMap(SpriteBatch sbWorld, SpriteBatch sbStatic, RenderTarget2D worldScene)
         {
 
             // Set Ocean Water RenderTarget
@@ -269,10 +269,13 @@ namespace Gusto.GameMap
                 Stream s = File.Create("C:\\Users\\GMON\\source\\repos\\GustoGame\\GustoGame\\Content\\waterScene.png");
                 waterScene.SaveAsPng(s, GameOptions.PrefferedBackBufferWidth, GameOptions.PrefferedBackBufferHeight);
             }*/
-           
+
 
             // ocean effect
-            RenderTarget2D ocean = oceanWater.RenderOcean(waterScene, camMoveDistance, _cam.ViewportOffset.InvertAbsolute);
+            Vector2 camMove;
+            camMove.X = ((_cam.Position.X % GameOptions.PrefferedBackBufferWidth) / (GameOptions.PrefferedBackBufferWidth));
+            camMove.Y = ((_cam.Position.Y % GameOptions.PrefferedBackBufferHeight) / (GameOptions.PrefferedBackBufferHeight));
+            RenderTarget2D ocean = oceanWater.RenderOcean(waterScene, camMove);
 
             // set up gamescene draw
             _graphics.SetRenderTarget(worldScene);

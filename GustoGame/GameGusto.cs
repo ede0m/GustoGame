@@ -541,7 +541,7 @@ namespace Gusto
                 DrawUtility.DrawSpotLighting(spriteBatchView, this.camera, lightsTarget, DrawOrder);
 
                 // draw map
-                map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene, gameTime, camMove);
+                map.DrawMap(spriteBatchView, spriteBatchStatic, worldScene);
 
                 // draw treasure locations if any
                 spriteBatchView.Begin(this.camera);
