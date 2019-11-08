@@ -68,6 +68,7 @@
     <Compile Include="AnimatedSprite\InventoryItems\BaseBarrelItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BaseChestItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\BasePlank.cs" />
+    <Compile Include="AnimatedSprite\InventoryItems\FishingPole.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Weapon\ArrowItem.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Weapon\Ballista.cs" />
     <Compile Include="AnimatedSprite\InventoryItems\Weapon\BaseCannon.cs" />

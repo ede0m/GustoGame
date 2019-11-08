@@ -105,6 +105,10 @@ namespace Gusto
             CrossBow crossBow = new CrossBow(TeamType.A, "GustoMap", new Vector2(220, -350), _content, _graphics);
             crossBow.amountStacked = 1;
             crossBow.onGround = true;
+            FishingPole fishingPole = new FishingPole(TeamType.A, "GustoMap", new Vector2(180, -350), _content, _graphics);
+            fishingPole.amountStacked = 1;
+            fishingPole.onGround = true;
+
             ArrowItem arrows = new ArrowItem(TeamType.A, "GustoMap", new Vector2(210, -340), _content, _graphics);
             arrows.onGround = true;
             arrows.amountStacked = 10;
@@ -137,6 +141,7 @@ namespace Gusto
             ItemUtility.ItemsToUpdate.Add(crossBow);
             ItemUtility.ItemsToUpdate.Add(arrows);
             ItemUtility.ItemsToUpdate.Add(pickaxe);
+            ItemUtility.ItemsToUpdate.Add(fishingPole);
             //ItemUtility.ItemsToUpdate.Add(pistolAmmo);
             ItemUtility.ItemsToUpdate.Add(cannonAmmo);
             ItemUtility.ItemsToUpdate.Add(harpoonAmmo);

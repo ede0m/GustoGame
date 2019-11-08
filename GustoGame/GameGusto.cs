@@ -133,6 +133,8 @@ namespace Gusto
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePistol, "pistol", 1.0f, 1.0f);
             Texture2D textureCrossBow = Content.Load<Texture2D>("crossBow");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureCrossBow, "crossBow", 1.0f, 1.0f);
+            Texture2D textureFishingPole = Content.Load<Texture2D>("fishingPole");
+            LoadDynamicBoundingBoxPerFrame(false, 4, 3, textureFishingPole, "fishingPole", 1.0f, 1.0f);
             Texture2D texturePickaxe = Content.Load<Texture2D>("pickaxe");
             LoadDynamicBoundingBoxPerFrame(false, 4, 3, texturePickaxe, "pickaxe", 1.0f, 1.0f);
             Texture2D textureShortSword = Content.Load<Texture2D>("ShortSword");
