@@ -30,8 +30,9 @@ namespace Gusto.Models.Animated
         public int shotRange;
 
         public bool usingItem;
-        public InventoryItem ammoLoaded;
+        public bool infiniteAmmo;
         public string ammoTypeKey;
+        public InventoryItem ammoLoaded;
         public Type ammoItemType;
         public List<Ammo> Shots;
         public Light emittingLight; // if this handheld emits any light
@@ -154,10 +155,12 @@ namespace Gusto.Models.Animated
                             rotation = 0;
                     }
 
+                    // TODO: maybe intercept fishing objects here to handle the bobber differently. 
+
                     // shooting
                     if (kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
                     {
-                        if (ammoLoaded != null)
+                        if (ammoLoaded != null || infiniteAmmo)
                         {
                             Vector2 shotStart = new Vector2(GetBoundingBox().Center.ToVector2().X + shotOffsetX, GetBoundingBox().Center.ToVector2().Y + shotOffsetY);
                             Ammo shot = (Ammo)ItemUtility.CreateItem(ammoTypeKey, TeamType.Player, regionKey, shotStart, _content, _graphics);
@@ -259,9 +262,12 @@ namespace Gusto.Models.Animated
                             shot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), 0);
                             shot.moving = true;
                             Shots.Add(shot);
-                            ammoLoaded.amountStacked -= 1;
-                            if (ammoLoaded.amountStacked == 0)
-                                ammoLoaded = null;
+                            if (!infiniteAmmo)
+                            {
+                                ammoLoaded.amountStacked -= 1;
+                                if (ammoLoaded.amountStacked == 0)
+                                    ammoLoaded = null;
+                            }
                             timeSinceLastShot = 0;
                         }
                     }

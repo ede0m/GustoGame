@@ -49,7 +49,7 @@ namespace Gusto
             _graphics = g;
             UpdateOrder = new HashSet<Sprite>();
 
-            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(-120, -550), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
+            player = new PiratePlayer(TeamType.Player, "GustoMap", new Vector2(-020, -350), _content, _graphics); // This is a default location (for new game) if there is a load it will be overwritten
         }
 
         // Creates the initial game state - this will probably be a huge method at the end of it.. TODO: find way to dynamically create items/npc/etc and place them in appropriate region

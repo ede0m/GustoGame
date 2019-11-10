@@ -21,6 +21,7 @@ namespace Gusto.AnimatedSprite.InventoryItems
             msCraftTime = 20000;
 
             ammoTypeKey = "bobber";
+            infiniteAmmo = true;
             //ammoItemType = typeof(Gusto.AnimatedSprite.InventoryItems.PistolShotItem);
 
             Texture2D texturePistol = content.Load<Texture2D>("FishingPole");

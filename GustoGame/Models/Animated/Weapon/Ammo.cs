@@ -17,19 +17,23 @@ namespace Gusto.Models.Animated
     {
         public int timeSinceLastFrame;
         public int millisecondsPerFrame; // turning speed
+        private float secondsSinceFired;
         public float baseMovementSpeed;
         public float structureDamage;
         public float groundDamage;
         public bool exploded = false;
         public bool outOfRange = false;
-        public float shotDirX;
-        public float shotDirY;
-        public float distanceTraveledX = 0;
-        public float distanceTraveledY = 0;
+        
+        public int shotSpeed;
+        public bool arcShot;
+
+        public Vector2 shotDirection;
+        public Vector2 distanceTraveled;
+        public Vector2 shotLength;
         public float vectorMagnitude;
-        int shotLenX;
-        int shotLenY;
+
         public Vector2 firedFromLoc;
+        public Vector2 firedAtLoc;
         public TeamType teamType;
 
         public Ammo (Vector2 firedFrom, TeamType type) : base(null)
@@ -53,17 +57,25 @@ namespace Gusto.Models.Animated
             else
                 moving = true;
 
+            secondsSinceFired += (float)gameTime.ElapsedGameTime.TotalSeconds;
             timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
             if (timeSinceLastFrame > millisecondsPerFrame)
             {
                 if (moving && !exploded)
                 {
-                    location.X += shotDirX;
-                    location.Y += shotDirY;
-                    distanceTraveledX += Math.Abs(shotDirX);
-                    distanceTraveledY += Math.Abs(shotDirY);
+                    // TODO arc shot
+                    if (arcShot)
+                    {
+                        location += new Vector2(secondsSinceFired * (float)shotDirection.X,
+                            shotDirection.Y - (shotDirection.Y * (float)Math.Sin(secondsSinceFired / shotDirection.X / MathHelper.TwoPi)));
+                    }
+                    else
+                        location += shotDirection;
+
+                    distanceTraveled += shotDirection;
                 }
-                if (distanceTraveledX > (shotLenX * 1.5) || distanceTraveledY > (shotLenY * 1.5))
+
+                if (distanceTraveled.X > (shotLength.X * 1.5) || distanceTraveled.Y > (shotLength.Y * 1.5))
                     outOfRange = true;
                 timeSinceLastFrame -= millisecondsPerFrame;
             }
@@ -72,13 +84,18 @@ namespace Gusto.Models.Animated
             SpatialBounding.SetQuad(GetBase());
         }
 
-        public void SetFireAtDirection(Vector2 fireAtDirection, int shotSpeed, int aimOffset)
+        public void SetFireAtDirection(Vector2 fireAtDirection, int speed, int aimOffset)
         {
+            firedAtLoc = fireAtDirection;
+            shotSpeed = speed;
             vectorMagnitude = PhysicsUtility.VectorMagnitude(GetBoundingBox().X, fireAtDirection.X, GetBoundingBox().Y, fireAtDirection.Y);
-            shotLenX = Math.Max((int)fireAtDirection.X, GetBoundingBox().X) - Math.Min((int)fireAtDirection.X, GetBoundingBox().X);
-            shotLenY = Math.Max((int)fireAtDirection.Y, GetBoundingBox().Y) - Math.Min((int)fireAtDirection.Y, GetBoundingBox().Y);
-            shotDirX = (fireAtDirection.X - GetBoundingBox().X + aimOffset) / vectorMagnitude  * shotSpeed;
-            shotDirY = (fireAtDirection.Y - GetBoundingBox().Y + aimOffset) /vectorMagnitude * shotSpeed;
+            float shotLenX = Math.Max((int)fireAtDirection.X, GetBoundingBox().X) - Math.Min((int)fireAtDirection.X, GetBoundingBox().X);
+            float shotLenY = Math.Max((int)fireAtDirection.Y, GetBoundingBox().Y) - Math.Min((int)fireAtDirection.Y, GetBoundingBox().Y);
+            shotLength = new Vector2(shotLenX, shotLenY);
+
+            float shotDirX = (fireAtDirection.X - GetBoundingBox().X + aimOffset) / vectorMagnitude  * speed;
+            float shotDirY = (fireAtDirection.Y - GetBoundingBox().Y + aimOffset) /vectorMagnitude * speed;
+            shotDirection = new Vector2(shotDirX, shotDirY);
         }
     }
 }

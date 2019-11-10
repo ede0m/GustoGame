@@ -54,6 +54,7 @@
     <Compile Include="AnimatedSprite\BaseSail.cs" />
     <Compile Include="AnimatedSprite\BaseShip.cs" />
     <Compile Include="AnimatedSprite\ClayFurnace.cs" />
+    <Compile Include="AnimatedSprite\FiredAmmo\Bobber.cs" />
     <Compile Include="AnimatedSprite\GameMap\Grass1.cs" />
     <Compile Include="AnimatedSprite\GameMap\Interior\CanvasTileWall.cs" />
     <Compile Include="AnimatedSprite\GameMap\Interior\DirtTile.cs" />

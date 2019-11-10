@@ -187,6 +187,9 @@ namespace Gusto.Utility
                 case ("baseCannonBall"):
                     item = new BaseCannonBall(team, region, location, content, graphics);
                     break;
+                case ("bobber"):
+                    item = new Bobber(team, region, location, content, graphics);
+                    break;
             }
             return item;
         }
