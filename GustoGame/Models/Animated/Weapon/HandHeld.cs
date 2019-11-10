@@ -155,8 +155,6 @@ namespace Gusto.Models.Animated
                             rotation = 0;
                     }
 
-                    // TODO: maybe intercept fishing objects here to handle the bobber differently. 
-
                     // shooting
                     if (kstate.IsKeyDown(Keys.Space) && timeSinceLastShot > millisecondsNewShot)
                     {
@@ -258,6 +256,8 @@ namespace Gusto.Models.Animated
                                     }
                                 }
                             }
+
+                            // TODO: Should Bobber exist on shot? Maybe Where to handle minigame and bobber animate and check if in and stay in water. 
 
                             shot.SetFireAtDirection(shotDirection.Value, RandomEvents.rand.Next(10, 25), 0);
                             shot.moving = true;
